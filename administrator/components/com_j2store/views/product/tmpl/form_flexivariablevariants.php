@@ -20,7 +20,7 @@ $limit = $global_config->get('list_limit',20);
         </select>
     <?php endforeach; ?>
     <a onclick="addFlexiVariant()" class="btn btn-info"><?php echo JText::_('J2STORE_ADD_VARIANT');?></a>
-    <a onclick="remvoeFlexiAllVariant()" class="btn btn-danger"><?php echo JText::_('J2STORE_REMOVE_ALL_VARIANT');?></a>
+    <a onclick="removeFlexiAllVariant()" class="btn btn-danger"><?php echo JText::_('J2STORE_REMOVE_ALL_VARIANT');?></a>
 </div>
 <div id="variant_display_block">
     <!-- Advanced variable starts here  -->
@@ -140,7 +140,7 @@ $limit = $global_config->get('list_limit',20);
         })(j2store.jQuery);
     }
 
-    function remvoeFlexiAllVariant() {
+    function removeFlexiAllVariant() {
         (function ($) {
             var delete_var_data = {
                 option: 'com_j2store',
