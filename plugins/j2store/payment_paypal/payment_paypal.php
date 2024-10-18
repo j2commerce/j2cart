@@ -103,9 +103,9 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
      */
     function _prePaymentForSubscriptionProduct( $data )
     {
-        $expresCheckout = PaypalExpressCheckoutForJ2StoreSubscriptionProduct::getInstance($this->params);
+        $expressCheckout = PaypalExpressCheckoutForJ2StoreSubscriptionProduct::getInstance($this->params);
 
-        $setAPI = $expresCheckout->checkSetAPI();
+        $setAPI = $expressCheckout->checkSetAPI();
         if(!$setAPI){
             return JText::_('J2STORE_PAYMENT_PAYPALSUBSCRIPTION_SOMETHING_WENT_WRONG_IN_CREATING_TOKEN');
         }
@@ -244,7 +244,7 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
 
         J2Store::plugin()->event('AfterPrepaymentForSubscriptionProduct', array(&$postFields, $this->_element));
 
-        $result = $expresCheckout->sendRequest($postFields);
+        $result = $expressCheckout->sendRequest($postFields);
         $this->_log($result);
         if(isset($result['ACK']) && $result['ACK'] == 'Success'){
             $token = $result['TOKEN'];
@@ -253,7 +253,7 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
             $order->transaction_id = $token;
             if($order->store()){
                 // Redirect to paypal.com here
-                $vars->post_url = $expresCheckout->auth_url.$token;
+                $vars->post_url = $expressCheckout->auth_url.$token;
             }
         } else if(isset($result['ACK']) && $result['ACK'] == 'Failure'){
             if(isset($result['L_SHORTMESSAGE0'])){
