@@ -680,9 +680,9 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         $return['pricing'] = array();
         $return['pricing']['base_price'] = J2Store::product()->displayPrice($variant->pricing->base_price, $product, $params);
         $return['pricing']['price'] = J2Store::product()->displayPrice($variant->pricing->price, $product, $params);
-        $return ['pricing'] ['orginal'] = array();
-        $return ['pricing'] ['orginal']['base_price'] = $variant->pricing->base_price;
-        $return ['pricing'] ['orginal']['price'] = $variant->pricing->price;
+        $return ['pricing'] ['original'] = array();
+        $return ['pricing'] ['original']['base_price'] = $variant->pricing->base_price;
+        $return ['pricing'] ['original']['price'] = $variant->pricing->price;
         if($variant->pricing->base_price != $variant->pricing->price){
             $return['pricing']['class'] = 'show';
         }else{
