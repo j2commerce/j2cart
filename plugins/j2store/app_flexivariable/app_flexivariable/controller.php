@@ -33,9 +33,9 @@ class J2StoreControllerAppFlexiVariable extends J2StoreAppController
         $app = J2Store::platform()->application();
         $fof_helper = J2Store::fof();
         $post = $app->input->getArray($_REQUEST);
-        if (isset($post['varient_combin']) && !empty($post['varient_combin']) && isset($post['flexi_product_id']) && !empty($post['flexi_product_id'])) {
+        if (isset($post['variant_combin']) && !empty($post['variant_combin']) && isset($post['flexi_product_id']) && !empty($post['flexi_product_id'])) {
             $product_optionvalue_ids = array();
-            foreach ($post['varient_combin'] as $variant_key => $variant_value) {
+            foreach ($post['variant_combin'] as $variant_key => $variant_value) {
                 //get Product Option
                 $product_option = $fof_helper->getModel('ProductOption', 'J2StoreModel')->getItem($variant_key);
                 // save to Product OptionValues

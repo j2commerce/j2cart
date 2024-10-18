@@ -12,7 +12,7 @@ $limit = $global_config->get('list_limit',20);
 <div id="variant_add_block">
     <input type="hidden" name="flexi_product_id" value="<?php echo $this->item->j2store_product_id;?>"/>
     <?php foreach ($this->item->product_options as $product_option): ?>
-        <select name="varient_combin[<?php echo $product_option->j2store_productoption_id;?>]">
+        <select name="variant_combin[<?php echo $product_option->j2store_productoption_id;?>]">
             <option value="0"><?php echo substr(JText::_('J2STORE_ANY').' '.$this->escape($product_option->option_name),0,10).'...';?></option>
             <?php foreach ($product_option->option_values as $option_value): ?>
                 <option value="<?php echo $option_value->j2store_optionvalue_id;?>"><?php echo $this->escape($option_value->optionvalue_name);?></option>

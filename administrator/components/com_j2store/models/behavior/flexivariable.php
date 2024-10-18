@@ -207,7 +207,7 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
             $platform = J2Store::platform();
             //save variable values
             if(isset($this->_rawData['variable'])){
-                foreach($this->_rawData['variable'] as $varient_key => $item){
+                foreach($this->_rawData['variable'] as $variant_key => $item){
 
                     if(is_array($item)){
                         $item = $platform->toObject($item);
@@ -260,9 +260,9 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
                     $variantChild->is_master = 0;
                     $item->product_id = $table->j2store_product_id;
                     $quantity_item = $item->quantity;
-                    $quantity_item->variant_id = $varient_key;
+                    $quantity_item->variant_id = $variant_key;
                     $quantity = F0FTable::getAnInstance('Productquantity','J2StoreTable')->getClone();
-                    $quantity->load(array('variant_id'=>$varient_key));
+                    $quantity->load(array('variant_id'=>$variant_key));
                     try {
                         if($variantChild->save($item)){
 
