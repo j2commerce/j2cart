@@ -285,7 +285,7 @@ class plgContentJ2Store extends JPlugin
         J2Store::plugin()->event( 'AfterContentPrepareForm', array( $form, $data ) );
         if ( ! $message_display )
         {
-            $app->enqueueMessage( JText::_( 'J2STORE_TAB_NOT_DISPLY_IN_CONTENT' ), 'waring' );
+            $app->enqueueMessage( JText::_( 'J2STORE_TAB_NOT_DISPLY_IN_CONTENT' ), 'warning' );
         }
         return true;
     }
@@ -573,7 +573,7 @@ class plgContentJ2Store extends JPlugin
 				 	');
         $search = $model->getState('search','','string');
         if(!empty($search )) {
-            $query->where('CASE WHEN #__j2store_products.product_source = '.$db->q('com_content') .' THEN	
+            $query->where('CASE WHEN #__j2store_products.product_source = '.$db->q('com_content') .' THEN
 			( #__content.title LIKE '.$db->q('%'.$search.'%').' OR '.$db->qn('#__j2store_products').'.'.$db->qn('j2store_product_id').' LIKE '.$db->q('%'.$search.'%').'OR '.
                 $db->qn('#__j2store_products').'.'.$db->qn('product_source').' LIKE '.$db->q('%'.$search.'%').'OR '.
                 $db->qn('#__j2store_variants').'.'.$db->qn('sku').' LIKE '.$db->q('%'.$search.'%').'OR '.

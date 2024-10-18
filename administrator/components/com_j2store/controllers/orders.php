@@ -230,7 +230,7 @@ class J2StoreControllerOrders extends F0FController
 		$orderinfo->load(array('order_id'=>$order_id));
 		$type = "all_".$address_type;
 		$custom_datas = json_decode($orderinfo->$type);
-		
+
 		$processed = $this->removePrefix((array)$orderinfo,$address_type);
 		if (!empty($custom_datas)) {
 			foreach($custom_datas as $key =>$custom_data){
@@ -378,7 +378,7 @@ class J2StoreControllerOrders extends F0FController
 		$view->setLayout('print_shipping');
 		$view->display();
 	}
-	
+
 	/**
 	 * Method to create or edit an existing order
 	 *
@@ -389,17 +389,17 @@ class J2StoreControllerOrders extends F0FController
 		$app = JFactory::getApplication();
 		$session  = JFactory::getSession();
 		$params = J2Store::config();
-		
+
 		$j2store_order_id = $this->input->getInt('oid',0);
 		if($j2store_order_id == 0){
 			$cid = $this->input->get('cid',array());
 			if(isset($cid[0])){
-				$j2store_order_id =$cid[0]; 
+				$j2store_order_id =$cid[0];
 			}
 		}
 		$view = $this->getThisView('Orders');
 		$sublayout = $app->input->getString('layout','basic');
-		
+
 		if ($model = $this->getThisModel())
 		{
 			// Push the model into the view (as default)
@@ -410,14 +410,14 @@ class J2StoreControllerOrders extends F0FController
 
 		//On before admin edit order
 		$app->triggerEvent("onJ2StoreOnBeforeEditOrder", array( $order ) );
-		
+
 		//get currency id, value and code and store it
-		$currency = J2Store::currency();		
+		$currency = J2Store::currency();
 		$view->assign('order' ,$order );
 		$view->assign('currency' ,$currency );
 		$view->assign('params',$params);
 		$order_items = $order->getItems();
-		
+
 		if((count($order_items) == 0) && in_array($sublayout, array('payment_shipping_methods','summary'))){
 			$sublayout = 'items';
 		}
@@ -450,22 +450,22 @@ class J2StoreControllerOrders extends F0FController
 					$update_history = 1;
 				}
 				$order_status = J2Html::getOrderStatusHtml($order->order_state_id);
-				$view->assign('update_history',$update_history); 
+				$view->assign('update_history',$update_history);
 				$view->assign('order_status',$order_status);
 				$view->assign('languages',$languages);
 				break;
 			case 'billing':
 				$orderinfo = $order->getOrderInformation();
-				$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');				
+				$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
 				$addresses = $address_model->user_id($order->user_id)->getList();
-				$billing_processed = $this->removePrefix((array)$orderinfo,'billing');												
+				$billing_processed = $this->removePrefix((array)$orderinfo,'billing');
 				$view->assign('orderinfo',$orderinfo);
 				if($order->user_id) {
 					$address = $address_model->user_id($order->user_id)->getFirstItem();
 				} else {
 					$address = F0FTable::getAnInstance('Address', 'J2StoreTable');
 				}
-				$view->assign('addresses',$addresses);					
+				$view->assign('addresses',$addresses);
 				$view->assign('billing_address_id', $session->get('billing_address_id','','j2store'));
 				$view->assign('fieldClass', J2Store::getSelectableBase());
 				$view->assign('storeProfile', J2Store::storeProfile());
@@ -479,7 +479,7 @@ class J2StoreControllerOrders extends F0FController
 				$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
                 $address_model->clearState();
 				$addresses = $address_model->user_id($order->user_id)->getList();
-				$shipping_processed = $this->removePrefix((array)$orderinfo,'shipping');				
+				$shipping_processed = $this->removePrefix((array)$orderinfo,'shipping');
 				$view->assign('orderinfo',$orderinfo);
 				$view->assign('addresses',$addresses);
 				$view->assign('shipping_address_id', $session->get('shipping_address_id','','j2store'));
@@ -499,15 +499,15 @@ class J2StoreControllerOrders extends F0FController
 				$this->checkBillingInfo ( $order );
 				//$taxes = $order->getOrderTaxRates();
 				$orderitems = $order->getItems();
-				//$view->assign('taxes',$taxes);				
+				//$view->assign('taxes',$taxes);
 				$view->assign('orderitems',$orderitems);
 				break;
 			case 'payment_shipping_methods':
 				$this->checkBillingInfo ( $order );
-				$payment_plugins = J2Store::plugin()->getPluginsWithEvent( 'onJ2StoreGetPaymentPlugins' );						
+				$payment_plugins = J2Store::plugin()->getPluginsWithEvent( 'onJ2StoreGetPaymentPlugins' );
 				$default_method = !empty($order->orderpayment_type) ? $order->orderpayment_type : $params->get('default_payment_method', '');
 				$plugins = array();
-					
+
 				if ($payment_plugins)
 				{
 					foreach ($payment_plugins as $plugin)
@@ -530,14 +530,14 @@ class J2StoreControllerOrders extends F0FController
 				$view->assign('shipping_code',$shipping->ordershipping_code);
 				$view->assign('shipping_price',$order->order_shipping);
                 $view->assign('shipping_tax',$order->order_shipping_tax);
-				$view->assign('shipping_plugin',$shipping->ordershipping_type);		
+				$view->assign('shipping_plugin',$shipping->ordershipping_type);
 				$view->assign('paymentplugins',$plugins);
 				break;
-			
+
 			case 'summary':
 				$this->checkBillingInfo ( $order );
 				$taxes = $order->getOrderTaxrates();
-				
+
 				$view->assign('taxes',$taxes);
 				$view->assign('vouchers' , $order->getOrderVouchers());
 				$view->assign('coupons' , $order->getOrderCoupons());
@@ -562,7 +562,7 @@ class J2StoreControllerOrders extends F0FController
 		if(empty( $orderinfo ) || empty( $orderinfo->billing_first_name )){
 			//redirect to billing
 			$url ='index.php?option=com_j2store&view=orders&task=createOrder&layout=billing&oid='.$order->j2store_order_id;
-			$app->redirect ( $url,JText::_ ( 'J2STORE_BILLING_ADDRESS_REQUIRED' ),'waring' );
+			$app->redirect ( $url,JText::_ ( 'J2STORE_BILLING_ADDRESS_REQUIRED' ),'warning' );
 		}
 	}
 	/**
@@ -571,7 +571,7 @@ class J2StoreControllerOrders extends F0FController
 	 * switch to save function
 	 * @return result array()
 	 */
-	
+
 	public function saveAdminOrder(){
 		$app = JFactory::getApplication();
 		// get the session object
@@ -580,7 +580,7 @@ class J2StoreControllerOrders extends F0FController
 		$next_layout = $app->input->getString('next_layout','');
 		$order_id = $this->input->getInt('oid',0);
 		$order = F0FTable::getInstance('Order' ,'J2StoreTable');
-		$order->load($order_id);		
+		$order->load($order_id);
 		$result =array('msg' => JText::_('J2STORE_SAVE_SUCCESS') ,'msgType'=>'message');
 		$data = $app->input->get('jform',array(),'ARRAY');
 		J2Store::plugin ()->event ( 'BeforeSaveAdminOrder', array(&$order) );
@@ -592,7 +592,7 @@ class J2StoreControllerOrders extends F0FController
 			// save billing information
 			case 'billing':
 				//$address_type = $app->input->getString('address_type' ,'billing');
-				$data = $app->input->getArray($_REQUEST);							
+				$data = $app->input->getArray($_REQUEST);
 				$result = $order->saveAdminOrderInfo($data);
 				break;
 			//save shipping address
@@ -600,12 +600,12 @@ class J2StoreControllerOrders extends F0FController
 				//$address_type = $app->input->getString('address_type' ,'shipping');
 				$data = $app->input->getArray($_REQUEST);
 				$result = $order->saveAdminOrderInfo($data);
-				break;				
+				break;
 			case 'payment_shipping_methods':
 				$shipping_name = $app->input->getString('shipping_name','');
 
-				if(!empty($shipping_name)){	
-					$post_data = $app->input->getArray($_REQUEST);					
+				if(!empty($shipping_name)){
+					$post_data = $app->input->getArray($_REQUEST);
 					$values = array();
 					$values['shipping_price'] = isset($post_data['shipping_price']) ? $post_data['shipping_price'] : 0;
 					$values['shipping_extra'] = isset($post_data['shipping_extra']) ? $post_data['shipping_extra'] : 0;
@@ -628,7 +628,7 @@ class J2StoreControllerOrders extends F0FController
 				}
 				$order->orderpayment_type = $app->input->getString('payment_plugin','');
 				$order->getAdminTotals();
-				break;	
+				break;
 			case 'items':
 				$order->getAdminTotals();
 				$result['msg'] = JText::_('J2STORE_ORDER_ITEM_CHANGE_SUCCESS');
@@ -636,10 +636,10 @@ class J2StoreControllerOrders extends F0FController
 			case 'summary':
 				$order->getAdminTotals();
 				J2Store::plugin()->event('AfterSummarySaveOrder', array($order));
-				break;			
+				break;
 		}
-		
-		$url ='index.php?option=com_j2store&view=orders&task=createOrder&layout='.$sublayout.'&oid='.$order->j2store_order_id;		
+
+		$url ='index.php?option=com_j2store&view=orders&task=createOrder&layout='.$sublayout.'&oid='.$order->j2store_order_id;
 		if($next_layout=="summary" && $sublayout=="summary"){
 			$url ="index.php?option=com_j2store&view=order&id=".$order->j2store_order_id;
 		}elseif($next_layout !=''){
@@ -678,7 +678,7 @@ class J2StoreControllerOrders extends F0FController
 	 *   */
 	public function validate_address(){
 		$app = JFactory::getApplication();
-		$data = $app->input->getArray($_POST);		
+		$data = $app->input->getArray($_POST);
 		$json = array();
 		if(isset($data['order_id']) && isset($data['validate_type']) && $data['order_id'] && $data['validate_type']){
 			$order = F0FTable::getInstance('Order' ,'J2StoreTable');
@@ -687,8 +687,8 @@ class J2StoreControllerOrders extends F0FController
 			));
 			$data['email'] = $order->user_email;
 			$data['admin_display_error'] = 1;
-			$selectableBase = J2Store::getSelectableBase();			
-			$json = $selectableBase->validate($data, $data['validate_type'], 'address');			
+			$selectableBase = J2Store::getSelectableBase();
+			$json = $selectableBase->validate($data, $data['validate_type'], 'address');
 		}else{
 			$json['error']['validate_type'] = JText::_('J2STORE_INVALID_ADDRESS_TYPE');
 		}
@@ -719,7 +719,7 @@ class J2StoreControllerOrders extends F0FController
 		echo json_encode($items);
 		$app->close();
 	}
-		
+
 	function removeOrderitem(){
 		$app = JFactory::getApplication();
 		$item_ids = $app->input->get('cid',array(),"ARRAY");
@@ -731,9 +731,9 @@ class J2StoreControllerOrders extends F0FController
 			$order->load($order_id);
 			$items = $order->getItems();
 			if(count($items) == count($item_ids) || count($item_ids)==0){
-				$json['error'] = JText::_("J2STORE_ORDER_MUSTHAVE_ATLEAST_ONE_ITEM");				
-			}else{				
-				foreach ($item_ids as $item_id){				
+				$json['error'] = JText::_("J2STORE_ORDER_MUSTHAVE_ATLEAST_ONE_ITEM");
+			}else{
+				foreach ($item_ids as $item_id){
 					$orderItem = F0FTable::getAnInstance('OrderItem','J2StoreTable')->getClone();
 					$orderItem->load($item_id);
 					$item_name = $orderItem->orderitem_name;
@@ -756,13 +756,13 @@ class J2StoreControllerOrders extends F0FController
 					}
 				}
 				$json['success'] = 1;
-				$order->getAdminTotals();				
+				$order->getAdminTotals();
 			}
 		}else{
 			$json['error'] = JText::_('J2STORE_ORDER_NOT_FOUND_MISSING');
 		}
 		echo json_encode($json);
-		$app->close();		
+		$app->close();
 	}
 
 	function updateInventry($type){
