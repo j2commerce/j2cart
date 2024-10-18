@@ -24,7 +24,7 @@ if (!defined('F0F_INCLUDED') || !class_exists('F0FLess', true))
     return;
 }
 
-// Do not run if Akeeba Subscriptions is not enabled
+// Do not run if j2store component is not enabled
 JLoader::import('joomla.application.component.helper');
 
 if (!JComponentHelper::isEnabled('com_j2store', true))

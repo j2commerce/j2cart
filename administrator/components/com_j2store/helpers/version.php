@@ -17,7 +17,7 @@ defined('_JEXEC') or die('Restricted access');
 class J2StoreVersion {
 
 /**
-	 * Populates global constants holding the Akeeba version
+	 * Populates global constants holding the j2store component version
 	 */
 	public static function load_version_defines()
 	{

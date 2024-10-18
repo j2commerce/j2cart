@@ -22,7 +22,7 @@ if (!defined('F0F_INCLUDED') || !class_exists('F0FLess', true))
 	return;
 }
 
-// Do not run if Akeeba Subscriptions is not enabled
+// Do not run if j2store component is not enabled
 JLoader::import('joomla.application.component.helper');
 
 if (!JComponentHelper::isEnabled('com_j2store', true))
@@ -291,7 +291,7 @@ class plgSystemJ2Store extends JPlugin {
 		$app = JFactory::getApplication ();
 		$option = $app->input->get('option','');
 		$view = $app->input->get('view','');
-		
+
 		if(J2Store::platform()->isClient('administrator') && in_array ( $order->order_type, array('normal') ) && $option == 'com_j2store' && in_array ( $view, array('orders','order') ) ){
 
 			$db = JFactory::getDbo ();
