@@ -8,13 +8,13 @@
 defined('_JEXEC') or die;
 
 class J2StoreModelVouchers extends F0FModel {
-	
+
 	public $code = '';
 	public $voucher = false;
 	public $history = array();
-	
+
 	public function init($voucher_code = '') {
-	
+
 		//get the coupon from the session and assign it to the coupon variable
         if(empty($voucher_code)){
             $this->code = $this->get_voucher ();
@@ -23,7 +23,7 @@ class J2StoreModelVouchers extends F0FModel {
         }
 
 		if(empty($this->code)) return false;
-	
+
 		//load the coupon
 		$table = F0FTable::getInstance('Voucher', 'J2StoreTable')->getClone();
 		$table->load(array('voucher_code'=>$this->code));
@@ -38,9 +38,9 @@ class J2StoreModelVouchers extends F0FModel {
 		}
 		return $status;
 	}
-	
+
 	public function get_voucher_history($voucher_id) {
-	
+
 		if(!isset($this->history[$voucher_id])) {
 			$db = JFactory::getDbo();
 			$query = $db->getQuery (true);
@@ -94,7 +94,7 @@ class J2StoreModelVouchers extends F0FModel {
 			$this->validate_exists();
 			$this->validate_usage_limit();
 			$this->validate_expiry_date();
-			//allo plugins to run their own course.
+			//allow plugins to run their own course.
 			$results = J2Store::plugin()->eventWithArray('VoucherIsValid', array($this));
 			if (in_array(false, $results, false)) {
 				throw new Exception( JText::_('J2STORE_VOUCHER_NOT_APPLICABLE'));
@@ -115,7 +115,7 @@ class J2StoreModelVouchers extends F0FModel {
             $this->validate_exists();
             $this->validate_admin_usage_limit($order);
             $this->validate_expiry_date();
-            //allo plugins to run their own course.
+            //allow plugins to run their own course.
             $results = J2Store::plugin()->eventWithArray('VoucherIsValid', array($this));
             if (in_array(false, $results, false)) {
                 throw new Exception( JText::_('J2STORE_VOUCHER_NOT_APPLICABLE'));
@@ -129,14 +129,14 @@ class J2StoreModelVouchers extends F0FModel {
 
         return true;
     }
-	
+
 	private function validate_enabled() {
 		$params = J2Store::config();
 		if($params->get('enable_voucher', 0) == 0) {
 			throw new Exception( JText::_('J2STORE_VOUCHER_NOT_ENABLED') );
 		}
 	}
-	
+
 	/**
 	 * Ensure coupon exists or throw exception
 	 */
@@ -145,7 +145,7 @@ class J2StoreModelVouchers extends F0FModel {
 			throw new Exception( JText::_('J2STORE_VOUCHER_DOES_NOT_EXIST') );
 		}
 	}
-	
+
 	/**
 	 * Ensure coupon usage limit is valid or throw exception
 	 */
@@ -155,7 +155,7 @@ class J2StoreModelVouchers extends F0FModel {
 		if ($amount <= 0) {
 			throw new Exception( JText::_('J2STORE_VOUCHER_USAGE_LIMIT_HAS_REACHED') );
 		}
-	
+
 	}
 
 	private function validate_admin_usage_limit($order){
@@ -187,7 +187,7 @@ class J2StoreModelVouchers extends F0FModel {
             throw new Exception( JText::_('J2STORE_VOUCHER_EXPIRED'));
         }
     }
-	
+
 	public function get_discount_amount($price, $cartitem, $order, $single=true)  {
         $platform = J2Store::platform();
         if ( $platform->isClient('administrator') ) {
@@ -201,7 +201,7 @@ class J2StoreModelVouchers extends F0FModel {
 		} else {
 			$amount = $this->voucher->voucher_value;
 		}
-		
+
 		/**
 		 * This is the most complex discount - we need to divide the discount between rows based on their price in
 		 * proportion to the subtotal. This is so rows with different tax rates get a fair discount, and so rows
@@ -213,7 +213,7 @@ class J2StoreModelVouchers extends F0FModel {
 		$product_helper = J2Store::product ();
 		$cart_item_qty = $cartitem->orderitem_quantity;
 
-		$discount_percent = 0;		
+		$discount_percent = 0;
 		if ($params->get ( 'config_including_tax', 0 )) {
 			$actual_price = ($cartitem->orderitem_price + $cartitem->orderitem_option_price);
 			$price_for_discount = $product_helper->get_price_including_tax ( ($actual_price * $cart_item_qty), $cartitem->orderitem_taxprofile_id );
@@ -223,7 +223,7 @@ class J2StoreModelVouchers extends F0FModel {
 			$price_for_discount = $product_helper->get_price_excluding_tax ( ($actual_price * $cart_item_qty), $cartitem->orderitem_taxprofile_id );
 			$discount_percent = ($price_for_discount) / $order->subtotal_ex_tax;
 		}
-		$discount = ($amount * $discount_percent) / $cart_item_qty;		
+		$discount = ($amount * $discount_percent) / $cart_item_qty;
 		//allow plugins to modify the discount
 		J2Store::plugin()->event('GetVoucherDiscountAmount', array($discount, $price, $cartitem, $order, $this, $single));
 		return $discount;
@@ -252,20 +252,20 @@ class J2StoreModelVouchers extends F0FModel {
 		$db->setQuery ( $query );
 		$row = $db->loadObject ();
 		return $row;
-	
+
 	}
-	
+
 	public function getVoucher($code) {
 		$status = true;
 
-		$vouchers = $this->enabled(1)->voucher_code($code)->getList();		
+		$vouchers = $this->enabled(1)->voucher_code($code)->getList();
 		if(count($vouchers) > 1) {
-			//duplicate vouchers found. 
+			//duplicate vouchers found.
 			$status = false;
-			return $status; 
+			return $status;
 		}
-		
-	
+
+
 		if (isset($vouchers[0]) && $vouchers[0]) {
 			$voucher = $vouchers[0];
 			$db = JFactory::getDbo();
@@ -283,14 +283,14 @@ class J2StoreModelVouchers extends F0FModel {
 			} else {
 				$amount = $voucher->voucher_value;
 			}
-				
+
 			if ($amount <= 0) {
 				$status = false;
 			}
 		} else {
 			$status = false;
 		}
-	
+
 		if ($status) {
 			$return = array(
 					'voucher_id'       => $voucher->j2store_voucher_id,
@@ -301,63 +301,63 @@ class J2StoreModelVouchers extends F0FModel {
 					'enabled'           => $voucher->enabled,
 					'created_on'       => $voucher->created_on
 			);
-			
+
 			return (object) $return;
 		}
 
 		return $status;
 	}
-	
+
 	public function sendVouchers($cids) {
 		$app = JFactory::getApplication ();
 		$config = JFactory::getConfig ();
 		$params = J2Store::config ();
-		
+
 		$sitename = $config->get ( 'sitename' );
-		
+
 		$emailHelper = J2Store::email ();
-		
+
 		$mailfrom = $config->get ( 'mailfrom' );
 		$fromname = $config->get ( 'fromname' );
-		
+
 		$failed = 0;
 		foreach ( $cids as $cid ) {
 			$voucherTable = F0FTable::getAnInstance ( 'Voucher', 'J2StoreTable' )->getClone ();
-			$voucherTable->load ( $cid );			
-			
+			$voucherTable->load ( $cid );
+
 			$mailer = JFactory::getMailer ();
 			$mailer->setSender ( array (
 					$mailfrom,
-					$fromname 
+					$fromname
 			) );
 			$mailer->isHtml(true);
 			$mailer->addRecipient ( $voucherTable->email_to );
 			$mailer->setSubject ( $voucherTable->subject );
 			// parse inline images before setting the body
 			$emailHelper->processInlineImages ( $voucherTable->email_body, $mailer );
-			$mailer->setBody ( $voucherTable->email_body );			
+			$mailer->setBody ( $voucherTable->email_body );
 			//Allow plugins to modify
-			J2Store::plugin ()->event ( 'BeforeSendVoucher', array ($voucherTable,&$mailer));			
+			J2Store::plugin ()->event ( 'BeforeSendVoucher', array ($voucherTable,&$mailer));
 			if($mailer->Send () !== true) {
 				$this->setError(JText::sprintf('J2STORE_VOUCHERS_SENDING_FAILED_TO_RECEIPIENT', $voucherTable->email_to));
 				$failed++;
 			}
-			
+
 			J2Store::plugin ()->event ( 'AfterSendVoucher', array ($voucherTable,&$mailer));
 			$mailer = null;
 		}
-		
+
 		if($failed > 0) return false;
-		
+
 		return true;
 	}
-	
+
 	public function getVoucherHistory($id) {
-		
+
 		$app = JFactory::getApplication();
-		
+
 		if($id < 1) return array();
-		
+
 		$voucher_history_model = F0FModel::getTmpInstance('Orderdiscounts', 'J2StoreModel');
 		$items = $voucher_history_model->discount_entity_id($id)->discount_type('voucher')->getList();
 
@@ -365,10 +365,10 @@ class J2StoreModelVouchers extends F0FModel {
 			foreach($items as $k => &$item) {
 				$order = F0FTable::getAnInstance('Order', 'J2StoreTable')->getClone();
 				$order->load(array('order_id'=>$item->order_id));
-				
+
 				if( $order->order_state_id == 5 ) {
 					// skip new order discounts
-					unset($items[$k]); continue;	
+					unset($items[$k]); continue;
 				}
 				$item->order = $order;
 			}
@@ -386,7 +386,7 @@ class J2StoreModelVouchers extends F0FModel {
 		if(isset( $cart_table->j2store_cart_id ) && !empty( $cart_table->j2store_cart_id )){
 			$cart_table->cart_voucher = '';
 			$cart_table->store();
-			
+
 		}
 
 	}

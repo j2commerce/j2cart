@@ -197,7 +197,7 @@ class J2StoreModelProducts extends F0FModel {
         }
         catch (Exception $e)
         {
-            // Oops, an exception occured!
+            // Oops, an exception occurred!
             $this->setError($e->getMessage());
         }
 
@@ -209,7 +209,7 @@ class J2StoreModelProducts extends F0FModel {
         }
         catch (Exception $e)
         {
-            // Oops, an exception occured!
+            // Oops, an exception occurred!
             $this->setError($e->getMessage());
         }
         return $product;
@@ -249,7 +249,7 @@ class J2StoreModelProducts extends F0FModel {
         }
         catch (Exception $e)
         {
-            // Oops, an exception occured!
+            // Oops, an exception occurred!
             $this->setError($e->getMessage());
             return false;
         }
@@ -1050,7 +1050,7 @@ class J2StoreModelProducts extends F0FModel {
 
     public function getSortFields()
     {
-        //containes sorting fields
+        //contains sorting fields
         //both in ascending and descending
 
         return array(
@@ -1335,7 +1335,7 @@ class J2StoreModelProducts extends F0FModel {
         //for variable product
         $query->join('LEFT OUTER', '#__j2store_productprice_index ON  #__j2store_products.j2store_product_id=#__j2store_productprice_index.product_id');
 
-        $query->select('CASE 
+        $query->select('CASE
 							WHEN #__j2store_products.product_type IN ("variable","flexivariable","advancedvariable","variablesubscriptionproduct") THEN
 							  #__j2store_productprice_index.min_price
 							ELSE
@@ -1343,7 +1343,7 @@ class J2StoreModelProducts extends F0FModel {
 							END as min_price
 				');
 
-        $query->select('CASE 
+        $query->select('CASE
 							WHEN #__j2store_products.product_type IN ("variable","flexivariable","advancedvariable","variablesubscriptionproduct") THEN
 							  #__j2store_productprice_index.max_price
 							ELSE
@@ -1622,15 +1622,15 @@ class J2StoreModelProducts extends F0FModel {
             $query->where($db->qn('#__j2store_variants').'.'.$db->qn('sku').' LIKE ('.$db->q('%'.$state->sku.'%').')');
         }
 
-               
+
         // filter price range
         if (!is_null($state->pricefrom ) && ($state->pricefrom >=0 || !empty($state->pricefrom )) && !is_null($state->priceto ) && !empty($state->priceto)  )
-        {   
+        {
            $variant_pricerange_qry = '';
            $variant_pricerange_qry .= '(price >= '.$db->q(( int ) $state->pricefrom).') ' ;
            $variant_pricerange_qry .= ' AND ';
            $variant_pricerange_qry .= '(price <= '.$db->q(( int ) $state->priceto).') ' ;
-        
+
            $query->where( '#__j2store_products.j2store_product_id in ( select distinct product_id from #__j2store_variants where '
                                 . $variant_pricerange_qry .' )' );
         }

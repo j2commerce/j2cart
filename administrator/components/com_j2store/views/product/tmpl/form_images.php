@@ -171,7 +171,7 @@ if(version_compare(JVERSION,'3.99.99','ge')){
 
     function addAdditionalImage(image_div, counter, joomla_version) {
         (function ($) {
-            //increament the
+            //increment the
             var clone = image_div.clone();
             clone.attr('id', 'additional-image-' + counter);
             //need to change the input name
@@ -209,7 +209,7 @@ if(version_compare(JVERSION,'3.99.99','ge')){
             //get the newly added tbody and insert after the additional-image-0
             $(processed_html).insertAfter($('#additionalImages tbody:last-child'));
             $(processed_html).show();
-            // intialize squeeze box again for edit button to work
+            // initialize squeeze box again for edit button to work
             // no need in joomla 3.5
             if (joomla_version == 0) {
                 //window.parent.SqueezeBox.initialize({});

@@ -73,7 +73,7 @@ class J2StoreModelCarts extends F0FModel {
 		}
 		catch (Exception $e)
 		{
-			// Oops, an exception occured!
+			// Oops, an exception occurred!
 			$this->setError($e->getMessage());
 			echo $e->getMessage();
 		}
@@ -135,7 +135,7 @@ class J2StoreModelCarts extends F0FModel {
 							&$table
 					) );
 				} catch ( Exception $e ) {
-					// Oops, an exception occured!
+					// Oops, an exception occurred!
 					$this->setError ( $e->getMessage () );
 					return false;
 				}
@@ -328,18 +328,18 @@ class J2StoreModelCarts extends F0FModel {
 				$cartitem_model = F0FModel::getTmpInstance('Cartitems', 'J2StoreModel');
 				$cartitem_model->setState('filter_cart', $cart->j2store_cart_id);
 				$items = $cartitem_model->getList();
-	
+
 				$params = J2Store::config();
 				foreach($items as &$item) {
-	
+
 					//all ok. Fire model dispatcher
-	
+
 					if($item->product_type) {
 						$this->addBehavior($this->behavior_prefix.$item->product_type);
 					}else {
 						$this->addBehavior($this->behavior_prefix.'simple');
 					}
-	
+
 					//run model behaviors
 					try
 					{
@@ -349,18 +349,18 @@ class J2StoreModelCarts extends F0FModel {
 					}
 					catch (Exception $e)
 					{
-						// Oops, an exception occured!
+						// Oops, an exception occurred!
 						$this->setError($e->getMessage());
 						return array();
 					}
-	
+
 				} // cart item loops
-	
+
 				J2Store::plugin()->event('AfterGetCartItems', array(&$items));
 				$cartsets[$cart->j2store_cart_id] = $items;
-			}	
+			}
 
-		
+
 		return $cartsets[$cart->j2store_cart_id];
 	}
 
@@ -380,7 +380,7 @@ class J2StoreModelCarts extends F0FModel {
 			// get the difference quantity
 
 			if ($this->validate ($cartitem, $quantity ) === false) {
-				// an error occured. Return it
+				// an error occurred. Return it
 				$json ['error'] = $this->getError();
 				continue; // exit from the loop
 			}
@@ -467,7 +467,7 @@ class J2StoreModelCarts extends F0FModel {
 		}
 		catch (Exception $e)
 		{
-			// Oops, an exception occured!
+			// Oops, an exception occurred!
 			$result = false;
 			$this->setError($e->getMessage());
 		}
@@ -541,7 +541,7 @@ class J2StoreModelCarts extends F0FModel {
 						}else {
 							$cmenu = $menu_item;
 						}
-						
+
 						if (JURI::isInternal($cmenu->link)) {
 							$url = $link = JRoute::_($cmenu->link.'&Itemid='.$cmenu->id, false);
 						}

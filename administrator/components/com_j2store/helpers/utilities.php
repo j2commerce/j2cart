@@ -30,7 +30,7 @@ class J2Utilities {
 
 		return self::$instance;
 	}
-	
+
 	public function clear_cache() {
 		try{
 			//clean it just once.
@@ -44,7 +44,7 @@ class J2Utilities {
 
 		}
 	}
-	
+
 	public function nocache() {
 			if(headers_sent()) return false;
 			header('Cache-Control: no-store, no-cache, must-revalidate');
@@ -66,7 +66,7 @@ class J2Utilities {
 	/**
 	 * Method to convert an object or an array to csv
 	 * @param mixed $data array or object
-	 * @return string comma seperated value
+	 * @return string comma separated value
 	 */
 
 	public function to_csv($data) {
@@ -90,7 +90,7 @@ class J2Utilities {
 
 	/**
 	 * Method to format stock quantity
-	 * @param Float|Int $qty An int or a float value can be formated here.
+	 * @param Float|Int $qty An int or a float value can be formatted here.
 	 * @return mixed
 	 */
 
@@ -99,15 +99,15 @@ class J2Utilities {
 		JFactory::getApplication('OnJ2StoreFilterQuantity', array(&$qty));
 		return intval($qty);
 	}
-	
+
 	public function errors_to_string($errors) {
 		return $this->toString($errors);
 	}
-	
+
 	public static function toString($array = null, $inner_glue = '=', $outer_glue = '\n', $keepOuterKey = false)
 	{
 		$output = array();
-	
+
 		if (is_array($array))
 		{
 			foreach ($array as $key => $item)
@@ -127,23 +127,23 @@ class J2Utilities {
 				}
 			}
 		}
-	
+
 		return implode($outer_glue, $output);
 	}
-	
+
 	// Character limit
 	public static function characterLimit($str, $limit = 150, $end_char = '...')
 	{
 		if (trim($str) == '')
 			return $str;
-	
+
 		// always strip tags for text
 		$str = strip_tags(trim($str));
-	
+
 		$find = array("/\r|\n/u", "/\t/u", "/\s\s+/u");
 		$replace = array(" ", " ", " ");
 		$str = preg_replace($find, $replace, $str);
-	
+
 		if (strlen($str) > $limit)
 		{
 			$str = substr($str, 0, $limit);
@@ -153,15 +153,15 @@ class J2Utilities {
 		{
 			return $str;
 		}
-	
+
 	}
-	
+
 	// Cleanup HTML entities
 	public static function cleanHtml($text)
 	{
 		return htmlentities($text, ENT_QUOTES, 'UTF-8');
 	}
-	
+
 	public function cleanIntArray($array, $db = null) {
 		if (! $db)
 			$db = JFactory::getDbo ();
@@ -178,12 +178,12 @@ class J2Utilities {
 			return $array;
 		}
 	}
-	
+
 	public function getContext($prefix='') {
 		$app = JFactory::getApplication();
 		$context = array();
 		$context[] = 'j2store';
-		
+
 		if(J2Store::platform()->isClient('site')) {
 			$context[] = 'site';
 		}else {
@@ -191,19 +191,19 @@ class J2Utilities {
 		}
 		$context[] = $app->input->getCmd('view', '');
 		$context[] = $app->input->getCmd('task', '');
-		return implode('.', $context).$prefix;		
+		return implode('.', $context).$prefix;
 	}
-	
+
 	public function get_formatted_date($local=true, $options=array()) {
 		$tz = JFactory::getConfig()->get('offset');
 		$date = JFactory::getDate('now', $tz);
-		
+
 		//default to the sql formatted date
 		$result = $date->toSql($local);
-		
+
 		if(isset($options['formatted']) && $options['formatted']) {
 			//format option is set.
-			$format = isset($options['format']) ? $options['format'] : 'Y-m-d'; 
+			$format = isset($options['format']) ? $options['format'] : 'Y-m-d';
 			$result = $date->format($format,$local);
 		}
 		return $result;

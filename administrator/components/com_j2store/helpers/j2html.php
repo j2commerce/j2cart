@@ -489,7 +489,7 @@ class J2Html
 
         //assign the html
         $html = '';
-        //swtich the type of input
+        //switch the type of input
         switch ($type) {
 
             // return text input
@@ -693,13 +693,13 @@ class J2Html
 					type : \'get\',
 					cache : false,
 					dataType : \'json\',
-					success : function(json) {				
+					success : function(json) {
 						if (json != null && json[\'queue_key\']) {
 							$("#j2store_queue_key").html(json["queue_key"]);
 						}
 					}
-		
-				});		
+
+				});
 			})(jQuery);
 		}
 		</script>
@@ -1004,11 +1004,11 @@ class J2Html
         $selected = json_encode($value);
         $input_id = !empty($options->id) ? $options->id : 'duallistbox-input';
         $html ='<div id="dual-list-box" class="row-fluid">';
-        $html .='<select id='.$input_id.' multiple="multiple" 
+        $html .='<select id='.$input_id.' multiple="multiple"
 					size ="10"  name='.$name.'[]'.'
-					>		
+					>
                     </select>';
-        $html .='<script type="text/javascript"> 
+        $html .='<script type="text/javascript">
 	   var optionList = document.getElementById(\''.$input_id.'\').options;
               var options = '.$json.'
               var selected = '. $selected .'
@@ -1024,7 +1024,7 @@ class J2Html
         $("#' . $input_id . ' option[value=\'" + e + "\']").attr("selected", true);
         });
         }
-		var dualListObj =  $(\'#'.$input_id.'\').bootstrapDualListbox(); 
+		var dualListObj =  $(\'#'.$input_id.'\').bootstrapDualListbox();
 		})(j2store.jQuery)
 		</script></div>';
         return $html;
@@ -1161,7 +1161,7 @@ class J2Html
             {
                 if(version_compare(JVERSION,'3.99.99','lt')){
                     $document->addScriptDeclaration("window.jSelectJ2Article_" . $id . " = function (id, title, catid, object, url, language) {
-                   
+
                     document.getElementById(\"" . $id . "_id\").value = id;
 					document.getElementById(\"" . $id . "_name\").value = title;
 					jQuery(\"#".$id."_clear\").removeClass(\"hidden\");
@@ -1557,8 +1557,8 @@ jQuery('.modal-backdrop').remove();
     {
         $start = date("Y-m-d");
         $today = date_create($start);
-        //assing the coupon offer start date
-        // Assing the coupon valid date
+        //assign the coupon offer start date
+        // Assign the coupon valid date
         $date2 = date_create($valid_to);
         return date_diff($today, $date2);
     }

@@ -106,7 +106,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                         <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
                             <div class="j2store-confirm-cont">
                                 <a data-fancybox data-src="#j2storeConfirmChange" type="button" class="btn btn-warning" ><?php echo  JText::_('J2STORE_CHANGE_PRODUCT_TYPE');?></a>
-                                <!-- here load the confim modal -->
+                                <!-- here load the confirm modal -->
                                 <?php echo $this->loadTemplate('confirm_change'); ?>
                             </div>
                         <?php endif; ?>

@@ -363,7 +363,7 @@ class J2User
 	}
 
 	/**
-	 * Method to validate the password based on the password rules set under user manager options 
+	 * Method to validate the password based on the password rules set under user manager options
 	 * @param string $password 			password
 	 * @param string $confirm_password 	confirm password
 	 * @param array  $json 				json as a reference
@@ -429,7 +429,7 @@ class J2User
 			}
 		}
 
-		// Minimum number of upper case ASII characters required
+		// Minimum number of upper case ASCII characters required
 		if (!empty($minimumUppercase))
 		{
 			$nUppercase = preg_match_all("/[A-Z]/", $password, $umatch);

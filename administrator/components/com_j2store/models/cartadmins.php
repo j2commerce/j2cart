@@ -14,7 +14,7 @@ class J2StoreModelCartadmins extends F0FModel {
 	private $behavior_prefix = 'cart';
 	protected $default_behaviors = array('filters', 'cartdefault');
 	protected  $_rawData = null;
-	
+
 	protected $_cartitems = null;
 	var $cart_type = 'cart';
 
@@ -22,7 +22,7 @@ class J2StoreModelCartadmins extends F0FModel {
 		parent::__construct($config);
 	}
 
-	public function addAdminCartItem() {		
+	public function addAdminCartItem() {
 		$app = JFactory::getApplication();
 		$errors = array();
 		$json = new JObject();
@@ -52,7 +52,7 @@ class J2StoreModelCartadmins extends F0FModel {
 			$this->addBehavior($this->behavior_prefix.$product->product_type);
 		}else {
 			$this->addBehavior($this->behavior_prefix.'simple');
-		}				
+		}
 		try
 		{
 		    $ref_model = $this;
@@ -61,7 +61,7 @@ class J2StoreModelCartadmins extends F0FModel {
 		}
 		catch (Exception $e)
 		{
-			// Oops, an exception occured!
+			// Oops, an exception occurred!
 			$this->setError($e->getMessage());
 			echo $e->getMessage();
 		}
@@ -110,7 +110,7 @@ class J2StoreModelCartadmins extends F0FModel {
 							&$table
 					) );
 				} catch ( Exception $e ) {
-					// Oops, an exception occured!
+					// Oops, an exception occurred!
 					$this->setError ( $e->getMessage () );
 					return false;
 				}
@@ -139,17 +139,17 @@ class J2StoreModelCartadmins extends F0FModel {
 		$order->load ( $oid );
 		if (is_array ( $item )) {
 			$item = $platform->toObject ( $item );
-		}		
+		}
 		// cart details
-		$cart = $this->getCart ($order->cart_id);		
+		$cart = $this->getCart ($order->cart_id);
 		if (! empty ( $cart )) {
-			$keynames = array ();			
+			$keynames = array ();
 			$keynames ['cart_id'] = $cart->j2store_cart_id;
 			$keynames ['variant_id'] = $item->variant_id;
 			$keynames ['product_options'] = $item->product_options;
-			//cart table update			
+			//cart table update
 			$table = $fof_helper->loadTable( 'Cartitems', 'J2StoreTable' );
-			$item->cart_id = $cart->j2store_cart_id;						
+			$item->cart_id = $cart->j2store_cart_id;
 			if ($table->load ( $keynames )) {
 				$table->product_id = $item->product_id;
 				$table->variant_id = $item->variant_id;
@@ -163,8 +163,8 @@ class J2StoreModelCartadmins extends F0FModel {
 					}
 				}
 			}
-			
-			if ($table->store ()) {					
+
+			if ($table->store ()) {
 				$variantTable = $fof_helper->loadTable( 'Variant', 'J2StoreTable' );
 				$variantTable->load($table->variant_id);
 				$product_helper = J2Store::product ();
@@ -175,13 +175,13 @@ class J2StoreModelCartadmins extends F0FModel {
 				$item->weight = $variantTable->weight;
 				$item->price = $pricing->price;
 				$item->j2store_variant_id = $table->variant_id;
-				
+
 				if($item->product_type) {
 					$this->addBehavior($this->behavior_prefix.$item->product_type);
 				}else {
 					$this->addBehavior($this->behavior_prefix.'simple');
 				}
-				
+
 				//run model behaviors
 				try
 				{
@@ -191,17 +191,17 @@ class J2StoreModelCartadmins extends F0FModel {
 				}
 				catch (Exception $e)
 				{
-					// Oops, an exception occured!
+					// Oops, an exception occurred!
 					$this->setError($e->getMessage());
 					return false;
 				}
-			
-				
+
+
 				//orderitem table
 				$orderitemTable = $fof_helper->loadTable( 'Orderitem', 'J2StoreTable' );
 				$orderitem = new \stdClass();
 				// get product
-				$product = $product_helper->setId ( $item->product_id )->getProduct ();								
+				$product = $product_helper->setId ( $item->product_id )->getProduct ();
 				$fof_helper->getModel( 'Products', 'J2StoreModel' )->runMyBehaviorFlag ( true )->getProduct ( $product );
 
 				$orderitem->cartitem_id = $table->j2store_cartitem_id;
@@ -215,19 +215,19 @@ class J2StoreModelCartadmins extends F0FModel {
                 $orderitem->product_params = $product->params;
 				$orderitem->orderitem_sku = $variantTable->sku;
 				$orderitem->orderitem_quantity = J2Store::utilities ()->stock_qty ( $item->product_qty );
-				
+
 				$array = array ();
 				$array ['thumb_image'] = isset ( $product->thumb_image ) ? $product->thumb_image : '';
 				$array ['shipping'] = $variantTable->shipping;
-				
+
 				$registry = $platform->getRegistry($array,true);
 				$orderitem->orderitem_params = $registry->toString ( 'JSON' );
 				$product_option_array = array();
-				if($item->product_options){					
+				if($item->product_options){
 					$product_option_array = unserialize ( base64_decode ( $item->product_options ));
 				}
-				
-				//product option 
+
+				//product option
 				$product_option_data = $product_helper->getOptionPrice ( $product_option_array, $product->j2store_product_id );
                 if(isset($item->product_type) && $item->product_type == 'flexivariable'){
                     $product_option_data = array();
@@ -242,7 +242,7 @@ class J2StoreModelCartadmins extends F0FModel {
 				//weight
 				$orderitem->orderitem_weight = isset($product->variant) && ($product->variant->weight) && ! empty ( $product->variant->weight ) ? $product->variant->weight : 0;
 				//tax profile
-				$orderitem->orderitem_taxprofile_id = $product->taxprofile_id;				
+				$orderitem->orderitem_taxprofile_id = $product->taxprofile_id;
 				// just a placeholder and also used as reference for product options
 				$orderitem->orderitem_attributes = $item->product_options;
 				$orderitem->orderitem_raw_attributes = $item->product_options;
@@ -281,15 +281,15 @@ class J2StoreModelCartadmins extends F0FModel {
 					$orderitem_attrib->orderitemattribute_type = $product_option ['type'];
 					$orderitem->orderitemattributes [] = $orderitem_attrib;
 				}
-				
+
 				$orderitem->orderitem_weight_total = ($orderitem->orderitem_weight + (! empty ( $product_option_data ['option_weight'] ) ? $product_option_data ['option_weight'] : 0)) * $item->product_qty;
                 J2Store::plugin()->event('AfterAddOrderItem', array(&$orderitem));
 				if ($orderitemTable->save ( $orderitem )) {
 				    if($insert_item_attributes){
                         $order->saveOrderItemAttributes ( $orderitem->orderitemattributes, $orderitemTable );
                     }
-					$order->cart_id = $cart->j2store_cart_id;			
-					$order->getAdminTotals ( );	
+					$order->cart_id = $cart->j2store_cart_id;
+					$order->getAdminTotals ( );
 					//return true;
 				}else{
 					return false;
@@ -301,30 +301,30 @@ class J2StoreModelCartadmins extends F0FModel {
 		}else {
 			return false;
 		}
-		
+
 		return false;
 	}
-	
+
 	function deleteItem() {
-	
+
 		// TODO we should be removing promotions as well
 		$app = JFactory::getApplication();
 		$cartitem_id = $this->input->get ( 'cartitem_id' );
 		$cartitem = F0FTable::getInstance ( 'Cartitem', 'J2StoreTable' );
-	
+
 		// the user wants to remove the item from cart. so remove it
 		if ($cartitem->load ( $cartitem_id )) {
-	
+
 			if($cartitem->cart_id != $this->getAdminCartId()) {
 				$this->setError ( JText::_ ( 'J2STORE_CART_DELETE_ERROR' ) );
 				return false;
 			}
-	
+
 			$item = new JObject ();
 			$item->product_id = $cartitem->product_id;
 			$item->variant_id = $cartitem->variant_id;
 			$item->product_options = $cartitem->product_options;
-	
+
 			if ($cartitem->delete ( $cartitem_id )) {
 				J2Store::plugin()->event( 'RemoveFromCart', array (
 				$item
@@ -339,7 +339,7 @@ class J2StoreModelCartadmins extends F0FModel {
 			return false;
 		}
 	}
-	 public function getCart($cart_id=0/*, $user_id */) {	
+	 public function getCart($cart_id=0/*, $user_id */) {
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession ();
 		$data = $app->input->getArray($_POST);
@@ -349,16 +349,16 @@ class J2StoreModelCartadmins extends F0FModel {
 		if(empty($cart_id)){
 			$cart_id = $order->cart_id;
 		}
-		$user_id = $order->user_id;		
+		$user_id = $order->user_id;
 		$keynames = array();
-	
+
 		if(!$cart_id) {
 			$cart_id = $this->getState('filter_cart_id', null);
-		}	
+		}
 		if(!empty($cart_id) && $cart_id > 0) {
 			$keynames['j2store_cart_id'] = $cart_id;
 		} 	//one more key needs to be added.
-	
+
 		$cart = F0FTable::getInstance('Cart', 'J2StoreTable');
 		$cart->reset();
 		if (!$cart->load( $keynames) )	{
@@ -367,20 +367,20 @@ class J2StoreModelCartadmins extends F0FModel {
 		}else{
 			$cart->is_new = false;
 		}
-	
+
 		$cart->cart_type = $this->getCartType();
 		$cart->user_id = $user_id;
-		$cart->session_id = $session->getId();	
-		$cart->store();		
+		$cart->session_id = $session->getId();
+		$cart->store();
 		//set the cart id to session
 		$this->setCartId($cart->j2store_cart_id);
 		$order->cart_id = $cart->j2store_cart_id;
-		$order->store();		
+		$order->store();
 		return $cart;
 	}
 
 	public function setCartId($cart_id=0) {
-		
+
 		$session = JFactory::getSession();
 		$session->set('admin_cart_id.'.$this->getCartType(), $cart_id, 'j2store');
 	}
@@ -392,20 +392,20 @@ class J2StoreModelCartadmins extends F0FModel {
 	public function setCartType($type='cart') {
 		$this->cart_type = $type;
 	}
-	
+
 	public function getCartType() {
 		return $this->cart_type;
 	}
 	function getCartUrl($order_id) {
 		$app = JFactory::getApplication();
-		$url = 'administrator/index.php?option=com_j2store&view=orders&task=createOrder&layout=summary&oid='.$order_id;		
+		$url = 'administrator/index.php?option=com_j2store&view=orders&task=createOrder&layout=summary&oid='.$order_id;
 		/* if($app->isAdmin()){
 			$url = 'index.php?option=com_j2store&view=orders&task=createOrder&layout=summary&oid='.$order_id;
 		} */
 		J2Store::plugin()->event('GetCartLink', array(&$url));
 		return $url;
 	}
-	
+
 	function update(){
 		$app = JFactory::getApplication ();
 		$post = $app->input->getArray ( $_POST );
@@ -414,13 +414,13 @@ class J2StoreModelCartadmins extends F0FModel {
 		$productHelper = J2Store::product ();
 		$json = array ();
 		if(isset($post['jform']['orderitem'])){
-			foreach ( $post['jform']['orderitem'] as $orderitem_id => $orderitem ) {				
+			foreach ( $post['jform']['orderitem'] as $orderitem_id => $orderitem ) {
 				$cartitem = F0FModel::getTmpInstance ( 'Cartitem', 'J2StoreModel' )->getItem ( $orderitem['cartitem_id']);
 				//sanity check
 				if($cartitem->cart_id != $orderitem['cart_id']) continue;
-				
+
 				if ($this->validate ($cartitem, $orderitem ) === false) {
-					// an error occured. Return it
+					// an error occurred. Return it
 					$json ['error'] = $this->getError();
 					continue; // exit from the loop
 				}
@@ -429,18 +429,18 @@ class J2StoreModelCartadmins extends F0FModel {
 				$cartitem2->load ( $orderitem['cartitem_id']);
 				if (empty ( $orderitem['orderitem_quantity'] ) || $orderitem['orderitem_quantity'] < 1) {
 					// the user wants to remove the item from cart. so remove it
-					
+
 					$item = new JObject ();
 					$item->product_id = $cartitem->product_id;
 					$item->variant_id = $cartitem->variant_id;
 					$item->product_type = $cartitem->product_type;
 					$item->product_options = $cartitem->product_options;
-					
+
 					$cartitem2->delete ( );
 					J2Store::plugin()->event( 'RemoveFromCart', array (
 					$item
 					) );
-						
+
 				}else {
 					$cartitem2->product_qty = J2Store::utilities()->stock_qty($orderitem['orderitem_quantity']);
 					$cartitem2->store ();
@@ -457,24 +457,24 @@ class J2StoreModelCartadmins extends F0FModel {
 					$orderitem_table->orderitem_quantity = $orderitem['orderitem_quantity'];
 					$orderitem_table->store();
 				}
-			}						
-		}		
+			}
+		}
 		return $json;
 	}
-	
+
 	function validate($cartitem, $orderitem) {
-	
+
 		$json = new JObject();
-	
+
 		$cart = $this->getCart($orderitem['cart_id']);
 		if($cart->cart_type != 'cart') return true;
-	
+
 		if($cartitem->product_type) {
 			$this->addBehavior($this->behavior_prefix.$cartitem->product_type);
 		}else {
 			$this->addBehavior($this->behavior_prefix.'simple');
 		}
-	
+
 		try
 		{
             $ref_model = $this;
@@ -483,10 +483,10 @@ class J2StoreModelCartadmins extends F0FModel {
 		}
 		catch (Exception $e)
 		{
-			// Oops, an exception occured!
+			// Oops, an exception occurred!
 			$result = false;
 			$this->setError($e->getMessage());
 		}
 		return $result;
-	}	
+	}
 }

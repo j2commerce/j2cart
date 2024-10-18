@@ -28,7 +28,7 @@ class J2Currency {
 
 		$this->session = JFactory::getSession();
 		$this->input = JFactory::getApplication()->input;
-		
+
 		if(count($this->currencies) < 1) {
 			$rows = F0FModel::getTmpInstance('Currencies', 'J2StoreModel')->enabled(1)->getList();
 	    	foreach ($rows as $result) {
@@ -134,7 +134,7 @@ class J2Currency {
   	}
 
   	public function getId($currency = '') {
-		if (!$currency) {			
+		if (!$currency) {
 			return $this->currencies[$this->code]['j2store_currency_id'];
 		} elseif ($currency && isset($this->currencies[$currency])) {
 			return $this->currencies[$currency]['j2store_currency_id'];
@@ -200,7 +200,7 @@ class J2Currency {
   	public function has($currency) {
     	return isset($this->currencies[$currency]);
   	}
-  	
+
   	public static function getNumericCurrencies(){
   		$currencies = self::getNumericCode();
   		$result = array();
@@ -209,25 +209,25 @@ class J2Currency {
   		}
   		return $result;
   	}
-  	
+
   	public static function getCurrenciesNumericCode($code){
   		$result = self::getNumericCode();
   		if(isset($code)){
   			$result = $result[$code];
   		}
-  	
+
   		return $result;
   	}
-  	
-  	
-  	
-  	
-  	
-  	
+
+
+
+
+
+
   	/**
   	 * Method to get Numerice code
   	 * @param string $code alpha 3 digit code
-  	 * @return int numberic code
+  	 * @return int numeric code
   	 */
   	public static function getNumericCode(){
   		$result = array('AFN' => 4,
@@ -393,7 +393,7 @@ class J2Currency {
   				'ZWD' => 716,
 		    'BTC'=> 999
   		);
-  	
+
   		return $result;
   	}
 }

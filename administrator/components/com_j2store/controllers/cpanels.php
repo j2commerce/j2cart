@@ -135,7 +135,7 @@ class J2StoreControllerCpanels extends F0FController
 				}
 
 				if (count ( $migrated_coupons )) {
-					// now delete the records of succesfully migrated order coupons
+					// now delete the records of successfully migrated order coupons
 					$query = $db->getQuery ( true )->delete ( '#__j2store_ordercoupons' )->where ( 'j2store_ordercoupon_id IN (' . implode ( ',', $migrated_coupons ) . ')' );
 					$db->setQuery ( $query );
 					try {
@@ -195,7 +195,7 @@ class J2StoreControllerCpanels extends F0FController
 				}
 
 				if (count ( $migrated_vouchers )) {
-					// now delete the records of succesfully migrated order coupons
+					// now delete the records of successfully migrated order coupons
 					$query = $db->getQuery ( true )->delete ( '#__j2store_voucherhistories' )->where ( 'j2store_voucherhistory_id IN (' . implode ( ',', $migrated_vouchers ) . ')' );
 					$db->setQuery ( $query );
 					try {
@@ -315,14 +315,14 @@ class J2StoreControllerCpanels extends F0FController
 		$old_cart_items_exists = $db->loadResult();
 
 		if ( $old_cart_items_exists ) {
-		
+
 			$delete_cartitems_qry = "delete from #__j2store_cartitems where cart_id in "
 									."(select j2store_cart_id from #__j2store_carts c where c.cart_type=".$db->q('cart')
 										." AND datediff(now(), c.created_on) > ".$db->q($no_of_days_old)." );" ;
 			$db->setQuery($delete_cartitems_qry);
 			try {
 				$db->execute();
-			}catch (Exception $e) {	}			
+			}catch (Exception $e) {	}
 
 			$delete_carts_qry = "delete from #__j2store_carts where #__j2store_carts.cart_type=".$db->q('cart')
 								." AND datediff(now(), #__j2store_carts.created_on) > ".$db->q($no_of_days_old)." ;" ;
@@ -330,7 +330,7 @@ class J2StoreControllerCpanels extends F0FController
 			try {
 				$db->execute();
 			}catch (Exception $e) {	}
-			
+
 		}
 		//delete from #__j2store_cartitems where cart_id in (select j2store_cart_id from #__j2store_carts c where c.cart_type='cart' AND datediff(now(), c.modified_on) > 120);
 		//delete from #__j2store_carts where #__j2store_carts.cart_type='cart' AND datediff(now(), #__j2store_carts.modified_on) > 120;

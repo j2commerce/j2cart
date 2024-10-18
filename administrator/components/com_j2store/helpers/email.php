@@ -40,7 +40,7 @@ class J2Email {
 		/**
 		 * 1. Get order emails by type
 		 * 2. filter by language and process each mail template ( process tags )
-		 * 3. prepare the mailer for each template (intialize the mailer object)
+		 * 3. prepare the mailer for each template (initialize the mailer object)
 		 * 4. set the receivers ( customer emails / admins )
 		 * 5. return the array
 		 * */
@@ -145,13 +145,13 @@ class J2Email {
 				                          'lang_score' => 1 ) ;
 			if ( J2Store::isPro() == 1 ) {
 				if ($params->get('send_default_email_template',1) == 1) {
-					$default_template_group[] =  (object) $standard_template;	
+					$default_template_group[] =  (object) $standard_template;
 				}
 			}else{
 				$default_template_group[] =  (object) $standard_template;
 			}
 		}
-		// sort by language prefernce
+		// sort by language preference
 		krsort($filtered_templates);
 
 		$result = $default_template_group ;
@@ -492,7 +492,7 @@ class J2Email {
 			$customer_groups = trim($customer_groups, ',');
 			$tags['CUSTOMER_GROUPS'] = $customer_groups;
 		}
-		
+
 		$tags = array_merge($tags, $extras);
 		foreach ($tags as $key => $value)
 		{
@@ -551,7 +551,7 @@ class J2Email {
 
 			if (isset ( $custom_fields ) && count ( $custom_fields )) {
 				foreach ( $custom_fields as $namekey => $field ) {
-	
+
 					if (! property_exists ( $row, $type . '_' . $namekey ) && ! property_exists ( $row, 'user_' . $namekey ) && $namekey != 'country_id' && $namekey != 'zone_id' && $namekey != 'option' && $namekey != 'task' && $namekey != 'view') {
 						if(is_array($field['value'])){
                             $field['value'] = implode(',',$field['value']);
@@ -559,8 +559,8 @@ class J2Email {
 						$field['value'] = nl2br($field['value']);
 
 						$fields [$namekey] = $field;
-					}				
-					
+					}
+
 				}
 			}
 		}

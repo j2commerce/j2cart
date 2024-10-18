@@ -484,7 +484,7 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
         return $db->loadObjectList();
     }
 	/**
-	 * Method to get Filters and to assing in the browse view
+	 * Method to get Filters and to assign in the browse view
 	 */
 	public function getFilters($items){
 
@@ -764,7 +764,7 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 			}
 		}
 		//$active_menu = $app->getMenu()->getActive();
-		
+
 		$back_link = "";
 		$back_link_title = "";
 		$item_id = "";
