@@ -367,11 +367,11 @@ class J2StorePaymentPlugin extends J2StorePluginBase
 
     public function generateHash($order)
     {
-        $secrect_key = J2Store::config()->get('queue_key', '');
+        $secret_key = J2Store::config()->get('queue_key', '');
         $status = $this->params->get('payment_status', 4);
         $session = J2Store::platform()->application()->getSession();
         $session_id = $session->getId();
-        $hash_string = $order->order_id . $secrect_key . $order->orderpayment_type . $secrect_key . $status . $secrect_key . $order->user_email . $secrect_key . $session_id . $secrect_key;
+        $hash_string = $order->order_id . $secret_key . $order->orderpayment_type . $secret_key . $status . $secret_key . $order->user_email . $secret_key . $session_id . $secret_key;
         return md5($hash_string);
     }
 
