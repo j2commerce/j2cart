@@ -17,8 +17,8 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         $variantModel = F0FModel::getTmpInstance('Variants', 'J2StoreModel');
         $variantModel->setState('product_type', $record->product_type);
 
-        $record->lengths =$variantModel->getDimesions('lengths', 'j2store_length_id','length_title');
-        $record->weights = $variantModel->getDimesions('weights', 'j2store_weight_id','weight_title');
+        $record->lengths =$variantModel->getDimensions('lengths', 'j2store_length_id','length_title');
+        $record->weights = $variantModel->getDimensions('weights', 'j2store_weight_id','weight_title');
 
         try {
             //first load master variant
@@ -377,8 +377,8 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         $variantModel = F0FModel::getTmpInstance('Variants', 'J2StoreModel');
         $variantModel->setState('product_type', $product->product_type);
 
-        $product->lengths =$variantModel->getDimesions('lengths', 'j2store_length_id','length_title');
-        $product->weights = $variantModel->getDimesions('weights', 'j2store_weight_id','weight_title');
+        $product->lengths =$variantModel->getDimensions('lengths', 'j2store_length_id','length_title');
+        $product->weights = $variantModel->getDimensions('weights', 'j2store_weight_id','weight_title');
         try {
             //first load master variant
             $product->variants = $variantModel

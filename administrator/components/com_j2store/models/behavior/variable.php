@@ -18,8 +18,8 @@ class J2StoreModelProductsBehaviorVariable extends F0FModelBehavior {
 		$variantModel->setState('product_type', $record->product_type);
 
 
-		$record->lengths =$variantModel->getDimesions('lengths', 'j2store_length_id','length_title');
-		$record->weights = $variantModel->getDimesions('weights', 'j2store_weight_id','weight_title');
+		$record->lengths =$variantModel->getDimensions('lengths', 'j2store_length_id','length_title');
+		$record->weights = $variantModel->getDimensions('weights', 'j2store_weight_id','weight_title');
 
 		try {
 			//first load master variant
