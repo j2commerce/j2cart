@@ -11,19 +11,26 @@
 	<description> This plugin solves the duplicate URL problem in search engines by adding appropriate Canonical tags for J2Store products and Articles. </description>
 	<files>
 		<filename plugin="j2canonical">j2canonical.php</filename>
-	</files>	
+	</files>
     <languages>
         <language tag="en-GB">languages/en-GB.plg_system_j2canonical.ini</language>
     </languages>
 	<config>
 	<fields name="params">
-  	  <fieldset name="basic">  	  	
-  	  	<field name="current_url_canonical" type="radio" default="0" class="btn-group" label="j2store_current_url_canonical" description="j2store_current_url_canonical_desc" >
-          <option value="0">PLG_J2STORECANONICAL_MENU_CANONICAL</option>
-          <option value="1">PLG_J2STORECANONICAL_SET_CURRENT_URL_AS_CANONICAL</option>
+  	  <fieldset name="basic">
+  	  	<field
+			name="current_url_canonical"
+			type="radio"
+			default="0"
+			class="btn-group"
+			label="J2STORE_CURRENT_URL_CANONICAL"
+			description="J2STORE_CURRENT_URL_CANONICAL_DESC"
+			>
+          	<option value="0">PLG_J2STORECANONICAL_MENU_CANONICAL</option>
+          	<option value="1">PLG_J2STORECANONICAL_SET_CURRENT_URL_AS_CANONICAL</option>
         </field>
 	</fieldset>
-  </fields>	
-</config>			
+  </fields>
+</config>
 </extension>
 

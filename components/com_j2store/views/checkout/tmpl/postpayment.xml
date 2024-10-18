@@ -9,13 +9,13 @@
 		</message>
 	</layout>
 	<fields name="request">
-    <fieldset name="request">    
-        <field name="task" type="hidden"
-            label=""
-            required=""
-            description=""
-            default="confirmPayment"
-        />
-    </fieldset>
-</fields>
+		<fieldset name="request">
+			<field name="task" type="hidden"
+				label=""
+				required=""
+				description=""
+				default="confirmPayment"
+			/>
+		</fieldset>
+	</fields>
 </metadata>
