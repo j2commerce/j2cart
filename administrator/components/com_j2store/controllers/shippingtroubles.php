@@ -37,7 +37,7 @@ class J2storeControllerShippingtroubles extends F0FController
 			}
 			$view = $this->getThisView();
 			$view->setModel($model);
-			$view->assign('shipping_avaliable',$shipping);
+			$view->assign('shipping_available',$shipping);
 			$view->assign('shipping_messages',$messages);
 			$view->setLayout($layout);
 		}elseif ($layout=='default_shipping_product'){
@@ -56,14 +56,14 @@ class J2storeControllerShippingtroubles extends F0FController
 			}
 			$view = $this->getThisView();
 			$view->setModel($model);
-			$view->assign('shipping_avaliable',$shipping);
+			$view->assign('shipping_available',$shipping);
 			$view->assign('products',$products);
 			$view->assign('state', $model->getState());
 			$view->setLayout($layout);
 		}
-		return parent::browse();	
+		return parent::browse();
 	}
-	
+
 	public function getFilterStates() {
 		$app = JFactory::getApplication();
 		$state = array();
@@ -72,7 +72,7 @@ class J2storeControllerShippingtroubles extends F0FController
 		$state['filter_order']= $app->input->getString('filter_order','j2store_product_id');
 		$state['filter_order_Dir']= $app->input->getString('filter_order_Dir','ASC');
 		$state['sku']= $app->input->getString('sku','');
-		
+
 		return $state;
 	}
 }
