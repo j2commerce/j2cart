@@ -16,10 +16,10 @@ if(typeof(j2store.jQuery) == 'undefined') {
 MaterialCharts.bar = function( element, data ) {
 	MaterialCharts.helpers.initializeChartArea( element, data.height, data.width, data.background, data.shadowDepth, "bar" );
 	var hovered = false;
-	
+
 	var validateResult = MaterialCharts.validators.validateBarChartData( data );
 
-	if (validateResult.valid) {	
+	if (validateResult.valid) {
 		if (data.title) {
 			MaterialCharts.helpers.insertTitle( element, data.title );
 		}
@@ -52,7 +52,7 @@ MaterialCharts.bar = function( element, data ) {
 MaterialCharts.pie = function( element, data ) {
 	MaterialCharts.helpers.initializeChartArea( element, data.height, data.width, data.background, data.shadowDepth, "pie" );
 	var hovered = false;
-	
+
 	MaterialCharts.helpers.insertTitle( element, data.title );
 	var pieChartPercentages = MaterialCharts.helpers.pie.computePercentages( data.dataset );
 	var pieChartAngles = MaterialCharts.helpers.pie.computeAngles( pieChartPercentages );
@@ -135,14 +135,14 @@ MaterialCharts.helpers.bar = {
 			tickMax++;
 		}
 
-		var absoluteHeightMultipler = ((height - 60) / tickMax);
-		var verticalSpread = (tickMax / 5) * absoluteHeightMultipler;
+		var absoluteHeightMultiplier = ((height - 60) / tickMax);
+		var verticalSpread = (tickMax / 5) * absoluteHeightMultiplier;
 		var startTickPosition = 25;
-		var endTickPosition = (25 + tickMax) * absoluteHeightMultipler - (25)  * absoluteHeightMultipler;
+		var endTickPosition = (25 + tickMax) * absoluteHeightMultiplier - (25)  * absoluteHeightMultiplier;
 
 		if (!noY) {
 			for (var i = startTickPosition + verticalSpread; i <= endTickPosition; i += verticalSpread) {
-				this.insertVerticalTick( element, i, (i - 25) / absoluteHeightMultipler);
+				this.insertVerticalTick( element, i, (i - 25) / absoluteHeightMultiplier);
 			}
 		}
 
@@ -151,7 +151,7 @@ MaterialCharts.helpers.bar = {
 		var j, barCount;
 		for (j = startTickPosition + horizontalSpread, barCount = 0; barCount < dataLabels.length; j += horizontalSpread, barCount++ ) {
 			this.insertHorizontalLabel( element, j, dataLabels[barCount]);
-			this.insertVerticalBar( element, j, horizontalSpread, dataElements[barCount] * absoluteHeightMultipler, dataElements[barCount], color);
+			this.insertVerticalBar( element, j, horizontalSpread, dataElements[barCount] * absoluteHeightMultiplier, dataElements[barCount], color);
 		}
 	},
 	insertVerticalTick: function( element, heightPos, label ) {
@@ -164,8 +164,8 @@ MaterialCharts.helpers.bar = {
 		this.alignLabel( labelElement );
 	},
 	insertVerticalBar: function( element, horizontalPos, horizontalSpread, height, value, color ) {
-		$("<div data-hover='" + value + "' class='material-charts-box-chart-vertical-bar material-charts-" + color + "' style='left: " + 
-			(horizontalPos - horizontalSpread / 4) + "px; width: " + (horizontalSpread / 2) + 
+		$("<div data-hover='" + value + "' class='material-charts-box-chart-vertical-bar material-charts-" + color + "' style='left: " +
+			(horizontalPos - horizontalSpread / 4) + "px; width: " + (horizontalSpread / 2) +
 			"px; height: " + height + "px'></div>").appendTo($(element)).hide().slideDown();
 	},
 	alignLabel: function( labelElement ) {
@@ -206,7 +206,7 @@ MaterialCharts.helpers.pie = {
 	degreesToClipPath: function( degrees ) {
 		var points = [];
 		var x;
-		
+
 		if ( degrees <= 45 ) {
 			points.push("50% 50%");
 			points.push("50% 0%");
@@ -243,7 +243,7 @@ MaterialCharts.helpers.pie = {
 			x = 100 - (50 + Math.tan(this.degreesToRadians(360 - degrees)) * 50);
 			points.push(x.toString() + "%" + " 0%");
 		}
-		
+
 		return points;
 	},
 	drawPieSections: function( element, labels, percentages, angles ) {
@@ -266,7 +266,7 @@ MaterialCharts.helpers.pie = {
 	},
 	makePieSector: function( degrees, offset, label, color ) {
 		var points = this.degreesToClipPath( degrees );
-		
+
 		$("<div class='material-charts-pie-sector'></div>")
 			.appendTo(".material-charts-pie-chart")
 			.css({
