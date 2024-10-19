@@ -10,7 +10,9 @@
 	</layout>
 	<fields name="request">
 		<fieldset name="request">
-			<field name="task" type="hidden"
+			<field
+				name="task"
+				type="hidden"
 				label=""
 				required=""
 				description=""

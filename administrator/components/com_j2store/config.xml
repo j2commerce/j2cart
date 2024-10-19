@@ -12,6 +12,7 @@
 			filter="rules"
 			validate="rules"
 			component="com_j2store"
-			section="component" />
-	</fieldset>	
+			section="component"
+		/>
+	</fieldset>
 </config>

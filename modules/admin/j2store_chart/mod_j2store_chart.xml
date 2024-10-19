@@ -15,31 +15,40 @@
 	<version>1.0</version>
 	<description>
 	 <![CDATA[<p>J2 Store Chart
-	 <p> Please contact to us for more info <a href="mailto:support@j2store.org">support@j2store.org</a></p>	  
-    ]]>	
-	
+	 <p> Please contact to us for more info <a href="mailto:support@j2store.org">support@j2store.org</a></p>
+	]]>
+
 	</description>
 <files>
 	<filename module="mod_j2store_chart">mod_j2store_chart.php</filename>
 	<filename>index.html</filename>
-    <filename>helper.php</filename>	
-    <filename>mod_j2store_chart.xml</filename>    
+	<filename>helper.php</filename>
+	<filename>mod_j2store_chart.xml</filename>
 	<folder>tmpl</folder>
 	<folder>media</folder>
-</files>	
+</files>
 <config>
 	<fields name="params">
-	<fieldset name="basic" addfieldpath="administrator/components/com_j2store/models/fields">
-		<field name="chart_type" type="list" default="1" label="MOD_J2STORE_CHART_TYPE" description="MOD_J2STORE_CHART_TYPE_DESC" >
-				 <option value="daily">MOD_J2STORE_CHART_DAILY</option>
-				 <option value="monthly">MOD_J2STORE_CHART_MONTHLY</option>
-				 <option value="yearly">MOD_J2STORE_CHART_YEARLY</option>
-				 </field>	
-		<field name="order_status"  type="orderstatuslist"  multiple="true"
-				 label="J2STORE_ORDER_STATUS">
-				 </field>
+		<fieldset name="basic" addfieldpath="administrator/components/com_j2store/models/fields">
+			<field
+				name="chart_type"
+				type="list"
+				default="1"
+				label="MOD_J2STORE_CHART_TYPE"
+				description="MOD_J2STORE_CHART_TYPE_DESC"
+				>
+				<option value="daily">MOD_J2STORE_CHART_DAILY</option>
+				<option value="monthly">MOD_J2STORE_CHART_MONTHLY</option>
+				<option value="yearly">MOD_J2STORE_CHART_YEARLY</option>
+			</field>
+			<field
+				name="order_status"
+				type="orderstatuslist"
+				multiple="true"
+				label="J2STORE_ORDER_STATUS"
+			/>
 		</fieldset>
-	</fields>	
+	</fields>
 
 </config>
 </extension>
