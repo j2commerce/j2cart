@@ -15,23 +15,26 @@
 	<version>1.0</version>
 	<description>
 	 <![CDATA[<p>J2 Store Stats
-	 <p> Please contact to us for more info <a href="mailto:support@j2store.org">support@j2store.org</a></p>	  
-    ]]>	
-	
+	 <p> Please contact to us for more info <a href="mailto:support@j2store.org">support@j2store.org</a></p>
+	]]>
+
 	</description>
 <files>
 	<filename module="mod_j2store_stats_mini">mod_j2store_stats_mini.php</filename>
 	<filename>index.html</filename>
-    <filename>mod_j2store_stats_mini.xml</filename>    
+	<filename>mod_j2store_stats_mini.xml</filename>
 	<folder>tmpl</folder>
 </files>
 
 <config>
 	<fields name="params">
-	<fieldset name="basic" addfieldpath="administrator/components/com_j2store/models/fields">
-		<field name="order_status"  type="orderstatuslist"  multiple="true"
-				 label="J2STORE_ORDER_STATUS">
-				 </field>
+		<fieldset name="basic" addfieldpath="administrator/components/com_j2store/models/fields">
+			<field
+				name="order_status"
+				type="orderstatuslist"
+				multiple="true"
+				label="J2STORE_ORDER_STATUS"
+			/>
 		</fieldset>
 	</fields>
 </config>
