@@ -33,12 +33,12 @@ class J2StoreModelCoupons extends F0FModel {
         }
 
         if( isset($data['valid_from']) && ($data['valid_from'] != '0000-00-00 00:00:00') && isset($data['valid_to']) && ($data['valid_to'] != '0000-00-00 00:00:00') && ($data['valid_from'] >= $data['valid_to'] )){
-              $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GRATER_THAN_COUPON VALID_TO_DATE"));
+              $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
               $status = false;
         }
 
         if( ($data['valid_to'] != '0000-00-00 00:00:00' && $data['valid_from'] == '0000-00-00 00:00:00' )){
-            $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GRATER_THAN_COUPON VALID_TO_DATE"));
+            $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
             $status = false;
         }
 
