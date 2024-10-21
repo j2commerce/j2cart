@@ -513,7 +513,7 @@ class J2StoreControllerProductsBase extends F0FController
 
 
             if( isset(  $item['date_from']) && (  $item['date_from'] != '0000-00-00 00:00:00') && isset(  $item['date_to']) && (  $item['date_to'] != '0000-00-00 00:00:00') && (  $item['date_from'] >=   $item['date_to'] )){
-                $msg = JText::_('J2STORE_PRICE_VALID_FORM_DATE_NEED_TO_GRATER_THAN_PRICE VALID_TO_DATE');
+                $msg = JText::_('J2STORE_PRICE_VALID_FORM_DATE_NEED_TO_GREATER_THAN_PRICE_VALID_TO_DATE');
                 $msgType = "error";
                 $platform->redirect($url, $msg, $msgType);
             }
