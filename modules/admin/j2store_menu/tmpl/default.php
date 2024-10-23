@@ -65,7 +65,7 @@ $icons = array (
 $menus = array (
 		array (
 				'name' => 'Dashboard',
-				'icon' => 'fas fa-tachometer-alt me-lg-1',
+				'icon' => 'fas fa-tachometer-alt',
 				'active' => 1
 		),
 		array (
@@ -86,7 +86,7 @@ $menus = array (
 				'submenu' => array (
 						'orders' => 'fa fa-list-alt',
 						'customers' => 'fa fa-users',
-						'coupons' => 'fa fa-scissors',
+						'coupons' => 'fa fa-scissors fa-cut',
 						'vouchers' => 'fa fa-gift'
 				)
 		),
@@ -203,13 +203,13 @@ $menus = array (
         <?php foreach($menus as $key => $value): ?>
             <?php if(isset($value['submenu']) && count($value['submenu'])):?>
                 <a   class="dropdown-item j2submenu" href="#">
-                    <span class="fa-fw <?php echo isset($value['icon']) ? $value['icon'] : '';?>" aria-hidden="true"></span>
+                    <span class="fa-fw me-1 me-xxl-2 <?php echo isset($value['icon']) ? $value['icon'] : '';?>" aria-hidden="true"></span>
                     <?php echo $value['name'];?>
                 </a>
         <div class="j2submenu-list dropdown-menu dropdown-menu-end">
             <?php foreach($value['submenu'] as $sub_key => $sub_value): ?>
                 <a class="dropdown-item" href="<?php echo JRoute::_('index.php?option=com_j2store&view='.strtolower($sub_key)); ?>">
-                    <span class="fa-fw <?php echo isset($sub_value) ? $sub_value : '';?>" aria-hidden="true"></span>
+                    <span class="fa-fw me-1 me-xxl-2 <?php echo isset($sub_value) ? $sub_value : '';?>" aria-hidden="true"></span>
                     <?php echo JText::_('COM_J2STORE_TITLE_'.strtoupper($sub_key));?>
                 </a>
             <?php endforeach;?>
@@ -223,7 +223,7 @@ $menus = array (
             }
             ?>
             <a class="dropdown-item" href="<?php echo $url; ?>">
-                <span class="fa-fw <?php echo isset($value['icon']) ? $value['icon'] : '';?>" aria-hidden="true"></span>
+                <span class="fa-fw me-1 me-xxl-2 <?php echo isset($value['icon']) ? $value['icon'] : '';?>" aria-hidden="true"></span>
                 <?php echo JText::_('COM_J2STORE_MAINMENU_'.$value['name']); ?>
             </a>
             <?php endif; ?>

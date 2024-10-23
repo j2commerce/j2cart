@@ -46,7 +46,6 @@ $menus = array (
 						'vendors' => 'fa fa-male',
 						'manufacturers' => 'fa fa-user',
 						'filtergroups' => 'fa fa-filter'
-
 				)
 		),
 		array (
@@ -92,7 +91,6 @@ $menus = array (
 						'shippings' => 'fa fa-truck',
 						'shippingtroubles' => 'fa fa-bug',
 						'customfields' => 'fa fa-th-list',
-//						'eupdates' => 'fa fa-refresh',
 				)
 		),
 		array (
@@ -100,6 +98,7 @@ $menus = array (
 				'icon' => 'fas fa-th',
 				'active' => 0
 		),
+
 		array (
 				'name' => 'Reporting',
 				'icon' => 'fas fa-pie-chart fa-chart-pie',
