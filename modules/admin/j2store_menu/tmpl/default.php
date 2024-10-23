@@ -96,12 +96,12 @@ $menus = array (
 				'submenu' => array (
 						'countries' => 'fa fa-globe',
 						'zones' => 'fa fa-flag',
-            'geozones' => 'fa fa-pie-chart fa-chart-pie',
-            'taxrates' => 'fa fa-calculator',
-            'taxprofiles' => 'fa fa-sitemap',
-            'lengths' => 'fa fa-arrows-alt-v fa-up-down',
-            'weights' => 'fa fa-arrows-alt-h fa-left-right',
-            'orderstatuses' => 'fa fa-check-square'
+                        'geozones' => 'fa fa-pie-chart fa-chart-pie',
+                        'taxrates' => 'fa fa-calculator',
+                        'taxprofiles' => 'fa fa-sitemap',
+                        'lengths' => 'fa fa-arrows-alt-v fa-up-down',
+                        'weights' => 'fa fa-arrows-alt-h fa-left-right',
+                        'orderstatuses' => 'fa fa-check-square'
 				)
 		),
 		array (
