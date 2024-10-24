@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="COM_J2STORE_VIEW_PRODUCTS_LABEL"
-				>
+	<layout title="COM_J2STORE_VIEW_PRODUCTS_LABEL">
 		<message>
 				<![CDATA[COM_J2STORE_VIEW_PRODUCTS_DESC]]>
 		</message>
@@ -442,8 +441,7 @@
 				extension="com_content"
 				multiple="true"
 				label="J2STORE_PRODUCT_LIST_FILTER_SELECTED_CATEGORIES"
-				class="j2store-label"
-				class="input"
+				class="j2store-label input"
 				default="140"
 				addfieldpath="administrator/components/com_j2store/models/fields/"
 			/>
