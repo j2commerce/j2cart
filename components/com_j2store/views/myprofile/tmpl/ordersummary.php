@@ -52,7 +52,7 @@ $currency = J2Store::currency();
 						<?php endif; ?>
 
 						<?php if(!empty($item->orderitem_sku)): ?>
-						<br />
+						<br>
 							<span class="cart-product-sku">
 								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
 								<span class="cart-item-value"><?php echo $item->orderitem_sku; ?></span>
@@ -60,7 +60,7 @@ $currency = J2Store::currency();
 
 						<?php endif; ?>
                         <?php if($back_order_text):?>
-                            <br />
+                            <br>
                             <span class="label label-inverse"><?php echo JText::_($back_order_text);?></span>
                         <?php endif;?>
 						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitleInOrder', array($item, $this->order, $this->params));?>

@@ -32,7 +32,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
             <?php endif; ?>
             <div class="hero-unit">
                 <h1><?php echo JText::_('J2STORE_SHIPPING_TROUBLESHOOTER_HEADING'); ?></h1>
-                <br/>
+                <br>
                 <p class="lead"><?php echo JText::_('J2STORE_SHIPPING_TROUBLESHOOT_INTRODUCTION'); ?></p>
                 <p class="lead"><?php echo JText::_('J2STORE_SHIPPING_TROUBLESHOOT_INTRODUCTION_NOTE'); ?></p>
 

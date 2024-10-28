@@ -83,7 +83,7 @@ class J2Help {
 		$html .= '<div class="user-notifications ' . $type . ' '.$class.'">';
 		$html .= '<h3>' . $title . '</h3>';
 		$html .= '<p>' . $message . '</p>';
-		$html .= '<br />';
+		$html .= '<br>';
 		$html .= '<a class="btn btn-danger" href="' . $url . '">' . Text::_ ( 'J2STORE_GOT_IT_AND_HIDE' ) . '</a>';
 		$html .= '</div>';
 		return $html;
@@ -96,7 +96,7 @@ class J2Help {
 		$html .= '<div class="user-notifications alert alert-info alert-' . $type . ' ">';
 		$html .= '<h3>' . $title . '</h3>';
 		$html .= '<p><strong>' . $message . '</strong></p>';
-		$html .= '<br />';
+		$html .= '<br>';
 		$html .= '</div>';
 		return $html;
 	}

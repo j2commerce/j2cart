@@ -79,7 +79,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                                         <?php echo J2Html::custom($field['type'],$field['name'],$field['value'],$field['options']);?>
                                                     <?php endif; ?>
                                                     <?php if(isset($field['desc']) && !empty($field['desc'])):?>
-                                                        <br/>
+                                                        <br>
                                                         <small><?php echo JText::_($field['desc']);?></small>
                                                     <?php endif; ?>
                                                 </div>

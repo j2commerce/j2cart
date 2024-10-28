@@ -104,7 +104,7 @@ width:100px;
 
 		              	<input type="hidden"  name="option_value[<?php echo $option_value_row; ?>][j2store_optionvalue_id]" value="<?php echo $option_value->j2store_optionvalue_id	; ?>" />
 		                <input type="text" class="input-small" name="option_value[<?php echo $option_value_row; ?>][optionvalue_name]" value="<?php echo isset($option_value->optionvalue_name) ? JText::_($option_value->optionvalue_name): ''; ?>" />
-		                <br />
+		                <br>
 		               </td>
 		               <td class="right">
 		               <div class="input-prepend input-append">
@@ -222,7 +222,7 @@ function j2storeAddOptionValue(){
 	html  = '<tbody id="option-value-row' + option_value_row + '">';
 	html += '  <tr>';
     html += '    <td class="left"><input  type="hidden" name="option_value[' + option_value_row + '][j2store_optionvalue_id]" value="" />';
-	html += '<input type="text" class="input-small" name="option_value[' + option_value_row + '][optionvalue_name]" value="" /> <br />';
+	html += '<input type="text" class="input-small" name="option_value[' + option_value_row + '][optionvalue_name]" value="" /> <br>';
 	html += '  </td>';
 	html += '<td class="right">';
 	html += '<input type="hidden" name="option_value[' + option_value_row + '][optionvalue_image]" value="" />';

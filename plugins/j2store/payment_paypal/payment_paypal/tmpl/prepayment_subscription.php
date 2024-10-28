@@ -23,7 +23,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		<?php endif; ?>
 		
 <?php echo JText::_($vars->display_name); ?>
-<br />
+<br>
 <?php echo JText::_($vars->onbeforepayment_text); ?>
 <?php
 if($vars->post_url != ''){

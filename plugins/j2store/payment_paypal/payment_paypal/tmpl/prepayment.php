@@ -23,7 +23,7 @@ $image = $this->params->get('display_image', '');
 <?php endif; ?>
 
 <?php echo JText::_($vars->display_name); ?>
-<br />
+<br>
 <?php echo JText::_($vars->onbeforepayment_text); ?>
 
 <form action='<?php echo $vars->post_url; ?>' method='post'>

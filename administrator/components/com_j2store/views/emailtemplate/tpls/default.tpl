@@ -146,7 +146,7 @@ $params = J2Store::config();
 						<span class="cart-product-name">
 							<?php echo $item->orderitem_name; ?>
 						</span>
-						<br />
+						<br>
 						<?php if(isset($item->orderitemattributes)): ?>
 							<span class="">
 							<?php foreach ($item->orderitemattributes as $attribute): ?>
@@ -154,7 +154,7 @@ $params = J2Store::config();
 								- <?php echo JText::_($attribute->orderitemattribute_name); ?> : <?php echo $attribute->orderitemattribute_value; ?>
 								</small>
 
-								<br />
+								<br>
 							<?php endforeach;?>
 							</span>
 						<?php endif; ?>
@@ -170,7 +170,7 @@ $params = J2Store::config();
 						<?php endif; ?>
 
 						<?php if(!empty($item->orderitem_sku)): ?>
-						<br />
+						<br>
 							<span class="cart-product-sku">
 								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
 								<span class="cart-item-value"><?php echo $item->orderitem_sku; ?></span>

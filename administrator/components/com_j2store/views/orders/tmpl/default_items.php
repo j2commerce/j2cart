@@ -74,15 +74,15 @@ $platform->loadExtra('behavior.modal');
  				<td><?php  echo JHTML::_('date',$row->created_on, $this->params->get('date_format', JText::_('DATE_FORMAT_LC1'))); ?></td>
 				<td align="center">
 				<?php  echo $row->billing_first_name .' '.$row->billing_last_name; ?>
-				<br />
+				<br>
 				<small>
 					<?php echo $row->user_email;?>
 				</small>
-				<br />
+				<br>
 				<?php if($row->user_id == 0): ?>
 				<label class="label label-warning"><?php echo JText::_('J2STORE_GUEST')?></label>
 				<?php endif;?>
-				<br />
+				<br>
 					<?php if($row->discount_code):?>
 					<?php echo JText::_('J2STORE_COUPON_CODE');?>:<?php echo $row->discount_code;?>
 					<?php endif;?>

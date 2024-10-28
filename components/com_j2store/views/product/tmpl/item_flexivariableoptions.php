@@ -40,7 +40,7 @@ if(isset($this->product->variant->variant_name) && $this->product->variant->vari
                     <?php if ($option['required']) { ?>
                         <span class="required">*</span>
                     <?php } ?>
-                    <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br />
+                    <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
                     <select name="product_option[<?php echo $option['productoption_id']; ?>]"
                             onChange="doFlexiAjaxPrice(
                             <?php echo $this->product->j2store_product_id?>,
@@ -59,7 +59,7 @@ if(isset($this->product->variant->variant_name) && $this->product->variant->vari
                         <?php } ?>
                     </select>
                 </div>
-                <br />
+                <br>
             <?php } ?>
 
             <?php if ($option['type'] == 'radio') { ?>
@@ -69,7 +69,7 @@ if(isset($this->product->variant->variant_name) && $this->product->variant->vari
                     <?php if ($option['required']) { ?>
                         <span class="required">*</span>
                     <?php } ?>
-                    <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br />
+                    <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
                     <?php foreach ($option['option_value'] as $option_value) { ?>
                         <?php $checked = ''; if($default_option_value_id == $option_value->j2store_optionvalue_id) $checked = 'checked="checked"'; ?>
                         <?php //$checked = ''; if(isset($option_value->j2store_optionvalue_id) && isset($variant_name[$option_key]) && $option_value->j2store_optionvalue_id == $variant_name[$option_key]) $checked = 'checked="checked"'; ?>
@@ -96,10 +96,10 @@ if(isset($this->product->variant->variant_name) && $this->product->variant->vari
                         <label for="option-value-<?php echo $option_value->j2store_optionvalue_id; ?>"  >
                             <?php echo stripslashes($this->escape(JText::_($option_value->optionvalue_name))); ?>
                         </label>
-                        <br />
+                        <br>
                     <?php } ?>
                 </div>
-                <br />
+                <br>
             <?php } ?>
             <?php echo J2Store::plugin()->eventWithHtml('AfterDisplaySingleProductOption', array($this->product, $option)); ?>
         <?php } ?>

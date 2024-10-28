@@ -43,14 +43,14 @@ $platform = J2Store::platform();
 							 <a class="j2store-remove remove-icon" href="<?php echo $platform->getCartUrl(array('task' => 'remove','cartitem_id' => $item->cartitem_id)); ?>">X</a>
 							 <?php endif; ?>
 						</span>
-						<br />
+						<br>
 						<?php if(isset($item->orderitemattributes) && $item->orderitemattributes): ?>
 							<span class="cart-item-options">
 							<?php foreach ($item->orderitemattributes as $attribute): ?>
 								<small>
 								- <?php echo JText::_($attribute->orderitemattribute_name); ?> : <?php echo nl2br(JText::_($attribute->orderitemattribute_value)); ?>
 								</small>
-								<br />
+								<br>
 							<?php endforeach;?>
 							</span>
 						<?php endif; ?>
@@ -66,7 +66,7 @@ $platform = J2Store::platform();
 						<?php endif; ?>
 
 						<?php if($this->params->get('show_sku', 1)): ?>
-						<br />
+						<br>
 							<span class="cart-product-sku">
 								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
 								<span class="cart-item-value"><?php echo $item->orderitem_sku; ?></span>
@@ -74,11 +74,11 @@ $platform = J2Store::platform();
 
 						<?php endif; ?>
 						<?php if($back_order_text):?>
-                            <br />
+                            <br>
                             <span class="label label-inverse"><?php echo JText::_($back_order_text);?></span>
                         <?php endif;?>
 						<?php if(isset($this->onDisplayCartItem[$i])):?>
-							<br/>
+							<br>
 							<?php echo $this->onDisplayCartItem[$i];?>						
 						<?php endif;?>
 						<?php $i++;?>

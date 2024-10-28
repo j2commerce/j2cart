@@ -129,31 +129,31 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 			if(isset($this->orderinfo->j2store_orderinfo_id) && $this->orderinfo->j2store_orderinfo_id > 0):?>
 			<strong><?php echo JText::_('J2STORE_BILLING_ADDRESS');?></strong>
 			<?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->order->order_id."&address_type=billing&layout=address&tmpl=component",'',array('class'=>'fa fa-pencil','refresh'=>true,'id'=>'fancybox','width'=>700,'height'=>600));?>
-				<br/>
-				<br/>
-				<?php echo '<strong>'.$this->orderinfo->billing_first_name." ".$this->orderinfo->billing_last_name."</strong><br/>"; ?>
+				<br>
+				<br>
+				<?php echo '<strong>'.$this->orderinfo->billing_first_name." ".$this->orderinfo->billing_last_name."</strong><br>"; ?>
 					<?php echo $this->orderinfo->billing_address_1;?>
-					<br/>
+					<br>
 					<address>
-						<?php echo $this->orderinfo->billing_address_2 ? $this->orderinfo->billing_address_2 : "<br/>";?>
-							<?php echo $this->orderinfo->billing_city;?><br />
-							<?php echo $this->orderinfo->billing_zone_name ? $this->orderinfo->billing_zone_name.'<br />' : "";?>
-							<?php echo !empty($this->orderinfo->billing_zip) ? $this->orderinfo->billing_zip.'<br />': '';?>
-							<?php echo $this->orderinfo->billing_country_name." <br/> ".JText::_('J2STORE_TELEPHONE').":";?>
+						<?php echo $this->orderinfo->billing_address_2 ? $this->orderinfo->billing_address_2 : "<br>";?>
+							<?php echo $this->orderinfo->billing_city;?><br>
+							<?php echo $this->orderinfo->billing_zone_name ? $this->orderinfo->billing_zone_name.'<br>' : "";?>
+							<?php echo !empty($this->orderinfo->billing_zip) ? $this->orderinfo->billing_zip.'<br>': '';?>
+							<?php echo $this->orderinfo->billing_country_name." <br> ".JText::_('J2STORE_TELEPHONE').":";?>
 							<?php echo $this->orderinfo->billing_phone_1;
-							echo $this->orderinfo->billing_phone_2 ? '<br/> '.$this->orderinfo->billing_phone_2 : "<br/> ";
-							echo '<br/> ';
+							echo $this->orderinfo->billing_phone_2 ? '<br> '.$this->orderinfo->billing_phone_2 : "<br> ";
+							echo '<br> ';
 							echo '<a href="mailto:'.$this->order->user_email.'">'.$this->order->user_email.'</a>';
-							echo '<br/> ';
+							echo '<br> ';
 							echo $this->orderinfo->billing_company ? JText::_('J2STORE_ADDRESS_COMPANY_NAME').':&nbsp;'.$this->orderinfo->billing_company."</br>" : "";
 							echo $this->orderinfo->billing_tax_number ? JText::_('J2STORE_ADDRESS_TAX_NUMBER').':&nbsp;'.$this->orderinfo->billing_tax_number."</br>" : "";
 							?>
 						</address>
 							<?php echo J2Store::getSelectableBase()->getFormatedCustomFields($this->orderinfo, 'customfields', 'billing'); ?>
-				<br/>
+				<br>
 				<button id="change_address" class="btn btn-warning"><?php echo JText::_("J2STORE_CHOOSE_ALTERNATE_ADDRESS");?></button>
-				<br/>
-				<br/>
+				<br>
+				<br>
 			<?php endif;?>
 		</div>
 	</div>

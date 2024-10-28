@@ -95,7 +95,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 	            </td>
 	            <td>
 	                <?php echo $this->data['address_override']; ?>
-	                <br />
+	                <br>
 	                <p class="text-info"><?php echo JText::_('J2STORE_STANDARD_SHIPPING_ADDRESS_OVERRIDE_HELP_TEXT'); ?></p>
 	            </td>
 	        </tr>

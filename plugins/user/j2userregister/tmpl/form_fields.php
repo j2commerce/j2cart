@@ -95,7 +95,7 @@ if($platform->isClient('administrator')) {
 							$vars->address->$fieldName = $vars->address_default[$fieldName];
 						}
 						$uhtml .= $vars->selectableBase->getFormatedDisplay($oneExtraField,$vars->address->$fieldName, $fieldName,false, $options = '', $test = false, $allFields, $allValues = null);
-						$uhtml .='<br />';
+						$uhtml .='<br>';
 					}
 				endforeach;
 				echo $uhtml;

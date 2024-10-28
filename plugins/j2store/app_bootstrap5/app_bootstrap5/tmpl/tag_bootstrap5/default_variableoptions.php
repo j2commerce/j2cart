@@ -25,7 +25,7 @@ $options = isset($this->product->options) && !empty($this->product->options) ? $
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br />
+          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
           <select name="product_option[<?php echo $option['productoption_id']; ?>]"
          	 onChange="doAjaxPrice(
          	 			<?php echo $this->product->j2store_product_id?>,
@@ -42,7 +42,7 @@ $options = isset($this->product->options) && !empty($this->product->options) ? $
             <?php } ?>
           </select>
         </div>
-        <br />
+        <br>
         <?php } ?>
 
         <?php if ($option['type'] == 'radio') { ?>
@@ -51,7 +51,7 @@ $options = isset($this->product->options) && !empty($this->product->options) ? $
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b ><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br />
+          <b ><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
           <?php foreach ($option['optionvalue'] as $option_value) { ?>
           	<?php $checked = ''; if($option_value['product_optionvalue_default']) $checked = 'checked="checked"'; ?>
           <input <?php echo $checked; ?> type="radio" name="product_option[<?php echo $option['productoption_id']; ?>]" autocomplete="off"
@@ -77,7 +77,7 @@ $options = isset($this->product->options) && !empty($this->product->options) ? $
           	<?php echo $option_value['product_optionvalue_attribs'];?> >
           <?php echo stripslashes($this->escape(JText::_($option_value['optionvalue_name']))); ?>
           </label>
-          <br />
+          <br>
           <?php } ?>
         </div>
         <?php } ?>

@@ -46,7 +46,7 @@ $colspan = '2';
 						<span class="cart-product-name">
 							<?php echo $item->orderitem_name; ?> 
 						</span>
-						<br />
+						<br>
 						<?php if(isset($item->orderitemattributes)): ?>
 							<span class="cart-item-options">
 							<?php foreach ($item->orderitemattributes as $attribute):
@@ -63,7 +63,7 @@ $colspan = '2';
 								<small>
 								- <?php echo JText::_($attribute->orderitemattribute_name); ?> : <?php echo nl2br($attribute_value); ?>
 								</small>						
-             				   	<br />
+             				   	<br>
 							<?php endforeach;?>
 							</span>
 						<?php endif; ?>
@@ -79,7 +79,7 @@ $colspan = '2';
 						<?php endif; ?>
 
 						<?php if($this->params->get('show_sku', 1)): ?>
-						<br />
+						<br>
 							<span class="cart-product-sku">
 								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
 								<span class="cart-item-value"><?php echo $item->orderitem_sku; ?></span>
@@ -88,7 +88,7 @@ $colspan = '2';
 						<?php endif; ?>
 
                         <?php if($back_order_text):?>
-                            <br />
+                            <br>
                             <span class="label label-inverse"><?php echo JText::_($back_order_text);?></span>
                         <?php endif;?>
 						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitle', array($item, $this->order, $this->params));?>

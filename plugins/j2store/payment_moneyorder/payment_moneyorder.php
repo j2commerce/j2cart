@@ -170,9 +170,9 @@ class plgJ2StorePayment_moneyorder extends J2StorePaymentPlugin
 
 			if (strlen ( $moneyorder_information ) > 5) {
 
-				$html = '<br />';
+				$html = '<br>';
 				$html .= '<strong>' . JText::_ ( 'J2STORE_MONEYORDER_INSTRUCTIONS' ) . '</strong>';
-				$html .= '<br />';
+				$html .= '<br>';
 				$html .= $moneyorder_information;
                 if($this->params->get('enable_strip_tags',0)){
                     $html = strip_tags(preg_replace('#<br\s*/?>#i', "\n",$html));

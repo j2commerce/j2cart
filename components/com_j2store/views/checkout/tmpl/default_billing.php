@@ -116,7 +116,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
                             $field_options .= ' placeholder="'.$placeholder.'" ';
                         }
 						$uhtml .= $this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null);
-						$uhtml .='<br />';
+						$uhtml .='<br>';
 					}
 					?>
 				<?php endforeach; ?>
@@ -127,7 +127,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 
 </div>
 <?php echo J2Store::plugin()->eventWithHtml('CheckoutBilling', array($this)); ?>
-<br />
+<br>
 <div class="buttons">
 	<div class="left">
 		<input type="button" value="<?php echo JText::_('J2STORE_CHECKOUT_CONTINUE'); ?>" id="button-billing-address" class="button btn btn-primary" />

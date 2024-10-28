@@ -45,14 +45,14 @@ $status = false;
         if($placeholder){
             $field_options .= ' placeholder="'.$placeholder.'" ';
         }
-		$html = str_replace('['.$fieldName.']',$this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null).'<br />',$html);
+		$html = str_replace('['.$fieldName.']',$this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null).'<br>',$html);
 	}
 	?>
 <?php endforeach; ?>
 
 <?php
 $email ='<span class="j2store_field_required">*</span>'.JText::_('J2STORE_EMAIL');
-$email .='<br /><input type="text" name="email" value="" class="large-field" /> <br />';
+$email .='<br><input type="text" name="email" value="" class="large-field" /> <br>';
 if($status == false) {
 	//email not found. manually add it
 	$html = str_replace('[email]',$email,$html);
@@ -100,7 +100,7 @@ $html = $html.$phtml;
                         $field_options .= ' placeholder="'.$placeholder.'" ';
                     }
 					$uhtml .= $this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null);
-					$uhtml .='<br />';
+					$uhtml .='<br>';
 				}
 				?>
 			<?php endforeach; ?>
@@ -117,8 +117,8 @@ $html = $html.$phtml;
 			<input type="checkbox" name="shipping_address" value="1" id="shipping" />
 		<?php } ?>
 		<label for="shipping"><?php echo JText::_('J2STORE_MAKE_SHIPPING_SAME'); ?></label>
-		<br />
-		<br />
+		<br>
+		<br>
 	</div>
 <?php } ?>
 <?php echo J2Store::plugin()->eventWithHtml('CheckoutGuest', array($this)); ?>

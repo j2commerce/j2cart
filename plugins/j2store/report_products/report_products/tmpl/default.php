@@ -179,7 +179,7 @@ $currency = J2Store::currency();
                             <tbody>
                             <tr>
                                 <td><?php echo $product->orderitem_name; ?>
-                                    <br/>
+                                    <br>
                                     <?php echo JText::_('J2STORE_SKU'); ?>: <?php echo $product->orderitem_sku; ?></td>
                                 <td><?php echo $product->total_qty; ?></td>
                                 <td><?php echo $currency->format($product->total_item_discount + $product->total_item_discount_tax); ?></td>

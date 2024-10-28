@@ -121,30 +121,30 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 			if(isset($this->orderinfo->j2store_orderinfo_id) && $this->orderinfo->j2store_orderinfo_id > 0 && !empty($this->orderinfo->shipping_country_id) /*&& !empty($this->orderinfo->shipping_zone_id)*/):?>
 				<strong><?php echo JText::_('J2STORE_SHIPPING_ADDRESS');?></strong>
 			<?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->order->order_id."&address_type=shipping&layout=address&tmpl=component",'',array('class'=>'fa fa-pencil','refresh'=>true,'id'=>'fancybox','width'=>700,'height'=>600));?>
-				<br/>
-				<br/>
-				<?php echo '<strong>'.$this->orderinfo->shipping_first_name." ".$this->orderinfo->shipping_last_name."</strong><br/>"; ?>
+				<br>
+				<br>
+				<?php echo '<strong>'.$this->orderinfo->shipping_first_name." ".$this->orderinfo->shipping_last_name."</strong><br>"; ?>
 					<?php echo $this->orderinfo->shipping_address_1;?>
-					<br/>
+					<br>
 					<address>
-						<?php echo $this->orderinfo->shipping_address_2 ? $this->orderinfo->shipping_address_2 : "<br/>";?>
-							<?php echo $this->orderinfo->shipping_city;?><br />
-							<?php echo $this->orderinfo->shipping_zone_name ? $this->orderinfo->shipping_zone_name.'<br />' : "";?>
-							<?php echo !empty($this->orderinfo->shipping_zip) ? $this->orderinfo->shipping_zip.'<br />': '';?>
-							<?php echo $this->orderinfo->shipping_country_name." <br/> ".JText::_('J2STORE_TELEPHONE').":";?>
+						<?php echo $this->orderinfo->shipping_address_2 ? $this->orderinfo->shipping_address_2 : "<br>";?>
+							<?php echo $this->orderinfo->shipping_city;?><br>
+							<?php echo $this->orderinfo->shipping_zone_name ? $this->orderinfo->shipping_zone_name.'<br>' : "";?>
+							<?php echo !empty($this->orderinfo->shipping_zip) ? $this->orderinfo->shipping_zip.'<br>': '';?>
+							<?php echo $this->orderinfo->shipping_country_name." <br> ".JText::_('J2STORE_TELEPHONE').":";?>
 							<?php echo $this->orderinfo->shipping_phone_1;
-							echo $this->orderinfo->shipping_phone_2 ? '<br/> '.$this->orderinfo->shipping_phone_2 : "<br/> ";
-							echo '<br/> ';
+							echo $this->orderinfo->shipping_phone_2 ? '<br> '.$this->orderinfo->shipping_phone_2 : "<br> ";
+							echo '<br> ';
 							echo '<a href="mailto:'.$this->order->user_email.'">'.$this->order->user_email.'</a>';
-							echo '<br/> ';
+							echo '<br> ';
 							echo $this->orderinfo->shipping_company ? JText::_('J2STORE_ADDRESS_COMPANY_NAME').':&nbsp;'.$this->orderinfo->shipping_company."</br>" : "";
 							echo $this->orderinfo->shipping_tax_number ? JText::_('J2STORE_ADDRESS_TAX_NUMBER').':&nbsp;'.$this->orderinfo->shipping_tax_number."</br>" : "";
 							?>
 						</address>
 							<?php echo J2Store::getSelectableBase()->getFormatedCustomFields($this->orderinfo, 'customfields', 'shipping'); ?>
 					<button id="change_address" class="btn btn-warning"><?php echo JText::_("J2STORE_CHOOSE_ALTERNATE_ADDRESS");?></button>
-					<br/>
-					<br/>
+					<br>
+					<br>
 			<?php endif;?>
 		</div>
 	</div>

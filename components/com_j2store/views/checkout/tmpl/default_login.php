@@ -29,7 +29,7 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
             <input type="radio" name="account" value="register" id="register" />
           <?php } ?>
           <b><?php echo JText::_('J2STORE_CHECKOUT_REGISTER'); ?></b></label>
-        <br />
+        <br>
       <?php endif; ?>
 
       <!-- guest -->
@@ -41,33 +41,33 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
             <input type="radio" name="account" value="guest" id="guest" />
           <?php } ?>
           <b><?php echo JText::_('J2STORE_CHECKOUT_GUEST'); ?></b></label>
-        <br />
+        <br>
       <?php endif; ?>
-      <br />
+      <br>
       <?php if($this->params->get('allow_registration', 1)): ?>
         <p><?php echo JText::_('J2STORE_CHECKOUT_REGISTER_ACCOUNT_HELP_TEXT'); ?></p>
       <?php endif; ?>
 
         <button type="button" id="button-account" class="button btn btn-primary" ><?php echo JText::_('J2STORE_CHECKOUT_CONTINUE'); ?></button>
-      <br />
+      <br>
     </div>
   <?php endif; ?>
   <?php if($this->params->get('show_login_form', 1)): ?>
   <div id="login" class="<?php echo $J2gridCol;?>6 right">
     <h2><?php echo JText::_('J2STORE_CHECKOUT_RETURNING_CUSTOMER'); ?></h2>
-    <b><?php echo JText::_('J2STORE_CHECKOUT_USERNAME'); ?></b><br />
+    <b><?php echo JText::_('J2STORE_CHECKOUT_USERNAME'); ?></b><br>
     <input type="text" name="email" value=""  onkeypress="return loginKeyPress(event);"/>
-    <br />
-    <br />
-    <b><?php echo JText::_('J2STORE_CHECKOUT_PASSWORD'); ?></b><br />
+    <br>
+    <br>
+    <b><?php echo JText::_('J2STORE_CHECKOUT_PASSWORD'); ?></b><br>
     <input type="password" name="password" value="" onkeypress="return loginKeyPress(event);" />
-    <br />
+    <br>
       <?php echo J2Store::plugin()->eventWithHtml('BeforeCheckoutLoginButton', array($this)); ?>
-    <button type="button" id="button-login" class="button btn btn-primary" ><?php echo JText::_('J2STORE_CHECKOUT_LOGIN'); ?></button><br />
+    <button type="button" id="button-login" class="button btn btn-primary" ><?php echo JText::_('J2STORE_CHECKOUT_LOGIN'); ?></button><br>
     <input type="hidden" name="task" value="login_validate" />
     <input type="hidden" name="option" value="com_j2store" />
     <input type="hidden" name="view" value="checkout" />
-    <br />
+    <br>
     <?php
     $forgot_pass_link = JRoute::_('index.php?option=com_users&view=reset');
     ?>
