@@ -57,8 +57,8 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 				 	<strong><?php echo JText::_("J2STORE_ORDER_CUSTOMER_NOTE"); ?></strong>
 				 	<input class="btn <?php echo $btn_small ?> btn-primary" type="submit" onclick="jQuery('#task').attr('value','saveOrderCnote');"
 											value="<?php echo JText::_('J2STORE_ORDER_STATUS_SAVE'); ?>" />
-					<br />
-					 <textarea rows="3" cols="6" name="customer_note"><?php echo $this->item->customer_note; ?></textarea>			 
+					<br><br>
+					 <textarea class="form-control valid form-control-success" aria-invalid="false" name="customer_note"><?php echo $this->item->customer_note; ?></textarea>			 
 					 
 					</div>						
 				</div>
@@ -68,8 +68,8 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 				 	<strong><?php echo JText::_("J2STORE_SHIPPING_TRACKING_ID"); ?></strong>
 				 	<input class="btn <?php echo $btn_small ?> btn-primary" type="submit" onclick="jQuery('#task').attr('value','saveTrackingId');"
 											value="<?php echo JText::_('J2STORE_ORDER_STATUS_SAVE'); ?>" />
-					<br />
-					 <textarea rows="3" cols="6" name="ordershipping_tracking_id"><?php echo $this->shipping->ordershipping_tracking_id; ?></textarea>			 
+					<br><br>
+					 <textarea class="form-control valid form-control-success" aria-invalid="false" name="ordershipping_tracking_id"><?php echo $this->shipping->ordershipping_tracking_id; ?></textarea>			 
 					 
 					</div>						
 				</div>

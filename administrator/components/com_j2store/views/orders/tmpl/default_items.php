@@ -127,7 +127,7 @@ $platform->loadExtra('behavior.modal');
 							<?php echo JText::_('J2STORE_NOTIFY_CUSTOMER');?>
 						</label>
 						<input type="hidden" name="return" value="orders" />
-						<input class="btn btn-primary" id="order-list-save_<?php echo $row->j2store_order_id;?>" type="button" onclick="submitOrderState('<?php echo $row->j2store_order_id; ?>','<?php echo $row->order_id; ?>')"
+						<input class="btn btn-sm btn-primary" id="order-list-save_<?php echo $row->j2store_order_id;?>" type="button" onclick="submitOrderState('<?php echo $row->j2store_order_id; ?>','<?php echo $row->order_id; ?>')"
 							value="<?php echo JText::_('J2STORE_ORDER_STATUS_SAVE'); ?>" />
 				</td>
 					<?php echo J2Store::plugin ()->eventWithHtml ( 'AdminOrderListTabContent', array($row))?>
@@ -135,7 +135,7 @@ $platform->loadExtra('behavior.modal');
 					<div class="order-list-print">
 				<?php
 					$url = JRoute::_( "index.php?option=com_j2store&view=orders&task=printOrder&tmpl=component&order_id=".$row->order_id);
-					echo J2StorePopup::popup($url, JText::_( "J2STORE_PRINT_INVOICE" ), array('class'=>'fa fa-print btn btn-small btn-primary'));
+					echo J2StorePopup::popup($url,'<i class="fa fa-print"></i> '.JText::_( "J2STORE_PRINT_INVOICE" ), array('class'=>'btn btn-sm btn-primary'));
 				?>
 				</div>
 

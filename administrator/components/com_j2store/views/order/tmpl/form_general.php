@@ -66,7 +66,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 			<span class="action-buttons">
 			<?php
 				$url = JRoute::_( "index.php?option=com_j2store&view=orders&task=printOrder&tmpl=component&order_id=".$this->item->order_id);
-				echo J2StorePopup::popup($url,'<i class="fa fa-print"></i>'.JText::_( "J2STORE_PRINT_ORDER" ), array('class'=>$primary_button));
+				echo J2StorePopup::popup($url,'<i class="fa fa-print"></i> '.JText::_( "J2STORE_PRINT_ORDER" ), array('class'=>$primary_button));
 			?>
 			</span>
 			<span >
