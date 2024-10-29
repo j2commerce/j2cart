@@ -2,10 +2,14 @@
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c) 2024 J2Commerce
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Language\Text;
+
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
 $sidebar = JHtmlSidebar::render();
@@ -41,7 +45,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 
             <div class="alert alert-block alert-info">
                 <strong>
-                    <?php echo JText::_('J2STORE_PRODUCTS_LIST_VIEW_HELP_TEXT'); ?>
+                    <?php echo Text::_('J2STORE_PRODUCTS_LIST_VIEW_HELP_TEXT'); ?>
                 </strong>
             </div>
             <?php echo J2Store::help()->watch_video_tutorials(); ?>

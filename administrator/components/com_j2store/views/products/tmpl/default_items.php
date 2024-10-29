@@ -2,10 +2,15 @@
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c) 2024 J2Commerce
  * @license GNU GPL v3 or later
  */
 // No direct access
 defined('_JEXEC') or die;
+
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
 $this->params = J2Store::config();
@@ -17,25 +22,25 @@ $success_class = $platform->getLabel('success');
 <table class="table table-striped table-bordered">
 	<thead>
 		<tr>
-			<th><?php echo JText::_('J2STORE_NUM');?></th>
+			<th><?php echo Text::_('J2STORE_NUM');?></th>
 			<th><input type="checkbox" name="checkall-toggle" value=""
-				title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>"
+				title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>"
 				onclick="Joomla.checkAll(this)" /></th>
 			<th>
-						<?php  echo JHTML::_('grid.sort',  'J2STORE_PRODUCT_ID', 'j2store_product_id',$this->state->filter_order_Dir, $this->state->filter_order ); ?>
+						<?php  echo HTMLHelper::_('grid.sort',  'J2STORE_PRODUCT_ID', 'j2store_product_id',$this->state->filter_order_Dir, $this->state->filter_order ); ?>
 					</th>
 			<th width="30%" class="title">
-						<?php  echo JText::_('J2STORE_PRODUCT_NAME'); ?>
+						<?php  echo Text::_('J2STORE_PRODUCT_NAME'); ?>
 					</th>
 
-			<th><?php  echo JText::_('J2STORE_PRODUCT_SKU'); ?></th>
-			<th><?php  echo JText::_('J2STORE_PRODUCT_PRICE'); ?></th>			
-			<th><?php  echo JText::_('J2STORE_SHIPPING'); ?></th>
+			<th><?php  echo Text::_('J2STORE_PRODUCT_SKU'); ?></th>
+			<th><?php  echo Text::_('J2STORE_PRODUCT_PRICE'); ?></th>			
+			<th><?php  echo Text::_('J2STORE_SHIPPING'); ?></th>
             <?php if($this->params->get('enable_inventory', 0)):?>
-                <th><?php  echo JText::_('J2STORE_CURRENT_STOCK'); ?></th>
+                <th><?php  echo Text::_('J2STORE_CURRENT_STOCK'); ?></th>
             <?php endif;?>
-            <th><?php  echo JHTML::_('grid.sort',  'J2STORE_PRODUCT_SOURCE', 'product_source', $this->state->filter_order_Dir, $this->state->filter_order ); ?></th>
-			<th><?php  echo JHTML::_('grid.sort',  'J2STORE_PRODUCT_SOURCE_ID', 'product_source_id', $this->state->filter_order_Dir, $this->state->filter_order ); ?></th>
+            <th><?php  echo HTMLHelper::_('grid.sort',  'J2STORE_PRODUCT_SOURCE', 'product_source', $this->state->filter_order_Dir, $this->state->filter_order ); ?></th>
+			<th><?php  echo HTMLHelper::_('grid.sort',  'J2STORE_PRODUCT_SOURCE_ID', 'product_source_id', $this->state->filter_order_Dir, $this->state->filter_order ); ?></th>
 		</tr>
 	</thead>
 	<tfoot>
@@ -48,7 +53,7 @@ $success_class = $platform->getLabel('success');
 				<?php
 					if($this->products && !empty($this->products)):
 					foreach($this->products as $i => $item):					
-					$checked = JHTML::_('grid.id', $i, $item->j2store_product_id );
+					$checked = HTMLHelper::_('grid.id', $i, $item->j2store_product_id );
 
 					?>
 					<tr>
@@ -83,18 +88,18 @@ $success_class = $platform->getLabel('success');
 										<?php echo $item->product_name;?>
 									</strong>
 			</a> <br /> <span>
-									<?php echo JText::_('J2STORE_PRODUCT_TYPE')?> : <label
+									<?php echo Text::_('J2STORE_PRODUCT_TYPE')?> : <label
 					class="<?php echo $info_class ?>"><?php echo $item->product_type; ?></label>
 			</span> <br /> <span>
-									<?php echo JText::_('J2STORE_PRODUCT_VISIBILITY')?> : <label
-					class="<?php echo $label_class ?><?php echo $item->visibility ? 'success':'important'; ?>"><?php echo $item->visibility ? JText::_('JYES'):JText::_('JNO'); ?></label>
+									<?php echo Text::_('J2STORE_PRODUCT_VISIBILITY')?> : <label
+					class="<?php echo $label_class ?><?php echo $item->visibility ? 'success':'important'; ?>"><?php echo $item->visibility ? Text::_('JYES'):Text::_('JNO'); ?></label>
 			</span>
-						<?php echo JText::_('J2STORE_TAXPROFILE'); ?>: 
+						<?php echo Text::_('J2STORE_TAXPROFILE'); ?>: 
 						
 						<?php if($item->taxprofile_id):?>
 							<label class="label label-inverted"><?php echo $item->taxprofile_name; ?></label>
 						<?php else: ?>
-							<label class="<?php echo $warning_class ?>"><?php echo JText::_('J2STORE_NOT_TAXABLE'); ?> </label>
+							<label class="<?php echo $warning_class ?>"><?php echo Text::_('J2STORE_NOT_TAXABLE'); ?> </label>
 						<?php endif; ?>
 			
 
@@ -107,9 +112,9 @@ $success_class = $platform->getLabel('success');
 			
 						<td>
 							<?php if($item->shipping):?>
-							<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_ENABLED'); ?> </label>
+							<label class="<?php echo $success_class ?>"> <?php echo Text::_('J2STORE_ENABLED'); ?> </label>
 							<?php else: ?>
-							<label class="<?php echo $warning_class ?>"> <?php echo JText::_('J2STORE_DISABLED'); ?> </label>
+							<label class="<?php echo $warning_class ?>"> <?php echo Text::_('J2STORE_DISABLED'); ?> </label>
 							<?php endif; ?>
 						</td>
                         <?php if($this->params->get('enable_inventory')):?>
@@ -117,7 +122,7 @@ $success_class = $platform->getLabel('success');
 								<?php if($item->manage_stock == 1): ?>
 									<?php echo $item->quantity; ?>
 								<?php else : ?>
-									<?php echo JText::_('J2STORE_NO_STOCK_MANAGEMENT'); ?>
+									<?php echo Text::_('J2STORE_NO_STOCK_MANAGEMENT'); ?>
 								<?php endif; ?>
 							</td>
                             <?php endif;?>
@@ -126,12 +131,12 @@ $success_class = $platform->getLabel('success');
                         <?php $colspan = (isset($enable_inventory)) && !empty($enable_inventory) ? 4 : 3 ; ?>
 						<td colspan="<?php echo $colspan; ?>">
                             <?php if(in_array($item->product_type,J2Store::product()->getVariableProductTypes())):?>
-							<?php echo JText::_('J2STORE_HAS_VARIANTS'); ?>
+							<?php echo Text::_('J2STORE_HAS_VARIANTS'); ?>
 							<button type="button" class="btn btn-small btn-warning"
 					id="showvariantbtn-<?php echo $item->j2store_product_id;?>"
 					href="javascript:void(0);"
 					onclick="jQuery('#hide-icon-<?php echo $item->j2store_product_id;?>').toggle('click');jQuery('#show-icon-<?php echo $item->j2store_product_id;?>').toggle('click');jQuery('#variantListTable-<?php echo $item->j2store_product_id;?>').toggle('click');">
-								<?php echo JText::_('J2STORE_OPEN_CLOSE'); ?>
+								<?php echo Text::_('J2STORE_OPEN_CLOSE'); ?>
 								<i id="show-icon-<?php echo $item->j2store_product_id;?>"
 						class="icon icon-plus"></i> <i
 						id="hide-icon-<?php echo $item->j2store_product_id;?>"
@@ -141,11 +146,11 @@ $success_class = $platform->getLabel('success');
 					class="table table-condensed table-bordered" style="display: none;">
 
 					<thead>
-						<th><?php echo JText::_('J2STORE_VARIANT_NAME'); ?></th>
-						<th><?php echo JText::_('J2STORE_VARIANT_SKU'); ?></th>
-						<th><?php echo JText::_('J2STORE_VARIANT_PRICE'); ?></th>
-						<th><?php echo JText::_('J2STORE_PRODUCT_ENABLE_SHIPPING'); ?></th>
-						<th><?php echo JText::_('J2STORE_CURRENT_STOCK'); ?></th>
+						<th><?php echo Text::_('J2STORE_VARIANT_NAME'); ?></th>
+						<th><?php echo Text::_('J2STORE_VARIANT_SKU'); ?></th>
+						<th><?php echo Text::_('J2STORE_VARIANT_PRICE'); ?></th>
+						<th><?php echo Text::_('J2STORE_PRODUCT_ENABLE_SHIPPING'); ?></th>
+						<th><?php echo Text::_('J2STORE_CURRENT_STOCK'); ?></th>
 					</thead>
 					<tbody>
 										<?php
@@ -161,13 +166,13 @@ $success_class = $platform->getLabel('success');
 							<td><?php echo J2Store::product()->getVariantNamesByCSV($variant->variant_name); ?></td>
 							<td><?php echo $variant->sku; ?></td>
 							<td><?php echo J2store::currency()->format($variant->price); ?></td>
-							<td><?php echo (isset($variant->shipping) && ($variant->shipping)) ? JText::_('J2STORE_YES') : JText::_('J2STORE_NO'); ?></td>
+							<td><?php echo (isset($variant->shipping) && ($variant->shipping)) ? Text::_('J2STORE_YES') : Text::_('J2STORE_NO'); ?></td>
 							<td><?php echo $variant->quantity;?></td>
 						</tr>
 										<?php endforeach;?>
 										<?php else:?>
 										<tr>
-							<td colspan="5"><?php echo JText::_('J2STORE_NO_ITEMS_FOUND')?></td>
+							<td colspan="5"><?php echo Text::_('J2STORE_NO_ITEMS_FOUND')?></td>
 						</tr>
 										<?php endif;?>
 									</tbody>
@@ -188,7 +193,7 @@ $success_class = $platform->getLabel('success');
 							);
 							?>							
 							<label class="<?php echo $label_class ?><?php echo $state_array[$item->source->state][0]; ?>">
-								<?php echo JText::_($state_array[$item->source->state][1]);?>
+								<?php echo Text::_($state_array[$item->source->state][1]);?>
 							</label>							
 						<?php endif;?>
 						
@@ -198,7 +203,7 @@ $success_class = $platform->getLabel('success');
 				<?php endforeach;?>
 				<?php else:?>
 				<tr>
-			<td colspan="10"><?php  echo JText::_('J2STORE_NO_ITEMS_FOUND');?></td>
+			<td colspan="10"><?php  echo Text::_('J2STORE_NO_ITEMS_FOUND');?></td>
 		</tr>
 				<?php endif;?>
 			</tbody>
