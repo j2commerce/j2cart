@@ -1,8 +1,9 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
+ * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 // No direct access to this file
 defined ( '_JEXEC' ) or die ();
@@ -11,13 +12,6 @@ $col_class = 'col-md-';
 $primary_button = 'btn btn-primary ';
 $secondary_button = 'btn btn-dark  ';
 $success_button = 'btn btn-success ';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-    $primary_button = 'btn btn-primary btn-large';
-    $secondary_button = 'btn btn-inverse btn-large';
-    $success_button = 'btn btn-success btn-large';
-}
 ?>
 
 <div class="<?php echo $row_class ?>">
