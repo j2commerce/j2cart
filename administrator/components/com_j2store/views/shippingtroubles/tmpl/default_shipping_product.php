@@ -111,21 +111,21 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 								<?php else:?>
 									<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 								<?php endif;?>
-								<br/>
+								<br>
 							<?php echo JText::_('J2STORE_WIDTH').":";
 								if($product->width < 0.1):?>
 									<label class="<?php echo $warning_class ?>"> <?php echo JText::_('J2STORE_NOT_SET'); ?> </label>
 								<?php else:?>
 									<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 								<?php endif;?>
-								<br/>							
+								<br>							
 							<?php echo JText::_('J2STORE_HEIGHT').":";
 								if($product->height < 0.1):?>
 									<label class="<?php echo $warning_class ?>"> <?php echo JText::_('J2STORE_NOT_SET'); ?> </label>
 								<?php else:?>
 									<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 								<?php endif;?>
-								<br/>
+								<br>
 							</td>
 							<td><?php echo JText::_('J2STORE_PRODUCT_WEIGHT').":";
 								if($product->weight < 0.1):?>
@@ -133,7 +133,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 								<?php else:?>
 									<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 								<?php endif;?>
-								<br/>
+								<br>
 							</td>
 							<td>
 							<?php echo JText::_('J2STORE_PRODUCT_WEIGHT_CLASS').":";
@@ -142,14 +142,14 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 							<?php else:?>
 								<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 							<?php endif;?>
-							<br/>							
+							<br>							
 							<?php echo JText::_('J2STORE_PRODUCT_LENGTH_CLASS').":";
 							if($product->length_class_id == 0):?>
 								<label class="<?php echo $warning_class ?>"> <?php echo JText::_('J2STORE_NOT_SET'); ?> </label>
 							<?php else:?>
 								<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 							<?php endif;?>
-							<br/>
+							<br>
 							</td>
 							<?php else:?>
 							<td colspan="4">
@@ -202,21 +202,21 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 											<?php echo JText::_('J2STORE_WIDTH').":";
 											if($variant->width < 0.1):?>
 												<label class="<?php echo $warning_class ?>"> <?php echo JText::_('J2STORE_NOT_SET'); ?> </label>
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 											<?php echo JText::_('J2STORE_HEIGHT').":";
 											if($variant->height < 0.1):?>
 												<label class="<?php echo $warning_class ?>"> <?php echo JText::_('J2STORE_NOT_SET'); ?> </label>
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 										</td>
 										<td><?php echo JText::_('J2STORE_PRODUCT_WEIGHT').":";
 											if($variant->weight < 0.1):?>
@@ -224,7 +224,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 										</td>
 										<td>
 											<?php echo JText::_('J2STORE_PRODUCT_WEIGHT_CLASS').":";
@@ -233,14 +233,14 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 											<?php echo JText::_('J2STORE_PRODUCT_LENGTH_CLASS').":";
 											if($variant->length_class_id == 0):?>
 												<label class="<?php echo $warning_class ?>"> <?php echo JText::_('J2STORE_NOT_SET'); ?> </label>
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo JText::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 										</td>
 										</tr>
 									<?php endforeach;?>

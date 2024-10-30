@@ -100,11 +100,11 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                                         <?php echo J2Html::custom($field['type'],$field['name'],$field['value'],$field['options']);?>
                                                     <?php endif; ?>
                                                     <?php if(isset($field['desc']) && !empty($field['desc'])):?>
-                                                        <br/>
+                                                        <br>
                                                         <small><?php echo JText::_($field['desc']);?></small>
                                                     <?php endif; ?>
                                                     <?php if($field_name == 'product_links'):?>
-                                                        <br/>
+                                                        <br>
                                                         <div class="<?php echo $row_class ?>">
                                                             <div class="<?php echo $col_class ?>6">
                                                                 <div class="table-responsive">

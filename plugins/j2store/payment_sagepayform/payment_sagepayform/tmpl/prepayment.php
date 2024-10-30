@@ -15,7 +15,7 @@
 defined('_JEXEC') or die('Restricted access'); ?>
 
 <?php echo JText::_($vars->display_name); ?>
-<br />
+<br>
 <?php echo JText::_($vars->onbeforepayment_text); ?>
 
 <form action='<?php echo $vars->post_url; ?>' method='post'>

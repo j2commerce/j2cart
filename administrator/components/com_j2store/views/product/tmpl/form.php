@@ -128,7 +128,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                             <small>
                                 <?php echo JText::_('J2STORE_PLUGIN_SHORTCODE_HELP_TEXT');?>
                             </small>
-                            <br />
+                            <br>
 
                             <span class="pull-right">
 					<button type="button" class="btn btn-small btn-warning"
@@ -141,7 +141,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                 class="icon icon-minus" style="display: none;"></i>
 					</button>
 				</span>
-                            <br/>
+                            <br>
 
 
                             <div class="additional-short-code" style="display: none;">

@@ -120,7 +120,7 @@ $listDirn = $state->get('filter_order_Dir');
 						if(isset($item->orderitem_attributes) && $item->orderitem_attributes):
 
 						foreach($item->orderitem_attributes as $attr):?>
-							<small><strong><?php echo $attr->orderitemattribute_name;?> :</strong> <?php echo $attr->orderitemattribute_value;?></small><br/>
+							<small><strong><?php echo $attr->orderitemattribute_name;?> :</strong> <?php echo $attr->orderitemattribute_value;?></small><br>
 						<?php endforeach;?>
 					<?php endif;?>
 				</td>

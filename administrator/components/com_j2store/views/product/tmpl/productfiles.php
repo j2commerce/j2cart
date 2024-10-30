@@ -26,7 +26,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		<div class="j2store-modal">
             <div id="myFileModal" style="display: none;">
             <h4 class="message-title"><?php echo JText::_('J2STORE_CHOOSE_FILE'); ?></h4>
-            <hr/>
+            <hr>
             <div><div id="fileTreeDemo_1" class="demo1"></div></div>
             </div>
 

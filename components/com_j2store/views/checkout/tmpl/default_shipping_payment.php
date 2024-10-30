@@ -154,7 +154,7 @@ foreach($removeFields[1] as $fieldName) {
                         $field_options .= ' placeholder="'.$placeholder.'" ';
                     }
 					$uhtml .= $this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null);
-					$uhtml .='<br />';
+					$uhtml .='<br>';
 				}
 				?>
 			<?php endforeach; ?>

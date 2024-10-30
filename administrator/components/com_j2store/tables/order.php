@@ -2489,7 +2489,7 @@ class J2StoreTableOrder extends F0FTable
 	*/
 	function get_formatted_lineitem_name ( $item, $receiver_type = '*' )
 	{
-		$html = '<span class="cart-product-name">'.$item->orderitem_name.'</span><br />';
+		$html = '<span class="cart-product-name">'.$item->orderitem_name.'</span><br>';
 		if ( isset( $item->orderitemattributes ) ) {
 			$html .= '<span class="cart-item-options">';
 			foreach ( $item->orderitemattributes as $attribute ) {
@@ -2505,7 +2505,7 @@ class J2StoreTableOrder extends F0FTable
 					$attribute_value = JText::_ ( $attribute->orderitemattribute_value );
 				}
 				$html .= $this->get_formatted_lineitem_attribute_value($attribute, $attribute_value);
-				//$html .= '<small>'.JText::_( $attribute->orderitemattribute_name ).' : '.$attribute_value.'</small><br />';
+				//$html .= '<small>'.JText::_( $attribute->orderitemattribute_name ).' : '.$attribute_value.'</small><br>';
 				if(J2Store::platform()->isClient('administrator') && $receiver_type == 'admin' && $attribute->orderitemattribute_type=='file' && JFactory::getApplication()->input->getString('task')!='printOrder'){
 					$html .= '<a target="_blank" class="btn btn-primary"';
 					$url = JUri::base()."index.php?option=com_j2store&view=orders&task=download&ftoken=".$attribute->orderitemattribute_value;
@@ -2513,7 +2513,7 @@ class J2StoreTableOrder extends F0FTable
 					$html .= '<i class="icon icon-download"></i>';
 					$html .= JText::_('J2STORE_DOWNLOAD');
 					$html .= '</a>';
-					$html .= '<br />';
+					$html .= '<br>';
 				}
 			}
 			$html .= '</span>';
@@ -2539,7 +2539,7 @@ class J2StoreTableOrder extends F0FTable
 		$html .= '</span>';
 
 		$html .= '</small>';
-		$html .= '<br />';
+		$html .= '<br>';
 		J2Store::plugin()->event( 'GetFormattedLineItemAttributeValue', array( $attribute, $attribute_value, &$html ) );
 
 		return $html;

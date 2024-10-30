@@ -109,7 +109,7 @@ $allFields = $this->fields;
                                 $field_options .= ' placeholder="'.$placeholder.'" ';
                             }
 						 	$uhtml .= $this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null);
-						 	$uhtml .='<br />';
+						 	$uhtml .='<br>';
 						}
 						?>
   <?php endforeach; ?>
@@ -120,7 +120,7 @@ $allFields = $this->fields;
 
 </div>
 <?php echo J2Store::plugin()->eventWithHtml('CheckoutShipping', array($this)); ?>
-<br />
+<br>
 <div class="buttons">
   <div class="left">
     <input type="button" value="<?php echo JText::_('J2STORE_CHECKOUT_CONTINUE'); ?>" id="button-shipping-address" class="button btn btn-primary" />

@@ -16,7 +16,7 @@ defined('_JEXEC') or die('Restricted access');
 		<?php echo JText::_('J2STORE_POSTCONFIG_LBL_ACCEPTLICENSE')?>
 	</label> </br>
 	<div class="postsetup-desc"><?php echo JText::_('J2STORE_POSTCONFIG_DESC_ACCEPTLICENSE');?></div>
-	<br /> <label for="acceptsupport" class="postsetup-main" id="acceptsupport"> <input
+	<br> <label for="acceptsupport" class="postsetup-main" id="acceptsupport"> <input
 		type="checkbox"  name="acceptsupport"
 		<?php if($this->params->get('acceptsupport')): ?> checked="checked" <?php endif; ?> />
 		<?php echo JText::_('J2STORE_POSTCONFIG_LBL_ACCEPTSUPPORT')?>

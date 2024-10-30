@@ -90,14 +90,14 @@ $title = $params->get('cart_module_title', '');
 											<p class="j2store-product-name"> 
 												<strong><?php echo $item->orderitem_name;?></strong>
 											</p>
-											<br />
+											<br>
 											<?php if(isset($item->orderitemattributes) && $item->orderitemattributes): ?>
 												<span class="cart-item-options">
 												<?php foreach ($item->orderitemattributes as $attribute): ?>
 													<small>
 													- <?php echo JText::_($attribute->orderitemattribute_name); ?> : <?php echo JText::_($attribute->orderitemattribute_value); ?>
 													</small>
-													<br />
+													<br>
 												<?php endforeach;?>
 												</span>
 											<?php endif; ?>

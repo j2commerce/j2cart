@@ -149,7 +149,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                         html = '<tbody id="filter-value-row' + filter_value_row + '">';
                         html += '  <tr>';
                         html += '    <td class="left"><input type="hidden" name="filter_value[' + filter_value_row + '][j2store_filter_id]" value="" />';
-                        html += '<input type="text" class="input" name="filter_value[' + filter_value_row + '][filter_name]" value="" /> <br />';
+                        html += '<input type="text" class="input" name="filter_value[' + filter_value_row + '][filter_name]" value="" /> <br>';
                         html += '  </td>';
                         html += '    <td class="right"><input class="input-small" type="text" name="filter_value[' + filter_value_row + '][ordering]" value="" size="1" /></td>';
                         html += '    <td class="left"><a class="btn btn-danger" onclick="j2store.jQuery(\'#filter-value-row' + filter_value_row + '\').remove();" class="button"><?php echo JText::_('J2STORE_REMOVE'); ?></a></td>';

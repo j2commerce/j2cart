@@ -32,7 +32,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                 <h2>Looking for more payment options? Check our extensions directory</h2>
                 <p class="lead">
                     J2Store is integrated with 65+ payment gateways across the world.
-                    <br />
+                    <br>
                     Find more at our extensions directory
                 </p>
                 <a onclick="return ! window.open(this.href);" class="btn btn-large btn-success" href="<?php echo J2Store::buildHelpLink('extensions/payment-plugins.html', 'gateways'); ?>">Get more payment plugins</a>

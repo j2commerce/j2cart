@@ -42,7 +42,7 @@ $platform = J2Store::platform();
 						<span class="cart-product-name">
 							<?php echo $item->orderitem_name; ?>  
 						</span>
-						<br />
+						<br>
 						<?php if(isset($item->orderitemattributes)): ?>
 							<span class="cart-item-options">
 							<?php foreach ($item->orderitemattributes as $attribute):
@@ -70,7 +70,7 @@ $platform = J2Store::platform();
              					   <?php echo JText::_('J2STORE_DOWNLOAD');?>
              					   </a>
              				   	<?php endif;?>
-             				   	<br />
+             				   	<br>
 							<?php endforeach;?>
 							</span>
 						<?php endif; ?>
@@ -86,7 +86,7 @@ $platform = J2Store::platform();
 						<?php endif; ?>
 
 						<?php if(!empty($item->orderitem_sku)): ?>
-						<br />
+						<br>
 							<span class="cart-product-sku">
 								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
 								<span class="cart-item-value"><?php echo $item->orderitem_sku; ?></span>

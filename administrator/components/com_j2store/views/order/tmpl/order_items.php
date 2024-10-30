@@ -82,13 +82,13 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 										href="<?php echo J2Store::platform()->getCartUrl(array('task' => 'remove','cartitem_id' => $item->cartitem_id));//JRoute::_('index.php?option=com_j2store&view=carts&task=remove&cartitem_id='.$item->cartitem_id); ?>">X</a>
 										<?php endif; ?>
 							</span>
-							<br />
+							<br>
 
 							<?php if(isset($item->orderitemattributes) && $item->orderitemattributes): ?>
 							<span class="cart-item-options"> <?php foreach ($item->orderitemattributes as $attribute): ?>
 								<small> - <?php echo JText::_($attribute->orderitemattribute_name); ?>
 									: <?php echo $attribute->orderitemattribute_value; ?>
-							</small> <br /> <?php endforeach;?>
+							</small> <br> <?php endforeach;?>
 							</span>
 							<?php endif; ?>
 
@@ -100,7 +100,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 								<?php echo $this->currency->format($this->order->get_formatted_lineitem_price($item, $this->params->get('checkout_price_display_options', 1))); ?>
 							</span>
 						</span> <?php endif; ?> <?php if($this->params->get('show_sku', 1)): ?>
-							<br /> <span class="cart-product-sku"> <span
+							<br> <span class="cart-product-sku"> <span
 								class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_SKU'); ?>
 							</span> <span class="cart-item-value"><?php echo $item->orderitem_sku; ?>
 							</span>
@@ -108,7 +108,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 						</span> <?php endif; ?>
                             <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitle', array($item, $this->order, $this->params));?>
                             <?php if(isset($this->onDisplayCartItem[$i])):?>
-							<br /> <?php echo $this->onDisplayCartItem[$i];?> <?php endif;?>
+							<br> <?php echo $this->onDisplayCartItem[$i];?> <?php endif;?>
 							<?php $i++;?>
 						</td>
 						<td><?php echo J2Html::hidden($this->form_prefix.'[orderitem]['.$item->j2store_orderitem_id.'][j2store_orderitem_id]', $item->j2store_orderitem_id);?>

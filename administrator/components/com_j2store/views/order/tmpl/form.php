@@ -39,12 +39,12 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 			<div class="<?php echo $col_class ?>4">
 			<?php if($this->item->user_id == 0): ?>
 				<label class="label label-warning"><?php echo JText::_('J2STORE_GUEST')?></label>
-				<br />
+				<br>
 				<small class="muted">(<?php echo JText::_('J2STORE_UNIQUE_TOKEN'); ?>: <?php echo $this->item->token;?>)</small>
 				<?php endif;?>				
 			</div>
 		</div>
-		<hr />
+		<hr>
 		
 		<div class="j2store-general-order">
 				<!-- General layout  -->
@@ -59,7 +59,6 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 											value="<?php echo JText::_('J2STORE_ORDER_STATUS_SAVE'); ?>" />
 					<br><br>
 					 <textarea class="form-control valid form-control-success" aria-invalid="false" name="customer_note"><?php echo $this->item->customer_note; ?></textarea>			 
-					 
 					</div>						
 				</div>
 
@@ -70,7 +69,6 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 											value="<?php echo JText::_('J2STORE_ORDER_STATUS_SAVE'); ?>" />
 					<br><br>
 					 <textarea class="form-control valid form-control-success" aria-invalid="false" name="ordershipping_tracking_id"><?php echo $this->shipping->ordershipping_tracking_id; ?></textarea>			 
-					 
 					</div>						
 				</div>
 

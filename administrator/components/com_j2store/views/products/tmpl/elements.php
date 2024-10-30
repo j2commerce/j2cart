@@ -49,7 +49,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 				<tr>
 					<th>
 						<input class="btn btn-success" id="setAllProductsBnt" type="button" value="<?php echo JText::_('J2STORE_SET');?>"  style="display:none;"/>
-						<br/>
+						<br>
 						<?php echo JHtml::_('grid.checkall'); ?>
 					</th>
 					<th class="title">

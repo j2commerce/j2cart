@@ -16,7 +16,7 @@ $platform->loadExtra('behavior.modal','a.modal');
 					<!-- Customer's  Billing Address Details  -->
 					<address class="pull-left">
 						<strong>
-                            <?php echo $this->item->company;?> <br/>
+                            <?php echo $this->item->company;?> <br>
 							<?php echo $this->item->first_name.' '.$this->item->last_name;?>
 						</strong>
 						<?php echo $this->item->address_1;?>
@@ -34,7 +34,7 @@ $platform->loadExtra('behavior.modal','a.modal');
 									<?php if(isset( $this->item->$name_key ) && !empty($this->item->$name_key)):?>
 										<?php $field_present += 1; ?>
 										<?php if($field_present == 1): ?>
-										<br /><strong><?php echo JText::_('J2STORE_CUSTOM_FIELDS');?></strong><br />
+										<br><strong><?php echo JText::_('J2STORE_CUSTOM_FIELDS');?></strong><br>
 										<?php endif; ?>
 										<?php echo $field->field_name.' :'; ?>
 										<?php echo $this->item->$name_key;?>

@@ -26,7 +26,7 @@ defined('_JEXEC') or die;
 <div class="j2store-modal">
 		<div class="j2store-confirm-change" style="display: none;" id="j2storeConfirmChange" >
             <h3><?php echo JText::_('J2STORE_WARNING');?></h3>
-            <hr/>
+            <hr>
             <div class="alert alert-warning">
                 <span class="ui-icon ui-icon-info"></span>
                 <?php echo JText::_('J2STORE_PRODUCT_TYPE_CHANGE_WARNING_MSG');?>

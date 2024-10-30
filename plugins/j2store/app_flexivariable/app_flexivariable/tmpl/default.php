@@ -78,7 +78,7 @@ JHtml::_('script', 'media/j2store/js/j2store.js', false, false);
                                     <?php echo J2Html::pro(); ?>
                                 <?php else: ?>
                                 <div class="controls"><?php echo $field->input; ?>
-                                    <br/>
+                                    <br>
                                     <small class="muted"><?php echo JText::_($field->description); ?></small>
                                     <?php endif; ?>
 

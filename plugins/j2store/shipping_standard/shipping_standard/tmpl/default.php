@@ -98,11 +98,11 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                         }
                         if ($item->subtotal_minimum > '0')
                         {
-                        	echo "<br/><b>".JText::_('J2STORE_SHIPPING_METHODS_MINIMUM_SUBTOTAL_REQUIRED')."</b>: ".J2Store::currency()->format( $item->subtotal_minimum );
+                        	echo "<br><b>".JText::_('J2STORE_SHIPPING_METHODS_MINIMUM_SUBTOTAL_REQUIRED')."</b>: ".J2Store::currency()->format( $item->subtotal_minimum );
                         }
                         if( $item->subtotal_maximum > '-1' )
                         {
-                        	echo "<br/><b>".JText::_('J2STORE_SHIPPING_METHODS_SUBTOTAL_MAX')."</b>: ".J2Store::currency()->format( $item->subtotal_maximum );
+                        	echo "<br><b>".JText::_('J2STORE_SHIPPING_METHODS_SUBTOTAL_MAX')."</b>: ".J2Store::currency()->format( $item->subtotal_maximum );
                         }
                         ?>
                     </div>

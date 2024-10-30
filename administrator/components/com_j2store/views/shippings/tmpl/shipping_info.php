@@ -24,7 +24,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 					Check our comprehensive user guide.
 				</p>
 				<a onclick="return ! window.open(this.href);" class="btn btn-large btn-warning" href="<?php echo J2Store::buildHelpLink('support/user-guide.html', 'shipping');  ?>">User guide</a>
-				<br />
+				<br>
 				<p class="lead">
 					Shipping is not working?  Check the troubleshooting guide
 				</p>
@@ -39,7 +39,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 				<h2>Need more shipping methods? Check our extensions directory</h2>
 				<p class="lead">
 					J2Store has integrations 10+ shipping carriers.
-					<br />
+					<br>
 					Find more at our extensions directory
 				</p>
 				<a onclick="return ! window.open(this.href);" class="btn btn-large btn-success" href="<?php echo  J2Store::buildHelpLink('extensions/shipping-plugins.html', 'shipping'); ?>">Get more shipping plugins </a>

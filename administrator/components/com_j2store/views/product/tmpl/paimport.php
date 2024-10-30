@@ -27,7 +27,7 @@ nav, header, div.subhead {
 					
 				</div>
 				<div class="span1">
-				<br />
+				<br>
 				<?php echo JText::_('J2STORE_OR'); ?></div>
 				<div class="span2">
 					
@@ -61,7 +61,7 @@ nav, header, div.subhead {
 				</button> 
 				<br><br>
 			</div>
-			<br />
+			<br>
 			<div class="alert alert-block alert-info"><?php echo JText::_('J2STORE_PAI_IMPORT_PRODUCT_OPTIONS_HELP_TEXT');?></div>
 			<table class="adminlist table table-striped">
 				<thead>

@@ -86,7 +86,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                 <?php echo J2Html::pro(); ?>
                             <?php else: ?>
                             <div class="controls"><?php echo $field->input; ?>
-                                <br />
+                                <br>
                                 <small class="muted"><?php echo JText::_($field->description); ?></small>
                                 <?php endif; ?>
 

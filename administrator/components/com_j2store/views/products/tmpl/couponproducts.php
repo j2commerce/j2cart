@@ -42,7 +42,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 				<tr>
 					<th>
 						<input class="btn btn-success" id="setAllProductsBnt" type="button" value="<?php echo JText::_('J2STORE_SET_VALUES');?>"  style="display:none;"/>
-						<br/>
+						<br>
 						<?php echo JHtml::_('grid.checkall'); ?>
 					</th>
 					<th class="title">
@@ -87,7 +87,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 										<?php foreach($variants as $variant):?>
 											<?php if(!empty($variant->sku)):?>
 												<?php echo $variant->sku; ?>
-												<br/>
+												<br>
 											<?php endif;?>
 
 										<?php endforeach;?>

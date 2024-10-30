@@ -87,10 +87,10 @@ $success_class = $platform->getLabel('success');
 					<strong>
 										<?php echo $item->product_name;?>
 									</strong>
-			</a> <br /> <span>
+			</a> <br> <span>
 									<?php echo Text::_('J2STORE_PRODUCT_TYPE')?> : <label
 					class="<?php echo $info_class ?>"><?php echo $item->product_type; ?></label>
-			</span> <br /> <span>
+			</span> <br> <span>
 									<?php echo Text::_('J2STORE_PRODUCT_VISIBILITY')?> : <label
 					class="<?php echo $label_class ?><?php echo $item->visibility ? 'success':'important'; ?>"><?php echo $item->visibility ? Text::_('JYES'):Text::_('JNO'); ?></label>
 			</span>
@@ -183,7 +183,7 @@ $success_class = $platform->getLabel('success');
 
 						<td>
 						<?php echo  $item->product_source;?>
-						<br />						
+						<br>						
 						<?php if($item->product_source == 'com_content' && ($item->source->state == 0 || $item->source->state == -2)): ?>
 							<?php
 							$state_array = array (

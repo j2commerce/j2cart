@@ -68,7 +68,7 @@ if(empty($order->customer_language) || $order->customer_language == '*' || $orde
                     <?php endif; ?>
 
                     <?php if($this->params->get('show_sku', 1) && !empty($item->orderitem_sku)): ?>
-                        <br />
+                        <br>
                         <span class="cart-product-sku">
 								<span class="cart-item-title"><?php echo $language->_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
 								<span class="cart-item-value"><?php echo $item->orderitem_sku; ?></span>
@@ -76,7 +76,7 @@ if(empty($order->customer_language) || $order->customer_language == '*' || $orde
 
                     <?php endif; ?>
                     <?php if($back_order_text):?>
-                        <br />
+                        <br>
                         <span class="label label-inverse"><?php echo $language->_($back_order_text);?></span>
                     <?php endif;?>
                     <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitleInOrder', array($item, $this->order, $this->params));?>

@@ -59,20 +59,20 @@ $status = false;
 if($status == false) {
 //email not found. manually add it
 $email ='<span class="j2store_field_required">*</span>'.JText::_('J2STORE_EMAIL');
-$email .='<br /><input type="text" name="email" id="email" value="" class="large-field" /> <br />';
+$email .='<br><input type="text" name="email" id="email" value="" class="large-field" /> <br>';
 $html = str_replace('[email]',$email,$html);
 }
 
 $password ='<h2>'.JText::_('J2STORE_CHECKOUT_SET_PASSWORD').'</h2>';
 $password .='<span class="j2store_field_required">*</span>'.JText::_('J2STORE_CHECKOUT_ENTER_PASSWORD');
-$password .='<br /><input type="password" name="password" value="" class="large-field" /> <br /> <br />';
-$confirm_password= '<span class="j2store_field_required">*</span>'.JText::_('J2STORE_CHECKOUT_CONFIRM_PASSWORD').'<br />
+$password .='<br><input type="password" name="password" value="" class="large-field" /> <br> <br>';
+$confirm_password= '<span class="j2store_field_required">*</span>'.JText::_('J2STORE_CHECKOUT_CONFIRM_PASSWORD').'<br>
   <input type="password" name="confirm" value="" class="large-field" />
-  <br />';
+  <br>';
 if($this->privacyconsent_enabled){
     $privacy_plugin = JPluginHelper::getPlugin('system', 'privacyconsent');
     $privacy_params = $platform->getRegistry($privacy_plugin->params);
-    $confirm_password .= '<label id="privacyconsent" for="privacyconsent"><input type="checkbox" value="1"  name="privacyconsent" />  '.JText::_($privacy_params->get('privacy_note','')).'</label><br />';
+    $confirm_password .= '<label id="privacyconsent" for="privacyconsent"><input type="checkbox" value="1"  name="privacyconsent" />  '.JText::_($privacy_params->get('privacy_note','')).'</label><br>';
 }
 //now replace pass fields
 $html = str_replace('[password]',$password,$html);
@@ -142,7 +142,7 @@ $html = $html.$phtml;
                                 $field_options .= ' placeholder="'.$placeholder.'" ';
                             }
 						 	$uhtml .= $this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null);
-						 	$uhtml .='<br />';
+						 	$uhtml .='<br>';
 						}
 						?>
   <?php endforeach; ?>
@@ -158,7 +158,7 @@ $html = $html.$phtml;
 	  <label for="shipping"><?php echo JText::_('J2STORE_MAKE_SHIPPING_SAME'); ?></label>	  
   </div>
   </div> <!-- end of row-fluid -->
-  <br />
+  <br>
   <?php } ?>
   
 <?php echo J2Store::plugin()->eventWithHtml('CheckoutRegister', array($this)); ?>

@@ -58,7 +58,7 @@ $tagid = JFactory::getApplication()->input->getInt('tagid',0);?>
 		<div id="j2store-price-filter-container" class="j2store-product-filters price-filters"  >
 			<h4 class="product-filter-heading"><?php echo JText::_('J2STORE_PRODUCT_FILTER_PRICE_TITTLE'); ?></h4>
 				<div  id="j2store-slider-range" style="width:100%;" ></div>
-			<br/>
+			<br>
 			<!-- Price Filters Ends Here -->
 			<div id="j2store-slider-range-box" class="price-input-box" >
 				<input class="btn btn-success" type="submit"   id="filterProductsBtn"  value="<?php echo JText::_('J2STORE_FILTER_GO');?>" />

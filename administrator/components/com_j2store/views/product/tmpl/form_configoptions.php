@@ -37,7 +37,7 @@ $base_path = rtrim(JUri::root(),'/').'/administrator';
 						<?php echo J2Html::hidden($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][option_id]', $poption->option_id);?>
 					<td>
 						<?php echo $this->escape($poption->option_name);?>
-						<br/>
+						<br>
 						<small>(<?php  echo $this->escape($poption->option_unique_name);?>)</small>
 						<small><?php JText::_('J2STORE_OPTION_TYPE');?><?php echo JText::_('J2STORE_'.strtoupper($poption->type))?></small>
 					</td>

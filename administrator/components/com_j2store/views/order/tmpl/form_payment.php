@@ -74,7 +74,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                     <?php echo JText::_($this->item->transaction_status); ?>
                                 </p>
                             </li>
-                            <li><?php echo JText::_('J2STORE_ORDER_TRANSACTION_DETAILS'); ?> <br />
+                            <li><?php echo JText::_('J2STORE_ORDER_TRANSACTION_DETAILS'); ?> <br>
                                 <div class="alert alert-warning">
                                     <small><?php echo JText::_('J2STORE_ORDER_TRANSACTION_DETAILS_HELP_MSG'); ?>
                                     </small>

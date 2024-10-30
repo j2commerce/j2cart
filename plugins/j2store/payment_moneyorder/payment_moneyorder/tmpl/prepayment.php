@@ -73,7 +73,7 @@ $ajax_loader = JUri::root (true).'/media/j2store/images/loader.gif';
 				//console.log(json);
 				if (json['error']) {
 					form.find('.plugin_error').after('<span class="j2error">' + json['error']+ '</span>');
-					form.find('.plugin_error_instruction').after('<br /><span class="j2error"><?php echo JText::_('J2STORE_STRIPE_ON_ERROR_INSTRUCTIONS'); ?></span>');
+					form.find('.plugin_error_instruction').after('<br><span class="j2error"><?php echo JText::_('J2STORE_STRIPE_ON_ERROR_INSTRUCTIONS'); ?></span>');
 					$(button).val('<?php echo addslashes(JText::_('J2STORE_PAYMENT_ERROR_PROCESSING'))?>');
 				}
 

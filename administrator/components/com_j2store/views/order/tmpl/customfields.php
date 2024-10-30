@@ -46,17 +46,17 @@ if(!empty($row->$field) && strlen($row->$field) > 0) {
 		<dd>
 		<?php
 		if(is_array($field->value)) {
-			echo '<br />';
+			echo '<br>';
 			foreach($field->value as $value) {
-				echo '- '.JText::_($value).'<br/>';
+				echo '- '.JText::_($value).'<br>';
 			}
 
 		}elseif(is_object($field->value)) {
                 //convert the object into an array
             $obj_array = $platform->fromObject($field->value);
-            echo '<br />';
+            echo '<br>';
             foreach($obj_array as $value) {
-                echo '- '.JText::_($value).'<br/>';
+                echo '- '.JText::_($value).'<br>';
             }
 		
 		}elseif(is_string($field->value) && J2Store::utilities()->isJson(stripslashes($field->value))) {
@@ -64,7 +64,7 @@ if(!empty($row->$field) && strlen($row->$field) > 0) {
 
 		if(is_array($json_values)) {
 			foreach($json_values as $value){
-				echo '- '.JText::_($value).'<br/>';
+				echo '- '.JText::_($value).'<br>';
 			}
 		} else {
 				echo JText::_(nl2br($field->value));

@@ -40,7 +40,7 @@ $allFields = $this->fields;
         if($placeholder){
             $field_options .= ' placeholder="'.$placeholder.'" ';
         }
-		$html = str_replace('['.$fieldName.']',$this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null).'<br />',$html);
+		$html = str_replace('['.$fieldName.']',$this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null).'<br>',$html);
 	}
 	?>
 <?php endforeach; ?>
@@ -80,7 +80,7 @@ foreach($removeFields[1] as $fieldName) {
                         $field_options .= ' placeholder="'.$placeholder.'" ';
                     }
 					$uhtml .= $this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null);
-					$uhtml .='<br />';
+					$uhtml .='<br>';
 				}
 				?>
 			<?php endforeach; ?>
@@ -89,7 +89,7 @@ foreach($removeFields[1] as $fieldName) {
 	</div>
 <?php endif; ?>
 <?php echo J2Store::plugin()->eventWithHtml('CheckoutGuestShipping', array($this)); ?>
-<br />
+<br>
 <div class="buttons">
 	<div class="left"><input type="button" value="<?php echo JText::_('J2STORE_CHECKOUT_CONTINUE'); ?>" id="button-guest-shipping" class="button btn btn-primary" /></div>
 </div>
