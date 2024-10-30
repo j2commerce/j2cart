@@ -1,9 +1,9 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce
- * @license GNU GPL v3 or later
+ * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
+ * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 // No direct access to this file
 defined('_JEXEC') or die;
@@ -17,10 +17,6 @@ $this->params = J2Store::config();
 $create_url = 'index.php?option=com_content&view=article&layout=edit';
 $row_class = 'row';
 $col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-}
 ?>
 <div class="<?php echo $row_class; ?>">
 
