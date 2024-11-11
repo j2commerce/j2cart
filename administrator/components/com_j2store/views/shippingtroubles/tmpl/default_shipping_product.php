@@ -226,21 +226,21 @@ $search = htmlspecialchars($this->state->search);
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo Text::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 											<?php echo Text::_('J2STORE_WIDTH').":";
 											if($variant->width < 0.1):?>
 												<label class="<?php echo $warning_class ?>"> <?php echo Text::_('J2STORE_NOT_SET'); ?> </label>
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo Text::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 											<?php echo Text::_('J2STORE_HEIGHT').":";
 											if($variant->height < 0.1):?>
 												<label class="<?php echo $warning_class ?>"> <?php echo Text::_('J2STORE_NOT_SET'); ?> </label>
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo Text::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 										</td>
 										<td><?php echo Text::_('J2STORE_PRODUCT_WEIGHT').":";
 											if($variant->weight < 0.1):?>
@@ -248,7 +248,7 @@ $search = htmlspecialchars($this->state->search);
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo Text::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 										</td>
 										<td>
 											<?php echo Text::_('J2STORE_PRODUCT_WEIGHT_CLASS').":";
@@ -257,14 +257,14 @@ $search = htmlspecialchars($this->state->search);
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo Text::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 											<?php echo Text::_('J2STORE_PRODUCT_LENGTH_CLASS').":";
 											if($variant->length_class_id == 0):?>
 												<label class="<?php echo $warning_class ?>"> <?php echo Text::_('J2STORE_NOT_SET'); ?> </label>
 											<?php else:?>
 												<label class="<?php echo $success_class ?>"> <?php echo Text::_('J2STORE_OK'); ?> </label>
 											<?php endif;?>
-											<br/>
+											<br>
 										</td>
 										</tr>
 									<?php endforeach;?>
