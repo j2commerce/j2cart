@@ -38,7 +38,6 @@ $wa->useScript('table.columns')
     </caption>
 	<thead>
 		<tr>
-			<td class="w-1 text-center d-none"><?php //echo Text::_('J2STORE_NUM');?></td>
 			<td class="w-1 text-center"><input type="checkbox" name="checkall-toggle" value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" /></td>
 			<th scope="col" class="text-center d-none d-md-table-cell">
 				<?php echo HTMLHelper::_('grid.sort', 'J2STORE_PRODUCT_ID', 'j2store_product_id', $this->state->filter_order_Dir, $this->state->filter_order); ?>
@@ -65,7 +64,6 @@ $wa->useScript('table.columns')
                 $r++;
             ?>
             <tr class="row<?php echo $r;?>">
-                <td class="d-none"><?php //echo $this->pagination->getRowOffset( $i ); ?></td>
                 <td><?php echo $checked; ?></td>
                 <td class="text-center d-none d-md-table-cell"><?php echo $item->j2store_product_id;?></td>
                 <td><?php
