@@ -819,7 +819,7 @@ div.j2store-tab div.j2store-tab-content:not(.active){
     border-left:3px solid #1B7ECF;
 }
 #j2store-navbar .bg-primary {
-    background-color: #132f53!important;
+    background-color: var(--template-bg-dark-80)!important;
 }
 
 #j2store-navbar .nav-item{
@@ -841,10 +841,10 @@ div.j2store-tab div.j2store-tab-content:not(.active){
     font-size:0.86rem;
 }
 #j2store-navbar .dropdown-item:hover{
-    background-color:#3d618f;
+    background-color: var(--template-bg-dark-60);
 }
 #j2store-navbar .active{
-    background-color:#2e486b;
+    background-color: var(--template-bg-dark-70);
 }
 #j2store-navbar #dropdown{
     position: relative;
