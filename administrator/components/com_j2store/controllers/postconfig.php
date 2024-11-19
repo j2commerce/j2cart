@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\CMS\Factory;
+
 class J2StoreControllerPostconfig extends F0FController {
 
 	public function execute($task)
@@ -78,7 +81,7 @@ class J2StoreControllerPostconfig extends F0FController {
 		unset($values['config_currency_symbol']);
 
 		if(!$json) {
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = 'REPLACE INTO #__j2store_configurations (config_meta_key,config_meta_value) VALUES ';
 
 			jimport('joomla.filter.filterinput');

@@ -6,7 +6,11 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2html.php';
+
 class J2StoreViewProduct extends F0FViewHtml
 {
 	public function preRender() {
@@ -128,7 +132,7 @@ class J2StoreViewProduct extends F0FViewHtml
 	}
 
 	public function getProductOptionList($product_type){
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('j2store_option_id, option_unique_name, option_name');
         $query->from('#__j2store_options');

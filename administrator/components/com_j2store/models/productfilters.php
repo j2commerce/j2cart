@@ -6,11 +6,14 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 class J2StoreModelProductFilters extends F0FModel {
 
     public function buildQuery($overrideLimits = false) {
         $query = parent::buildQuery($overrideLimits);
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $product_id = $this->getState('product_id', '');
         if(isset($product_id) && (is_array($product_id) || is_numeric($product_id))) {
             $search_product_ids ='';

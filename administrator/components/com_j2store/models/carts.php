@@ -9,6 +9,8 @@ defined('_JEXEC') or die;
 
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/models/behavior/autoload.php';
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelCarts extends F0FModel {
 
 	protected $default_behaviors = array('filters', 'cartdefault');
@@ -216,7 +218,7 @@ class J2StoreModelCarts extends F0FModel {
 	}
 
 	 public function buildQuery($overrideLimits=false) {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$filter_order = $this->getState('filter_order','tbl.j2store_cart_id');
 		$filter_order_Dir = $this->getState('filter_order_Dir','ASC');
 

@@ -9,8 +9,10 @@
 # Technical Support:  Forum - http://j2store.org/forum/index.html
 -------------------------------------------------------------------------*/
 
-// No direct access
+// No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
 
 class J2StoreTableFilter extends F0FTable
 {
@@ -39,7 +41,7 @@ class J2StoreTableFilter extends F0FTable
 
 
 	private function isProductAssociated($oid){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$query->select('pf.*');
 		$query->from('#__j2store_product_filters as pf');

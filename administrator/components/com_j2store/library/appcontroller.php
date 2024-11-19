@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreAppController extends F0FController
 {
 
@@ -39,7 +41,7 @@ class J2StoreAppController extends F0FController
         $data_params = $app->input->post->get('params', array(), 'array');
         $save_params = $platform->getRegistry($data_params,true);
         $json = $save_params->toString();
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true)->update($db->qn('#__extensions'))->set($db->qn('params') . ' = ' . $db->q($json))->where($db->qn('element') . ' = ' . $db->q($this->_element))->where($db->qn('folder') . ' = ' . $db->q('j2store'))->where($db->qn('type') . ' = ' . $db->q('plugin'));
         $db->setQuery($query);
         $db->execute();

@@ -7,6 +7,7 @@
 // No direct access to this file
 defined ( '_JEXEC' ) or die ();
 
+use Joomla\CMS\Factory;
 
 class J2StoreModelOrders extends F0FModel {
 
@@ -167,7 +168,7 @@ class J2StoreModelOrders extends F0FModel {
 	}
 
 	public function buildQuery($overrideLimites = false) {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = parent::buildQuery($overrideLimites);
 		$query->select($this->_db->qn('#__j2store_orderstatuses.orderstatus_name'));
 		$query->select($this->_db->qn('#__j2store_orderstatuses.orderstatus_cssclass'));
@@ -287,7 +288,7 @@ class J2StoreModelOrders extends F0FModel {
 			return '';
 		}
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$state = $this->getFilterValues();
 
@@ -787,7 +788,7 @@ class J2StoreModelOrders extends F0FModel {
 
 		$date = date( "Y-m-d H:i:s", strtotime( '-' . abs( intval( $held_duration )) . ' MINUTES', $now) );
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true)->select('order_id')->from('#__j2store_orders')->where('modified_on <'.$db->q($date))
             ->where('order_type ='.$db->q('normal'))
             ->where('order_state_id IN (4,5)');

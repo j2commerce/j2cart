@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 class J2StoreModelShippingtroubles extends F0FModel {
 	/**
 	 * Method to buildQuery to return list of data
@@ -14,8 +17,8 @@ class J2StoreModelShippingtroubles extends F0FModel {
 	 */
 	public function buildQuery($overrideLimits = false) {
 
-		$app = JFactory::getApplication();
-		$db = JFactory::getDbo();
+		$app = Factory::getApplication();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$query->select('#__j2store_products.*')->from('#__j2store_products');
 		$this->_buildQueryJoin($query);
@@ -72,7 +75,7 @@ class J2StoreModelShippingtroubles extends F0FModel {
 	}
 
 	function getShippingMethods(){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$query->select("shipping.extension_id,shipping.name,shipping.type,shipping.folder,shipping.element,shipping.params,shipping.enabled,shipping.ordering,shipping.manifest_cache")
 		->from("#__extensions as shipping");

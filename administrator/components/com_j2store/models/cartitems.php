@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/models/behavior/autoload.php';
 
 class J2StoreModelCartitems extends F0FModel {
@@ -100,7 +102,7 @@ class J2StoreModelCartitems extends F0FModel {
 	}
 	
 	public function buildQuery($overrideLimits=false) {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->from('#__j2store_cartitems as tbl');
 		$this->_buildQueryFields($query);
 		$this->_buildQueryJoins($query);

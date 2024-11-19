@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined ( '_JEXEC' ) or die ();
+
+use Joomla\CMS\Factory;
+
 class J2Article {
 
 	public static $instance = null;
@@ -70,7 +73,7 @@ class J2Article {
 		}
 		if ( !isset( $sets[$id] ) )
 		{
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery(true);
 			$query->select('*')->from('#__content')->where('id='.$db->q($id));
 			$db->setQuery($query);
@@ -107,7 +110,7 @@ class J2Article {
         $params               = JComponentHelper::getParams('com_languages');
         $lang = $params->get('site');
 		$default_lang_id = J2StoreRouterHelper::getLanguageId($lang);
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		if($default_lang_id == $lang_id){
 			$query->select('original_text');
@@ -149,7 +152,7 @@ class J2Article {
 				}
 			}
 
-			$db    = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery( true );
 			$query->select( '*' )->from( '#__content' );
 			if ( $content_id > 0 )
@@ -212,7 +215,7 @@ class J2Article {
 		if (empty($alias)){
 			return 0;
 		}
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$query->select('reference_id')->from('#__falang_content')
 			->where($db->quoteName('reference_table') . ' = ' . $db->quote('content'))
@@ -281,7 +284,7 @@ class J2Article {
                         $arrId   = explode(':', $item->id);
                         $assocId = $arrId[0];
 
-                        $db    = JFactory::getDbo();
+                        $db = Factory::getContainer()->get('DatabaseDriver');
                         $query = $db->getQuery(true)
                             ->select($db->qn('state'))
                             ->from($db->qn('#__content'))

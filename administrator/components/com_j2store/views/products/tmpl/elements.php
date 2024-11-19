@@ -6,12 +6,15 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 $platform = J2Store::platform();
 $platform->loadExtra('bootstrap.tooltip');
 $platform->loadExtra('behavior.framework');
 
 $app = $platform->application();
-$db = JFactory::getDbo();
+$db = Factory::getContainer()->get('DatabaseDriver');
 $function  = $app->input->getString('function', 'jSelectProduct');
 $field = $app->input->getString('field');
 $listOrder = $this->escape($this->state->get('list.ordering'));

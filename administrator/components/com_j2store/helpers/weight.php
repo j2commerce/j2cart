@@ -12,6 +12,8 @@
 /** ensure this file is being included by a parent file */
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
+
 class J2Weight {
 
 	private $weights = array();
@@ -25,7 +27,7 @@ class J2Weight {
 	protected static $instance;
 
 	public function __construct() {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('*')
 					->from('#__j2store_weights');
 		$db->setQuery($query);

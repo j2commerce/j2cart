@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 /**
  * J2Store helper.
  */
@@ -164,7 +166,7 @@ class J2Utilities {
 
 	public function cleanIntArray($array, $db = null) {
 		if (! $db)
-			$db = JFactory::getDbo ();
+			$db = Factory::getContainer()->get('DatabaseDriver');
 		if (is_array ( $array )) {
 			$results = array ();
 			foreach ( $array as $id ) {

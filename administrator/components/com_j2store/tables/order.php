@@ -7,6 +7,7 @@
 // No direct access to this file
 defined ( '_JEXEC' ) or die ();
 
+use Joomla\CMS\Factory;
 
 class J2StoreTableOrder extends F0FTable
 {
@@ -1291,7 +1292,7 @@ class J2StoreTableOrder extends F0FTable
 	 * Delete Order fees
 	 * */
 	protected function removeOrderFees(){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->delete('#__j2store_orderfees');
 		$query->where('order_id = '.$db->q($this->order_id));
 		try {
@@ -3634,7 +3635,7 @@ class J2StoreTableOrder extends F0FTable
 	 * Remove / Delete order taxes
 	 * */
 	protected function removeOrderTaxesRows($order_id){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->delete('#__j2store_ordertaxes');
 		$query->where('order_id = '.$db->q($order_id));
 		try {
@@ -3690,7 +3691,7 @@ class J2StoreTableOrder extends F0FTable
 
 	function saveAdminOrderFiles() {
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$items = $this->getItems();
 		foreach($items as $item) {
 			//get the list of files based on

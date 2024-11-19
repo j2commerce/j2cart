@@ -7,6 +7,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/selectable/base.php');
 class J2StoreSelectableFields {
 
@@ -152,7 +155,7 @@ class j2storeCountryType{
 			}
 
 			if(!isset($sets[1])) {
-				$db = JFactory::getDbo();
+                $db = Factory::getContainer()->get('DatabaseDriver');
 				$query = $db->getQuery(true);
 
 				$query->select('a.*')->from('#__j2store_countries AS a');
@@ -172,7 +175,7 @@ class j2storeCountryType{
 				$sets1= array( );
 			}
 			if(!isset($sets1[$this->country_id])) {
-				$db = JFactory::getDbo();
+                $db = Factory::getContainer()->get('DatabaseDriver');
 				$query = $db->getQuery(true);
 				$query->select('a.*')->from('#__j2store_zones AS a');
 				$query->where('a.enabled=1')

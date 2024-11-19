@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelOptions extends F0FModel {
 
 	protected function onProcessList(&$resultArray)
@@ -113,7 +115,7 @@ class J2StoreModelOptions extends F0FModel {
 	}
 
 	public function getOptions($q){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$app = JFactory::getApplication();
 		$product_type = $app->input->getString('product_type');
 		$query = $db->getQuery(true);
@@ -130,7 +132,7 @@ class J2StoreModelOptions extends F0FModel {
 		return $db->loadObjectList();
 	}
 	public function getParent($q=''){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$query->select('j2store_option_id, option_unique_name, option_name');
 		$query->from('#__j2store_options');

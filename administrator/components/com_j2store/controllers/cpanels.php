@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 class J2StoreControllerCpanels extends F0FController
 {
 	 public function execute($task) {
@@ -16,7 +19,7 @@ class J2StoreControllerCpanels extends F0FController
 	}
 
 	protected function onBeforeBrowse() {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
 		$config = J2Store::config();
 		$installation_complete = $config->get('installation_complete', 0);
@@ -258,7 +261,7 @@ class J2StoreControllerCpanels extends F0FController
 	public function drop_indexes() {
 		//This fix is required because multiple indexes were created in previous versions.
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = "SHOW INDEX FROM #__j2store_orders WHERE `key_name` LIKE ".$db->q('%user_email_%');
 		$db->setQuery($query);
 		$indexes = $db->loadObjectList();
@@ -279,7 +282,7 @@ class J2StoreControllerCpanels extends F0FController
 		$i++;
 		}
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = "SHOW INDEX FROM #__j2store_addresses WHERE `key_name` LIKE ".$db->q('%email_%');
 		$db->setQuery($query);
 		$indexes = $db->loadObjectList();
@@ -309,7 +312,7 @@ class J2StoreControllerCpanels extends F0FController
 		$j2params = J2Store::config();
 		$no_of_days_old = $j2params->get('clear_outdated_cart_data_term',90);
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = "select count(j2store_cart_id) from #__j2store_carts c where c.cart_type='cart' AND datediff(now(), c.created_on) > ".$db->q($no_of_days_old).";";
 		$db->setQuery($query);
 		$old_cart_items_exists = $db->loadResult();

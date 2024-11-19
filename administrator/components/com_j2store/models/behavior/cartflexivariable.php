@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 class J2StoreModelCartsBehaviorCartFlexiVariable extends F0FModelBehavior {
 
     public function getVariantByOptions($options, $product){
@@ -213,7 +216,7 @@ class J2StoreModelCartsBehaviorCartFlexiVariable extends F0FModelBehavior {
         if(empty($option_value)) return $ovsets;
         if ( !isset( $ovsets[$product_option_id][$option_value])) {
             //first get the product options
-            $db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
             $query = $db->getQuery(true);
             $query->select('pov.*');
             $query->from('#__j2store_product_optionvalues AS pov');

@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/utilities.php';
 class J2StoreModelCurrencies extends F0FModel {
 
@@ -54,7 +57,7 @@ class J2StoreModelCurrencies extends F0FModel {
 			if($store->get('config_currency_auto', 1) != 1) return;
 
 			$data = array();
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			//update the default currency
 			$query = $db->getQuery(true);
 			$query->update('#__j2store_currencies')->set('currency_value ='.$db->q('1.00000'))

@@ -12,6 +12,8 @@
 // No direct access
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreTableVariant extends F0FTable
 {
 	public function __construct($table, $key, &$db, $config=array())
@@ -112,7 +114,7 @@ class J2StoreTableVariant extends F0FTable
 	}
 
 	protected function onBeforeDelete($id) {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		//delete all related records
 		try {
 				//inventory

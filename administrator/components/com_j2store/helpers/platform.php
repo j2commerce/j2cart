@@ -7,6 +7,9 @@
  */
 /** ensure this file is being included by a parent file */
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\CMS\Factory;
+
 class J2StorePlatform {
 
     /**
@@ -155,7 +158,7 @@ class J2StorePlatform {
     }
     public function checkAdminMenuModule(){
         if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            $db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
             $sql = $db->getQuery(true)
                 ->select('COUNT(*)')
                 ->from('#__modules')

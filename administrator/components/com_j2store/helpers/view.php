@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined ( '_JEXEC' ) or die ();
+
+use Joomla\CMS\Factory;
+
 class J2ViewHelper extends JObject {
 	
 	
@@ -103,7 +106,7 @@ class J2ViewHelper extends JObject {
 		}
 		
 		if(!isset($this->default_template)) {
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = "SELECT template FROM #__template_styles WHERE client_id = ".$app_client." AND home=1";
 			$db->setQuery( $query );
 			$this->default_template = $db->loadResult();

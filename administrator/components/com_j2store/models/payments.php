@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelPayments extends F0FModel {
 
 	/**
@@ -17,7 +19,7 @@ class J2StoreModelPayments extends F0FModel {
 	public function buildQuery($overrideLimits = false) {
 
 		$app = JFactory::getApplication();
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$this->getSelectQuery($query);
 		$this->getWhereQuery($query);

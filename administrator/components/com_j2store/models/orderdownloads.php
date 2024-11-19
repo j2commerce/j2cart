@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined ( '_JEXEC' ) or die ();
+
+use Joomla\CMS\Factory;
+
 jimport('joomla.filesystem.file');
 jimport('joomla.filesystem.folder');
 if(!defined('DS')){
@@ -16,7 +19,7 @@ class J2StoreModelOrderdownloads extends F0FModel {
 	public function buildQuery($overrideLimits = false) {
 
 		$user = JFactory::getUser();
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('#__j2store_orderdownloads.*')->from('#__j2store_orderdownloads');
 
 		$order_id = $this->getState('order_id', null);

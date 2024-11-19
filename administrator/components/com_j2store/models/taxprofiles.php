@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelTaxprofiles extends F0FModel {
 
 	private $shipping_address;
@@ -268,7 +270,7 @@ class J2StoreModelTaxprofiles extends F0FModel {
             $tax_profile->load($taxprofile_id);
             $result = array();
             if(isset($tax_profile->j2store_taxprofile_id) && $tax_profile->j2store_taxprofile_id > 0 && isset($tax_profile->enabled) && $tax_profile->enabled > 0){
-                $db = JFactory::getDbo();
+                $db = Factory::getContainer()->get('DatabaseDriver');
                 $query = "SELECT tr2.j2store_taxrate_id, tr2.taxrate_name AS name, tr2.tax_percent AS rate FROM "
                     . " #__j2store_taxrules tr1 LEFT JOIN "
                     . " #__j2store_taxrates tr2 ON (tr1.taxrate_id = tr2.j2store_taxrate_id) LEFT JOIN "

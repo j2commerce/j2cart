@@ -8,6 +8,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 //require_once('fields.php');
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/selectable/fields.php');
 class J2StoreSelectableBase {
@@ -30,7 +32,7 @@ class J2StoreSelectableBase {
 
 
 	function __construct() {
-		$this->database = JFactory::getDbo();
+		$this->database = Factory::getContainer()->get('DatabaseDriver');
 	}
 
 	public static function getInstance()
@@ -950,7 +952,7 @@ class J2StoreSelectableBase {
 			}
 
                 foreach ($tables as $table_name) {
-                    $db = JFactory::getDbo();
+                    $db = Factory::getContainer()->get('DatabaseDriver');
                     if ($table_name == 'address') $table_name = F0FInflector::pluralize($table_name);
                     $query = 'ALTER TABLE ' . $this->fieldTable($table_name) . ' ADD `' . $field->field_namekey . '` TEXT NULL';
                     $db->setQuery($query);

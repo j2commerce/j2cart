@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined ( '_JEXEC' ) or die ();
+
+use Joomla\CMS\Factory;
+
 class J2StoreModelCustomers extends F0FModel {
 
 
@@ -42,7 +45,7 @@ class J2StoreModelCustomers extends F0FModel {
 
 
 	public function getAddressesByemail($email){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = parent::buildQuery($overrideLimits=false);
 		$query->where($this->_db->qn('#__j2store_addresses.email').' LIKE '.$db->q('%'.$email.'%'));
 		$db->setQuery($query);
@@ -88,7 +91,7 @@ class J2StoreModelCustomers extends F0FModel {
 	}
 
 	public function updateAlladdressesByemail($email ,$new_email){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
 		$query = $db->getQuery(true);
 		// Fields to update.
@@ -105,7 +108,7 @@ class J2StoreModelCustomers extends F0FModel {
 
 
 	function updateOrdersbyEmail($email ,$new_email) {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		// Fields to update.
 		$fields = array($db->quoteName('user_email') . ' = ' . $db->quote($new_email));
@@ -120,7 +123,7 @@ class J2StoreModelCustomers extends F0FModel {
 	}
 
 	function updateOrderDownloadsbyEmail($email ,$new_email) {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		// Fields to update.
 		$fields = array($db->quoteName('user_email') . ' = ' . $db->quote($new_email));
@@ -136,7 +139,7 @@ class J2StoreModelCustomers extends F0FModel {
 
 
 	function updateOrderCouponsbyEmail($email ,$new_email) {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		// Fields to update.
 		$fields = array($db->quoteName('discount_customer_email') . ' = ' . $db->quote($new_email));
@@ -150,7 +153,7 @@ class J2StoreModelCustomers extends F0FModel {
 	}
 
 	function updateUsersbyEmail($email ,$new_email) {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		// Fields to update.
 		$fields = array($db->quoteName('email') . ' = ' . $db->quote($new_email));

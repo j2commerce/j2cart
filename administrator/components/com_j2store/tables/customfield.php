@@ -9,7 +9,10 @@
 # Technical Support:  Forum - http://j2store.org/forum/index.html
 -------------------------------------------------------------------------*/
 
+// No direct access to this file
 defined('_JEXEC') or die();
+
+use Joomla\CMS\Factory;
 
 class J2StoreTableCustomfield extends F0FTable
 {
@@ -23,7 +26,7 @@ class J2StoreTableCustomfield extends F0FTable
 	protected function onBeforeDelete($oid)
 	{
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$status = true;
 		// Load the post record
 		$item = clone $this;

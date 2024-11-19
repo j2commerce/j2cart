@@ -8,6 +8,8 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2Invoice {
 
 	public static $instance = null;
@@ -87,7 +89,7 @@ class J2Invoice {
 	public function getInvoiceTemplates($order) {
 
 
- 		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
 			$query = $db->getQuery(true)
 			->select('*')

@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelVendors extends F0FModel {
 
 	protected function onProcessList(&$resultArray)
@@ -18,7 +20,7 @@ class J2StoreModelVendors extends F0FModel {
 	}
 	public function buildQuery($overrideLimits = false)
 	{
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query  = $db->getQuery(true);
 		$query->select('#__j2store_vendors.*')->from("#__j2store_vendors as #__j2store_vendors");
 		$query->select($db->qn('#__j2store_addresses').'.j2store_address_id')
@@ -50,7 +52,7 @@ class J2StoreModelVendors extends F0FModel {
 	public function buildOrderbyQuery(&$query){
 		$state = $this->getState();
 		$app = JFactory::getApplication();
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$filter_order_Dir = $app->input->getString('filter_order_Dir','asc');
 		$filter_order = $app->input->getString('filter_order','j2store_vendor_id');
         $search = $app->input->getString('first_name','');
@@ -80,7 +82,7 @@ class J2StoreModelVendors extends F0FModel {
 		$addressTable = F0FTable::getInstance('Address','J2storeTable')->getClone();
 		$addressTable->load($data['address_id']);
 		$addressTable->save($data);
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true)
             ->select($db->qn(array('address_id','j2store_user_id')))
             ->from($db->qn('#__j2store_vendors'))

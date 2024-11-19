@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelFiltergroups extends F0FModel {
 
 	protected function onProcessList(&$resultArray)
@@ -62,7 +64,7 @@ class J2StoreModelFiltergroups extends F0FModel {
 
     public function getSFQuery($overrideLimits=false) {
 
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query = $query->select('*')->from('#__j2store_filters');
         $filter_group_id = $this->getState('filter_group_id',0);

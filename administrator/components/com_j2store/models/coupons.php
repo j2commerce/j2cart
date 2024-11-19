@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 class J2StoreModelCoupons extends F0FModel {
 
 	public $code = '';
@@ -14,7 +17,7 @@ class J2StoreModelCoupons extends F0FModel {
 
 	protected function onBeforeSave(&$data, &$table) {
         $status = true ;
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true)
             ->select($db->qn(array('coupon_code')))
             ->from($db->qn('#__j2store_coupons'))
@@ -123,7 +126,7 @@ class J2StoreModelCoupons extends F0FModel {
 		if(!is_array($history)) $history= array();
 
 		if(!isset($history[$coupon_id][$user_id])) {
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery ( true );
 			$query->select ( 'COUNT(*) AS total' )->from ( '#__j2store_orderdiscounts' )
                 ->join('LEFT','#__j2store_orders on #__j2store_orderdiscounts.order_id = #__j2store_orders.order_id')
@@ -366,7 +369,7 @@ class J2StoreModelCoupons extends F0FModel {
 	 * Ensure coupon date is valid or throw exception
 	 */
 	private function validate_expiry_date() {
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$nullDate = $db->getNullDate();
 		$tz = JFactory::getConfig()->get('offset');
 		$now = JFactory::getDate('now', $tz)->toSql(true);

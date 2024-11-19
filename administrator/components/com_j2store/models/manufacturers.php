@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelManufacturers extends F0FModel {
 
 	protected function onProcessList(&$resultArray)
@@ -18,7 +20,7 @@ class J2StoreModelManufacturers extends F0FModel {
 	}
 	public function buildQuery($overrideLimits = false)
 	{
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query  = $db->getQuery(true)
 		->select('#__j2store_manufacturers.*')->from("#__j2store_manufacturers as #__j2store_manufacturers")
 		->select($db->qn('#__j2store_addresses').'.j2store_address_id')
@@ -44,7 +46,7 @@ class J2StoreModelManufacturers extends F0FModel {
 
 	public function buildOrderbyQuery(&$query){
 		$app = JFactory::getApplication();
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
         $filter_order_Dir = $this->getState('filter_order_Dir',$app->input->getString('filter_order_Dir','asc'));
         $filter_order = $this->getState('filter_order',$app->input->getString('filter_order','company'));
@@ -83,7 +85,7 @@ class J2StoreModelManufacturers extends F0FModel {
 
 	public function getManufacturersList($brand_ids){
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $this->buildQuery($overrideLimits = false);
 		$query->where('#__j2store_manufacturers.j2store_manufacturer_id IN ('. $brand_ids. ')');
 		$db->setQuery($query);

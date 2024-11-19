@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2Config extends JObject {
 	public static $instance = null;	
 	var $_data;
@@ -14,7 +16,7 @@ class J2Config extends JObject {
 	public function __construct($properties=null) {
 
 		if(!isset($this->_data) && !is_array($this->_data)) {
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery(true)->select('*')->from('#__j2store_configurations');
 			$db->setQuery($query);
 			$this->_data = $db->loadObjectList('config_meta_key');

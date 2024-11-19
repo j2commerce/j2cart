@@ -8,6 +8,8 @@
 // No direct access
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelProductPrices extends F0FModel {
 
 	private function getFilterValues()
@@ -29,7 +31,7 @@ class J2StoreModelProductPrices extends F0FModel {
 
 	public function buildQuery($overrideLimits = false) {
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('#__j2store_product_prices.*')
 		->from('#__j2store_product_prices');
 

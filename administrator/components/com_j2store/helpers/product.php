@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 /**
  * J2Html class provides Form Inputs
  */
@@ -171,7 +173,7 @@ class J2Product extends JObject{
 		if(empty($test)){
 			static $last_pid = null;
 			if($last_pid===null){
-				$db = JFactory::getDbo();
+                $db = Factory::getContainer()->get('DatabaseDriver');
 				$query = 'SELECT MAX(`j2store_product_id`) FROM #__j2store_products';
 				$db->setQuery($query);
 				$last_pid = (int)$db->loadResult();
@@ -326,7 +328,7 @@ class J2Product extends JObject{
 		if ( !isset( $osets[$product_id.''.$parent_id])) {
 
 			//first get the product options
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$product_option_data = array();
 
 			$product_options = F0FModel::getTmpInstance('ProductOptions', 'J2StoreModel')
@@ -412,7 +414,7 @@ class J2Product extends JObject{
 		}
 		if ( !isset( $ovsets[$product_option_id][$product_id])) {
 			//first get the product options
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery(true);
 			$query->select('pov.*');
 			$query->from('#__j2store_product_optionvalues AS pov');
@@ -1007,7 +1009,7 @@ class J2Product extends JObject{
 		$cart_model->getCart();
 		$cart_id = $cart_model->getCartId();
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('SUM(product_qty) as total_cart_qty')
 		->from('#__j2store_cartitems')
 		->where('variant_id='.$db->q($variant_id));
@@ -1053,7 +1055,7 @@ class J2Product extends JObject{
 
 	function getVariantByOptions($product_options, $product_id) {
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$optionvalues = array();
 		foreach($product_options as $productoption_id => $optionvalue) {
 			$optionvalues[] = intval($optionvalue);
@@ -1100,7 +1102,7 @@ class J2Product extends JObject{
 
 	public function getOptionvalueName($product_optionvalue_id) {
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('#__j2store_optionvalues.optionvalue_name')
 									->from('#__j2store_product_optionvalues')
 									->join('INNER', '#__j2store_optionvalues ON #__j2store_product_optionvalues.optionvalue_id = #__j2store_optionvalues.j2store_optionvalue_id')
@@ -1117,7 +1119,7 @@ class J2Product extends JObject{
 			$posets = array( );
 		}
 		if ( !isset( $posets[$product_option_id][$product_id])) {
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery(true);
 			$query->select('po.*');
 			$query->from('#__j2store_product_options AS po');
@@ -1156,7 +1158,7 @@ class J2Product extends JObject{
         if ( !isset( $ovsets[$product_option_id][$option_value])) {
 
 			//first get the product options
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery(true);
 			$query->select('pov.*');
 			$query->from('#__j2store_product_optionvalues AS pov');
@@ -1299,7 +1301,7 @@ class J2Product extends JObject{
 	function getRelatedProducts($items){
 
 		if(is_string($items) && !empty($items)){
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery(true);
 			$query->select('v.sku,v.upc,#__j2store_products.*')->from('#__j2store_products');
 			$query->join ( 'LEFT', '#__j2store_variants AS v ON v.product_id=#__j2store_products.j2store_product_id' );

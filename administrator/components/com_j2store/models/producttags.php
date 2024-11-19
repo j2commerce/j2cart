@@ -7,6 +7,9 @@
 
 // No direct access
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/models/behavior/autoload.php';
 class J2StoreModelProducttags extends F0FModel {
 
@@ -173,7 +176,7 @@ class J2StoreModelProducttags extends F0FModel {
 
 	public function getTags($tag){
 		//get the db object
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
 		if($tag){
 			$selected_tag = implode('\',\'',$tag);
@@ -248,7 +251,7 @@ class J2StoreModelProducttags extends F0FModel {
 
 		//now load the configurations
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('*')->from('#__j2store_configurations');
 		$db->setQuery($query);
 		$results = $db->loadObjectList('config_meta_key');
@@ -300,7 +303,7 @@ class J2StoreModelProducttags extends F0FModel {
 	}
 
 	public function getVendors($vendor_ids=''){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$query->select('a.*');
 		$query->select('v.*');
@@ -436,7 +439,7 @@ class J2StoreModelProducttags extends F0FModel {
 
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$db = $this->getDbo();
 		$query = $db->getQuery(true);
 
@@ -906,7 +909,7 @@ class J2StoreModelProducttags extends F0FModel {
 
 	public function getQueryDate($orderDate)
 	{
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
 		switch ($orderDate)
 		{

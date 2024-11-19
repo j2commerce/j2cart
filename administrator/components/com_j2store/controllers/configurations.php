@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR . '/components/com_j2store/controllers/traits/list_view.php';
 
 class J2StoreControllerConfigurations extends F0FController
@@ -1013,7 +1016,7 @@ class J2StoreControllerConfigurations extends F0FController
         if ($task == 'populatedata') {
             $this->getPopulatedData($data);
         }
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $config = J2Store::config();
         $query = 'REPLACE INTO #__j2store_configurations (config_meta_key,config_meta_value) VALUES ';
 

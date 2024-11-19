@@ -7,6 +7,9 @@
 
 // No direct access
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/models/behavior/autoload.php';
 class J2StoreModelProducts extends F0FModel {
 
@@ -277,7 +280,7 @@ class J2StoreModelProducts extends F0FModel {
     function getGlobalOptions($product_type){
 
         //$items = F0FModel::getTmpInstance('Options','J2StoreModel')->enabled(1)
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('*')->from("#__j2store_options");
 
@@ -323,7 +326,7 @@ class J2StoreModelProducts extends F0FModel {
      */
     function getRelationalProducts($product_id ,$q){
 
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('p.j2store_product_id')->from("#__j2store_products as p");
         $query->select('a.title as product_name');
@@ -338,7 +341,7 @@ class J2StoreModelProducts extends F0FModel {
     function getProductPrices($product_id){
         $variant = F0FTable::getInstance('Variants','J2StoreTable');
         $variant->load(array('product_id'=>$product_id));
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('p.*')->from("#__j2store_product_prices as p");
         $query->where('p.variant_id =' .$db->q($variant->j2store_variant_id));
@@ -504,7 +507,7 @@ class J2StoreModelProducts extends F0FModel {
                 //get the last stored variant id
                 $variant_id = $variantTable->getId();
 
-                $db = JFactory::getDbo();
+                $db = Factory::getContainer()->get('DatabaseDriver');
                 $columns = array('variant_id', 'product_optionvalue_ids');
                 $fields = array ($variant_id, $db->q($variant));
 
@@ -627,7 +630,7 @@ class J2StoreModelProducts extends F0FModel {
 
     public function getCategories($cat){
         //get the db object
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
         if($cat){
             $selected_cat = implode(',',$cat);
@@ -728,7 +731,7 @@ class J2StoreModelProducts extends F0FModel {
 
     public function getProductListQuery($overrideLimits = false) {
 
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true)->select('#__j2store_products.*')->from('#__j2store_products');
         $this->_buildQueryJoins($query);
         $this->_buildWhereQuery($query);
@@ -1025,7 +1028,7 @@ class J2StoreModelProducts extends F0FModel {
 
         //now load the configurations
 
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true)->select('*')->from('#__j2store_configurations');
         $db->setQuery($query);
         $results = $db->loadObjectList('config_meta_key');
@@ -1077,7 +1080,7 @@ class J2StoreModelProducts extends F0FModel {
     }
 
     public function getVendors($vendor_ids=''){
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('a.*');
         $query->select('v.*');
@@ -1204,7 +1207,7 @@ class J2StoreModelProducts extends F0FModel {
     }
 
     public function getSearchProduct(){
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $search = $this->getState('search',null,'string');
         $query->select('*')->from('#__j2store_variants');
@@ -1239,7 +1242,7 @@ class J2StoreModelProducts extends F0FModel {
 
         $app = JFactory::getApplication();
         $user = JFactory::getUser();
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $db = $this->getDbo();
         $query = $db->getQuery(true);
 
@@ -1820,7 +1823,7 @@ class J2StoreModelProducts extends F0FModel {
 
     public function getQueryDate($orderDate)
     {
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
         switch ($orderDate)
         {

@@ -12,6 +12,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
 
 class J2Email {
 
@@ -623,7 +624,7 @@ class J2Email {
     }
 	public function getEmailTemplates($order, $receiver_type='*') {
 
- 		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
 			$query = $db->getQuery(true)
 			->select('*')

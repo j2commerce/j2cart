@@ -7,6 +7,7 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 
 class J2StoreControllerApps extends F0FController
 {
@@ -75,7 +76,7 @@ class J2StoreControllerApps extends F0FController
             'campaignrabbit' => 'system',
             'app_retainfulcoupon' => 'j2store'
         );
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         foreach ($uninstall_plugins as $plugin => $folder)
         {
             $sql = $db->getQuery(true)

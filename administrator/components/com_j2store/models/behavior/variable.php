@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelProductsBehaviorVariable extends F0FModelBehavior {
 
 	private $_rawData = array();
@@ -306,7 +308,7 @@ class J2StoreModelProductsBehaviorVariable extends F0FModelBehavior {
 			}
 		}
 		//load the price index table and set the min - max price
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$values = array();
 		$product_id = $table->j2store_product_id;
 		$values['product_id'] = $product_id;
@@ -460,7 +462,7 @@ class J2StoreModelProductsBehaviorVariable extends F0FModelBehavior {
 		if($product->has_options && $product->variants) {
 			try {
 
-				$db = JFactory::getDbo();
+                $db = Factory::getContainer()->get('DatabaseDriver');
 				//get all the variants
 				$query = $db->getQuery(true)->select('#__j2store_product_variant_optionvalues.variant_id as variant_id, #__j2store_product_variant_optionvalues.product_optionvalue_ids')->from('#__j2store_product_variant_optionvalues')
 					->where('variant_id IN ('.implode(',', $variant_ids).')' );

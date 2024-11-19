@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelReports extends F0FModel {
 
 	/**
@@ -17,7 +19,7 @@ class J2StoreModelReports extends F0FModel {
 	public function buildQuery($overrideLimits = false) {
 
 		$app = JFactory::getApplication();
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$this->getSelectQuery($query);
 		$this->getWhereQuery($query);
@@ -37,7 +39,7 @@ class J2StoreModelReports extends F0FModel {
 	protected function getWhereQuery(&$query)
 	{
         $app = J2Store::platform()->application();
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query->where("report.type='plugin'");
 		$query->where("report.element LIKE 'report_%'");
 		$query->where("report.folder='j2store'");

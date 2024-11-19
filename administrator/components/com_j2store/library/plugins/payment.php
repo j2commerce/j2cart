@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/_base.php');
 if (!defined('F0F_INCLUDED')) {
     require_once JPATH_LIBRARIES . '/f0f/include.php';
@@ -217,7 +219,7 @@ class J2StorePaymentPlugin extends J2StorePluginBase
 
         if (isset($geozone_id) && (int)$geozone_id > 0) {
             //get the geozones
-            $db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
             $query = $db->getQuery(true);
             $query->select('gz.*,gzr.*')->from('#__j2store_geozones AS gz')
                 ->innerJoin('#__j2store_geozonerules AS gzr ON gzr.geozone_id = gz.j2store_geozone_id')
@@ -339,7 +341,7 @@ class J2StorePaymentPlugin extends J2StorePluginBase
     {
 
         if (empty($this->_j2version)) {
-            $db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
             // Get installed version
             $query = $db->getQuery(true);
             $query->select($db->quoteName('manifest_cache'))->from($db->quoteName('#__extensions'))->where($db->quoteName('element') . ' = ' . $db->quote('com_j2store'));

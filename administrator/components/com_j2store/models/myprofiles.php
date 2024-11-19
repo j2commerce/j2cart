@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 class J2StoreModelMyProfiles extends F0FModel {
 
 	/**
@@ -15,7 +18,7 @@ class J2StoreModelMyProfiles extends F0FModel {
 	public function getAddress()
 	{
 		/** Get a DB Object */
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
 		/** get the current query Object **/
 		$query = $db->getQuery(true);
@@ -35,7 +38,7 @@ class J2StoreModelMyProfiles extends F0FModel {
 	}
 
 	public function _buildWhere(&$query){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$user = JFactory::getUser();
         if($user->id){
             $query->where('a.user_id='.$db->quote($user->id));

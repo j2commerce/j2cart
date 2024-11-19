@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreModelVouchers extends F0FModel {
 
 	public $code = '';
@@ -42,7 +44,7 @@ class J2StoreModelVouchers extends F0FModel {
 	public function get_voucher_history($voucher_id) {
 
 		if(!isset($this->history[$voucher_id])) {
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery (true);
 			$j2config = J2Store::config ();
 			if($j2config->get('config_including_tax', 0)) {
@@ -65,7 +67,7 @@ class J2StoreModelVouchers extends F0FModel {
     public function get_admin_voucher_history($voucher_id,$order_id = '') {
 
         if(!isset($this->history[$voucher_id])) {
-            $db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
             $query = $db->getQuery (true);
             $j2config = J2Store::config ();
             if($j2config->get('config_including_tax', 0)) {
@@ -171,7 +173,7 @@ class J2StoreModelVouchers extends F0FModel {
      * Ensure voucher date is valid or throw exception
      */
     private function validate_expiry_date() {
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $nullDate = $db->getNullDate();
         $tz = JFactory::getConfig()->get('offset');
         $now = JFactory::getDate('now', $tz)->format('Y-m-d', true);
@@ -246,7 +248,7 @@ class J2StoreModelVouchers extends F0FModel {
 
 
 	public function getVoucherByCode($code) {
-		$db = JFactory::getDbo ();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery ( true );
 		$query->select ( '*' )->from ( '#__j2store_vouchers' )->where ( 'voucher_code=' . $db->q ( $code ) )->where ( 'enabled=1' );
 		$db->setQuery ( $query );
@@ -268,7 +270,7 @@ class J2StoreModelVouchers extends F0FModel {
 
 		if (isset($vouchers[0]) && $vouchers[0]) {
 			$voucher = $vouchers[0];
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$params = J2Store::config();
 
 			//sum of voucher history

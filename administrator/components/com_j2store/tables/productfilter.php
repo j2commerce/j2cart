@@ -7,6 +7,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2StoreTableProductFilter extends F0FTable
 {
 	public function __construct($table, $key, &$db)
@@ -20,7 +22,7 @@ class J2StoreTableProductFilter extends F0FTable
 		if(empty($product_id)){
 			return new stdClass();
 		}
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$query->delete('#__j2store_product_filters');
 		$query->where('product_id ='.$db->q($product_id));
@@ -29,7 +31,7 @@ class J2StoreTableProductFilter extends F0FTable
 	}
 
 	public function searchFilters($q){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$app = JFactory::getApplication();
 		$query = $db->getQuery(true);
 		$query->select('pfv.*');
@@ -59,7 +61,7 @@ class J2StoreTableProductFilter extends F0FTable
         }
 		if(!is_array($filters) || empty($product_id)) return false;
 
-		$db = $this->getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		foreach($filters as $filter_id) {
 
 			$query = $db->getQuery(true)->select('*')->from('#__j2store_product_filters')
@@ -82,7 +84,7 @@ class J2StoreTableProductFilter extends F0FTable
 
 
 	public function deleteFilter($filter_id, $product_id) {
-		$db = $this->getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->delete('#__j2store_product_filters')
 		->where('filter_id='.$db->q($filter_id))
 		->where('product_id='.$db->q($product_id));
@@ -102,7 +104,7 @@ class J2StoreTableProductFilter extends F0FTable
 	 */
 
 	public function getFiltersByProduct($product_id=null) {
-		$db = $this->getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('pf.*')->from('#__j2store_product_filters AS pf');
 
 		if(isset($product_id)) {
@@ -139,7 +141,7 @@ class J2StoreTableProductFilter extends F0FTable
 
 	public function getFiltersByFilterIds($filter_ids){
 
-		$db = $this->getDbo();
+		$db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('pf.*')->from('#__j2store_product_filters AS pf');
 		if($filter_ids ){
 			$query->where('filter_id IN('. $filter_ids.')');
@@ -168,7 +170,7 @@ class J2StoreTableProductFilter extends F0FTable
 	 * Method to get all the filters
 	 */
 	public function getFilters(){
-		$db = $this->getDbo();
+		$db = $Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$query->select('f.filter_name, f.group_id ,f.j2store_filter_id as filter_id')
 		->from('#__j2store_filters as f')

@@ -6,6 +6,9 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 class J2StoreModelEmailtemplates extends F0FModel {
 	
 	
@@ -14,7 +17,7 @@ class J2StoreModelEmailtemplates extends F0FModel {
 		if(isset($data['body_source']) && $data['body_source'] == 'file') {
 			$app = JFactory::getApplication ();
 			// Codemirror or Editor None should be enabled
-			$db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery(true)
 			->select('COUNT(*)')
 			->from('#__extensions as a')

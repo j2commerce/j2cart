@@ -6,6 +6,9 @@
  */
 // No direct access
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 class J2StoreModelApps extends F0FModel {
 
 	/**
@@ -15,8 +18,8 @@ class J2StoreModelApps extends F0FModel {
 	 */
 	public function buildQuery($overrideLimits = false) {
 
-		$app = JFactory::getApplication();
-		$db = JFactory::getDbo();
+		$app = Factory::getApplication();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 		$this->getSelectQuery($query);
 		$this->getWhereQuery($query);
@@ -54,7 +57,7 @@ class J2StoreModelApps extends F0FModel {
 	}
 
 	public function getInserted($tablename){
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$status = true;
         $application = JFactory::getApplication();
 		//Force parsing of SQL file since Joomla! does that only in install mode, not in upgrades

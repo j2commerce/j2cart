@@ -7,11 +7,13 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
 class J2storeTableOrderinfo extends F0FTable
 {
   public function __construct($table, $key, &$db)
   {
- 	 	$query = JFactory::getDbo()->getQuery(true);
+ 	 	$query = Factory::getContainer()->get('DatabaseDriver')->getQuery(true);
   		$query->leftJoin('#__j2store_countries as billingcountry ON billingcountry.j2store_country_id = #__j2store_orderinfos.billing_country_id');
   		$query->select('billingcountry.country_name as billing_country_name');
   		

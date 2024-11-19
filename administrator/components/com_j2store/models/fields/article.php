@@ -9,6 +9,8 @@
 
 defined('JPATH_BASE') or die;
 
+use Joomla\CMS\Factory;
+
 /**
  * Supports a modal article picker.
  *
@@ -96,7 +98,7 @@ class JFormFieldModal_Article extends JFormField
 
 		if ((int) $this->value > 0)
 		{
-			$db	= JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery(true)
 				->select($db->quoteName('title'))
 				->from($db->quoteName('#__content'))

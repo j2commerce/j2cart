@@ -7,6 +7,9 @@
 
 // No direct access
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/models/behavior/autoload.php';
 class J2StoreModelInventories extends F0FModel {
 	protected $_productlist = array();
@@ -35,7 +38,7 @@ class J2StoreModelInventories extends F0FModel {
 
 	public function getStockProductListQuery($overrideLimits = false) {
 
-		$db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('#__j2store_productquantities.*')->from('#__j2store_productquantities');
 		$this->_buildQueryJoins($query);
 		$this->_buildWhereQuery($query);
@@ -58,7 +61,7 @@ class J2StoreModelInventories extends F0FModel {
 	}
 
 	public function _buildWhereQuery(&$query){
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$inventry = $this->getState ('inventry_stock','');
 		if($inventry == 'in_stock'){
 			$query->where('#__j2store_variants.availability = 1');

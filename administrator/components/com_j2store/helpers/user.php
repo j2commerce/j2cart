@@ -12,6 +12,9 @@
 
 /** ensure this file is being included by a parent file */
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\CMS\Factory;
+
 //F0FTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_j2store/tables');
 class J2User
 {
@@ -478,7 +481,7 @@ class J2User
 				if ($groupId == 1) {
 					continue;
 				}
-			    $db = JFactory::getDbo();
+                $db = Factory::getContainer()->get('DatabaseDriver');
 			    $db->setQuery(
 			        'SELECT `title`' .
 			        ' FROM `#__usergroups`' .
