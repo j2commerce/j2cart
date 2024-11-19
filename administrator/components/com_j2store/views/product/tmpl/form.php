@@ -2,39 +2,31 @@
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
-defined('_JEXEC') or die;
+defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
+
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/input.php');
 $platform = J2Store::platform();
-$platform->addStyle('j2store-font-awesome-css','/media/j2store/css/font-awesome.min.css');
-$platform->addStyle('j2store-admin-css','/media/j2store/css/j2store_admin.css');
-//$doc = JFactory::getDocument();
-//$doc->addStyleSheet(JURI::root(true).'/media/j2store/css/font-awesome.min.css');
-//$doc->addStyleSheet(JURI::root(true).'/media/j2store/css/j2store_admin.css');
-$app = JFactory::getApplication();
+
+
+
+$app = Factory::getApplication();
 $option = $app->input->getString('option');
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
 $row_class = 'row';
 $col_class = 'col-md-';
 $product_type_class = 'badge bg-success';
-$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.JText::_('J2STORE_INVALID_INPUT_FIELD').'</div></div></joomla-alert>' ;
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-    $product_type_class = 'label label-success';
-    $alert_html = '<div class="alert alert-error alert-danger">'.JText::_('J2STORE_INVALID_INPUT_FIELD').'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
-    $platform->addInlineScript("jQuery(function($) {
-	SqueezeBox.initialize({});
-	SqueezeBox.assign($('a.modal').get(), {
-		parse: 'rel'
-	});
-});");
-}
+$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.Text::_('J2STORE_INVALID_INPUT_FIELD').'</div></div></joomla-alert>' ;
+
 ?>
-<script  type="text/javascript">
+<script type="text/javascript">
     Joomla.submitbutton = function(pressbutton) {
         var form = document.adminForm;
         if(pressbutton == 'article.cancel') {
@@ -72,91 +64,82 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 
 <div class="j2store">
     <div class="j2store-product-edit-form">
-
         <div class="<?php echo $row_class;?>">
-            <div class="<?php echo $col_class;?><?php echo ($this->item->j2store_product_id) ?'4':'12'; ?>">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><?php echo JText::_('J2STORE_PRODUCT_INFORMATION'); ?></h3>
+            <div class="<?php echo $col_class;?><?php echo ($this->item->j2store_product_id) ?'4':'12'; ?> mb-4">
+                <div class="card j2store-product-information">
+                    <div class="card-header justify-content-between">
+                        <h3 class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_INFORMATION'); ?></h3>
                     </div>
-                    <div class="panel-body">
-                        <div class="control-group form-group form-inline" id="j2store-product-enable">
-                            <?php echo J2Html::label(JText::_('J2STORE_TREAT_AS_PRODUCT'), 'enabled',array('class'=>'control-label'));?>
-                            <?php echo J2Html::radio($this->form_prefix.'[enabled]', $this->item->enabled, array('id'=>'j2store-product-enabled-radio-group', 'class'=>'radio'));?>
-                        </div>
-                        <div class="control-group form-group" id="j2store-product-type">
-                            <?php if(!empty($this->item->product_type)): ?>
-                                <?php echo J2Html::label(JText::_('J2STORE_PRODUCT_TYPE'), 'product_type',array('class'=>'control-label')); ?>
-                                <span class="<?php echo $product_type_class;?>"><?php echo JText::_('J2STORE_PRODUCT_TYPE_'.strtoupper($this->item->product_type)) ?></span></label>
-                                <?php echo J2Html::hidden($this->form_prefix.'[product_type]', $this->item->product_type); ?>
-                            <?php else: ?>
-                                <?php echo J2Html::label(JText::_('J2STORE_PRODUCT_TYPE'), 'product_type',array('class'=>'control-label')); ?>
-                                <div class="controls"><?php echo $this->product_types; ?></div>
-                            <?php endif; ?>
-                        </div>
-                        <?php if(!$this->item->enabled): ?>
-                            <!-- Show this only when this was not a product -->
-                            <?php if($option == 'com_content' && J2Store::platform()->isClient('administrator')): ?>
-                                <div class="control-group form-group">
-                                    <input type="button" id="submit_button" onclick="Joomla.submitbutton('article.apply')" class="btn btn-large btn-success" value="<?php echo JText::_('J2STORE_SAVE_AND_CONTINUE'); ?>" />
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="control-group" id="j2store-product-enable">
+                                <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_TREAT_AS_PRODUCT'), 'enabled',array());?></div>
+		                        <?php echo J2Html::inlineRadio($this->form_prefix.'[enabled]', $this->item->enabled, array('id'=>'j2store-product-enabled-radio-group', 'class'=>'form-check form-check-inline'));?>
+                            </div>
+                            <div class="control-group" id="j2store-product-type">
+		                        <?php if(!empty($this->item->product_type)): ?>
+                                    <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TYPE'), 'product_type',array()); ?></div>
+                                    <div class="controls">
+                                        <span class="<?php echo $product_type_class;?>"><?php echo Text::_('J2STORE_PRODUCT_TYPE_'.strtoupper($this->item->product_type)) ?></span>
+                                    </div>
+			                        <?php echo J2Html::hidden($this->form_prefix.'[product_type]', $this->item->product_type); ?>
+		                        <?php else: ?>
+                                    <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TYPE'), 'product_type',array()); ?></div>
+                                    <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', $this->product_types); ?></div>
+		                        <?php endif; ?>
+                            </div>
+	                        <?php if(!$this->item->enabled): ?>
+                                <!-- Show this only when this was not a product -->
+		                        <?php if($option == 'com_content' && J2Store::platform()->isClient('administrator')): ?>
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <input type="button" id="submit_button" onclick="Joomla.submitbutton('article.apply')" class="btn btn-primary" value="<?php echo Text::_('J2STORE_SAVE_AND_CONTINUE'); ?>" />
+                                        </div>
+                                    </div>
+		                        <?php endif; ?>
+	                        <?php endif; ?>
+
+	                        <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
+                                <div class="control-group">
+                                    <div class="control-label"></div>
+                                    <div class="controls">
+                                        <div class="j2store-confirm-cont">
+                                            <a data-fancybox data-src="#j2storeConfirmChange" type="button" class="btn btn-sm btn-outline-danger" ><?php echo  Text::_('J2STORE_CHANGE_PRODUCT_TYPE');?></a>
+                                            <?php echo $this->loadTemplate('confirm_change'); ?>
+                                        </div>
+                                    </div>
                                 </div>
                             <?php endif; ?>
-                        <?php endif; ?>
-
-                        <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
-                            <div class="j2store-confirm-cont">
-                                <a data-fancybox data-src="#j2storeConfirmChange" type="button" class="btn btn-warning" ><?php echo  JText::_('J2STORE_CHANGE_PRODUCT_TYPE');?></a>
-                                <!-- here load the confirm modal -->
-                                <?php echo $this->loadTemplate('confirm_change'); ?>
-                            </div>
-                        <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
-                <div class="<?php echo $col_class;?>7">
-                    <div class="panel panel-solid-success">
-                        <div class="panel-body">
-                            <p class="lead">
-                                <?php echo JText::_('J2STORE_PRODUCT_ID'); ?> : <strong><?php echo $this->item->j2store_product_id; ?></strong>
-                            </p>
-                            <h3><?php echo JText::_('J2STORE_PLUGIN_SHORTCODE')?></h3>
+                <div class="<?php echo $col_class;?>8 mb-4">
+                    <div class="card j2store-product-shortcodes text-bg-primary text-white">
+                        <div class="card-header justify-content-between fs-3">
+                            <h3 class="mb-0 text-white"><?php echo Text::_('J2STORE_PRODUCT_ID'); ?>: <?php echo $this->item->j2store_product_id; ?></h3>
+                            <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShortcodes" aria-expanded="false" aria-controls="collapseShortcodes"><?php echo Text::_('J2STORE_PRODUCT_VIEW_SHORTCODES'); ?></button>
+                        </div>
+                        <div class="card-body">
+                            <h4 class="mb-2 text-white fs-5"><?php echo Text::_('J2STORE_PLUGIN_SHORTCODE')?></h4>
                             <p class="shortcode">
                                 {j2store}<?php echo $this->item->j2store_product_id; ?>|cart{/j2store}
                             </p>
                             <small>
-                                <?php echo JText::_('J2STORE_PLUGIN_SHORTCODE_HELP_TEXT');?>
+		                        <?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_HELP_TEXT');?>
                             </small>
-                            <br>
-
-                            <span class="pull-right">
-					<button type="button" class="btn btn-small btn-warning"
-                            href="javascript:void(0);"
-                            onclick="jQuery('#hide-icon-<?php echo $this->item->j2store_product_id;?>').toggle('click');jQuery('#show-icon-<?php echo $this->item->j2store_product_id;?>').toggle('click');jQuery('.additional-short-code').toggle('click');jQuery('.panel-solid-success .panel-footer').toggle('click');">
-						<?php echo JText::_('J2STORE_EXPAND_CLOSE'); ?>
-						<i id="show-icon-<?php echo $this->item->j2store_product_id;?>"
-                           class="icon icon-plus"></i> <i
-                                id="hide-icon-<?php echo $this->item->j2store_product_id;?>"
-                                class="icon icon-minus" style="display: none;"></i>
-					</button>
-				</span>
-                            <br>
-
-
-                            <div class="additional-short-code" style="display: none;">
-                                <h4><?php echo JText::_('J2STORE_PLUGIN_SHORTCODE_ADDITIONAL')?></h4>
-                                <p>
-                                    <?php echo JText::_('J2STORE_PLUGIN_SHORTCODE_HELP_TEXT_ADDITIONAL');?> <strong style="color:black;"> {j2store}<?php echo $this->item->j2store_product_id; ?>|upsells|crosssells{/j2store}</strong>
+                            <div class="collapse additional-short-code" id="collapseShortcodes">
+                                <h4 class="mb-2 text-white fs-5 mt-4"><?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_ADDITIONAL')?></h4>
+                                <p class="small">
+		                            <?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_HELP_TEXT_ADDITIONAL');?> <b> {j2store}<?php echo $this->item->j2store_product_id; ?>|upsells|crosssells{/j2store}</b>
                                 </p>
-                                <p class="shortcode">price|thumbnail|mainimage|mainadditional|upsells|crosssells</p>
+                                <p class="shortcode small">price|thumbnail|mainimage|mainadditional|upsells|crosssells</p>
+                                <p class="small">
+		                            <?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_FOOTER_WARNING');?>
+                                </p>
                             </div>
-
-                        </div>
-                        <div class="panel-footer" style="display: none;">
-                            <strong>
-                                <?php echo JText::_('J2STORE_PLUGIN_SHORTCODE_FOOTER_WARNING');?>
-                            </strong>
                         </div>
                     </div>
                 </div>
@@ -164,11 +147,14 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
         </div>
         <input type="hidden" name="<?php echo $this->form_prefix.'[j2store_product_id]'?>" value="<?php echo $this->item->j2store_product_id; ?>" />
 
-        <!-- @TODO should fix with css -->
-        <hr>
+
+
         <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
-            <div class="panel panel-default">
-                <div class="panel-body">
+            <div class="card j2store-product-shortcodes">
+                <div class="card-header justify-content-between">
+                    <h3 class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_DETAILS'); ?></h3>
+                </div>
+                <div class="card-body">
                     <?php echo $this->loadTemplate($this->item->product_type); ?>
                     <input type="hidden" name="<?php echo $this->form_prefix.'[product_type]'?>" value="<?php echo $this->item->product_type; ?>" />
                 </div>

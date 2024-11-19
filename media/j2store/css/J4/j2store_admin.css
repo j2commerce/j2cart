@@ -630,21 +630,11 @@ div.j2store-tab div.j2store-tab-content:not(.active){
 }
 
 /* product form */
-.j2store-product-edit-form {
-    background: none repeat scroll 0 0 #f0f3f3;
-    padding: 20px 10px;
-}
+#fieldset-j2store.options-form {padding: 0.5vw 1vw;}
+#fieldset-j2store.options-form > legend {margin-bottom: 0.25rem;}
+.j2store-product-edit-form {background: none repeat scroll 0 0 var(--admin-background);padding: 20px;}
 
-.j2store-product-edit-form label {
-    font-size: 100%;
-    font-weight: 700;
-    color: #565656;
-}
-
-.j2store-product-edit-form label.control-label {
-    padding-top: 0px;
-    width: 180px;
-}
+.filterRemove {cursor:pointer;}
 
 .j2store-product-edit-form .tabs-left > .nav-tabs > li > a {
     border-radius: 0px !important;
@@ -761,9 +751,8 @@ div.j2store-tab div.j2store-tab-content:not(.active){
 }
 
 .j2store_field_required {
-    float: left;
     color: #ff0000;
-    margin-right: 2px;
+    margin-inline-start: 3px;
 }
 
 #myFileModal .modal-body {
@@ -890,18 +879,7 @@ div.j2store-tab div.j2store-tab-content:not(.active){
     #j2store-navbar .navbar-nav .dropdown-menu {
         position: static;
     }
-    /*#j2store-navbar .collapse:not(.show) {
-        display: none;
-    }*/
 
-   /* #j2store-navbar .nav-item {
-        padding: 10px 47px;
-    }*/
-    /*#j2store-navbar .navbar {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }*/
     #j2store-navbar .btn-group h3 {
         color: #FFFFFF;
         margin: -40px -117px;
@@ -926,9 +904,6 @@ div.j2store-tab div.j2store-tab-content:not(.active){
 .com_j2store a[target="_blank"]::before{
     content: none !important;
 }
-.com_j2store joomla-field-fancy-select .choices{
-    width: 260px;
-}
 
 .com_j2store .min-w-0 {min-width:0!important;}
 .com_j2store .form-control-qty {max-width:150px!important;}
@@ -936,3 +911,61 @@ div.j2store-tab div.j2store-tab-content:not(.active){
 .com_j2store .inventory-form-control {width:60px;}
 .com_j2store .table.itemList.options-list .field-media-wrapper .field-media-preview {height:100px;}
 .com_j2store .table.itemList.options-list joomla-field-media .field-media-preview-icon {background-size: 4rem;width: 4rem;height: 4rem;}
+.com_j2store .text-subdued {color:#64748b;}
+.com_j2store .max-content-height {height: max-content;}
+.com_j2store .width-48 {width: 48px;}
+.com_j2store .height-48 {height: 48px;}
+.com_j2store .width-64 {width: 64px;}
+.com_j2store .height-64 {height: 64px;}
+
+@media (min-width: 300px) {
+    .w-xs-25 { width: 25% !important; }
+    .w-xs-50 { width: 50% !important; }
+    .w-xs-75 { width: 75% !important; }
+    .w-xs-100 { width: 100% !important; }
+    .w-xs-auto { width: auto !important; }
+}
+/* Small devices (≥576px) */
+@media (min-width: 576px) {
+    .w-sm-25 { width: 25% !important; }
+    .w-sm-50 { width: 50% !important; }
+    .w-sm-75 { width: 75% !important; }
+    .w-sm-100 { width: 100% !important; }
+    .w-sm-auto { width: auto !important; }
+}
+
+/* Medium devices (≥768px) */
+@media (min-width: 768px) {
+    .w-md-25 { width: 25% !important; }
+    .w-md-50 { width: 50% !important; }
+    .w-md-75 { width: 75% !important; }
+    .w-md-100 { width: 100% !important; }
+    .w-md-auto { width: auto !important; }
+}
+
+/* Large devices (≥992px) */
+@media (min-width: 992px) {
+    .w-lg-25 { width: 25% !important; }
+    .w-lg-50 { width: 50% !important; }
+    .w-lg-75 { width: 75% !important; }
+    .w-lg-100 { width: 100% !important; }
+    .w-lg-auto { width: auto !important; }
+}
+
+/* Extra large devices (≥1200px) */
+@media (min-width: 1200px) {
+    .w-xl-25 { width: 25% !important; }
+    .w-xl-50 { width: 50% !important; }
+    .w-xl-75 { width: 75% !important; }
+    .w-xl-100 { width: 100% !important; }
+    .w-xl-auto { width: auto !important; }
+}
+
+/* Extra extra large devices (≥1400px) */
+@media (min-width: 1400px) {
+    .w-xxl-25 { width: 25% !important; }
+    .w-xxl-50 { width: 50% !important; }
+    .w-xxl-75 { width: 75% !important; }
+    .w-xxl-100 { width: 100% !important; }
+    .w-xxl-auto { width: auto !important; }
+}
