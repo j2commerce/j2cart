@@ -81,7 +81,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		                    <?php if(!empty($thumbimage )): ?>
                                 <div class="flex-shrink-0">
                                     <a href="<?php echo $item->product->product_edit_url;?>" class="d-none d-lg-inline-block" title="<?php echo $item->product->product_name;?>">
-                                        <img src="<?php echo $thumbimage;?>" class="img-fluid j2store-product-thumb-75" alt="<?php echo $this->escape($item->product->product_name);?>">
+                                        <img src="<?php echo $thumbimage;?>" class="img-fluid object-fit-cover width-64 height-64" alt="<?php echo $this->escape($item->product->product_name);?>">
                                     </a>
                                 </div>
 		                    <?php endif;?>
@@ -115,21 +115,46 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 	                                if(isset($variants) && count($variants)):
 	                                    $i = 0;
 	                                    foreach($variants as $variant):
+                                            $vParams = json_decode($variant->params);
+                                            $vImage = $vParams->variant_main_image;
 	                                ?>
                                             <div id="variantListTable-<?php echo $item->j2store_product_id;?>" class="list-group">
                                                 <div class="list-group-item mb-1">
-                                                    <div class="d-flex w-100 justify-content-between align-items-start mb-2">
-                                                        <div class="variant-title">
-                                                            <h5 class="lh-1 mb-0"><?php echo J2Store::product()->getVariantNamesByCSV($variant->variant_name); ?></h5>
-                                                            <div class="small text-capitalize"><?php echo $variant->sku; ?></div>
+                                                    <div class="d-flex w-100 justify-content-between mb-2 align-items-center">
+                                                        <div class="d-block d-lg-flex align-items-center">
+	                                                        <?php if($vImage): ?>
+                                                                <div class="flex-shrink-0">
+                                                                    <div class="d-inline-block">
+                                                                        <img src="<?php echo $platform->getImagePath($vImage);?>" class="img-fluid object-fit-cover width-48 height-48" alt="<?php echo J2Store::product()->getVariantNamesByCSV($variant->variant_name); ?>">
+                                                                    </div>
+                                                                </div>
+                                                            <?php elseif($thumbimage) :?>
+                                                                <div class="flex-shrink-0">
+                                                                    <div class="d-inline-block">
+                                                                        <img src="<?php echo $thumbimage;?>" class="img-fluid object-fit-cover width-48 height-48" alt="<?php echo J2Store::product()->getVariantNamesByCSV($variant->variant_name); ?>">
+                                                                    </div>
+                                                                </div>
+	                                                        <?php endif;?>
+                                                            <div class="flex-grow-1 ms-lg-3 mt-2 mt-lg-0">
+                                                                <div class="variant-title">
+                                                                    <h5 class="lh-1 mb-0"><?php echo J2Store::product()->getVariantNamesByCSV($variant->variant_name); ?></h5>
+                                                                    <div class="small text-capitalize"><?php echo $variant->sku; ?></div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <a class="btn btn-success btn-sm" onclick="j2storesaveinventory(<?php echo $variant->j2store_variant_id;?>)"><?php echo Text::_ ( 'JAPPLY' );?></a>
                                                     </div>
+
                                                     <div class="accordion j2-store-accordion" id="accordionVariant<?php echo $variant->j2store_variant_id;?>">
                                                         <div class="accordion-item border-0">
                                                             <div class="accordion-header">
-                                                                <button class="accordion-button collapsed rounded-0 py-2 px-1 small" type="button" data-bs-toggle="collapse" data-bs-target="#manageStock<?php echo $variant->j2store_variant_id;?>" aria-expanded="false" aria-controls="manageStock<?php echo $variant->j2store_variant_id;?>">
-	                                                                <?php echo Text::_('J2STORE_PRODUCT_MANAGE_STOCK')?> <b class="ms-2"><?php if($variant->manage_stock==0) : echo Text::_ ( 'JNO' ); elseif($variant->manage_stock==1): echo Text::_ ( 'JYES' ); endif;?></b>
+	                                                            <?php if($variant->manage_stock==0){
+		                                                            $text_color = ' text-danger';
+	                                                            } else {
+		                                                            $text_color = ' text-success';
+	                                                            } ?>
+                                                                <button class="accordion-button collapsed rounded-0 pt-1 pb-0 px-1 small" type="button" data-bs-toggle="collapse" data-bs-target="#manageStock<?php echo $variant->j2store_variant_id;?>" aria-expanded="false" aria-controls="manageStock<?php echo $variant->j2store_variant_id;?>">
+	                                                                <?php echo Text::_('J2STORE_PRODUCT_MANAGE_STOCK')?> <b class="ms-2<?php echo $text_color;?>"><?php if($variant->manage_stock==0) : echo Text::_ ( 'JNO' ); elseif($variant->manage_stock==1): echo Text::_ ( 'JYES' ); endif;?></b>
                                                                 </button>
                                                             </div>
                                                             <div id="manageStock<?php echo $variant->j2store_variant_id;?>" class="accordion-collapse collapse" data-bs-parent="#accordionVariant<?php echo $variant->j2store_variant_id;?>">
@@ -143,7 +168,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                                         </div>
                                                         <div class="accordion-item border-0">
                                                             <div class="accordion-header">
-                                                                <button class="accordion-button collapsed rounded-0 py-2 px-1 small" type="button" data-bs-toggle="collapse" data-bs-target="#quantity<?php echo $variant->j2store_variant_id;?>" aria-expanded="false" aria-controls="quantity<?php echo $variant->j2store_variant_id;?>">
+                                                                <button class="accordion-button collapsed rounded-0 pt-1 pb-0 px-1 small" type="button" data-bs-toggle="collapse" data-bs-target="#quantity<?php echo $variant->j2store_variant_id;?>" aria-expanded="false" aria-controls="quantity<?php echo $variant->j2store_variant_id;?>">
 	                                                                <?php echo Text::_('J2STORE_PRODUCT_STOCK_QUANTITY')?> <b class="ms-2"><?php echo $variant->quantity;?></b>
                                                                 </button>
                                                             </div>
@@ -155,8 +180,13 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                                         </div>
                                                         <div class="accordion-item border-0">
                                                             <div class="accordion-header">
-                                                                <button class="accordion-button collapsed rounded-0 py-2 px-1 small" type="button" data-bs-toggle="collapse" data-bs-target="#stock<?php echo $variant->j2store_variant_id;?>" aria-expanded="false" aria-controls="stock<?php echo $variant->j2store_variant_id;?>">
-	                                                                <?php echo Text::_('J2STORE_STOCK_STATUS')?> <b class="ms-2"><?php if($variant->availability==0) : echo Text::_ ( 'J2STORE_OUT_OF_STOCK' ); elseif($variant->availability==1): echo Text::_ ( 'COM_J2STORE_PRODUCT_IN_STOCK' ); endif;?></b>
+                                                                <?php if($variant->availability==0){
+                                                                    $text_color = ' text-danger';
+                                                                } else {
+	                                                                $text_color = ' text-success';
+                                                                } ?>
+                                                                <button class="accordion-button collapsed rounded-0 pt-1 pb-0 px-1 small" type="button" data-bs-toggle="collapse" data-bs-target="#stock<?php echo $variant->j2store_variant_id;?>" aria-expanded="false" aria-controls="stock<?php echo $variant->j2store_variant_id;?>">
+	                                                                <?php echo Text::_('J2STORE_STOCK_STATUS')?> <b class="ms-2<?php echo $text_color;?>"><?php if($variant->availability==0) : echo Text::_ ( 'J2STORE_OUT_OF_STOCK' ); elseif($variant->availability==1): echo Text::_ ( 'COM_J2STORE_PRODUCT_IN_STOCK' ); endif;?></b>
                                                                 </button>
                                                             </div>
                                                             <div id="stock<?php echo $variant->j2store_variant_id;?>" class="accordion-collapse collapse" data-bs-parent="#accordionVariant<?php echo $variant->j2store_variant_id;?>">
