@@ -1,16 +1,34 @@
 <?php
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Uri\Uri;
+
+
 trait list_view {
     function addBrowseToolBar(){
         $app = J2Store::platform()->application();
         $option = $app->input->getCmd('option', 'com_foobar');
         $subtitle_key = strtoupper($option . '_TITLE_' . $app->input->getCmd('view', 'cpanel'));
-        JToolBarHelper::title(JText::_(strtoupper($option)) . ': ' . JText::_($subtitle_key), str_replace('com_', '', $option));
-        JToolBarHelper::addNew();
-        JToolBarHelper::editList();
-        JToolBarHelper::publishList();
-        JToolBarHelper::unpublishList();
-        $msg = JText::_($option . '_CONFIRM_DELETE');
-        JToolBarHelper::deleteList(strtoupper($msg));
+        ToolbarHelper::title(Text::_(strtoupper($option)) . ': ' . Text::_($subtitle_key), str_replace('com_', '', $option));
+        ToolbarHelper::addNew();
+        ToolbarHelper::editList();
+        ToolbarHelper::publishList();
+        ToolbarHelper::unpublishList();
+        $msg = Text::_($option . '_CONFIRM_DELETE');
+        ToolbarHelper::deleteList(strtoupper($msg));
     }
 
     private function noToolbar() {
@@ -20,7 +38,7 @@ trait list_view {
 
         // Set toolbar title
         $subtitle_key = strtoupper($option . '_TITLE_' . F0FInflector::pluralize($this->input->getCmd('view', 'cpanel')));
-        JToolBarHelper::title(JText::_(strtoupper($option)) . ': ' . JText::_($subtitle_key), $componentName);
+        ToolbarHelper::title(Text::_(strtoupper($option)) . ': ' . Text::_($subtitle_key), $componentName);
     }
 
     function editToolBar(){
@@ -30,11 +48,11 @@ trait list_view {
 
         // Set toolbar title
         $subtitle_key = strtoupper($option . '_TITLE_' . F0FInflector::pluralize($this->input->getCmd('view', 'cpanel'))) . '_EDIT';
-        JToolBarHelper::title(JText::_(strtoupper($option)) . ': ' . JText::_($subtitle_key), $componentName);
-        JToolBarHelper::apply();
-        JToolBarHelper::save();
-        JToolBarHelper::custom('savenew', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
-        JToolBarHelper::cancel();
+        ToolbarHelper::title(Text::_(strtoupper($option)) . ': ' . Text::_($subtitle_key), $componentName);
+        ToolbarHelper::apply();
+        ToolbarHelper::save();
+        ToolbarHelper::custom('savenew', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+        ToolbarHelper::cancel();
     }
     public function toolbarBacktodashboard(){
         $app = J2Store::platform()->application();
@@ -42,9 +60,9 @@ trait list_view {
         $componentName = str_replace('com_', '', $option);
         // Set toolbar title
         $subtitle_key = strtoupper($option . '_TITLE_' . F0FInflector::pluralize($this->input->getCmd('view', 'cpanel')));
-        JToolBarHelper::title(JText::_(strtoupper($option)) . ': ' . JText::_($subtitle_key), $componentName);
+        ToolbarHelper::title(Text::_(strtoupper($option)) . ': ' . Text::_($subtitle_key), $componentName);
         // Set toolbar icons
-        JToolBarHelper::back(JText::_('J2STORE_BACK_TO_DASHBOARD'), 'index.php?option=com_j2store&view=cpanel');
+        ToolbarHelper::back(Text::_('J2STORE_BACK_TO_DASHBOARD'), 'index.php?option=com_j2store&view=cpanel');
     }
     function getBaseVars(){
         $platform = J2Store::platform();
@@ -56,28 +74,13 @@ trait list_view {
         $vars->action_url = 'index.php?option='.$vars->option;
         return $vars;
     }
-    /*$header  = array(
-                'id' => array(
-                    'type' => 'rowselect',
-                    'tdwidth' => '20',
-                    'label' => 'id'
-                ),
-                'name' => array(
-                    'type' => 'fieldsearchable',
-                    'sortable' => 'true',
-                    'label' => 'name'
-                )
-            );*/
+
     function setHeader($header,&$vars){
         if(empty($header)){
             $header = array();
         }
         $vars->header = $header;
     }
-    /*$items_format = array(
-        'id' => array('type' => 'selectrow'),
-        'name' => array( 'type' => 'text' , 'show_link' => 'true', url => 'index.php')
-    );*/
     function setItemsFormat($item_format,&$vars){
         $vars->items_format = $item_format;
     }
@@ -101,11 +104,10 @@ trait list_view {
         $defaultPath = JPATH_ADMINISTRATOR.'/components/com_j2store/layouts/'.$layout_type.'/'.$layout.'.php';
         $additional_path = JPATH_ADMINISTRATOR.'/components/com_j2store/views/'.$view.'/tmpl/'.$layout.'.php';
         // if the site template has a layout override, use it
-        jimport('joomla.filesystem.file');
-        if (JFile::exists( $templatePath ))
+        if(file_exists($templatePath))
         {
             return $templatePath;
-        }elseif (JFile::exists( $defaultPath ))
+        }elseif(file_exists($defaultPath))
         {
             return $defaultPath;
         }
@@ -131,9 +133,10 @@ trait list_view {
 
     protected function exportButton($view = 'orders') {
         if(!isset($view) || empty($view)) return;
-        $bar = JToolBar::getInstance('toolbar');
+        $bar = Factory::getContainer()->get(ToolbarFactoryInterface::class)->createToolbar('toolbar');
+        //$bar = JToolBar::getInstance('toolbar');
         // Add "Export to CSV"
-        $link = JURI::getInstance();
+        $link = Uri::getInstance();
         $query = $link->getQuery(true);
         $query['format'] = 'csv';
         $query['option'] = 'com_j2store';
@@ -141,8 +144,8 @@ trait list_view {
         $query['task'] = 'browse';
         $link->setQuery($query);
 
-        JToolBarHelper::divider();
+        ToolbarHelper::divider();
         $icon = 'download';
-        $bar->appendButton('Link', $icon, JText::_('J2STORE_EXPORTCSV'), $link->toString());
+        $bar->appendButton('Link', $icon, Text::_('J2STORE_EXPORTCSV'), $link->toString());
     }
 }
