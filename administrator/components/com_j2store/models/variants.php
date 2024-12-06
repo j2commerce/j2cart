@@ -1,16 +1,16 @@
 <?php
-/*------------------------------------------------------------------------
- # com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Sasi varna kumar - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
+/**
+ * @package J2Store
+ * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2024 J2Commerce, LLC . All rights reserved.
+ * @license GNU GPL v3 or later
+ */
 
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/models/behavior/autoload.php';
 
@@ -84,25 +84,17 @@ class J2StoreModelVariants extends F0FModel {
 	 * @param string $column
 	 * @param string $key
 	 */
-	public function getDimensions($table_name, $column, $key)
-	{
-		$db= JFactory::getDbo();
+	public function getDimensions($table_name,$column ,$key){
+        $db = Factory::getContainer()->get('DatabaseDriver');
 		$table = '#__j2store_'.$table_name;
 		$query = $db->getQuery(true);
 		$query->select('*');
 		$query->from($table);
 		$db->setQuery($query);
 		$results =array();
-		$results[] = JText::_('J2STORE_SELECT_OPTION');
+		$results[] = Text::_('J2STORE_SELECT_OPTION');
 		$results = $db->loadAssocList($column,$key);
-
 		return $results;
-	}
-
-	// Kept to avoid b/c breaks
-	public function getDimesions($table_name, $column, $key)
-	{
-		return $this->getDimensions($table_name, $column, $key);
 	}
 
 }
