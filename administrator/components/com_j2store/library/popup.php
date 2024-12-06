@@ -12,14 +12,21 @@ class J2StorePopup
     public static function popup($url, $text, $options = array())
     {
         $class = (!empty($options['class'])) ? $options['class'] : '';
-        $html = "<a  data-fancybox data-type=\"iframe\"  data-iframe='{\"css\":{\"height\":\"100vh\"}}' href=\"$url\"  href=\"javascript:;\" >\n";
+        $html = "<a data-fancybox data-type=\"iframe\"  data-iframe='{\"css\":{\"height\":\"100vh\"}}' href=\"$url\"  href=\"javascript:;\" >\n";
         $html .= "<span class=\"" . $class . "\" >\n";
         $html .= "$text\n";
         $html .= "</span>\n";
         $html .= "</a>\n";
         return $html;
     }
-
+	public static function popuplink($url, $text, $options = array())
+	{
+		$class = (!empty($options['class'])) ? $options['class'] : '';
+		$html = "<a data-fancybox data-type=\"iframe\"  data-iframe='{\"css\":{\"height\":\"100vh\"}}' href=\"$url\"  href=\"javascript:;\" class=\"" . $class . "\">\n";
+		$html .= "$text\n";
+		$html .= "</a>\n";
+		return $html;
+	}
     public static function getBrowser()
     {
         if (preg_match('/(?i)msie [2-9]/', $_SERVER['HTTP_USER_AGENT'])) {
@@ -66,10 +73,10 @@ class J2StorePopup
         $id = (isset($options['id']) && !empty($options['id'])) ? $options['id'] : '';
         if (J2Store::platform()->isClient('site')) {
             $class = "zoom";
-            $html = "<a  data-fancybox  class=\"$id\" data-type=\"iframe\" data-iframe='{\"css\":{\"height\":\"100vh\"}}' href=\"$url\" href=\"javascript:;\" >\n";
+            $html = "<a data-fancybox  class=\"$id\" data-type=\"iframe\" data-iframe='{\"css\":{\"height\":\"80vh\"}}' href=\"$url\" href=\"javascript:;\" >\n";
         } else {
             $class = (!empty($options['class'])) ? $options['class'] : '';
-            $html = "<a data-fancybox class=\"$id\"  data-type=\"iframe\"  data-iframe='{\"css\":{\"height\":\"100vh\"}}'  href=\"$url\" href=\"javascript:;\">\n";
+            $html = "<a data-fancybox class=\"$id\"  data-type=\"iframe\"  data-iframe='{\"css\":{\"height\":\"80vh\"}}'  href=\"$url\" href=\"javascript:;\">\n";
         }
         $html .= "<span class=\"" . $class . "\" id=\"" . $id . "\" >\n";
         $html .= "$text\n";

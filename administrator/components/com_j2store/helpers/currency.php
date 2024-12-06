@@ -1,15 +1,16 @@
 <?php
-/*------------------------------------------------------------------------
- # com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Sasi varna kumar - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
-// no direct access
+/**
+ * @package J2Store
+ * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
+ * @license GNU GPL v3 or later
+ */
+
+
+// No direct access to this file
 defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Factory;
+
 
 class J2Currency {
   	private $code;
@@ -26,8 +27,8 @@ class J2Currency {
 
   	public function __construct($config=array()) {
 
-		$this->session = JFactory::getSession();
-		$this->input = JFactory::getApplication()->input;
+		$this->session = Factory::getApplication()->getSession();
+		$this->input = Factory::getApplication()->input;
 
 		if(count($this->currencies) < 1) {
 			$rows = F0FModel::getTmpInstance('Currencies', 'J2StoreModel')->enabled(1)->getList();
@@ -181,6 +182,9 @@ class J2Currency {
 		} else {
 			return 0;
 		}
+	}
+	public function getThousandSysmbol($currency=''){ // kept for backwards compatibility with those who use layout overrides on the template
+		return $this->getThousandSymbol($currency);
 	}
 
 	public function getThousandSysmbol($currency=''){ // kept for backwards compatibility with those who use layout overrides on the template
