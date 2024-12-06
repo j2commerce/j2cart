@@ -66,9 +66,9 @@ class J2Html
 
         // return price input
         $html = '';
-        $html .= '<div class="input-prepend">';
+        $html .= '<div class="input-group">';
         if (!empty($symbol)) {
-            $html .= '<span class="add-on">' . $symbol . '</span>';
+            $html .= '<span class="input-group-text">' . $symbol . '</span>';
         }
         $html .= '<input type="text" name="' . $name . '" value="' . $value . '"  ' . $optionvalue . '    />';
         $html .= '</div>';
@@ -87,9 +87,9 @@ class J2Html
         $value = str_replace(str_split('\\/:*?"<>|+-'),'',$value);
         // return price input
         $html = '';
-        $html .= '<div class="input-prepend">';
+        $html .= '<div class="input-group">';
         if (!empty($symbol)) {
-            $html .= '<span class="add-on">' . $symbol . '</span>';
+            $html .= '<span class="input-group-text">' . $symbol . '</span>';
         }
         $html .= '<input type="text" name="' . $prefix . $name . '" value="' . $value . '"  ' . $optionvalue . '    />';
         $html .= '</div>';
@@ -213,21 +213,9 @@ class J2Html
 		$html = '';
 		$id = $options['id'] ?? $name;
 
-		// Display label if hide_label is not set or empty
-		if (empty($options['hide_label'])) {
-			$html .= '<div class="control-group">';
-			$labelText = $options['label_text'] ?? Text::_('JGLOBAL_YES');
-			$html .= self::label($labelText, $options);
-		}
-
 		// Use HTMLHelper to generate the boolean list with localized labels for yes/no
 		$attribs = [];
 		$html .= HTMLHelper::_('select.booleanlist', $name, $attribs, $value, Text::_('JYES'), Text::_('JNO'), $id);
-
-		// Close the control group div if label is displayed
-		if (empty($options['hide_label'])) {
-			$html .= '</div>';
-		}
 
 		return $html;
 	}
@@ -663,7 +651,7 @@ class J2Html
         $country_id = isset($options['id']) && $options['id'] ? $options['id'] : 'country_id';
         $zone_id = isset($options['zone_id']) && $options['zone_id'] ? $options['zone_id'] : 'zone_id';
         $zone_value = isset($options['zone_value']) && $options['zone_value'] ? $options['zone_value'] : '';
-        $attr = array("onchange" => "changeZone('$country_id',this.value,'$zone_id',$zone_value)", 'id' => $country_id);
+        $attr = array("onchange" => "changeZone('$country_id',this.value,'$zone_id',$zone_value)", 'id' => $country_id, 'class' => 'form-select');
         return self::select()->clearState()
             ->idTag($country_id)
             ->type('genericlist')
@@ -684,7 +672,7 @@ class J2Html
     public static function zone($name, $value, $options)
     {
         $zone_id = isset($options['id']) && $options['id'] ? $options['id'] : 'zone_id';
-        $attr = array('id' => $zone_id);
+        $attr = array('id' => $zone_id, 'class' => 'form-select');
         return self::select()->clearState()
             ->idTag($zone_id)
             ->type('genericlist')
@@ -709,13 +697,13 @@ class J2Html
         $queue_key = $config->get ( 'queue_key','' );
         $url = 'index.php?option=com_j2store&view=configuration&task=regenerateQueuekey';
         if(empty( $queue_key )){
-            $queue_string = JFactory::getConfig ()->get ( 'sitename','' ).time ();
+            $queue_string = Factory::getApplication()->getConfig()->get ( 'sitename','' ).time ();
             $queue_key = md5 ( $queue_string );
             $config->saveOne ( 'queue_key', $queue_key );
         }
 
         $html = '';
-        $html .= '<div class="alert alert-block alert-info"><strong id="j2store_queue_key">'.$queue_key.'</strong>&nbsp;&nbsp;&nbsp;<a onclick="regenerateQueueKey()" class="btn btn-danger">'.Text::_ ( 'J2STORE_STORE_REGENERATE' ).'</a>
+        $html .= '<div class="alert alert-block alert-info"><strong id="j2store_queue_key">'.$queue_key.'</strong><a onclick="regenerateQueueKey()" class="btn btn-primary btn-sm text-white ms-3"><span class="fas fa-solid fa-redo me-2" aria-hidden="true"></span>'.Text::_ ( 'J2STORE_STORE_REGENERATE' ).'</a>
 		<script>
 		function regenerateQueueKey(){
 			(function($){
@@ -758,7 +746,7 @@ class J2Html
     public static function customLink($name,$value,$options){
         $id = isset($options['id']) && $options['id'] ? $options['id'] : $name;
         $text = isset($options['text']) && $options['text'] ? $options['text'] : '';
-        return '<a class="btn btn-warning" id="'.$id.'" href="#">'.Text::_($text).'</a>';
+        return '<a class="btn btn-primary btn-sm" id="'.$id.'" href="#">'.Text::_($text).'</a>';
     }
 
     public static function menuItems($name,$value,$options){
@@ -817,13 +805,18 @@ class J2Html
                 )
             );
         }else {
-            $html = \Joomla\CMS\HTML\HTMLHelper::_(
-                'select.groupedlist', $groups, $name,
-                array(
-                    'list.attr' => implode(' ',$options), 'id' => $id, 'list.select' => $value, 'group.items' => null, 'option.key.toHtml' => false,
-                    'option.text.toHtml' => false,
-                )
-            );
+	        $attr = [
+		        'id'        => $id,
+		        'list.select' => $value,
+		        'option.key.toHtml' => false,
+		        'option.text.toHtml' => false,
+		        'group.items' => null,
+		        'list.attr' => [
+			        implode(' ',$options),
+			        'class' => 'form-select'
+		        ]
+	        ];
+	        $html = HTMLHelper::_('select.groupedlist', $groups, $name, $attr);
         }
          return $html;
     }
@@ -1351,7 +1344,7 @@ jQuery('.modal-backdrop').remove();
         $html = '';
         $item = F0FModel::getTmpInstance('OrderStatuses', 'J2StoreModel')->getItem($id);
         if ($id) {
-            $html .= '<label class="label ' . $item->orderstatus_cssclass . '">' . Text::_($item->orderstatus_name) . '</label>';
+            $html .= '<label class="label badge ' . $item->orderstatus_cssclass . '">' . Text::_($item->orderstatus_name) . '</label>';
         }
         return $html;
     }
@@ -1536,6 +1529,50 @@ jQuery('.modal-backdrop').remove();
         return $html;
     }
 
+	public static function checkboxswitch($data, $name, $attribs = null, $optKey = 'value', $optText = 'text', $selected = null, $idtag = false,
+	                                    $translate = false)
+	{
+		reset($data);
+
+		if (is_array($attribs)) {
+			$attribs = J2Store::platform()->toString($attribs);
+		}
+
+		$id_text = $idtag ? $idtag : $name;
+
+		$html = '<div class="form-check form-switch">';
+
+		foreach ($data as $obj) {
+			$k = $obj->$optKey;
+			$t = $translate ? Text::_($obj->$optText) : $obj->$optText;
+			$id = (isset($obj->id) ? $obj->id : null);
+
+			$extra = '';
+			$id = $id ? $obj->id : $id_text . $k;
+
+			if (is_array($selected)) {
+				foreach ($selected as $val) {
+					$k2 = is_object($val) ? $val->$optKey : $val;
+
+					if ($k == $k2) {
+						$extra .= ' selected="selected" ';
+						break;
+					}
+				}
+			} else {
+				$extra .= ((string)$k == (string)$selected ? ' checked="checked" ' : '');
+			}
+
+			$html .= '<input type="checkbox" name="' . $name . '" id="' . $id . '" value="' . $k . '" ' . $extra. $attribs . ' >';
+			$html .= '<label for="' . $id . '" id="' . $id . '-lbl" class="form-check-label">';
+			$html .= $t;
+			$html .= '</label>';
+		}
+		$html .= '</div>';
+
+		return $html;
+	}
+
     /**
      * Method to return PRO feature notice
      *
@@ -1637,11 +1674,7 @@ jQuery('.modal-backdrop').remove();
 
 		if (!empty($field['key_field']) && !empty($query) && !empty($item->$name)) {
 			// Get the database instance
-			if (version_compare(JVERSION, '3.99.99', 'lt')) {
-				$db = JFactory::getDbo();
-			} else {
-				$db = Factory::getContainer()->get('DatabaseDriver');
-			}
+			$db = Factory::getContainer()->get('DatabaseDriver');
 
 			// Properly escape column and value
 			$query .= ' WHERE ' . $db->quoteName($field['key_field']) . ' = ' . $db->quote($item->$name);
@@ -1649,11 +1682,7 @@ jQuery('.modal-backdrop').remove();
 
 		if (!empty($query)) {
 			try {
-				if (version_compare(JVERSION, '3.99.99', 'lt')) {
-					$db = JFactory::getDbo();
-				} else {
-					$db = Factory::getContainer()->get('DatabaseDriver');
-				}
+				$db = Factory::getContainer()->get('DatabaseDriver');
 				$field_data = $db->setQuery($query)->loadObject();
 				$value_field = $field['value_field'] ?? '';
 				$html = $field_data->$value_field ?? '';
@@ -1752,6 +1781,73 @@ jQuery('.modal-backdrop').remove();
 
         return $html;
     }
+	public static function calculateDaysFromStartDate($customer_start_date)
+	{
+		$startDate = new DateTime($customer_start_date);
+		$currentDate = new DateTime();
+		$interval = $startDate->diff($currentDate);
+		return $interval->days;
+	}
+	public static function getCustomerStartDate($orders)
+	{
+		if (!empty($orders) && isset($orders[0]->created_on)) {
+			return $orders[0]->created_on;
+		}
+		return null;
+	}
+	public static function getGrossCustomerSales($orders)
+	{
+		$total = 0;
+		foreach ($orders as $order) {
+			// Check if orderstatus_cssclass is set and does not contain 'danger', 'important', or 'warning'
+			if (isset($order->orderstatus_cssclass) &&
+				!str_contains($order->orderstatus_cssclass, 'danger') &&
+				!str_contains($order->orderstatus_cssclass, 'important') &&
+				!str_contains($order->orderstatus_cssclass, 'warning'))
+			{
+				$total += (float) $order->order_total;
+			}
+		}
+		return $total;
+	}
+	public static function getSumCustomerOrders($orders)
+	{
+		foreach ($orders as $order) {
+			// Ensure orderstatus_cssclass is set and does not contain 'danger', 'important', or 'warning'
+			if (isset($order->orderstatus_cssclass) &&
+				!str_contains($order->orderstatus_cssclass, 'danger') &&
+				!str_contains($order->orderstatus_cssclass, 'important') &&
+				!str_contains($order->orderstatus_cssclass, 'warning'))
+			{
+				$count++;
+			}
+		}
+		return $count;
+	}
+	public static function countUserOrders($userId)
+	{
+		$db = Factory::getContainer()->get('DatabaseDriver');
+		$query = $db->getQuery(true)
+			->select('COUNT(*)')
+			->from($db->quoteName('#__j2store_orders'))
+			->where($db->quoteName('user_id') . ' = ' . (int) $userId);
+		$db->setQuery($query);
+		$count = $db->loadResult();
+		return $count;
+	}
+
+	public static function getUserOrders($user_id)
+	{
+		$db = Factory::getContainer()->get('DatabaseDriver');
+		$query = $db->getQuery(true)
+			->select('*')
+			->from($db->quoteName('#__j2store_orders'))
+			->where($db->quoteName('user_id') . ' = ' . (int) $user_id);
+		$db->setQuery($query);
+		$orders = $db->loadObjectList();
+		return $orders;
+	}
+
 }
 
 class J2Select extends JObject
