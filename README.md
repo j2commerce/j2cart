@@ -5,7 +5,7 @@ We understand that many of you are concerned about the future of J2Store after t
 This forked version of J2Store marks the start of an exciting new chapter! We're fully committed to actively maintaining and developing J2Store, keeping it the powerful eCommerce solution you've relied on for your Joomla websites.
 
 
-**Our Commitment to the Community**
+**Our Commitment to the Joomla Community**
 
 - Ongoing Maintenance & Support: We are dedicated to maintaining and improving the core J2Store extension so you can continue to build, manage, and grow your online stores with confidence.
 
