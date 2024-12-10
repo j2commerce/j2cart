@@ -1,18 +1,19 @@
 <?php
 /**
- * --------------------------------------------------------------------------------
- * App Plugin - Flexible Variable
- * --------------------------------------------------------------------------------
- * @package     Joomla  3.x
- * @subpackage  J2 Store
- * @author      Alagesan, J2Store <support@j2store.org>
- * @copyright   Copyright (c) 2018 J2Store . All rights reserved.
- * @license     GNU/GPL V3 or later
- * @link        http://j2store.org
- * --------------------------------------------------------------------------------
+ * @package     Joomla.Plugin
+ * @subpackage  J2Store.app_flexivariable
  *
- * */
-defined('_JEXEC') or die ('Restricted access');
+ * @copyright Copyright (C) 2018 J2Store. All rights reserved.
+ * @copyright Copyright (C) 2024 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+// No direct access
+defined('_JEXEC') or die;
+use Joomla\CMS\Factory;
+
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/appcontroller.php');
 
 class J2StoreControllerAppFlexiVariable extends J2StoreAppController
@@ -87,7 +88,7 @@ class J2StoreControllerAppFlexiVariable extends J2StoreAppController
                     $product_variant_option_value = new \stdClass();
                     $product_variant_option_value->variant_id = $variantChild->j2store_variant_id;
                     $product_variant_option_value->product_optionvalue_ids = implode(',', $product_optionvalue_ids);
-                    JFactory::getDbo()->insertObject('#__j2store_product_variant_optionvalues', $product_variant_option_value);
+                    Factory::getContainer()->get('DatabaseDriver')->insertObject('#__j2store_product_variant_optionvalues', $product_variant_option_value);
                 }
 
             }
@@ -139,7 +140,7 @@ class J2StoreControllerAppFlexiVariable extends J2StoreAppController
 
     public function deleteSingleVariant($id)
     {
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $fof_helper = J2Store::fof();
         //delete all related records
         try {
@@ -244,8 +245,8 @@ class J2StoreControllerAppFlexiVariable extends J2StoreAppController
         $defaultPath = JPATH_SITE . '/plugins/' . $group . '/' . $plugin . '/' . $plugin . '/tmpl/' . $layout . '.php';
 
         // if the site template has a layout override, use it
-        jimport('joomla.filesystem.file');
-        if (JFile::exists($templatePath)) {
+
+        if (file_exists($templatePath)) {
             return $templatePath;
         } else {
             return $defaultPath;
