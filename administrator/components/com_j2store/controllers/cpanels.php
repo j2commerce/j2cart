@@ -2,99 +2,129 @@
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
  * @license GNU GPL v3 or later
  */
+
 // No direct access to this file
-defined('_JEXEC') or die;
+defined('_JEXEC') or die('Restricted access');
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Session\Session;
+
 class J2StoreControllerCpanels extends F0FController
 {
-	 public function execute($task) {
-		if(!in_array($task, array('browse' ,'getEupdates', 'notifications','getSubscription'))) {
-			$task = 'browse';
-		}
-		parent::execute($task);
-	}
-
-	protected function onBeforeBrowse() {
-		$db = JFactory::getDbo();
-
-		$config = J2Store::config();
-		$installation_complete = $config->get('installation_complete', 0);
-		if(!$installation_complete) {
-			//installation not completed
-			JFactory::getApplication()->redirect('index.php?option=com_j2store&view=postconfig');
-		}
-        $platform = J2Store::platform();
-        //$platform->checkAdminMenuModule();
-		//first check if the currency table has a default records at least.
-		$rows = F0FModel::getTmpInstance('Currencies', 'J2StoreModel')->enabled(1)->getList();
-		if(count($rows) < 1) {
-			//no records found. Dumb default data
-			F0FModel::getTmpInstance('Currencies', 'J2StoreModel')->create_currency_by_code('USD', 'USD');
-		}
-		//update schema
-		$dbInstaller = new F0FDatabaseInstaller(array(
-				'dbinstaller_directory'	=> JPATH_ADMINISTRATOR . '/components/com_j2store/sql/xml'
-		));
-		$dbInstaller->updateSchema();
-
-		//update cart table
-		$cols = $db->getTableColumns('#__j2store_carts');
-		$cols_to_delete = array('product_id', 'vendor_id', 'variant_id', 'product_type', 'product_options', 'product_qty');
-		foreach($cols_to_delete as $key) {
-			if(array_key_exists($key, $cols)) {
-				$db->setQuery('ALTER TABLE #__j2store_carts DROP COLUMN '.$key);
-				try {
-					$db->execute();
-				}catch(Exception $e) {
-					echo $e->getMessage();
-				}
-			}
-		}
-		$this->migrate_coupons();
-		$this->migrate_order_coupons();
-		$this->migrate_order_vouchers();
-		$this->drop_indexes();
-		$this->clear_outdated_cart_data();
-        $this->disable_plugin_for_j4();
-
-		return parent::onBeforeBrowse();
-	}
-
-    public function disable_plugin_for_j4(){
-        if(version_compare(JVERSION,'3.99.99','ge')) {
-            $db = JFactory::getDBO();
-            $platform = J2Store::platform();
-            $allowed_plugins = $platform->eventJ2Store4('onJ2StoreIsJ2Store4');
-            $query = $db->getQuery(true)->select('*')->from('#__extensions')->where('enabled = 1')->where('folder = ' . $db->q('j2store'))->where('type = ' . $db->q('plugin'))->order('ordering ASC');
-            $db->setQuery($query);
-            $plugins = $db->loadObjectList();
-            if (!empty($plugins  ) && !empty($allowed_plugins)) {
-                foreach ($plugins as $plugin) {
-                    if( !in_array($plugin->element, $allowed_plugins)) {
-                        $query = $db->getQuery(true)->update('#__extensions')->set('enabled = 0')->where('folder = ' . $db->q('j2store'))->where('element=' . $db->q($plugin->element));
-                        $db->setQuery($query);
-                        try {
-                            $db->execute();
-                        } catch (Exception $e) {
-                            //do nothing
-                        }
-                    }
-                }
-            }
-        }
+  public function execute($task)
+  {
+    if(!in_array($task, array('browse' ,'getEupdates', 'notifications','getSubscription'))) {
+      $task = 'browse';
     }
-	public function migrate_order_coupons() {
-		$db = JFactory::getDbo ();
+    parent::execute($task);
+  }
 
-		$tables = $db->getTableList ();
-		// get prefix
-		$prefix = $db->getPrefix ();
+  protected function onBeforeBrowse()
+  {
+    $db = Factory::getContainer()->get('DatabaseDriver');
 
-		//correct the collation
-       // if (in_array ( $prefix . 'j2store_orderdiscounts', $tables )) {
-        //    $db->setQuery ( 'ALTER TABLE #_j2store_orderdiscounts CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci' );
-        //}
+    $config = J2Store::config();
+    $installation_complete = $config->get('installation_complete', 0);
+    if(!$installation_complete) {
+      //installation not completed
+      Factory::getApplication()->redirect('index.php?option=com_j2store&view=postconfig');
+    }
+
+    $update_complete = $config->get('update_complete', 0);
+    if (!$update_complete) {
+      //first check if the currency table has a default records at least.
+      $rows = F0FModel::getTmpInstance('Currencies', 'J2StoreModel')->enabled(1)->getList();
+      if(count($rows) < 1) {
+        //no records found. Dumb default data
+        F0FModel::getTmpInstance('Currencies', 'J2StoreModel')->create_currency_by_code('USD', 'USD');
+      }
+      //update schema
+      $dbInstaller = new F0FDatabaseInstaller(array(
+          'dbinstaller_directory'	=> JPATH_ADMINISTRATOR . '/components/com_j2store/sql/xml'
+      ));
+      $dbInstaller->updateSchema();
+
+      //update cart table
+      $cols = $db->getTableColumns('#__j2store_carts');
+      $cols_to_delete = array('product_id', 'vendor_id', 'variant_id', 'product_type', 'product_options', 'product_qty');
+      foreach($cols_to_delete as $key) {
+        if(array_key_exists($key, $cols)) {
+          $db->setQuery('ALTER TABLE #__j2store_carts DROP COLUMN '.$key);
+          try {
+            $db->execute();
+          }catch(Exception $e) {
+            echo $e->getMessage();
+          }
+        }
+      }
+      $this->migrate_coupons();
+      $this->migrate_order_coupons();
+      $this->migrate_order_vouchers();
+      $this->drop_indexes();
+
+      // Update config
+
+      $query = $db->getQuery(true);
+
+      $query->insert($db->quoteName('#__j2store_configurations'));
+      $query->columns($db->quoteName(['config_meta_key', 'config_meta_value']));
+      $query->values(implode(',', [$db->quote('update_complete'), 1]));
+
+      $db->setQuery($query);
+
+      try {
+          $db->execute();
+      } catch (\Exception $e) {
+
+      }
+    }
+
+    $this->clear_outdated_cart_data();
+    $this->disable_plugin_for_j4();
+
+    return parent::onBeforeBrowse();
+  }
+
+  public function disable_plugin_for_j4()
+  {
+    if(version_compare(JVERSION,'3.99.99','ge')) {
+      $db = Factory::getContainer()->get('DatabaseDriver');
+      $platform = J2Store::platform();
+      $allowed_plugins = $platform->eventJ2Store4('onJ2StoreIsJ2Store4');
+      $query = $db->getQuery(true)->select('*')->from('#__extensions')->where('enabled = 1')->where('folder = ' . $db->q('j2store'))->where('type = ' . $db->q('plugin'))->order('ordering ASC');
+      $db->setQuery($query);
+      $plugins = $db->loadObjectList();
+      if (!empty($plugins  ) && !empty($allowed_plugins)) {
+        foreach ($plugins as $plugin) {
+          if( !in_array($plugin->element, $allowed_plugins)) {
+            $query = $db->getQuery(true)->update('#__extensions')->set('enabled = 0')->where('folder = ' . $db->q('j2store'))->where('element=' . $db->q($plugin->element));
+            $db->setQuery($query);
+            try {
+                $db->execute();
+            } catch (Exception $e) {
+                //do nothing
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public function migrate_order_coupons()
+  {
+    $db = Factory::getContainer()->get('DatabaseDriver');
+
+    $tables = $db->getTableList ();
+    // get prefix
+    $prefix = $db->getPrefix ();
+
+    //correct the collation
+    // if (in_array ( $prefix . 'j2store_orderdiscounts', $tables )) {
+    //    $db->setQuery ( 'ALTER TABLE #_j2store_orderdiscounts CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci' );
+    //}
 
 		// let us back up the table first
 		if (! in_array ( $prefix . 'j2store_backup_ordercoupons', $tables ) && in_array ( $prefix . 'j2store_ordercoupons', $tables )) {
@@ -151,8 +181,9 @@ class J2StoreControllerCpanels extends F0FController
 		}
 	}
 
-	public function migrate_order_vouchers() {
-		$db = JFactory::getDbo ();
+  public function migrate_order_vouchers()
+  {
+    $db = Factory::getContainer()->get('DatabaseDriver');
 
 		$tables = $db->getTableList ();
 		// get prefix
@@ -211,9 +242,11 @@ class J2StoreControllerCpanels extends F0FController
 		}
 	}
 
-	public function migrate_coupons() {
-		$db = JFactory::getDbo ();
-		if (! J2Store::isPro ()) return true;
+  public function migrate_coupons()
+  {
+    $db = Factory::getContainer()->get('DatabaseDriver');
+
+    if (! J2Store::isPro ()) return true;
 
 		$total = 0;
 		$query = $db->getQuery ( true )->select ( 'COUNT(*)' )->from ( '#__j2store_coupons' )->where ( '(value_type =' . $db->q ( 'P' ) . ' OR value_type =' . $db->q ( 'F' ) . ')' )->where ( 'enabled = 1' );
@@ -255,10 +288,12 @@ class J2StoreControllerCpanels extends F0FController
 		}
 	}
 
-	public function drop_indexes() {
-		//This fix is required because multiple indexes were created in previous versions.
+  public function drop_indexes()
+  {
+    //This fix is required because multiple indexes were created in previous versions.
 
-		$db = JFactory::getDbo();
+    $db = Factory::getContainer()->get('DatabaseDriver');
+
 		$query = "SHOW INDEX FROM #__j2store_orders WHERE `key_name` LIKE ".$db->q('%user_email_%');
 		$db->setQuery($query);
 		$indexes = $db->loadObjectList();
@@ -279,7 +314,6 @@ class J2StoreControllerCpanels extends F0FController
 		$i++;
 		}
 
-		$db = JFactory::getDbo();
 		$query = "SHOW INDEX FROM #__j2store_addresses WHERE `key_name` LIKE ".$db->q('%email_%');
 		$db->setQuery($query);
 		$indexes = $db->loadObjectList();
@@ -302,14 +336,16 @@ class J2StoreControllerCpanels extends F0FController
 
 	}
 
-	/**
-	 * Task to clear the old cart data
-	 * */
-	public function clear_outdated_cart_data(){
+  /**
+   * Task to clear the old cart data
+   * */
+  public function clear_outdated_cart_data()
+  {
 		$j2params = J2Store::config();
 		$no_of_days_old = $j2params->get('clear_outdated_cart_data_term',90);
 
-		$db = JFactory::getDbo();
+    $db = Factory::getContainer()->get('DatabaseDriver');
+
 		$query = "select count(j2store_cart_id) from #__j2store_carts c where c.cart_type='cart' AND datediff(now(), c.created_on) > ".$db->q($no_of_days_old).";";
 		$db->setQuery($query);
 		$old_cart_items_exists = $db->loadResult();
@@ -336,8 +372,9 @@ class J2StoreControllerCpanels extends F0FController
 		//delete from #__j2store_carts where #__j2store_carts.cart_type='cart' AND datediff(now(), #__j2store_carts.modified_on) > 120;
 	}
 
-	public function getEupdates(){
-		$app = JFactory::getApplication();
+  public function getEupdates()
+  {
+		$app = Factory::getApplication();
 		$eupdate_model = F0FModel::getTmpInstance('Eupdates','J2StoreModel');
 		$list = $eupdate_model->getUpdates();
 		$total = count($list);
@@ -349,17 +386,16 @@ class J2StoreControllerCpanels extends F0FController
 		$app->close();
 	}
 
-	//getSubscriptionDetails
-	public function notifications() {
+  public function notifications()
+  {
 		$platform = J2Store::platform();
-		JSession::checkToken( 'get' ) or die( 'Invalid Token' );
+		Session::checkToken( 'get' ) or die( 'Invalid Token' );
 		if($platform->isClient('administrator')) {
-			$app = JFactory::getApplication();
+			$app = Factory::getApplication();
 			$message_type= $app->input->getString('message_type');
 			J2Store::config()->saveOne($message_type, 1);
 		}
 		$url = 'index.php?option=com_j2store&view=cpanels';
-        $platform->redirect($url);
-	}
-
+    $platform->redirect($url);
+  }
 }
