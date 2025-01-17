@@ -213,7 +213,7 @@ class J2Product extends JObject{
 		->name($name)
 		->value($value)
 		->setPlaceHolders($modifiers)
-		->attribs(array('class'=>'input-small'))
+		->attribs(array('class'=>'form-select'))
 		->getHtml();
 
 		return $html;
