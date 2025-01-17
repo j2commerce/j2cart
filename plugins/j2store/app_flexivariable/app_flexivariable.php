@@ -1,17 +1,20 @@
 <?php
 /**
- * --------------------------------------------------------------------------------
- * App Plugin - Flexible Variable
- * --------------------------------------------------------------------------------
- * @package     Joomla  3.x
- * @subpackage  J2 Store
- * @author      Alagesan, J2Store <support@j2store.org>
- * @copyright   Copyright (c) 2018 J2Store . All rights reserved.
- * @license     GNU/GPL V3 or later
- * @link        http://j2store.org
- * --------------------------------------------------------------------------------
+ * @package     Joomla.Plugin
+ * @subpackage  J2Store.app_flexivariable
  *
- * */
+ * @copyright Copyright (C) 2018 J2Store. All rights reserved.
+ * @copyright Copyright (C) 2024 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+// No direct access
+defined('_JEXEC') or die;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Uri\Uri;
 defined('_JEXEC') or die ('Restricted access');
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/app.php');
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/helpers/j2store.php');
@@ -56,11 +59,11 @@ class plgJ2StoreApp_flexivariable extends J2StoreAppPlugin
     {
         $app = J2Store::platform()->application();
         $id = $app->input->getInt('id', '0');
-        JToolBarHelper::title(JText::_('J2STORE_APP') . '-' . JText::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
-        JToolBarHelper::back('J2STORE_BACK_TO_DASHBOARD', 'index.php?option=com_j2store');
-        JToolBarHelper::back('PLG_J2STORE_BACK_TO_APPS', 'index.php?option=com_j2store&view=apps');
-        JToolBarHelper::apply('apply');
-        JToolBarHelper::save();
+        ToolBarHelper::title(Text::_('J2STORE_APP') . '-' . Text::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
+        ToolBarHelper::back('J2STORE_BACK_TO_DASHBOARD', 'index.php?option=com_j2store');
+        ToolBarHelper::back('PLG_J2STORE_BACK_TO_APPS', 'index.php?option=com_j2store&view=apps');
+        ToolBarHelper::apply('apply');
+        ToolBarHelper::save();
 
         $vars = new \stdClass();
         $fof_helper = J2Store::fof();
@@ -79,7 +82,7 @@ class plgJ2StoreApp_flexivariable extends J2StoreAppPlugin
     {
         $is_pro = J2Store::isPro();
         if ($is_pro) {
-            $types['flexivariable'] = JText::_('J2STORE_PRODUCT_TYPE_FLEXIVARIABLE');
+            $types['flexivariable'] = Text::_('J2STORE_PRODUCT_TYPE_FLEXIVARIABLE');
         }
     }
 
@@ -87,8 +90,9 @@ class plgJ2StoreApp_flexivariable extends J2StoreAppPlugin
     {
         $is_pro = J2Store::isPro();
         if ($is_pro) {
-            $document = J2Store::platform()->application()->getDocument();
-            $document->addScript(JUri::root(true) . '/plugins/j2store/' . $this->_element . '/' . $this->_element . '/js/flexivariable.js');
+	        $wa  = Factory::getApplication()->getDocument()->getWebAssetManager();
+	        $wa->registerAndUseScript('flexivariable-script', Uri::base().'media/plg_j2store_app_flexivariable/js/flexivariable.js', [], [], []);
+
         }
     }
 
@@ -116,7 +120,7 @@ class plgJ2StoreApp_flexivariable extends J2StoreAppPlugin
 
     protected function getAppDetails()
     {
-        $db = JFactory::getDBo();
+	    $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('*')->from('#__extensions')
             ->where('folder=' . $db->q('j2store'))

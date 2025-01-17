@@ -2,10 +2,14 @@
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2024 J2Commerce, LLC . All rights reserved.
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
-defined('_JEXEC') or die;
+defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 
 class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
 
@@ -26,23 +30,15 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
             $variant_table = F0FTable::getAnInstance('Variant', 'J2StoreTable');
             $variant_table->load(array('product_id'=>$record->j2store_product_id, 'is_master'=>1));
             $record->variant = $variant_table;
-            $global_config = JFactory::getConfig();
+            $global_config = Factory::getApplication()->getConfig();
             $limit = $global_config->get('list_limit',20);
-            //now load variants
-            /* 			$record->variants = $variantModel
-                        ->product_id($record->j2store_product_id)
-                        ->is_master(0)
-                        ->getList();
-             */
+
             //now load variants
             $record->variants = $variantModel
                 ->product_id($record->j2store_product_id)
                 ->limit($limit)
                 ->is_master(0)
                 ->getList();
-            /*foreach ($record->variants as &$r_variant){
-                $r_variant->variant_name = $this->getVariantName($r_variant);
-            }*/
             //TODO pagination to be set
             $record->variant_pagination = $variantModel->getPagination();
 
@@ -51,7 +47,7 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
             echo 'No variant set';
         }
 
-        //lets load product options as well
+        //let us load product options as well
         $record->product_options = F0FModel::getTmpInstance('ProductOptions', 'J2StoreModel')
             ->product_id($record->j2store_product_id)
             ->limit(0)
@@ -73,7 +69,7 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
     }
 
     public function getAppDetails(){
-        $db = JFactory::getDBo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('*')->from('#__extensions')
             ->where('folder='.$db->q('j2store'))
@@ -147,7 +143,7 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         foreach ($data['variable'] as $variable) {
             if( isset($variable->max_sale_qty) &&  !empty($variable->max_sale_qty) && isset($variable->min_sale_qty) && !empty($variable->min_sale_qty) && ($variable->max_sale_qty < $variable->min_sale_qty)){
                 $variable->min_sale_qty= 0 ;
-                $app->enqueueMessage(JText::_('J2STORE_MAX_SALE_QTY_NEED_TO_GRATER_THEN_MIN_SALE_QTY'),'warning');
+                $app->enqueueMessage(Text::_('J2STORE_MAX_SALE_QTY_NEED_TO_GRATER_THEN_MIN_SALE_QTY'),'warning');
             }
         }
 
@@ -184,7 +180,6 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
             //since post has too much of information, this could do the job
             $variant = F0FTable::getInstance('Variant', 'J2StoreTable');
             $variant->bind($this->_rawData);
-            //echo "<pre>";print_r($variant);exit;
             //by default it is treated as master product.
             $variant->is_master = 1;
             $variant->product_id = $table->j2store_product_id;
@@ -330,7 +325,7 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
             }
         }
         //load the price index table and set the min - max price
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $values = array();
         $product_id = $table->j2store_product_id;
         $values['product_id'] = $product_id;
@@ -526,7 +521,7 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         if($product->has_options && $product->variants) {
             try {
 
-                $db = JFactory::getDbo();
+                $db = Factory::getContainer()->get('DatabaseDriver');
                 //get all the variants
                 $query = $db->getQuery(true)->select('#__j2store_product_variant_optionvalues.variant_id as variant_id, #__j2store_product_variant_optionvalues.product_optionvalue_ids')->from('#__j2store_product_variant_optionvalues')
                     ->where('variant_id IN ('.implode(',', $variant_ids).')' );
@@ -621,7 +616,7 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
             }
         }
 
-        if(empty($variant)) return array('error'=> JText::_('J2STORE_FLEXI_VARIABLE_VARIANT_NOT_FOUND'));
+        if(empty($variant)) return array('error'=> Text::_('J2STORE_FLEXI_VARIABLE_VARIANT_NOT_FOUND'));
 
         //now we have the variant. Process.
 
@@ -657,11 +652,11 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         if($is_main_as_thum){
             $thumb_image = isset( $main_image ) && !empty( $main_image )  ? $main_image: '';
         }
-        $image_path = JUri::root();
+        $image_path = Uri::root();
         $return['thumb_image'] = isset( $thumb_image) && !empty( $thumb_image) ? $image_path.$thumb_image : $image_path.$product->thumb_image ;
         $return['main_image'] = isset( $main_image ) && !empty( $main_image ) ? $image_path.$main_image : $image_path.$product->main_image ;
         $return['sku'] = $variant->sku;
-        $return['quantity'] = floatval($quantity);
+        $return['quantity'] = (float)$quantity;
         $return['price'] = $variant->price;
         $return['availability'] = $variant->availability;
         $return['manage_stock'] = $variant->manage_stock;
@@ -669,9 +664,10 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
 
         if($product_helper->managing_stock($variant)){
             if($variant->availability) {
-                $return['stock_status'] = $product_helper->displayStock($variant, $params);
+	            $displayStock = $product_helper->displayStock($variant, $params);
+                $return['stock_status'] = $displayStock ?: 'Available';
             }else {
-                $return['stock_status'] = JText::_('J2STORE_OUT_OF_STOCK');
+                $return['stock_status'] = Text::_('J2STORE_OUT_OF_STOCK');
             }
         }else{
             $return['stock_status'] = '';
@@ -692,14 +688,25 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         if( isset($variant->pricing->is_discount_pricing_available)) {
             $discount = (1 - ($variant->pricing->price / $variant->pricing->base_price)) * 100;
             if ($discount > 0){
-                $return['pricing']['discount_text'] = JText::sprintf('J2STORE_PRODUCT_OFFER',round($discount).'%');
+                $return['pricing']['discount_text'] = Text::sprintf('J2STORE_PRODUCT_OFFER',round($discount).'%');
             }
         }
         //dimensions
         $return['dimensions'] = round($variant->length,2).' x '.round($variant->width,2).' x '.round($variant->height,2).' '.$variant->length_title;
-        $return['weight'] = round($variant->weight,2).' '.$variant->weight_title;
+	    $return['weight'] = round($variant->weight,2).' '.$variant->weight_title;
+	    $return['length'] = round($variant->length,2).' '.$variant->length_title;
+	    $return['width'] = round($variant->width,2).' '.$variant->length_title;
+	    $return['height'] = round($variant->height,2).' '.$variant->length_title;
         $return['weight_raw'] = round($variant->weight,2);
+        $return['length_raw'] = round($variant->length,2);
+        $return['width_raw'] = round($variant->width,2);
+        $return['height_raw'] = round($variant->height,2);
+	    $return['dimensions_unit'] = $variant->length_title;
+	    $return['length_title'] = $variant->length_title . ($variant->length > 1 ? ($variant->length_title === 'Inch' ? 'es' : 's') : '');
+	    $return['width_title'] = $variant->length_title . ($variant->width > 1 ? ($variant->length_title === 'Inch' ? 'es' : 's') : '');
+	    $return['height_title'] = $variant->length_title . ($variant->height > 1 ? ($variant->length_title === 'Inch' ? 'es' : 's') : '');
         $return['weight_unit'] = $variant->weight_unit;
+        $return['weight_title'] = $variant->weight_title . ($variant->weight > 1 ? 's' : '');
         J2Store::plugin()->event('AfterUpdateProductReturn',array(&$return,$product,$params));
         return $return;
 
