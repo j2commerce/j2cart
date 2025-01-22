@@ -721,7 +721,7 @@ class J2Html
         }
 
         $html = '';
-        $html .= '<div class="alert alert-block alert-info"><strong id="j2store_queue_key">'.$queue_key.'</strong><a onclick="regenerateQueueKey()" class="btn btn-primary btn-sm text-white ms-3"><i class="fas fa-solid fa-redo me-2"></i>'.Text::_ ( 'J2STORE_STORE_REGENERATE' ).'</a>
+        $html .= '<div class="alert alert-block alert-info"><strong id="j2store_queue_key">'.$queue_key.'</strong><a onclick="regenerateQueueKey()" class="btn btn-primary btn-sm text-white ms-3"><span class="fas fa-solid fa-redo me-2" aria-hidden="true"></span>'.Text::_ ( 'J2STORE_STORE_REGENERATE' ).'</a>
 		<script>
 		function regenerateQueueKey(){
 			(function($){
@@ -827,7 +827,7 @@ class J2Html
 		        'id'        => $id,
 		        'list.select' => $value,
 		        'option.key.toHtml' => false,
-                    'option.text.toHtml' => false,
+		        'option.text.toHtml' => false,
 		        'group.items' => null,
 		        'list.attr' => [
 			        implode(' ',$options),
@@ -1692,7 +1692,7 @@ jQuery('.modal-backdrop').remove();
 
 		if (!empty($field['key_field']) && !empty($query) && !empty($item->$name)) {
 			// Get the database instance
-				$db = Factory::getContainer()->get('DatabaseDriver');
+			$db = Factory::getContainer()->get('DatabaseDriver');
 
 			// Properly escape column and value
 			$query .= ' WHERE ' . $db->quoteName($field['key_field']) . ' = ' . $db->quote($item->$name);
@@ -1700,7 +1700,7 @@ jQuery('.modal-backdrop').remove();
 
 		if (!empty($query)) {
 			try {
-					$db = Factory::getContainer()->get('DatabaseDriver');
+				$db = Factory::getContainer()->get('DatabaseDriver');
 				$field_data = $db->setQuery($query)->loadObject();
 				$value_field = $field['value_field'] ?? '';
 				$html = $field_data->$value_field ?? '';
