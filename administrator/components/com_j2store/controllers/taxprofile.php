@@ -1,22 +1,28 @@
 <?php
-/*------------------------------------------------------------------------
- # com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Sasi varna kumar - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerTaxprofile extends F0FController
 {
 	use list_view;
+
 	public function browse()
 	{
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		$model = $this->getThisModel();
 		$state = array();
 		$state['taxprofile_name'] = $app->input->getString('taxprofile_name','');
@@ -55,20 +61,21 @@ class J2StoreControllerTaxprofile extends F0FController
 		$vars->pagination = $model->getPagination();
 		echo $this->_getLayout('default',$vars);
 	}
-	function deleteTaxRule() {
-		$app = JFactory::getApplication();
+
+	function deleteTaxRule()
+  {
+		$app = Factory::getApplication();
 		$taxrule_id = $app->input->getInt('taxrule_id');
-		$taxrule =F0FTable::getInstance('taxrules','Table');
+		$taxrule = J2Store::fof()->loadTable('taxrules','Table');
 		$response = array();
 		try {
 			$taxrule->delete($taxrule_id);
-			$response['success'] =JText::_('J2STORE_TAXRULE_DELETED_SUCCESSFULLY');
+			$response['success'] = Text::_('J2STORE_TAXRULE_DELETED_SUCCESSFULLY');
 		}catch (Exception $e) {
-			$response['error'] =JText::_('J2STORE_TAXRULE_DELETE_FAILED');
+			$response['error'] = Text::_('J2STORE_TAXRULE_DELETE_FAILED');
 		}
 		echo json_encode($response );
 		$app->close();
 
 	}
 }
-?>

@@ -1,22 +1,30 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
 use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
+HTMLHelper::_('bootstrap.tooltip', '[data-bs-toggle="tooltip"]', ['placement' => 'top']);
 
 $global_config = Factory::getApplication()->getConfig();
 //get the config
 $limit = $global_config->get('list_limit',20);
 
-
+$wa  = Factory::getApplication()->getDocument()->getWebAssetManager();
+$style = '.com_j2store .fa-stack.small {width: 1.25rem;height: 1.25rem;line-height: 1.25rem;}.com_j2store .fa-stack.small .fa-stack-2x {font-size:1rem;}.com_j2store .fa-stack.small .fa-stack-1x {font-size:0.5rem;top: 50%;left: 50%;transform: translate(-50%, -50%);}';
+$wa->addInlineStyle($style, [], []);
 ?>
 <fieldset class="options-form">
     <legend><?php echo Text::_('J2STORE_PRODUCT_VARIANTS');?></legend>
@@ -33,13 +41,27 @@ $limit = $global_config->get('list_limit',20);
                 </select>
 			<?php endforeach; ?>
             <a onclick="addFlexiVariant()" class="btn btn-primary"><span class="fas fa-solid fa-plus me-1"></span><?php echo Text::_('J2STORE_ADD_VARIANT');?></a>
-            <a onclick="removeFlexiAllVariant()" class="btn btn-outline-danger"><span class="fas fa-solid fa-trash me-1"></span><?php echo Text::_('J2STORE_REMOVE_ALL_VARIANT');?></a>
+            <a onclick="removeFlexiAllVariant()" class="btn btn-outline-danger"><span class="fas fa-solid fa-trash me-1"></span><?php echo Text::_('J2STORE_DELETE_ALL_VARIANTS');?></a>
         </div>
     </div>
     <div id="variant_display_block">
         <!-- Advanced variable starts here  -->
         <div class="j2store-advancedvariants-settings">
-            <a class="btn btn-outline-danger btn-sm mb-3" href="javascript:;" id="deleteCheckedVariants">Delete Checked Variants</a>
+            <div class="d-flex justify-content-start mb-3">
+                <button type="button" class="btn btn-outline-danger btn-sm" id="deleteCheckedVariants" data-bs-toggle="tooltip" title="<?php echo Text::_('J2STORE_PRODUCT_VARIANTS_DELETE_CHECKED');?>" disabled>
+                <span class="fa-stack small">
+                  <span class="fa-solid fas fa-trash fa-stack-2x"></span>
+                  <span class="fas fa-solid fa-check fa-stack-1x text-danger small"></span>
+                </span>
+                </button>
+                <button type="button" id="openAll-panel" class="btn btn-outline-primary btn-sm ms-auto" onclick="setExpandAll();" data-bs-toggle="tooltip" title="<?php echo Text::_('J2STORE_OPEN_ALL');?>">
+                    <span class="fas fa-solid fa-chevron-down"></span>
+                </button>
+                <button type="button" id="closeAll-panel" class="btn btn-outline-primary btn-sm ms-2" onclick="setCloseAll();" data-bs-toggle="tooltip" title="<?php echo Text::_('J2STORE_CLOSE_ALL');?>">
+                    <span class="fas fa-solid fa-chevron-up"></span>
+                </button>
+            </div>
+
             <div class="accordion" id="accordion">
 				<?php
 				/* to get ajax advanced variable list need to
@@ -56,7 +78,6 @@ $limit = $global_config->get('list_limit',20);
         </div>
     </div>
 </fieldset>
-
 
 <script type="text/javascript">
     var currentPage = <?php echo $this->item->variant_pagination->pagesCurrent; ?>;
@@ -173,6 +194,31 @@ $limit = $global_config->get('list_limit',20);
         };
         xhr.send(serializedData);
     }
+
+    /**
+     * Method to Expand All Accordion Panel
+     */
+    function setExpandAll() {
+        const accordionPanels = document.querySelectorAll('.accordion .collapse');
+        accordionPanels.forEach(panel => {
+            if (!panel.classList.contains('show')) {
+                const collapseInstance = new bootstrap.Collapse(panel, { toggle: true });
+                collapseInstance.show();
+            }
+        });
+    }
+
+    /**
+     * Method to Close All Accordion Panel
+     */
+    function setCloseAll() {
+        const accordionPanels = document.querySelectorAll('.accordion .collapse.show');
+        accordionPanels.forEach(panel => {
+            const collapseInstance = new bootstrap.Collapse(panel, { toggle: true });
+            collapseInstance.hide();
+        });
+    }
+
     function addFlexiVariant() {
         var data = [];
         var inputs = document.querySelectorAll('#variant_add_block select, #variant_add_block input');
@@ -242,24 +288,43 @@ $limit = $global_config->get('list_limit',20);
         xhr.send();
     }
     document.addEventListener("DOMContentLoaded", function () {
-        var deleteButton = document.getElementById("deleteCheckedVariants");
-        if (deleteButton) {
-            deleteButton.addEventListener("click", function (e) {
-                var checkboxes = document.querySelectorAll('input[name="vid[]"]:checked');
-                checkboxes.forEach(function (checkbox) {
-                    var variant_id = checkbox.value;
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("GET", 'index.php?option=com_j2store&view=apps&task=view&appTask=deletevariant&id=<?php echo $this->item->app_detail->extension_id;?>&variant_id=' + variant_id, true);
-                    xhr.onloadstart = function () {
-                    };
-                    xhr.onload = function () {
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            location.reload(true);
+        // Select the button and checkboxes
+        const deleteButton = document.getElementById("deleteCheckedVariants");
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][name="vid[]"]');
+
+        // Function to check the state of the checkboxes and toggle the button
+        function toggleButtonState() {
+            const isAnyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+            deleteButton.disabled = !isAnyChecked; // Enable if any checkbox is checked, disable otherwise
                         }
-                    };
-                    xhr.send();
-                });
+
+        // Add event listeners to each checkbox
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", function () {
+                toggleButtonState();
             });
-        }
+                });
+
+        // Disable the button if all checkboxes are unchecked initially
+        toggleButtonState();
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector('#deleteCheckedVariants').addEventListener('click', function (e) {
+            const checkedVariants = document.querySelectorAll('input[name="vid[]"]:checked');
+            checkedVariants.forEach(function (element) {
+                const variant_id = element.value;
+                fetch(`index.php?option=com_j2store&view=products&task=deletevariant&variant_id=${variant_id}`, {
+                    method: 'GET',
+                })
+                    .then(response => response.json())
+                    .then(json => {
+                        if (json) {
+                            location.reload(true); // Reload the page if the server responds successfully
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
     });
 </script>

@@ -3,13 +3,14 @@
  * @package     Joomla.Component
  * @subpackage  J2Store
  *
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
 
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
@@ -40,7 +41,7 @@ trait list_view
 
         // Set toolbar title
         $subtitle_key = strtoupper($option . '_TITLE_' . F0FInflector::pluralize($this->input->getCmd('view', 'cpanel')));
-        ToolBarHelper::title(Text::_(strtoupper($option)) . ': ' . Text::_($subtitle_key), $componentName);
+        ToolbarHelper::title(Text::_(strtoupper($option)) . ': ' . Text::_($subtitle_key), $componentName);
     }
 
     function editToolBar()
@@ -131,7 +132,7 @@ trait list_view
         $app = J2Store::platform()->application();
         $id = $app->input->get('id',0);
         $task = $app->input->get('task','');
-        if ($task == 'add') {
+        if ($task === 'add') {
             $id = $app->input->get('id',0);
         }else{
             if (empty($id)) {

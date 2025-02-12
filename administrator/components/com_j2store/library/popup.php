@@ -1,11 +1,15 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
 
 class J2StorePopup
 {
@@ -19,6 +23,7 @@ class J2StorePopup
         $html .= "</a>\n";
         return $html;
     }
+
 	public static function popuplink($url, $text, $options = array())
 	{
 		$class = (!empty($options['class'])) ? $options['class'] : '';
@@ -27,6 +32,7 @@ class J2StorePopup
 		$html .= "</a>\n";
 		return $html;
 	}
+
     public static function getBrowser()
     {
         if (preg_match('/(?i)msie [2-9]/', $_SERVER['HTTP_USER_AGENT'])) {
@@ -43,7 +49,7 @@ class J2StorePopup
     {
         $document = J2Store::platform()->application()->getDocument();
         $js = "(function($) {
-            $(document).ready(function() {  
+            $(document).ready(function() {
               $('.fancybox').fancybox({
               afterClose: function() {
               window.location.reload();
@@ -54,7 +60,6 @@ class J2StorePopup
     ";
 
         $document->addScriptDeclaration($js);
-
     }
 
     /**
@@ -85,5 +90,4 @@ class J2StorePopup
 
         return $html;
     }
-
 }

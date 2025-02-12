@@ -1,25 +1,36 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2storeControllerShippings extends F0FController
 {
     use list_view;
-	public function __construct($config) {
+
+	public function __construct($config)
+  {
 		parent::__construct($config);
 		$this->registerTask('apply', 'save');
 		$this->registerTask('saveNew', 'save');
- 		/* $task = JFactory::getApplication()->input->getString('task');
+ 		/* $task = Factory::getApplication()->input->getString('task');
 		if($task=='view') $this->view(); */
 	}
+
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['name'] = $app->input->getString('name','');
@@ -34,7 +45,6 @@ class J2storeControllerShippings extends F0FController
         $vars->items = $items;
         $this->toolbarBacktodashboard();
         $vars->state = $model->getState();
-
 
         $header = array(
             'extension_id' => array(
@@ -75,12 +85,12 @@ class J2storeControllerShippings extends F0FController
 
 	public function execute($task)
 	{
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		 $shippingTask = $app->input->getCmd('shippingTask', '');
 		$values = $app->input->getArray($_POST);
 		// Check if we are in a shipping method view. If it is so,
 		// Try lo load the shipping plugin controller (if any)
-		if ( $task  == "view" && $shippingTask != '' )
+		if ( $task  === "view" && $shippingTask !== '' )
 		{
 			$model = $this->getModel('Shippings');
 			$id = $app->input->getInt('id', '0');
@@ -143,5 +153,4 @@ class J2storeControllerShippings extends F0FController
 	    	$view->setLayout( 'view' );
 	    	$view->display();
 	}
-
 }

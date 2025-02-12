@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -37,7 +37,7 @@ class J2StoreModelFiltergroups extends F0FModel {
 		$task = $app->input->getString ( 'task' );
 		if ($task == 'saveorder')
 			return parent::save ( $data );
-		
+
 		if (parent::save ( $data )) {
 			if (isset ( $this->otable->j2store_filtergroup_id )) {
 				if (isset ( $data ['filter_value'] ) && count ( $data ['filter_value'] )) {

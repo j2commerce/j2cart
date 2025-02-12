@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -266,7 +266,7 @@ class J2StoreModelCartsBehaviorCartFlexiVariable extends F0FModelBehavior {
         foreach ($options as $product_option_id => $option_value) {
 
             $product_option = $product_helper->getCartProductOptions($product_option_id, $item->product_id);
-            
+
 
             if ($product_option) {
                 if ($product_option->type == 'select' || $product_option->type == 'radio') {

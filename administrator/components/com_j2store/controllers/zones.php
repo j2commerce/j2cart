@@ -1,27 +1,42 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\HTML\Helpers\Select;
+use Joomla\CMS\Language\Text;
+
 jimport('joomla.application.component.controllerform');
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerZones extends F0FController
 {
     use list_view;
 
-    public function __construct($config) {
+    public function __construct($config)
+    {
         parent::__construct($config);
         $this->registerTask('apply', 'save');
     }
-    public function execute($task) {
+
+    public function execute($task)
+    {
         if(in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
         return parent::execute($task);
     }
+
     function add()
     {
         $platform = J2Store::platform();
@@ -30,14 +45,11 @@ class J2StoreControllerZones extends F0FController
         $this->editToolBar();
         $vars->primary_key = 'j2store_zone_id';
         $vars->id = $this->getPageId();
-        $zone_table = F0FTable::getInstance('Zone', 'J2StoreTable')->getClone ();
+        $zone_table = J2Store::fof()->loadTable('Zone', 'J2StoreTable')->getClone ();
         $zone_table->load($vars->id);
         $vars->item = $zone_table;
         $vars->field_sets = array();
         $col_class = 'col-md-';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $col_class = 'span';
-        }
         $vars->field_sets[] = array(
             'id' => 'basic_information',
             'class' => array(
@@ -50,28 +62,28 @@ class J2StoreControllerZones extends F0FController
                     'type' => 'text',
                     'name' => 'zone_name',
                     'value' => $zone_table->zone_name,
-                    'options' => array('required' => 'true','class' => 'input-xlarge')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'zone_code' => array(
                     'label' => 'J2STORE_ZONE_CODE',
                     'type' => 'text',
                     'name' => 'zone_code',
                     'value' => $zone_table->zone_code,
-                    'options' => array('required' => 'true','class' => 'input-xlarge')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'country_id' => array(
                     'label' => 'J2STORE_ADDRESS_COUNTRY',
                     'type' => 'country',
                     'name' => 'country_id',
                     'value' => $zone_table->country_id,
-                    'options' => array('class' => 'input-xlarge','id' => 'country_id')
+                    'options' => array('class' => 'form-control','id' => 'country_id')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
                     'type' => 'enabled',
                     'name' => 'enabled',
                     'value' => $zone_table->enabled,
-                    'options' => array('class' => 'input-xlarge')
+                    'options' => array('')
                 ),
             )
         );
@@ -80,7 +92,7 @@ class J2StoreControllerZones extends F0FController
 
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['zone_name'] = $app->input->getString('zone_name','');
@@ -136,10 +148,10 @@ class J2StoreControllerZones extends F0FController
     }
 
 	function getZoneList(){
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		$post = $app->input->getArray($_POST);
 		if($post['country_id']) {
-			$model = F0FModel::getTmpInstance('Zones', 'J2storeModel');
+			$model = J2Store::fof()->getModel('Zones', 'J2storeModel');
 			$model->setState('country_id', $post['country_id']);
 			$zones = $model->getList(true);
 		}
@@ -149,23 +161,23 @@ class J2StoreControllerZones extends F0FController
 		{
 			foreach ($zones as $zone)
 			{
-				$options[] = JHtml::_('select.option',
+				$options[] = HTMLHelper::_('select.option',
 						$zone->j2store_zone_id, $zone->zone_name);
 			}
 		}
 		$default = $post['zone_id'];
-		echo JHtmlSelect::genericlist($options, $post['field_name'], '', 'value', 'text', $default, $post['field_id']);
+		echo Select::genericlist($options, $post['field_name'], '', 'value', 'text', $default, $post['field_id']);
 		$app->close();
 	}
 
-
-	public function getCountry(){
-		$app = JFactory::getApplication();
+	public function getCountry()
+  {
+		$app = Factory::getApplication();
 		$country_id = $this->input->getInt('country_id');
 		$zone_id = $this->input->getInt('zone_id');
 		$json = array();
 		if($country_id) {
-			$zones = F0FModel::getTmpInstance('Zones', 'J2storeModel')->country_id($country_id)->getList();
+			$zones = J2Store::fof()->getModel('Zones', 'J2storeModel')->country_id($country_id)->getList();
 			$json['zone'] = $zones ;
 		}
 		echo json_encode($json);
@@ -176,9 +188,10 @@ class J2StoreControllerZones extends F0FController
 	 * Method
 	 * @return boolean
 	 */
-	function elements(){
+	function elements()
+  {
 		$geozone_id = $this->input->getInt('geozone_id');
-		$model = F0FModel::getTmpInstance('Zones','J2StoreModel');
+		$model = J2Store::fof()->getModel('Zones','J2StoreModel');
 		$filter =array();
 		$filter['limit'] = $this->input->getInt('limit',20);
 		$filter['limitstart'] = $this->input->getInt('limitstart');
@@ -191,11 +204,11 @@ class J2StoreControllerZones extends F0FController
 			$view = $this->getThisView();
 			$view->setModel($this->getThisModel(),true);
 			$zones =$model->enabled(1)->getItemList();
-			$view->assign('zones',$zones);
-			$view->assign('pagination',$model->getPagination());
-			$view->assign('geozone_id',$geozone_id);
-			$view->assign('state',$model->getState());
-			$view->setLayout('modal');
+			$view->set('zones',$zones);
+			$view->set('pagination',$model->getPagination());
+			$view->set('geozone_id',$geozone_id);
+			$view->set('state',$model->getState());
+			$view->set('modal');
 			$view->display();
 		}else{
 			return false;
@@ -208,18 +221,19 @@ class J2StoreControllerZones extends F0FController
      * @return bool|void
      * @throws Exception
      */
-    function save(){
+    function save()
+    {
         $platform = J2Store::platform();
         $app = $platform->application();
         $post = $app->input->getArray($_REQUEST);
         $zone_id = isset($post['j2store_zone_id']) && !empty($post['j2store_zone_id']) ? $post['j2store_zone_id']: 0;
-        $zone_table = F0FTable::getAnInstance('Zone' ,'J2StoreTable');
+        $zone_table = J2Store::fof()->loadTable('Zone' ,'J2StoreTable');
         try{
             $zone_table->load($zone_id);
             $zone_table->bind($post);
             $zone_table->store();
             $zone_id = $zone_table->j2store_zone_id;
-            $msg = JText::_('J2STORE_SAVE_SUCCESS');
+            $msg = Text::_('J2STORE_SAVE_SUCCESS');
             $type = '';
         }catch (Exception $e){
             $msg = $e->getMessage();

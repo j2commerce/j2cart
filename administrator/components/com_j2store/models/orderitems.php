@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -13,7 +13,7 @@ class J2StoreModelOrderItems extends F0FModel {
 	private $_items = array ();
 
 	public function setItems($cartitems) {
-		$product_helper = J2Store::product ();		
+		$product_helper = J2Store::product ();
 		$productitems = array ();
 		foreach ( $cartitems as $cartitem ) {
 
@@ -23,13 +23,13 @@ class J2StoreModelOrderItems extends F0FModel {
 			}
 
 			if ($product_helper->managing_stock ( $cartitem ) && $product_helper->backorders_allowed ( $cartitem ) === false) {
-				
-				//this could be wrong. we are not checking the total quantity for product types other than variant type	
+
+				//this could be wrong. we are not checking the total quantity for product types other than variant type
 				/* if ($cartitem->product_qty > $cartitem->available_quantity && $cartitem->available_quantity >= 1) {
 					JFactory::getApplication ()->enqueueMessage ( JText::sprintf ( "J2STORE_CART_QUANTITY_ADJUSTED", $cartitem->product_name, $cartitem->product_qty, $cartitem->available_quantity ) );
 					$cartitem->product_qty = $cartitem->available_quantity;
 				} */
-			
+
 				// removing the product from the cart if it's not available
 				$stock_status = ($cartitem->available_quantity == 0) ? true :false;
 				J2Store::plugin ()->event('ValidateStockOnSetOrderItems', array(&$stock_status, $cartitem));
@@ -53,7 +53,7 @@ class J2StoreModelOrderItems extends F0FModel {
 			$orderItem->vendor_id = $cartitem->vendor_id;
 			$orderItem->orderitem_name = $cartitem->product_name;
 			$orderItem->orderitem_quantity = J2Store::utilities()->stock_qty($cartitem->product_qty);
-			
+
 			//set the entire cartitem. We can use it later
 			$orderItem->cartitem = $cartitem;
 
@@ -83,7 +83,7 @@ class J2StoreModelOrderItems extends F0FModel {
 
 			//prepare orderitem_params and add some data that might be useful
 			$this->getOrderItemParams($orderItem, $cartitem);
-		
+
 			JPluginHelper::importPlugin ( 'j2store' );
 			$results = JFactory::getApplication ()->triggerEvent ( "onJ2StoreAfterAddCartItemToOrder", array (
 					$cartitem
@@ -113,7 +113,7 @@ class J2StoreModelOrderItems extends F0FModel {
 		$array['thumb_image'] = $thumb_image;
 		$array['shipping'] = $cartitem->shipping;
 		$product_helper = J2Store::product();
-		
+
         if($product_helper->managing_stock($cartitem) && $product_helper->backorders_allowed($cartitem) &&
             isset($cartitem->available_quantity) && isset($cartitem->product_qty) && $cartitem->product_qty > $cartitem->available_quantity){
             $array['back_order_item'] = 'J2STORE_BACK_ORDER_ITEM';
@@ -172,11 +172,11 @@ class J2StoreModelOrderItems extends F0FModel {
 
 	public function getItemsByOrder($order_id) {
 		if(empty($order_id)) return array();
-		
+
 		$query = $this->_db->getQuery(true);
 		$query->select('*')->from('#__j2store_orderitems')->where('order_id = '.$this->_db->q($order_id));
 		$this->_db->setQuery($query);
 		return  $this->_db->loadObjectList();
 	}
-	
+
 }

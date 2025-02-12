@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
  * @license GNU GPL v3 or later
  */
@@ -25,7 +25,7 @@ $this->useCoreUI = true;
             <h4 class="alert-heading"><?php echo Text::_('J2STORE_QUICK_HELP'); ?></h4>
             <?php echo Text::_('J2STORE_FLEXIVARIANT_PRODUCT_HELP_TEXT'); ?>
         </div>
-        
+
         <?php echo HTMLHelper::_('uitab.startTabSet', $this->tab_name, ['active' => 'generalTab', 'recall' => true, 'breakpoint' => 768]); ?>
         <?php echo HTMLHelper::_('uitab.addTab', $this->tab_name, 'generalTab', Text::_('J2STORE_PRODUCT_TAB_GENERAL')); ?>
         <div class="row">
@@ -96,6 +96,6 @@ $this->useCoreUI = true;
         </div>
         <?php echo HTMLHelper::_('uitab.endTab'); ?>
         <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
-        
+
     </div>
 </div>

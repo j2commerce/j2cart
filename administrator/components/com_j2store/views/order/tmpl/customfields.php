@@ -1,16 +1,17 @@
 <?php
-/*------------------------------------------------------------------------
-# com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Ramesh Elamathi - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
 
-// no direct access
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Language\Text;
 
 if($type=='billing') {
 	$field = 'all_billing';
@@ -40,15 +41,16 @@ if(!empty($row->$field) && strlen($row->$field) > 0) {
 ?>
 
 <?php if(isset($fields) && count($fields)) :?>
+    <div class="small">
 <?php foreach($fields as $namekey=>$field) : ?>
 	<?php if(is_object($field)): ?>
-		<dt><?php echo JText::_($field->label); ?>:</dt>
-		<dd>
+                <div>
+                    <strong><?php echo Text::_($field->label);?>:</strong>
 		<?php
 		if(is_array($field->value)) {
 			echo '<br>';
 			foreach($field->value as $value) {
-				echo '- '.JText::_($value).'<br>';
+                            echo '- '.Text::_($value).'<br>';
 			}
 
 		}elseif(is_object($field->value)) {
@@ -56,25 +58,26 @@ if(!empty($row->$field) && strlen($row->$field) > 0) {
             $obj_array = $platform->fromObject($field->value);
             echo '<br>';
             foreach($obj_array as $value) {
-                echo '- '.JText::_($value).'<br>';
+                            echo '- '.Text::_($value).'<br>';
             }
-		
+
 		}elseif(is_string($field->value) && J2Store::utilities()->isJson(stripslashes($field->value))) {
 			$json_values = json_decode(stripslashes($field->value));
 
 		if(is_array($json_values)) {
 			foreach($json_values as $value){
-				echo '- '.JText::_($value).'<br>';
+                                echo '- '.Text::_($value).'<br>';
 			}
 		} else {
-				echo JText::_(nl2br($field->value));
+                            echo Text::_(nl2br($field->value));
 			}
 
 		} else {
-			echo JText::_(nl2br($field->value));
+                        echo Text::_(nl2br($field->value));
 		}
 		?>
-		</dd>
+                </div>
 <?php endif; ?>
 <?php endforeach; ?>
+    </div>
 <?php endif; ?>

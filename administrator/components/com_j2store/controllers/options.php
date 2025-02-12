@@ -1,21 +1,31 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerOptions extends F0FController
 {
     use list_view;
-    public function deleteoptionvalue(){
 
-        $app = JFactory::getApplication();
+    public function deleteoptionvalue()
+    {
+        $app = Factory::getApplication();
         $option_value_id = $app->input->getInt('optionvalue_id');
 
-        $product_optionValue = F0FTable::getInstance('Productoptionvalue','J2StoreTable')->getClone();
+        $product_optionValue = J2Store::fof()->loadTable('Productoptionvalue','J2StoreTable')->getClone();
         $product_optionValue->load(array(
             'optionvalue_id' => $option_value_id
         ));
@@ -27,22 +37,22 @@ class J2StoreControllerOptions extends F0FController
             $delete_status = false;
         }
         if($delete_status){
-            $optionValue = F0FTable::getInstance('Optionvalue','J2StoreTable')->getClone();
+            $optionValue = J2Store::fof()->loadTable('Optionvalue','J2StoreTable')->getClone();
             $optionValue->load($option_value_id);
             $msg_type = "success";
             $msg_header ='Message';
-            $msg = JText::_('J2STORE_OPTION_VALUE_DELETED_SUCCESSFULLY');
+            $msg = Text::_('J2STORE_OPTION_VALUE_DELETED_SUCCESSFULLY');
             $json['success'] = true;
             if(!$optionValue->delete()){
                 $json['success'] = false;
                 $msg_type = "warning";
-                $msg = JText::_('J2STORE_OPTION_VALUE_DELETE_ERROR');
+                $msg = Text::_('J2STORE_OPTION_VALUE_DELETE_ERROR');
                 $msg_header ='Warning';
             }
         }else{
             $json['success'] = false;
             $msg_type = "warning";
-            $msg = JText::_('J2STORE_OPTION_VALUE_USED_IN_SOME_PRODUCT');
+            $msg = Text::_('J2STORE_OPTION_VALUE_USED_IN_SOME_PRODUCT');
             $msg_header ='Warning';
         }
 
@@ -54,9 +64,9 @@ class J2StoreControllerOptions extends F0FController
         $app->close();
     }
 
-
-    public function getOptions() {
-        $app = JFactory::getApplication();
+    public function getOptions()
+    {
+        $app = Factory::getApplication();
         $q = $app->input->post->get('q', '','string');
         $json = array();
         $model = $this->getThisModel('options');
@@ -123,5 +133,4 @@ class J2StoreControllerOptions extends F0FController
         $vars->pagination = $model->getPagination();
         echo $this->_getLayout('default',$vars);
     }
-
 }

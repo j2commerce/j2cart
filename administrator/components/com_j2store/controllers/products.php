@@ -1,17 +1,23 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/productbase.php');
 
-//print_r($_POST); exit;
 class J2StoreControllerProducts extends J2StoreControllerProductsBase
 {
-
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
@@ -23,36 +29,38 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 		return parent::execute($task);
 	}
 
-	public function create() {
+	public function create()
+  {
 		$url = 'index.php?option=com_content&view=article&layout=edit';
 		$this->setRedirect($url);
 	}
 
 	public function browse()
 	{
-		$app = JFactory::getApplication();
+		    $app = Factory::getApplication();
 			$model = $this->getThisModel();
 			$state = $this->getFilterStates();
 			foreach($state as $key => $value){
 				$model->setState($key,$value);
 			}
 			$product_types  = $model->getProductTypes();
-			array_unshift($product_types, JText::_('J2STORE_SELECT_OPTION'));
+			array_unshift($product_types, Text::_('J2STORE_SELECT_OPTION'));
 
 			$products = $model->getProductList();
 
 			$view = $this->getThisView();
 			$view->setModel($model);
-			$view->assign('products',$products);
-			$view->assign('state', $model->getState());
-			$view->assign('product_types',$product_types);
+			$view->set('products',$products);
+			$view->set('state', $model->getState());
+			$view->set('product_types',$product_types);
 			return parent::browse();
 
 	}
 
-	function setCouponProducts(){
+	function setCouponProducts()
+  {
 		//get variant id
-		$model = F0FModel::getTmpInstance('Products', 'J2StoreModel');
+		$model = J2Store::fof()->getModel('Products', 'J2StoreModel');
 		$limit = $this->input->getInt('limit',20);
 		$limitstart = $this->input->getInt('limitstart',0);
 
@@ -73,7 +81,4 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 		$view->setLayout($layout);
 		$view->display();
 	}
-
-
-
 }

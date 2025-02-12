@@ -1,12 +1,20 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
-class JFormFieldCouponproducts extends  JFormField
+
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\Language\Text;
+
+class JFormFieldCouponproducts extends FormField
 {
 	/**
 	 * The field type.
@@ -15,42 +23,11 @@ class JFormFieldCouponproducts extends  JFormField
 	 */
 	protected $type = 'Couponproducts';
 
-	protected function getInput(){
+	protected function getInput()
+    {
 		$html ='';
 		$fieldId = isset($this->element['id']) ? $this->element['id'] : 'jform_product_list';
-		$html =J2StorePopup::popup("index.php?option=com_j2store&view=coupons&task=setProducts&layout=products&tmpl=component&function=jSelectProduct&field=".$fieldId, JText::_( "J2STORE_SET_PRODUCTS" ), array('width'=>800 ,'height'=>400 ,'class'=>'btn btn-success'));
+		$html .= J2StorePopup::popup("index.php?option=com_j2store&view=coupons&task=setProducts&layout=products&tmpl=component&function=jSelectProduct&field=".$fieldId, Text::_( "J2STORE_SET_PRODUCTS" ), array('width'=>800 ,'height'=>400 ,'class'=>'btn btn-success'));
 		return $html ;
 	}
-
-	/* protected function getInput(){
-
-		$html ='';
-		$fieldId = isset($this->element['id']) ? $this->element['id'] : 'jform_product_list';
-		$products = F0FModel::getTmpInstance('Products' ,'J2StoreModel')->enabled(1)->getList();
-		$productarray =array();
-		$value =array();
-		if(isset($this->value) && $this->value){
-			$value = explode(',' ,$this->value);
-		}
-		foreach($products as $product){
-			$product = J2Product::getInstance()
-				->setId($product->j2store_product_id)
-				->getProduct();
-			 if(in_array($product->j2store_product_id ,$value)){
-				$productarray[$product->j2store_product_id] =$product->product_name;
-			 }
-		}
-		$html .=JHTML::_('behavior.modal', 'a.modal');
-		$html .= J2Html::select()->clearState()
-				->type('genericlist')
-				->idTag($fieldId)
-				->attribs(array('multiple'=>true))
-				->name('products[]')
-				->setPlaceholders($productarray)
-				->value($value)
-				->getHtml();
-		$html .=J2StorePopup::popup("index.php?option=com_j2store&view=coupons&task=setProducts&layout=products&tmpl=component&function=jSelectProduct&field=".$fieldId, JText::_( "J2STORE_SET_PRODUCTS" ), array('width'=>800 ,'height'=>400));
-		return $html ;
-	} */
-
 }

@@ -1,47 +1,56 @@
 <?php
 /**
- * @package     J2Store
- * @author      Alagesan, J2Store <support@j2store.org>
- * @copyright   Copyright (c) 2018 J2Store . All rights reserved.
- * @license     GNU GPL v3 or later
- * */
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
 class J2StoreControllerAppStores extends F0FController
 {
-    protected $cacheableTasks = array();
+    protected $cacheableTasks = [];
 
     public function execute($task)
     {
-        if(!in_array($task,array('browse'))){
+        if($task !== 'browse'){
             $task = 'browse';
         }
         parent::execute($task);
     }
 
-    function browse(){
+    function browse()
+    {
         $model = $this->getThisModel();
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
 
         $option = 'com_j2store';
         $ns = $option.'pluginsearch';
-        $limit		= $app->getUserStateFromRequest( 'global.list.limit', 'limit', $app->getCfg('list_limit'), 'int' );
+        $limit		= $app->getUserStateFromRequest( 'global.list.limit', 'limit', $app->get('list_limit'), 'int' );
         $limitstart	= $app->getUserStateFromRequest( $ns.'.limitstart', 'limitstart', 0, 'int' );
-        $limitstart = ($limit != 0 ? (floor($limitstart / $limit) * $limit) : 0);
+        $limitstart = ($limit !== 0 ? (floor($limitstart / $limit) * $limit) : 0);
         $filter_order_Dir =  $app->getUserStateFromRequest( $ns.'filter_order_Dir',	'filter_order_Dir',	'',	'word' );
         $filter_order	= $app->getUserStateFromRequest( $ns.'filter_order',		'filter_order',		'tbl.user_id',	'cmd' );
 
         $plugin_type = $app->input->getString('plugin_type',  $model->getState('plugin_type', ''));
         $search = $app->input->getString('search',  $model->getState('search', ''));
         $plugin_types = array(
-            '' => JText::_('J2STORE_ALL'),
-            'payment' => JText::_('J2STORE_PAYMENT'),
-            'shipping' => JText::_('J2STORE_SHIPPING'),
-            'app' => JText::_('J2STORE_APP'),
-            'report' => JText::_('J2STORE_REPORT'),
-            'other' => JText::_('J2STORE_OTHER')
+            '' => Text::_('J2STORE_ALL'),
+            'payment' => Text::_('J2STORE_PAYMENT'),
+            'shipping' => Text::_('J2STORE_SHIPPING'),
+            'app' => Text::_('J2STORE_APP'),
+            'report' => Text::_('J2STORE_REPORT'),
+            'other' => Text::_('J2STORE_OTHER')
         );
-        $final_list = array();
-        $plugin_version = array();
+        $final_list = [];
+        $plugin_version = [];
         $this->getInstalledPlugin($final_list,$plugin_version);
 
         $model->setState('limit', $limit);
@@ -57,7 +66,7 @@ class J2StoreControllerAppStores extends F0FController
         try {
             $items = $model->getList();
         } catch (Exception $e) {
-            $items = array();
+            $items = [];
         }
 
 
@@ -73,8 +82,9 @@ class J2StoreControllerAppStores extends F0FController
         $view->display();
     }
 
-    public function getInstalledPlugin(&$final_list,&$version_list){
-        $db = JFactory::getDBo();
+    public function getInstalledPlugin(&$final_list,&$version_list)
+    {
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('element,manifest_cache')->from('#__extensions')
             ->where('folder='.$db->q('j2store'));

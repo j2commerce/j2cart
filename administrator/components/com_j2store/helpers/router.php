@@ -1,17 +1,21 @@
 <?php
-/*------------------------------------------------------------------------
- # com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Ramesh Elamathi - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
 
+defined('_JEXEC') or die;
 
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Multilanguage;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Menu\AbstractMenu;
+use Joomla\Registry\Registry;
 
 if(!class_exists('J2Store')) {
 	require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2store.php');
@@ -39,18 +43,12 @@ class J2StoreRouterHelper
 	 * @param array $params The menu parameters to look for
 	 * @return null|object Null if not found, or the menu item if we did find it
 	 */
-	static public function findMenu($qoptions = array(), $params = null)
+	static public function findMenu($qoptions = [], $params = null)
 	{
-		static $joomla16 = null;
-
-		if(is_null($joomla16)) {
-			$joomla16 = version_compare(JVERSION,'1.6.0','ge');
-		}
-
 		// Convert $qoptions to an object
-		if(empty($qoptions) || !is_array($qoptions)) $qoptions = array();
+		if(empty($qoptions) || !is_array($qoptions)) $qoptions = [];
 
-		$menus =JMenu::getInstance('site');
+		$menus = AbstractMenu::getInstance('site');
 		$menuitem = $menus->getActive();
 		// First check the current menu item (fastest shortcut!)
 		if(is_object($menuitem)) {
@@ -59,18 +57,11 @@ class J2StoreRouterHelper
 			}
 		}
 
-
-		//print_r($menus->getItems(array('language'), $languages) );
-		foreach($menus->getMenu() as $item)
-		{
-			if($joomla16) {
-				if(self::checkMenu($item, $qoptions, $params)) return $item;
-			} elseif($item->published)
-			{
-				if(self::checkMenu($item, $qoptions, $params)) return $item;
-			}
-		}
-
+    foreach ($menus->getMenu() as $item) {
+        if (self::checkMenu($item, $qoptions, $params) && $item->published) {
+            return $item;
+        }
+    }
 
 		return null;
 	}
@@ -95,8 +86,9 @@ class J2StoreRouterHelper
 
 		if(!is_null($params))
 		{
-			$menus =JMenu::getInstance('site');
-			$check =  $menu->params instanceof JRegistry ? $menu->params : $menus->getParams($menu->id);
+      $menus = AbstractMenu::getInstance('site');
+      $menuitem = $menus->getActive();
+			$check =  $menu->params instanceof Registry ? $menu->params : $menus->getParams($menu->id);
 
 			foreach($params as $key => $value)
 			{
@@ -124,7 +116,7 @@ class J2StoreRouterHelper
 		$newSegments = array();
 		if(!empty($segments)) foreach($segments as $segment)
 		{
-			if(strstr($segment,':'))
+			if(strpos($segment, ':') !== false)
 			{
 				$segment = str_replace(':','-',$segment);
 			}
@@ -137,13 +129,13 @@ class J2StoreRouterHelper
 		return $newSegments;
 	}
 
-	static public function findMenuOrders($qoptions) {
-
-		$menus =JMenu::getInstance('site');
+	static public function findMenuOrders($qoptions)
+  {
+    $menus = AbstractMenu::getInstance('site');
 		$menu_id = null;
 		foreach($menus->getMenu() as $item)
 		{
-			if(isset($item->query['option']) && $item->query['option'] == 'com_j2store' && isset($item->query['view']) && $item->query['view']=='orders') {
+			if(isset($item->query['option'], $item->query['view']) && ($item->query['option'] === 'com_j2store') && ($item->query['view'] === 'orders')) {
 				if(self::checkMenuOrders($item, $qoptions)) {
 					$menu_id =$item->id;
 				}
@@ -153,17 +145,17 @@ class J2StoreRouterHelper
 		return $menu_id;
 	}
 
-    static public function findMenuMyprofile($qoptions) {
-
-        $menus = JMenu::getInstance('site');
+    static public function findMenuMyprofile($qoptions)
+    {
+        $menus = AbstractMenu::getInstance('site');
         $menu_id = null;
         $menu = null;
-        $user = JFactory::getUser();
+        $user = Factory::getApplication()->getIdentity();
         $user_access_level = $user->getAuthorisedViewLevels();
         foreach($menus->getMenu() as $item)
         {
-            if(isset($item->query['option']) && $item->query['option'] == 'com_j2store'
-                && isset($item->query['view']) && $item->query['view']=='myprofile' && in_array($item->access,$user_access_level)) {
+            if(isset($item->query['option']) && ($item->query['option'] === 'com_j2store')
+                && isset($item->query['view']) && ($item->query['view'] === 'myprofile') && in_array($item->access,$user_access_level)) {
                 if(self::checkMenuOrders($item, $qoptions)) {
                     $menu =$item;
                     break;
@@ -174,8 +166,8 @@ class J2StoreRouterHelper
         return $menu;
     }
 
-
-	public static function checkMenuOrders($menu, $qoptions) {
+	public static function checkMenuOrders($menu, $qoptions)
+  {
 		$lang = J2Store::platform()->application()->getLanguage() ;
         $langu = (isset($qoptions['lang']) && $qoptions['lang']) ? $qoptions['lang'] : $lang->getTag();
 		if($langu == $menu->language) {
@@ -187,13 +179,14 @@ class J2StoreRouterHelper
 		}
 	}
 
-	static public function findCheckoutMenu($qoptions){
-        $menus = JMenu::getInstance('site');
+	static public function findCheckoutMenu($qoptions)
+  {
+        $menus = AbstractMenu::getInstance('site');
         $menu_id = null;
         $menu = null;
         foreach($menus->getMenu() as $item)
         {
-            if(isset($item->query['option']) && $item->query['option'] == 'com_j2store' && isset($item->query['view']) && in_array($item->query['view'],array('checkouts','checkout')) && (!isset($item->query['layout']) || $item->query['layout'] != 'postpayment')) {
+            if(isset($item->query['option']) && ($item->query['option'] === 'com_j2store') && isset($item->query['view']) && in_array($item->query['view'],array('checkouts','checkout')) && (!isset($item->query['layout']) || $item->query['layout'] !== 'postpayment')) {
                 unset( $qoptions['task'] );
                 if(self::checkCartMenu($item, $qoptions)) {
                     $menu = $item;
@@ -205,13 +198,14 @@ class J2StoreRouterHelper
         return $menu;
     }
 
-    static public function findThankyouPageMenu($qoptions){
-        $menus = JMenu::getInstance('site');
+    static public function findThankyouPageMenu($qoptions)
+    {
+        $menus = AbstractMenu::getInstance('site');
         $menu_id = null;
         $menu = null;
         foreach($menus->getMenu() as $item)
         {
-            if(isset($item->query['option']) && $item->query['option'] == 'com_j2store' && isset($item->query['view']) && in_array($item->query['view'],array('checkouts','checkout')) && isset($item->query['layout']) && isset($item->query['task']) && $item->query['layout'] == 'postpayment' && $item->query['task'] == 'confirmPayment') {
+            if(isset($item->query['option'], $item->query['view'], $item->query['layout'], $item->query['task']) && ($item->query['option'] === 'com_j2store') && in_array($item->query['view'], array('checkouts', 'checkout')) && $item->query['layout'] === 'postpayment' && $item->query['task'] === 'confirmPayment') {
                 unset( $qoptions['task'] );
                 if(self::checkMenuOrders($item, $qoptions)) {
                     $menu = $item;
@@ -223,14 +217,14 @@ class J2StoreRouterHelper
         return $menu;
     }
 
-	static public function findMenuCarts($qoptions) {
-
-		$menus =JMenu::getInstance('site');
+	static public function findMenuCarts($qoptions)
+  {
+    $menus = AbstractMenu::getInstance('site');
 		$menu_id = null;
 		$menu = null;
 		foreach($menus->getMenu() as $item)
 		{
-			if(isset($item->query['option']) && $item->query['option'] == 'com_j2store' && isset($item->query['view']) && $item->query['view']=='carts') {
+			if(isset($item->query['option']) && $item->query['option'] === 'com_j2store' && isset($item->query['view']) && $item->query['view']==='carts') {
 				unset( $qoptions['task'] );
 				if(self::checkCartMenu($item, $qoptions)) {
 					$menu = $item;
@@ -242,9 +236,10 @@ class J2StoreRouterHelper
 		return $menu;
 	}
 
-    public static function checkCartMenu($menu,$qoptions) {
+    public static function checkCartMenu($menu,$qoptions)
+    {
         $lang =  J2Store::platform()->application()->getLanguage();
-        if(isset($qoptions['lang']) && $qoptions['lang'] == $menu->language){
+        if(isset($qoptions['lang']) && $qoptions['lang'] === $menu->language){
 
             return true;
         }elseif($lang->getTag() == $menu->language) {
@@ -257,9 +252,9 @@ class J2StoreRouterHelper
         }
     }
 
-    public static function findProductMenu($qoptions) {
-
-        $menus =JMenu::getInstance('site');
+    public static function findProductMenu($qoptions)
+    {
+        $menus = AbstractMenu::getInstance('site');
         $menu = null;
         $other_tasks = array('compare','wishlist');
         $list_menu = $menus->getMenu();
@@ -274,8 +269,8 @@ class J2StoreRouterHelper
         if(is_null($menu)){
             foreach($list_menu as $item)
             {
-                if(isset($item->query['option']) && $item->query['option'] == 'com_j2store' && isset($item->query['view']) && in_array ( $item->query['view'], array('products') )) {
-                    if (isset($item->query['task']) && !empty($item->query['task']) && in_array($item->query['task'] , $other_tasks) && ($item->query['task'] == $qoptions['task']) ){
+                if(isset($item->query['option']) && $item->query['option'] === 'com_j2store' && isset($item->query['view']) && in_array ( $item->query['view'], array('products') )) {
+                    if (isset($item->query['task']) && !empty($item->query['task']) && in_array($item->query['task'] , $other_tasks) && ($item->query['task'] === $qoptions['task']) ){
                         $menu =$item;
                         break;
                     }
@@ -290,16 +285,15 @@ class J2StoreRouterHelper
         }
         J2Store::plugin()->event('AfterFindProductMenu',array($menus,&$menu));
         return $menu;
-
     }
 
-	public static function findProductTagsMenu($qoptions) {
-
-		$menus =JMenu::getInstance('site');
+	public static function findProductTagsMenu($qoptions)
+  {
+    $menus = AbstractMenu::getInstance('site');
 		$menu = null;
 		foreach($menus->getMenu() as $item)
 		{
-			if(isset($item->query['option']) && $item->query['option'] == 'com_j2store' && isset($item->query['view']) && in_array ( $item->query['view'], array('producttags') )) {
+			if(isset($item->query['option']) && $item->query['option'] === 'com_j2store' && isset($item->query['view']) && in_array ( $item->query['view'], array('producttags') )) {
 				if(self::checkMenuProductTags($item, $qoptions)) {
 					$menu =$item;
 					//break on first found menu
@@ -309,15 +303,15 @@ class J2StoreRouterHelper
 
 		}
 		return $menu;
-
 	}
 
-	public static function checkMenuProducts($menu, $qoptions) {
+	public static function checkMenuProducts($menu, $qoptions)
+  {
 		$lang = J2Store::platform()->application()->getLanguage();
 
 		//first check the category
 		if(isset($qoptions['id'])) {
-			if($qoptions['view'] == 'products'){
+			if($qoptions['view'] === 'products'){
                 $langu = (isset($qoptions['lang']) && $qoptions['lang']) ? $qoptions['lang'] : $lang->getTag();
 				$cat_id = self::getProductCategory($qoptions['id'],$langu);
 				$categories = array();
@@ -340,10 +334,10 @@ class J2StoreRouterHelper
 			}
 		}
 		return false;
-
 	}
 
-	public static function checkMenuProductTags($menu, $qoptions) {
+	public static function checkMenuProductTags($menu, $qoptions)
+  {
 		    $lang = J2Store::platform()->application()->getLanguage() ;
 
 			//get tag alias
@@ -370,12 +364,12 @@ class J2StoreRouterHelper
 			}
 
 		return false;
-
 	}
 
-	public static function getProductTags($id,$lang = ''){
+	public static function getProductTags($id,$lang = '')
+  {
         //first load the product to get the id.
-        $product = F0FTable::getAnInstance('Product', 'J2StoreTable')->getClone();
+        $product = J2Store::fof()->loadTable('Product', 'J2StoreTable')->getClone();
         $tags = array();
         if($product->load($id)) {
             if ($product->product_source == 'com_content') {
@@ -387,11 +381,12 @@ class J2StoreRouterHelper
 		return $tags;
 	}
 
-	public static function getArticleTags($id){
+	public static function getArticleTags($id)
+  {
 	    if(empty($id)){
 	        return array();
         }
-        $db = JFactory::getDbo ();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery (true);
         $query->select('#__tags.alias')->from ( '#__contentitem_tag_map' )
             ->leftJoin('#__tags ON #__tags.id = #__contentitem_tag_map.tag_id')
@@ -407,13 +402,13 @@ class J2StoreRouterHelper
         return $tags;
 	}
 
-    public static function getProductCategory($id,$lang='') {
-
+    public static function getProductCategory($id,$lang='')
+    {
         //first load the product to get the id.
-        $product = F0FTable::getAnInstance('Product', 'J2StoreTable')->getClone();
+        $product = J2Store::fof()->loadTable('Product', 'J2StoreTable')->getClone();
 
         if($product->load($id)) {
-            if($product->product_source == 'com_content') {
+            if($product->product_source === 'com_content') {
                 $product->product_source_id = J2Store::article()->getAssociatedArticle($product->product_source_id,$lang);
                 $article = J2Store::article()->getArticle($product->product_source_id);
 
@@ -426,25 +421,27 @@ class J2StoreRouterHelper
         }
     }
 
-	public static function getLanguageId($tag){
-		$db = JFactory::getDbo ();
+	public static function getLanguageId($tag)
+  {
+		$db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery (true);
 		$query->select('lang_id')->from ( '#__languages' )->where ( 'lang_code ='.$db->q ( $tag ) );
 		$db->setQuery ( $query );
 		return $db->loadResult ();
 	}
 
-	public static function getItemAlias($id , $lang = '') {
+	public static function getItemAlias($id , $lang = '')
+  {
 		//first load the product to get the id.
-		$product = F0FTable::getAnInstance('Product', 'J2StoreTable')->getClone();
+		$product = J2Store::fof()->loadTable('Product', 'J2StoreTable')->getClone();
 
 		if($product->load($id)) {
-			if($product->product_source == 'com_content') {
+			if($product->product_source === 'com_content') {
 				$article_helper = J2Store::article();
 				$article = $article_helper->getArticle($product->product_source_id);
 				$content_alias = $article->alias;
 				if(!empty( $lang )){
-                    $multilang = JLanguageMultilang::isEnabled();
+                    $multilang = Multilanguage::isEnabled();
 				    if($multilang){
                         $article_id = $article_helper->getAssociatedArticle($product->product_source_id,$lang);
                         $article = $article_helper->getArticle($article_id);
@@ -477,7 +474,8 @@ class J2StoreRouterHelper
 	 * @param $segment mixed Either ID or a string containing the ID
 	 * @return mixed Product ID or false on finding none
      */
-	public static function getArticleByAlias($segment, $categories = array()) {
+	public static function getArticleByAlias($segment, $categories = array())
+  {
 		$explode_results = explode(':', $segment);
 		$article = new stdClass();
 		if(isset($explode_results[0]) && is_numeric($explode_results[0])) {
@@ -494,7 +492,7 @@ class J2StoreRouterHelper
 		$article = J2Store::article()->getArticleByAlias($segment, $categories);
 
 		if(isset($article->id)) {
-			$product = F0FTable::getAnInstance('Product', 'J2StoreTable');
+			$product = J2Store::fof()->loadTable('Product', 'J2StoreTable');
 			$product->get_product_by_source('com_content', $article->id);
 			if($product->j2store_product_id) {
 				return $product->j2store_product_id;
@@ -506,17 +504,17 @@ class J2StoreRouterHelper
 		}
 	}
 
-	public static function getTagAliasByItem($id){
-		$product = F0FTable::getAnInstance('Product', 'J2StoreTable');
+	public static function getTagAliasByItem($id)
+  {
+		$product = J2Store::fof()->loadTable('Product', 'J2StoreTable');
 
 		if($product->load($id)) {
-			if($product->product_source == 'com_content') {
-				$db = JFactory::getDbo ();
+			if($product->product_source === 'com_content') {
+				$db = Factory::getContainer()->get('DatabaseDriver');
 				$query = $db->getQuery (true);
 				$query->select ( 'tag.alias' )->from('#__contentitem_tag_map AS c_tag')
 					->join ( 'LEFT', '#__tags AS tag ON c_tag.tag_id = tag.id'  )
 					->where ( 'c_tag.content_item_id ='.$db->q($product->product_source_id) );
-				//$article = J2Store::article()->getArticle($product->product_source_id);
 				$db->setQuery ( $query );
 				return $db->loadResult ();
 			}else {
@@ -527,20 +525,21 @@ class J2StoreRouterHelper
 		}
 	}
 
-	public static function getFilterTagAlias($tag_id){
-		$db = JFactory::getDbo ();
+	public static function getFilterTagAlias($tag_id)
+  {
+		$db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery (true);
 		$query->select ( 'alias' )->from ( '#__tags' )->where ( 'id ='.$db->q($tag_id) );
 		$db->setQuery ( $query );
 		return $db->loadResult ();
 	}
 
-	public static function getTagByAlias($alias){
-		$db = JFactory::getDbo ();
+	public static function getTagByAlias($alias)
+  {
+		$db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery (true);
 		$query->select ( 'id' )->from ( '#__tags' )->where ( 'alias ='.$db->q($alias) );
 		$db->setQuery ( $query );
 		return $db->loadResult ();
 	}
-
 }

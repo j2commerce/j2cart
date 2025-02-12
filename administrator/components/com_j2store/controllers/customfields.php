@@ -1,29 +1,36 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerCustomfields extends F0FController
 {
-
     use list_view;
-	public function __construct($config = array())
+
+	public function __construct($config = [])
     {
 		parent::__construct($config);
-
-		$this->cacheableTasks = array();
-      //  $this->registerTask('showspared', 'browse');
+		$this->cacheableTasks = [];
 	}
 
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
-        $state = array();
+        $state = [];
         $state['field_namekey'] = $app->input->getString('field_namekey', '');
         $state['field_name'] = $app->input->getString('field_name', '');
         $state['filter_order'] = $app->input->getString('filter_order', 'j2store_customfield_id');
@@ -71,7 +78,7 @@ class J2StoreControllerCustomfields extends F0FController
         $vars->pagination = $model->getPagination();
         echo $this->_getLayout('default',$vars);
     }
-        
+
     /**
      * Delete selected item(s)
      *
@@ -82,16 +89,16 @@ class J2StoreControllerCustomfields extends F0FController
         $some_core_fields = false;
         $no_core_deleted = false;
         $deletion_status = true;
-        
+
         // Initialise the App variables
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $cids = $app->input->get('cid',array(),'array');
         if (!empty($cids)) {
             $model = $this->getThisModel();
             foreach ($cids as $cid) {
 				$item = $model->getItem($cid);
 				if (!$item->get('field_core', 1)) {
-				    $field = F0FTable::getInstance('Customfields', 'J2StoreTable')->getClone();
+				    $field = J2Store::fof()->loadTable('Customfields', 'J2StoreTable')->getClone();
 				    if (!$field->delete($cid)) {
 				        $deletion_status = false;
 				        break;
@@ -102,21 +109,21 @@ class J2StoreControllerCustomfields extends F0FController
 				}
             }
         }
-        
+
         if ($some_core_fields) {
             if ($no_core_deleted) {
-                $msg = JText::_('J2STORE_CUSTOM_FIELD_DELETED_BUT_NOT_CORE_FIELDS');
+                $msg = Text::_('J2STORE_CUSTOM_FIELD_DELETED_BUT_NOT_CORE_FIELDS');
             } else {
-                $msg = JText::_('J2STORE_CUSTOM_FIELD_CANNOT_DELETE_CORE_FIELDS');
-            }            
+                $msg = Text::_('J2STORE_CUSTOM_FIELD_CANNOT_DELETE_CORE_FIELDS');
+            }
         } else {
-            $msg = JText::_('J2STORE_ITEMS_DELETED');
+            $msg = Text::_('J2STORE_ITEMS_DELETED');
         }
-        
+
         $link = 'index.php?option=com_j2store&view=customfields';
-                
+
         if (!$deletion_status) {
-            $this->setRedirect($link, JText::_('J2STORE_CUSTOM_FIELD_DELETED_ERROR'), 'error');
+            $this->setRedirect($link, Text::_('J2STORE_CUSTOM_FIELD_DELETED_ERROR'), 'error');
         } else {
 			$this->setRedirect($link, $msg);
         }
@@ -173,5 +180,4 @@ class J2StoreControllerCustomfields extends F0FController
 		}
 		$this->redirect();
 	}
-
 }

@@ -1,17 +1,25 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined ( '_JEXEC' ) or die ();
-class J2Cart {
 
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
+class J2Cart
+{
 	public static $instance = null;
 	protected $state;
 
-	public function __construct($properties=null) {
+	public function __construct($properties=null)
+  {
 
 	}
 
@@ -25,7 +33,8 @@ class J2Cart {
 		return self::$instance;
 	}
 
-	public function getSubtotal($items) {
+	public function getSubtotal($items)
+  {
 		$subtotal = 0;
 		if (! isset ( $items ) && count ( $items ) < 1)
 			return $subtotal;
@@ -36,7 +45,8 @@ class J2Cart {
 		return $subtotal;
 	}
 
-	public function getCartTaxTotal($items) {
+	public function getCartTaxTotal($items)
+  {
 		$taxtotal = 0;
 		if (! isset ( $items ) && count ( $items ) < 1)
 			return $taxtotal;
@@ -49,8 +59,8 @@ class J2Cart {
 		return $taxtotal;
 	}
 
-	public static function getTaxes($items) {
-
+	public static function getTaxes($items)
+  {
 		$tax_data = array();
 
 		foreach ($items as $item) {
@@ -74,9 +84,8 @@ class J2Cart {
 		return $tax_data;
 	}
 
-
-	public function getCartTotalWeight($items) {
-
+	public function getCartTotalWeight($items)
+  {
 		$weight_total = 0;
 		if (! isset ( $items ) && count ( $items ) < 1) return $weight_total;
 
@@ -89,22 +98,23 @@ class J2Cart {
 		return $weight_total;
 	}
 
-	public function removeCartItem($cart_id) {
+	public function removeCartItem($cart_id)
+  {
 
 	}
 
-	public function getImage($type, $product_id) {
+	public function getImage($type, $product_id)
+  {
 
 	}
 
 	function resetCart( $session_id, $user_id )
 	{
-
-		$session = JFactory::getSession();
-		$user = JFactory::getUser();
+		$session = Factory::getApplication()->getSession();
+		$user = Factory::getApplication()->getIdentity();
 
 		//get cart items based on old session id
-		$model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');		
+		$model = J2Store::fof()->getModel('Carts', 'J2StoreModel');
 		$model->setState( 'filter_session', $session_id );
 		$model->setState( 'filter_cart_type', 'cart');
 		$cart  = $model->loadCart();
@@ -114,23 +124,23 @@ class J2Cart {
 		//delete the items with old session id
 		$this->deleteSessionCartItems( $session_id );
 		$this->resetCartTable($cart, $session_id, $user_id, 'cart');
-		
+
 		J2Store::plugin()->event('AfterResetCart', array($session_id, $user_id));
-		
+
 	}
-	
+
 	public function resetCartTable($cart, $session_id, $user_id, $cart_type='cart') {
-		$session = JFactory::getSession();
+		$session = Factory::getApplication()->getSession();
 		if (!empty($cart))
 		{
 			F0FTable::addIncludePath( JPATH_ADMINISTRATOR.'/components/com_j2store/tables' );
-				
+
 			$keynames = array();
 			$keynames['user_id'] = $user_id;
 			$keynames['cart_type'] = $cart_type;
-		
-			$table = F0FTable::getInstance( 'Carts', 'J2StoreTable' )->getClone();
-		
+
+			$table = J2Store::fof()->loadTable( 'Carts', 'J2StoreTable' )->getClone();
+
 			if (!$table->load($keynames))
 			{
 				foreach($cart as $key=>$value)
@@ -144,37 +154,35 @@ class J2Cart {
 				$table->j2store_cart_id = '0';
 			}
 			//table loaded.
-		
+
 			$table->user_id = $user_id;
 			$table->session_id = $session->getId();
-		
+
 			if (!$table->store())
 			{
-                JFactory::getApplication()->enqueueMessage($table->getError(),'notice');
+                Factory::getApplication()->enqueueMessage($table->getError(),'notice');
 			}else {
-					
+
 				//now we got the cart id.
 				$this->updateCartitemEntry($cart, $table);
 			}
-		
 		}
-		
 	}
-	
-	function updateCartitemEntry($current_cart, $existing_cart) {
-		
+
+	function updateCartitemEntry($current_cart, $existing_cart)
+  {
 		//also load the cart items
-		$cartitem_model = F0FModel::getTmpInstance('Cartitems', 'J2StoreModel');
-		$cartitem_model->setState('filter_cart', $current_cart->j2store_cart_id);		
+		$cartitem_model = J2Store::fof()->getModel('Cartitems', 'J2StoreModel');
+		$cartitem_model->setState('filter_cart', $current_cart->j2store_cart_id);
 		$items = $cartitem_model->getList();
-	
+
 		foreach($items as $item) {
-			
+
 			//first delete. And then proceed.
 			$this->deleteCartItem($item->j2store_cartitem_id);
-			
-			$cartitem = F0FTable::getInstance('Cartitem', 'J2StoreTable');
-			
+
+			$cartitem = J2Store::fof()->loadTable('Cartitem', 'J2StoreTable');
+
 			$keys = array();
 			$keys['product_id'] = $item->product_id;
 			$keys['vendor_id'] = $item->vendor_id;
@@ -184,10 +192,10 @@ class J2Cart {
 			$keys['cart_id'] = $existing_cart->j2store_cart_id;
 
             J2Store::plugin()->event("BeforeUpdateCartItemEntry", array( &$keys, $item ) );
-			
+
 			if($cartitem->load($keys)) {
 				//already has the item. So just add the quantity
-				$cartitem->product_qty = $cartitem->product_qty + $item->product_qty; 
+				$cartitem->product_qty = $cartitem->product_qty + $item->product_qty;
 			}else {
 				//new item
 				$item->cart_id = $existing_cart->j2store_cart_id;
@@ -196,32 +204,32 @@ class J2Cart {
 			}
 			//save item
 			$cartitem->store();
-						
+
 		}
-	
+
 		return true;
 	}
-	
-	function deleteCartItem($cartitem_id) {
-		
-		$db = JFactory::getDBO ();
+
+	function deleteCartItem($cartitem_id)
+  {
+		$db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery ( true );
-		
+
 		$query->delete( "#__j2store_cartitems" );
 		$query->where ( $db->qn ( 'j2store_cartitem_id' ) . " = " . $db->q ( $cartitem_id) );
 		$db->setQuery ( $query );
 		try {
 			$db->execute ();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e) {
 			$this->setError ( $e->getMessage () );
 			return false;
 		}
-		return true;		
+		return true;
 	}
 
 	function updateSession( $user_id, $session_id )
 	{
-		$db = JFactory::getDBO();
+		$db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 
 		$query->update( "#__j2store_carts" );
@@ -230,7 +238,7 @@ class J2Cart {
 		$db->setQuery( (string) $query );
 		try{
 			$db->execute();
-		}catch (Exception $e){
+		}catch (\Exception $e){
 			$this->setError( $e->getMessage () );
 			return false;
 		}
@@ -238,10 +246,9 @@ class J2Cart {
 		return true;
 	}
 
-
 	function deleteSessionCartItems( $session_id )
 	{
-		$db = JFactory::getDBO();
+		$db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
 
 		$query->delete();
@@ -259,9 +266,9 @@ class J2Cart {
 
 	public static function emptyCart( $order_id )
 	{
-		$app = JFactory::getApplication();
-		$cart = F0FTable::getAnInstance( 'Cart', 'J2StoreTable' );
-		$order = F0FTable::getAnInstance('Order', 'J2StoreTable');
+		$app = Factory::getApplication();
+		$cart = J2Store::fof()->loadTable( 'Cart', 'J2StoreTable' );
+		$order = J2Store::fof()->loadTable('Order', 'J2StoreTable');
 		$order->load(array('order_id'=>$order_id));
 		if (!empty($order->order_id))
 		{
@@ -271,7 +278,6 @@ class J2Cart {
 				$cart->delete();
 				J2Store::plugin()->event('AfterEmptyCart', array($item));
 			}
-						
 		}
 	}
 }

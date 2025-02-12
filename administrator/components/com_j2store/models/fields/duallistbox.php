@@ -1,33 +1,40 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die;
-/* class JFormFieldFieldtypes extends JFormField */
 
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('list');
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Form\Field\ListField;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Uri\Uri;
 
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2html.php';
-class JFormFieldDuallistbox  extends JFormFieldList  {
 
+class JFormFieldDuallistbox  extends ListField
+{
 	protected $type = 'Duallistbox';
 	public function getInput(){
 		$json = $this->getOptions();
 		$json = json_encode($json,JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
 		$title = !empty($this->element['data_title']) ? $this->element['data_title'] : $this->element['label'];
-		JHtml::_('script', 'media/j2store/js/dual-list-box.js', false, false);
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa->registerAndUseScript('j2commerce.dual-list-box.script', Uri::root() .'media/j2store/js/dual-list-box.js', [], [], []);
 		$script ="jQuery('select').DualListBox();";
-		//JFactory::getDocument()->addScriptDeclaration($script);
+        $wa->addInlineScript($script, [], [], ['j2commerce.dual-list-box.script']);
+
 		$selected = json_encode($this->value);
 		$input_id = !empty($this->id) ? $this->id : 'duallistbox-input';
-		$html ='<div id="dual-list-box" class="row-fluid">';
-		$html .='<select id='.$input_id.' multiple="multiple" data-title='.JText::_($title).'
+		$html ='<div id="dual-list-box" class="row">';
+		$html .='<select id='.$input_id.' multiple="multiple" data-title='.Text::_($title).'
 					data-source='. stripslashes($json).'
 					data-realdata='.$json.'
 					data-json='.$selected.'
@@ -38,15 +45,17 @@ class JFormFieldDuallistbox  extends JFormFieldList  {
 					data-maxAllBtn='.$this->element['data_maxAllBtn'].'></select>';
 		$html .='<script type="text/javascript">
 		var selected = '. $selected .';
-		var paramOptions;
+		var paramOptions = {
+		    btnMoveAllText: "Move all items",
+            moveAllLabel: "Move all items", // Label for the move all button
+            removeAllLabel: "Remove all items" // Optional: Label for the remove all button
+        };
 		(function($){
 		jQuery(\'#'.$input_id.'\').DualListBox(paramOptions, selected);
 		})(j2store.jQuery);
 		</script></div>';
 		return $html;
-
 	}
-
 
 	/**
 	 * Method to get the field options.
@@ -98,7 +107,7 @@ class JFormFieldDuallistbox  extends JFormFieldList  {
 
 		foreach ($this->element->children() as $option)
 		{
-			$name = JText::alt(trim((string) $option), preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname));
+			$name = Text::alt(trim((string) $option), preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname));
 
 			$sortOptions[$i] = new stdClass;
 			$sortOptions[$i]->option = $option;
@@ -129,7 +138,7 @@ class JFormFieldDuallistbox  extends JFormFieldList  {
 				continue;
 			}
 
-			$tmp = JHtml::_('select.option', (string) $option['value'], $name, 'value', 'text', ((string) $option['disabled'] == 'true'));
+			$tmp = HTMLHelper::_('select.option', (string) $option['value'], $name, 'value', 'text', ((string) $option['disabled'] == 'true'));
 
 			// Set some option attributes.
 			$tmp->class = (string) $option['class'];
@@ -153,7 +162,6 @@ class JFormFieldDuallistbox  extends JFormFieldList  {
 
 		if ($source_class && $source_method)
 		{
-
 			// Maybe we have to load a file?
 			if (!empty($source_file))
 			{

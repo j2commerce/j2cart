@@ -1,16 +1,24 @@
 <?php
 /**
- * @package     J2Store
- * @author      Alagesan
- * @copyright   Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license     GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// no direct access
-defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('joomla.form.formfield');
-class JFormFieldJ2StoreTagMenus extends JFormField
-{
 
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Menu\MenuFactoryInterface;
+
+class JFormFieldJ2StoreTagMenus extends FormField
+{
     protected $type = 'j2storetagmenus';
     /**
      * Method to get the field input markup.
@@ -22,33 +30,35 @@ class JFormFieldJ2StoreTagMenus extends JFormField
     {
         $plugin = $this->getPlugin();
         if(isset($plugin->enabled) && $plugin->enabled){
-            $app = JFactory::getApplication();
-            $options = array();
-            $menus = JMenu::getInstance('site');
+            $app = Factory::getApplication();
+            $options = [];
+            $menus = Factory::getContainer()->get(MenuFactoryInterface::class)->createMenu('site');
             $menu_id = null;
-            $options[''] = JText::_('J2STORE_SELECT_OPTION');
+            $options[''] = Text::_('J2STORE_SELECT_OPTION');
             foreach($menus->getMenu() as $item)
             {
-                if($item->type== 'component'){
-                    if(isset($item->query['option']) && $item->query['option'] == 'com_j2store' && isset($item->query['view']) && $item->query['view'] == 'producttags' ){
+                if($item->type === 'component'){
+                    if(isset($item->query['option']) && $item->query['option'] === 'com_j2store' && isset($item->query['view']) && $item->query['view'] === 'producttags' ){
                         $options[$item->id] = $item->title;
                     }
                 }
             }
-            return JHTML::_('select.genericlist', $options, $this->name, array('class'=>"input"), 'value', 'text', $this->value);
+            return HTMLHelper::_('select.genericlist', $options, $this->name, array('class'=>"form-select"), 'value', 'text', $this->value);
         }
         return '';
     }
 
-    public function getLabel(){
+    public function getLabel()
+    {
         $plugin = $this->getPlugin();
         if(isset($plugin->enabled) && $plugin->enabled){
-            return JText::_('J2STORE_CANONICAL_MENU');
+            return Text::_('J2STORE_CANONICAL_MENU');
         }
     }
 
-    public function getPlugin(){
-        $db = JFactory::getDBo();
+    public function getPlugin()
+    {
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('*')->from('#__extensions')
             ->where('element='.$db->q('j2canonical'))
@@ -57,6 +67,4 @@ class JFormFieldJ2StoreTagMenus extends JFormField
         $db->setQuery($query);
         return $db->loadObject();
     }
-
 }
-

@@ -1,13 +1,18 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/_base.php');
 if (!defined('F0F_INCLUDED')) {
@@ -87,7 +92,7 @@ class J2StorePaymentPlugin extends J2StorePluginBase
                 if((float) $surcharge_fixed > 0) {
                     $surcharge += (float) $surcharge_fixed;
                 }
-                $name = $this->params->get('surcharge_name', JText::_('J2STORE_CART_SURCHARGE'));
+                $name = $this->params->get('surcharge_name', Text::_('J2STORE_CART_SURCHARGE'));
                 $tax_class_id = $this->params->get('surcharge_tax_class_id', '');
                 $taxable = false;
                 if($tax_class_id && $tax_class_id > 0) $taxable = true;
@@ -117,7 +122,7 @@ class J2StorePaymentPlugin extends J2StorePluginBase
 
         switch ($paction) {
             case "display":
-                $vars->message = JText::_($this->params->get('onafterpayment', ''));
+                $vars->message = Text::_($this->params->get('onafterpayment', ''));
                 $html = $this->_getLayout('message', $vars);
                 $html .= $this->_displayArticle();
                 break;
@@ -128,11 +133,11 @@ class J2StorePaymentPlugin extends J2StorePluginBase
                 $app->close();
                 break;
             case "cancel":
-                $vars->message = JText::_($this->params->get('oncancelpayment', ''));
+                $vars->message = Text::_($this->params->get('oncancelpayment', ''));
                 $html = $this->_getLayout('message', $vars);
                 break;
             default:
-                $vars->message = JText::_($this->params->get('onerrorpayment', ''));
+                $vars->message = Text::_($this->params->get('onerrorpayment', ''));
                 $html = $this->_getLayout('message', $vars);
                 break;
         }
@@ -240,7 +245,6 @@ class J2StorePaymentPlugin extends J2StorePluginBase
         return $found;
     }
 
-
     /**
      * Wrapper for the internal _renderForm method
      *
@@ -336,7 +340,6 @@ class J2StorePaymentPlugin extends J2StorePluginBase
         return $this->_beforePayment($order);
     }
 
-
     public function getVersion()
     {
 
@@ -396,18 +399,7 @@ class J2StorePaymentPlugin extends J2StorePluginBase
     {
         $platform = J2Store::platform();
         $url = $platform->getThankyouPageUrl(array('orderpayment_type' => $this->_element, 'paction' => 'display'));
-        /*$menus = JMenu::getInstance('site');
-        $url = 'index.php?option=com_j2store&view=checkout&task=confirmPayment&layout=postpayment&orderpayment_type='.$this->_element.'&paction=display';
-        foreach ($menus->getMenu() as $menu){
-            if(isset($menu->type) && isset($menu->component) && isset($menu->query['option']) &&
-                isset($menu->query['view']) && isset($menu->query['layout']) && isset($menu->query['task'])
-                && $menu->type == 'component' && $menu->component == 'com_j2store'
-                && $menu->query['option'] == 'com_j2store' && $menu->query['view'] == 'checkout'
-                && $menu->query['layout'] == 'postpayment' && $menu->query['task'] == 'confirmPayment'){
-                $url = 'index.php?option=com_j2store&view=checkout&task=confirmPayment&layout=postpayment&orderpayment_type='.$this->_element.'&paction=display&Itemid='.$menu->id;
-                break;
-            }
-        }*/
+
         return $url;
     }
 

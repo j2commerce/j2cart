@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -171,7 +171,7 @@ class J2StoreTableProduct extends F0FTable
 		$product_filter = F0FTable::getAnInstance('ProductFilter' ,'J2StoreTable')->getClone();
 		if(!$product_filter->deleteProductFilterList($product_id)){
 			$status = false;
-		}	
+		}
 		return $status;
 	}
 
@@ -256,7 +256,7 @@ class J2StoreTableProduct extends F0FTable
         $user = JFactory::getUser();
         //access
         $access_groups = $user->getAuthorisedViewLevels();
-        
+
 		if($this->is_visible($product) && ((isset($product->source->access) && !empty($product->source->access) && in_array($product->source->access,$access_groups)) || !isset($product->source->access))){
             J2StoreStrapper::addJS();
 			J2StoreStrapper::addCSS();
@@ -374,7 +374,7 @@ class J2StoreTableProduct extends F0FTable
 			ob_end_clean();
 			J2Store::plugin()->event('BeforeDisplayImages', array(&$html, $view, 'com_j2store.products.view.default'));
 			$html .= J2Store::plugin ()->eventWithHtml ( 'AfterRenderingProductImages' , array($this) );
-			
+
 		}
 		return $html;
 

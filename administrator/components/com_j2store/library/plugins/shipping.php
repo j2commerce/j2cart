@@ -1,11 +1,16 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/_base.php');
 
 if (!class_exists('J2StoreShippingPlugin')) {
@@ -240,13 +245,14 @@ if (!class_exists('J2StoreShippingPlugin')) {
             return $vars;
         }
 
-        function onJ2StoreCustomModelPath(&$paths){
+        function onJ2StoreCustomModelPath(&$paths)
+        {
             $paths[] = JPATH_SITE.'/plugins/j2store/'.$this->_element.'/'.$this->_element.'/models';
         }
 
-        function onJ2StoreCustomTablePath(&$paths){
+        function onJ2StoreCustomTablePath(&$paths)
+        {
             $paths[] = JPATH_SITE.'/plugins/j2store/'.$this->_element.'/'.$this->_element.'/tables';
         }
     }
-
 }

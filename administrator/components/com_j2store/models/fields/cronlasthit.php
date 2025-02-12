@@ -1,13 +1,20 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
-/* class JFormFieldFieldtypes extends JFormField */
-class JFormFieldcronlasthit extends JFormField
+
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\Language\Text;
+
+class JFormFieldcronlasthit extends FormField
 {
 	protected $type = 'cronlasthit';
 
@@ -15,17 +22,14 @@ class JFormFieldcronlasthit extends JFormField
 		$cron_hit = J2Store::config ()->get('cron_last_trigger','');
 
 		if(empty( $cron_hit )){
-			$note = JText::_('J2STORE_STORE_CRON_LAST_TRIGGER_NOT_FOUND');
+			$note = Text::_('J2STORE_STORE_CRON_LAST_TRIGGER_NOT_FOUND');
 		}elseif(J2Store::utilities ()->isJson ( $cron_hit )){
 			$cron_hit = json_decode ( $cron_hit );
 			$date =  isset( $cron_hit->date ) ? $cron_hit->date: '';
 			$url = isset( $cron_hit->url ) ? $cron_hit->url:'';
 			$ip = isset( $cron_hit->ip ) ? $cron_hit->ip:'';
-			$note = JText::sprintf('J2STORE_STORE_CRON_LAST_TRIGGER_DETAILS',$date,$url,$ip);
+			$note = Text::sprintf('J2STORE_STORE_CRON_LAST_TRIGGER_DETAILS',$date,$url,$ip);
 		}
-
-		$html = '';
-		$html .= '<strong>'.$note.'</strong>';
-		return  $html;
+		return  '<strong>'.$note.'</strong>';
 	}
 }

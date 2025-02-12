@@ -1,20 +1,28 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
 
 class J2StoreControllerOrders extends F0FController
 {
-	public function __construct($config) {
+	public function __construct($config)
+  {
 		parent::__construct($config);
 		$this->registerTask('apply', 'save');
 		$this->registerTask('saveNew', 'save');
 	}
-
 
 	protected function onBeforeBrowse()
 	{
@@ -25,7 +33,8 @@ class J2StoreControllerOrders extends F0FController
 		return parent::onBeforeBrowse();
 	}
 
-	protected function onBeforeEdit() {
+	protected function onBeforeEdit()
+  {
 		if(!$this->checkACL('j2store.vieworder'))
 		{
 			return false;
@@ -33,8 +42,8 @@ class J2StoreControllerOrders extends F0FController
 		return true;//parent::onBeforeEdit();
 	}
 
-	public function onBeforeCreateOrder(){
-
+	public function onBeforeCreateOrder()
+  {
 		if(!$this->checkACL('core.edit'))
 		{
 			return false;
@@ -42,15 +51,16 @@ class J2StoreControllerOrders extends F0FController
 		return true;
 	}
 
-	public function saveOrderFee(){
-		$app = JFactory::getApplication ();
+	public function saveOrderFee()
+  {
+		$app = Factory::getApplication();
 		$data = $app->input->getArray($_POST);
 		$order_id = $app->input->getString('order_id','');
-		$order = F0FTable::getInstance('Order', 'J2StoreTable');
+		$order = J2Store::fof()->loadTable('Order', 'J2StoreTable');
 		$order->load(array('order_id'=>$order_id));
 		$json = array();
 		if(!empty($order->order_id)) {
-			$feeTable = F0FTable::getAnInstance ( 'OrderFee', 'J2StoreTable' )->getClone();
+			$feeTable = J2Store::fof()->loadTable ( 'OrderFee', 'J2StoreTable' )->getClone();
 			$data['fee_type'] = 'admin_added';
 			$feeTable->bind($data);
 			$feeTable->order_id = $order_id;
@@ -62,24 +72,25 @@ class J2StoreControllerOrders extends F0FController
 			$feeTable->store();
 			$json['success'] = 1;
 		}else{
-			$json['error'] = JText::_ ( 'J2STORE_ORDER_FEE_ERROR' );
+			$json['error'] = Text::_ ( 'J2STORE_ORDER_FEE_ERROR' );
 		}
 		echo json_encode ( $json );
 		$app->close();
 	}
 
-	public function removeOrderFee(){
-		$app = JFactory::getApplication ();
+	public function removeOrderFee()
+  {
+		$app = Factory::getApplication();
 		$fee_id = $app->input->getInt('fee_id',0);
 		if(!empty($fee_id)) {
-			$feeTable = F0FTable::getAnInstance ( 'OrderFee', 'J2StoreTable' )->getClone();
+			$feeTable = J2Store::fof()->loadTable ( 'OrderFee', 'J2StoreTable' )->getClone();
 			$feeTable->load ($fee_id);
 			if($feeTable->j2store_orderfee_id > 0){
 				$feeTable->delete ();
 			}
 			$json['success'] = 1;
 		}else{
-			$json['error'] = JText::_ ( 'J2STORE_ORDER_FEE_ERROR' );
+			$json['error'] = Text::_ ( 'J2STORE_ORDER_FEE_ERROR' );
 		}
 		echo json_encode ( $json );
 		$app->close();
@@ -88,14 +99,14 @@ class J2StoreControllerOrders extends F0FController
 	/*
 	 * Method to save Order status
 	*/
-	public function saveOrderstatus(){
-
+	public function saveOrderstatus()
+  {
 		$data = $this->input->getArray($_POST);
 		$id = $this->input->getInt('id');
 		$status =false;
 		$return = isset($data['return']) ? $data['return'] : '';
 		$order_id = $this->input->getString('order_id');
-		$order = F0FTable::getInstance('Order', 'J2StoreTable');
+		$order = J2Store::fof()->loadTable('Order', 'J2StoreTable');
 		$order->load(array('order_id'=>$order_id));
 
 		if(!empty($order->order_id)) {
@@ -125,7 +136,6 @@ class J2StoreControllerOrders extends F0FController
 			if(isset($data['reset_download_limit']) && $data['reset_download_limit'] == 1){
                 $order->reset_download_limit();
             }
-
 		}
 
 		//is it an ajax call
@@ -134,20 +144,20 @@ class J2StoreControllerOrders extends F0FController
 			$link = 'index.php?option=com_j2store&view=orders';
 			$json['success']['link'] = $link;
 			echo json_encode($json);
-			JFactory::getApplication()->close();
+			Factory::getApplication()->close();
 		}else {
 			$url ='index.php?option=com_j2store&view=order&task=edit&id='.$id;
 			$this->setRedirect($url);
 		}
-
 	}
 
-	public function resendEmail(){
-		$app = JFactory::getApplication ();
+	public function resendEmail()
+  {
+		$app = Factory::getApplication ();
 		$id = $app->input->getInt('id',0);
 		$message = '';
 		if($id > 0 ){
-			$order = F0FTable::getAnInstance('Order' ,'J2StoreTable');
+			$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable');
 			$order->load($id);
 			if(!empty( $order->j2store_order_id ) && $order->j2store_order_id == $id ){
 				$order->notify_customer();
@@ -159,11 +169,12 @@ class J2StoreControllerOrders extends F0FController
 	/**
 	 * Method to save Order Customer Note
 	 */
-	public function saveOrderCnote(){
+	public function saveOrderCnote()
+  {
 		$data = $this->input->getArray($_POST);
 		$id = $this->input->getInt('id');
-		$order = F0FTable::getAnInstance('Order' ,'J2StoreTable');
-		$msg = JText::_('J2STORE_ORDER_SAVE_ERROR');
+		$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable');
+		$msg = Text::_('J2STORE_ORDER_SAVE_ERROR');
 		$msgType='warning';
 		//must check id exists
 		if($id){
@@ -171,33 +182,33 @@ class J2StoreControllerOrders extends F0FController
 			if($order->load($id)){
 				//now assign the customer note to order customer note object
 				$order->customer_note = $data['customer_note'];
-				$msg = JText::_('J2STORE_ORDER_SAVED_SUCCESSFULLY');
+				$msg = Text::_('J2STORE_ORDER_SAVED_SUCCESSFULLY');
 				$msgType ='message';
 				if(!$order->save($order)){
-					$msg = JText::_('J2STORE_ORDER_SAVE_ERROR');
+					$msg = Text::_('J2STORE_ORDER_SAVE_ERROR');
 					$msgType='warning';
 				}
 			}
 		}
 		$url ='index.php?option=com_j2store&view=order&task=edit&id='.$id;
 		$this->setRedirect($url, $msg,$msgType);
-
 	}
 
 	/**
 	 * Method to save shipping tracking id
 	 */
-	public function saveTrackingId(){
+	public function saveTrackingId()
+  {
 		$data = $this->input->getArray($_POST);
 		$id = $this->input->getInt('id');
-		$order = F0FTable::getAnInstance('Order' ,'J2StoreTable');
+		$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable');
 		$msg = '';
 		$msgType='warning';
 
 		//must check id exists
 		if($order->load($id)){
 			//load the shipping
-			$ordershipping = F0FTable::getAnInstance('Ordershipping', 'J2StoreTable');
+			$ordershipping = J2Store::fof()->loadTable('Ordershipping', 'J2StoreTable');
 
 			if($ordershipping->load(array('order_id'=>$order->order_id))){
 				$ordershipping->ordershipping_tracking_id = isset($data['ordershipping_tracking_id']) ? $data['ordershipping_tracking_id'] : '';
@@ -206,27 +217,27 @@ class J2StoreControllerOrders extends F0FController
 				$ordershipping->ordershipping_tracking_id = isset($data['ordershipping_tracking_id']) ? $data['ordershipping_tracking_id'] : '';
 			}
 			if($ordershipping->store()) {
-				$msg = JText::_('J2STORE_ORDER_SAVED_SUCCESSFULLY');
+				$msg = Text::_('J2STORE_ORDER_SAVED_SUCCESSFULLY');
 				$msgType ='message';
 			}else {
-				$msg = JText::_('J2STORE_ORDER_SAVE_ERROR');
+				$msg = Text::_('J2STORE_ORDER_SAVE_ERROR');
 				$msgType='warning';
 			}
 
 		}
 		$url ='index.php?option=com_j2store&view=order&task=edit&id='.$id;
 		$this->setRedirect($url, $msg,$msgType);
-
 	}
 
 	/**
 	 * Method to edit orderinfo based on the address type
 	 *
 	 */
-	function setOrderinfo(){
+	function setOrderinfo()
+  {
 		$order_id  = $this->input->getString('order_id');
 		$address_type = $this->input->getString('address_type');
-		$orderinfo = F0FTable::getAnInstance('Orderinfo','J2StoreTable');
+		$orderinfo = J2Store::fof()->loadTable('Orderinfo','J2StoreTable');
 		$orderinfo->load(array('order_id'=>$order_id));
 		$type = "all_".$address_type;
 		$custom_datas = json_decode($orderinfo->$type);
@@ -237,7 +248,7 @@ class J2StoreControllerOrders extends F0FController
 				$processed->$key = $custom_data->value;
 			}
 		}
-		$model = F0FModel::getTmpInstance('Orders','J2StoreModel');
+		$model = J2Store::fof()->getModel('Orders','J2StoreModel');
 		$view = $this->getThisView();
 		$view->setModel($model, true);
 		$view->addTemplatePath(JPATH_ADMINISTRATOR.'/components/com_j2store/views/order/tmpl/');
@@ -256,23 +267,22 @@ class J2StoreControllerOrders extends F0FController
 	function saveOrderinfo(){
 		$data = $this->input->getArray($_POST);
 		$order_id = $this->input->getString('order_id');
-		$order = F0FTable::getAnInstance('Order','J2StoreTable');
+		$order = J2Store::fof()->loadTable('Order','J2StoreTable');
 		$order->load(array('order_id'=>$order_id));
 		$address_type = $this->input->getString('address_type');
-		$orderinfo = F0FTable::getAnInstance('Orderinfo','J2StoreTable');
+		$orderinfo = J2Store::fof()->loadTable('Orderinfo','J2StoreTable');
 		$orderinfo->load(array('order_id'=>$order_id));
 
 		//$orderinfo->bind($data);
-		$msg =JText::_('J2STORE_ORDERINFO_SAVED_SUCCESSFULLY');
+		$msg =Text::_('J2STORE_ORDERINFO_SAVED_SUCCESSFULLY');
 		$msgType='message';
 		$data['all_'.$address_type]= $order->processCustomFields($address_type, $data);
 		if(!$orderinfo->save($data)){
-			$msg =JText::_('J2STORE_ORDERINFO_SAVED_SUCCESSFULLY');
+			$msg =Text::_('J2STORE_ORDERINFO_SAVED_SUCCESSFULLY');
 			$msgType='warning';
 		}
 		$url = "index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$order_id."&address_type=".$address_type."&layout=address&tmpl=component";
 		$this->setRedirect($url, $msg,$msgType);
-
 	}
 
 	/**
@@ -280,7 +290,8 @@ class J2StoreControllerOrders extends F0FController
 	 * @param unknown_type $input
 	 * @param unknown_type $prefix
 	 */
-	public function removePrefix($input ,$prefix) {
+	public function removePrefix($input ,$prefix)
+  {
 		$keys = array_keys($input);
 		$values =array();
 		$return = new JObject();
@@ -297,27 +308,27 @@ class J2StoreControllerOrders extends F0FController
 	/**
 	 * Method to get Countrylist
 	 */
-	public function getCountry(){
-		$app = JFactory::getApplication();
+	public function getCountry()
+  {
+		$app = Factory::getApplication();
 		$country_id = $this->input->getInt('country_id');
 		$zone_id = $this->input->getInt('zone_id');
 		if($country_id) {
-			$zones = F0FModel::getTmpInstance('Zones', 'J2storeModel')->country_id($country_id)->getList();
+			$zones = J2Store::fof()->getModel('Zones', 'J2storeModel')->country_id($country_id)->getList();
 		}
 		$json = array();
 		$json['zone'] = $zones ;
 		echo json_encode($json);
 		$app->close();
-
 	}
 
-
-	function download() {
-		$app = JFactory::getApplication();
+	function download()
+  {
+		$app = Factory::getApplication();
 		$ftoken = $app->input->getString('ftoken', '');
 
 		if($ftoken) {
-			$table = F0FTable::getInstance('Upload', 'J2StoreTable');
+			$table = J2Store::fof()->loadTable('Upload', 'J2StoreTable');
 			if($table->load(array('mangled_name'=>$ftoken))) {
 				$name = $table->original_name;
 				$mask = basename($name);
@@ -325,17 +336,16 @@ class J2StoreControllerOrders extends F0FController
 				jimport('joomla.filesystem.file');
 				$path = JPATH_ROOT.'/media/j2store/uploads/'.$file;
 				if(JFile::exists($path)) {
-					F0FModel::getTmpInstance('Orderdownloads', 'J2StoreModel')->downloadFile($path, $mask);
+					J2Store::fof()->getModel('Orderdownloads', 'J2StoreModel')->downloadFile($path, $mask);
 					$app->close();
 				}
 			}
 		}
 	}
 
-
-
-	public function printOrder(){
-		$app = JFactory::getApplication();
+	public function printOrder()
+  {
+		$app = Factory::getApplication();
 		$order_id = $this->input->getString('order_id');
 		$view = $this->getThisView();
 		if ($model = $this->getThisModel())
@@ -343,7 +353,7 @@ class J2StoreControllerOrders extends F0FController
 			// Push the model into the view (as default)
 			$view->setModel($model, true);
 		}
-		$order = F0FTable::getInstance('Order' ,'J2StoreTable');
+		$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable');
 		$order->load(array('order_id' => $order_id));
 		$error = false;
 		$view->assign('order' ,$order );
@@ -353,9 +363,9 @@ class J2StoreControllerOrders extends F0FController
 		$view->display();
 	}
 
-
-	public function printShipping(){
-		$app = JFactory::getApplication();
+	public function printShipping()
+  {
+		$app = Factory::getApplication();
 		$order_id = $this->input->getString('order_id');
 		$view = $this->getThisView();
 		if ($model = $this->getThisModel())
@@ -364,10 +374,10 @@ class J2StoreControllerOrders extends F0FController
 			$view->setModel($model, true);
 		}
 
-		$order = F0FTable::getInstance('Order' ,'J2StoreTable');
+		$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable');
 		$order->load(array('order_id' => $order_id));
 
-		$orderinfo = F0FTable::getAnInstance('Orderinfo','J2StoreTable');
+		$orderinfo = J2Store::fof()->loadTable('Orderinfo','J2StoreTable');
 		$orderinfo->load(array('order_id'=>$order_id));
 
 		$error = false;
@@ -383,11 +393,12 @@ class J2StoreControllerOrders extends F0FController
 	 * Method to create or edit an existing order
 	 *
 	 */
-	public function createOrder(){
+	public function createOrder()
+  {
 		$option = $this->input->getCmd('option', 'com_j2store');
 		$componentName = str_replace('com_', '', $option);
-		$app = JFactory::getApplication();
-		$session  = JFactory::getSession();
+		$app = Factory::getApplication();
+		$session  = Factory::getApplication()->getSession();
 		$params = J2Store::config();
 
 		$j2store_order_id = $this->input->getInt('oid',0);
@@ -405,7 +416,7 @@ class J2StoreControllerOrders extends F0FController
 			// Push the model into the view (as default)
 			$view->setModel($model, true);
 		}
-		$order = F0FTable::getInstance('Order' ,'J2StoreTable')->getClone();
+		$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable')->getClone();
 		$order->load($j2store_order_id);
 
 		//On before admin edit order
@@ -421,12 +432,12 @@ class J2StoreControllerOrders extends F0FController
 		if((count($order_items) == 0) && in_array($sublayout, array('payment_shipping_methods','summary'))){
 			$sublayout = 'items';
 		}
-		$fieldsets = array('basic' => JText::_('J2STORE_STORES_GROUP_BASIC'),
-				'billing' => JText::_('J2STORE_BILLING_ADDRESS'),
-				'shipping' => JText::_('J2STORE_SHIPPING_ADDRESS'),
-				'items' => JText::_('J2STORE_ORDER_ITEMS'),
-				'payment_shipping_methods'=> JText::_('J2STORE_PAYMENT_SHIPPING_METHODS'),
-				'summary' => JText::_('J2STORE_ORDER_SUMMARY'),
+		$fieldsets = array('basic' => Text::_('J2STORE_STORES_GROUP_BASIC'),
+				'billing' => Text::_('J2STORE_BILLING_ADDRESS'),
+				'shipping' => Text::_('J2STORE_SHIPPING_ADDRESS'),
+				'items' => Text::_('J2STORE_ORDER_ITEMS'),
+				'payment_shipping_methods'=> Text::_('J2STORE_PAYMENT_SHIPPING_METHODS'),
+				'summary' => Text::_('J2STORE_ORDER_SUMMARY'),
 		);
 		$view->assign('fieldsets',$fieldsets);
 		switch($sublayout){
@@ -456,14 +467,14 @@ class J2StoreControllerOrders extends F0FController
 				break;
 			case 'billing':
 				$orderinfo = $order->getOrderInformation();
-				$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
+				$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 				$addresses = $address_model->user_id($order->user_id)->getList();
 				$billing_processed = $this->removePrefix((array)$orderinfo,'billing');
 				$view->assign('orderinfo',$orderinfo);
 				if($order->user_id) {
 					$address = $address_model->user_id($order->user_id)->getFirstItem();
 				} else {
-					$address = F0FTable::getAnInstance('Address', 'J2StoreTable');
+					$address = J2Store::fof()->loadTable('Address', 'J2StoreTable');
 				}
 				$view->assign('addresses',$addresses);
 				$view->assign('billing_address_id', $session->get('billing_address_id','','j2store'));
@@ -471,12 +482,12 @@ class J2StoreControllerOrders extends F0FController
 				$view->assign('storeProfile', J2Store::storeProfile());
 				$fields = J2Store::getSelectableBase()->getFields('billing',$address,'address');
 				$view->assign('fields', $fields);
-				$view->assign('address',F0FTable::getAnInstance('Address', 'J2StoreTable'));
+				$view->assign('address',J2Store::fof()->loadTable('Address', 'J2StoreTable'));
 				break;
 			case 'shipping':
 				$orderinfo = $order->getOrderInformation();
 				$this->checkBillingInfo ( $order );
-				$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
+				$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
                 $address_model->clearState();
 				$addresses = $address_model->user_id($order->user_id)->getList();
 				$shipping_processed = $this->removePrefix((array)$orderinfo,'shipping');
@@ -488,11 +499,11 @@ class J2StoreControllerOrders extends F0FController
 				if($order->user_id) {
 					$address = $address_model->user_id($order->user_id)->getFirstItem();
 				} else {
-					$address = F0FTable::getAnInstance('Address', 'J2StoreTable');
+					$address = J2Store::fof()->loadTable('Address', 'J2StoreTable');
 				}
 				$fields = J2Store::getSelectableBase()->getFields('shipping',$address,'address');
 				$view->assign('fields', $fields);
-				$view->assign('address',F0FTable::getAnInstance('Address', 'J2StoreTable'));
+				$view->assign('address',J2Store::fof()->loadTable('Address', 'J2StoreTable'));
 				break;
 				// let us load items
 			case 'items':
@@ -556,32 +567,34 @@ class J2StoreControllerOrders extends F0FController
 	 * @param Order object
 	 * @return null
 	*/
-	function checkBillingInfo($order){
-		$app = JFactory::getApplication ();
+	function checkBillingInfo($order)
+  {
+		$app = Factory::getApplication();
 		$orderinfo = $order->getOrderInformation();
 		if(empty( $orderinfo ) || empty( $orderinfo->billing_first_name )){
 			//redirect to billing
 			$url ='index.php?option=com_j2store&view=orders&task=createOrder&layout=billing&oid='.$order->j2store_order_id;
-			$app->redirect ( $url,JText::_ ( 'J2STORE_BILLING_ADDRESS_REQUIRED' ),'warning' );
+			$app->redirect ( $url,Text::_ ( 'J2STORE_BILLING_ADDRESS_REQUIRED' ),'warning' );
 		}
 	}
+
 	/**
 	 * Method to save the Order step by step
 	 * based on the layout
 	 * switch to save function
 	 * @return result array()
 	 */
-
-	public function saveAdminOrder(){
-		$app = JFactory::getApplication();
+	public function saveAdminOrder()
+  {
+		$app = Factory::getApplication();
 		// get the session object
-		$session = JFactory::getSession();
+		$session = Factory::getApplication()->getSession();
 		$sublayout = $app->input->getString('layout','basic');
 		$next_layout = $app->input->getString('next_layout','');
 		$order_id = $this->input->getInt('oid',0);
-		$order = F0FTable::getInstance('Order' ,'J2StoreTable');
+		$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable');
 		$order->load($order_id);
-		$result =array('msg' => JText::_('J2STORE_SAVE_SUCCESS') ,'msgType'=>'message');
+		$result =array('msg' => Text::_('J2STORE_SAVE_SUCCESS') ,'msgType'=>'message');
 		$data = $app->input->get('jform',array(),'ARRAY');
 		J2Store::plugin ()->event ( 'BeforeSaveAdminOrder', array(&$order) );
 		switch($sublayout){
@@ -619,7 +632,7 @@ class J2StoreControllerOrders extends F0FController
 				$shipping_tracking_id = $app->input->getString('shipping_tracking_id','');
 
 				if(isset($shipping_tracking_id)){
-					$ordershipping = F0FTable::getAnInstance('Ordershipping', 'J2StoreTable');
+					$ordershipping = J2Store::fof()->loadTable('Ordershipping', 'J2StoreTable');
 					if($ordershipping->load(array('order_id'=>$order->order_id))){
 						$ordershipping->ordershipping_tracking_id = $shipping_tracking_id;
 						$ordershipping->store();
@@ -631,7 +644,7 @@ class J2StoreControllerOrders extends F0FController
 				break;
 			case 'items':
 				$order->getAdminTotals();
-				$result['msg'] = JText::_('J2STORE_ORDER_ITEM_CHANGE_SUCCESS');
+				$result['msg'] = Text::_('J2STORE_ORDER_ITEM_CHANGE_SUCCESS');
 				break;
 			case 'summary':
 				$order->getAdminTotals();
@@ -640,20 +653,22 @@ class J2StoreControllerOrders extends F0FController
 		}
 
 		$url ='index.php?option=com_j2store&view=orders&task=createOrder&layout='.$sublayout.'&oid='.$order->j2store_order_id;
-		if($next_layout=="summary" && $sublayout=="summary"){
+		if($next_layout === "summary" && $sublayout === "summary"){
 			$url ="index.php?option=com_j2store&view=order&id=".$order->j2store_order_id;
 		}elseif($next_layout !=''){
 			$url ='index.php?option=com_j2store&view=orders&task=createOrder&layout='.$next_layout.'&oid='.$order->j2store_order_id;
 		}
 		$this->setRedirect($url ,$result['msg'] , $result['msgType']);
 	}
-	function calculateTax(){
-		$app = JFactory::getApplication();
+
+	function calculateTax()
+  {
+		$app = Factory::getApplication();
 		$order_id = $app->input->get('oid',0);
-		$order = F0FTable::getInstance('Order' ,'J2StoreTable');
+		$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable');
 		$order->load($order_id);
 		$discounts = $order->getOrderDiscounts();
-		$session = JFactory::getSession();
+		$session = Factory::getApplication()->getSession();
 		foreach ($discounts as $discount){
 		    if(isset($discount->discount_type) && $discount->discount_type == 'voucher'){
                 $session->set('voucher', $discount->discount_code, 'j2store');
@@ -665,7 +680,7 @@ class J2StoreControllerOrders extends F0FController
 
 		$order->getAdminTotals(true);
 		//echo "<pre>";print_r($order);exit;
-		$result['msg'] = JText::_('J2STORE_ORDER_ITEM_CHANGE_SUCCESS');
+		$result['msg'] = Text::_('J2STORE_ORDER_ITEM_CHANGE_SUCCESS');
 		$url ='index.php?option=com_j2store&view=orders&task=createOrder&layout=summary&oid='.$order->j2store_order_id;
 		$json = array();
 		$json['success']= 1;
@@ -673,15 +688,17 @@ class J2StoreControllerOrders extends F0FController
 		echo json_encode($json);
 		$app->close();
 	}
+
 	/**
 	 * validate order address
 	 *   */
-	public function validate_address(){
-		$app = JFactory::getApplication();
+	public function validate_address()
+  {
+		$app = Factory::getApplication();
 		$data = $app->input->getArray($_POST);
 		$json = array();
 		if(isset($data['order_id']) && isset($data['validate_type']) && $data['order_id'] && $data['validate_type']){
-			$order = F0FTable::getInstance('Order' ,'J2StoreTable');
+			$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable');
 			$order->load(array(
 					'order_id' => $data['order_id']
 			));
@@ -690,7 +707,7 @@ class J2StoreControllerOrders extends F0FController
 			$selectableBase = J2Store::getSelectableBase();
 			$json = $selectableBase->validate($data, $data['validate_type'], 'address');
 		}else{
-			$json['error']['validate_type'] = JText::_('J2STORE_INVALID_ADDRESS_TYPE');
+			$json['error']['validate_type'] = Text::_('J2STORE_INVALID_ADDRESS_TYPE');
 		}
 		J2Store::plugin()->event('CheckoutValidateBilling',array(&$json));
 		if(!$json){
@@ -703,45 +720,47 @@ class J2StoreControllerOrders extends F0FController
 	/**
 	 * get product list in search
 	 *    */
-	public function getproducts(){
-		$app = JFactory::getApplication();
+	public function getproducts()
+  {
+		$app = Factory::getApplication();
 		$q = $app->input->post->getString('q');
 		$json = array();
-		$model = F0FModel::getTmpInstance('Products','J2StoreModel');
+		$model = J2Store::fof()->getModel('Products','J2StoreModel');
 		$model->setState('search',$q);
 		//$items= $model->getSFProducts();
 		$items= $model->getSearchProduct();
 		if(count($items)) {
 			foreach($items as &$item) {
-				F0FModel::getTmpInstance('Products', 'J2StoreModel')->runMyBehaviorFlag(true)->getProduct($item);
+				J2Store::fof()->getModel('Products', 'J2StoreModel')->runMyBehaviorFlag(true)->getProduct($item);
 			}
 		}
 		echo json_encode($items);
 		$app->close();
 	}
 
-	function removeOrderitem(){
-		$app = JFactory::getApplication();
+	function removeOrderitem()
+  {
+		$app = Factory::getApplication();
 		$item_ids = $app->input->get('cid',array(),"ARRAY");
 		$order_id = $app->input->get('oid',0);
 		$json = array();
 		if($order_id > 0){
 			$url = 'index.php?option=com_j2store&view=orders&task=createOrder&layout=items&oid='.$order_id;
-			$order = F0FTable::getInstance('Order' ,'J2StoreTable')->getClone();
+			$order = J2Store::fof()->loadTable('Order' ,'J2StoreTable')->getClone();
 			$order->load($order_id);
 			$items = $order->getItems();
 			if(count($items) == count($item_ids) || count($item_ids)==0){
-				$json['error'] = JText::_("J2STORE_ORDER_MUSTHAVE_ATLEAST_ONE_ITEM");
+				$json['error'] = Text::_("J2STORE_ORDER_MUSTHAVE_ATLEAST_ONE_ITEM");
 			}else{
 				foreach ($item_ids as $item_id){
-					$orderItem = F0FTable::getAnInstance('OrderItem','J2StoreTable')->getClone();
+					$orderItem = J2Store::fof()->loadTable('OrderItem','J2StoreTable')->getClone();
 					$orderItem->load($item_id);
 					$item_name = $orderItem->orderitem_name;
 					$item_sku =  $orderItem->orderitem_sku;
 					if(!empty($orderItem->cartitem_id)){
-						$CartItem = F0FTable::getAnInstance('CartItem','J2StoreTable')->getClone();
+						$CartItem = J2Store::fof()->loadTable('CartItem','J2StoreTable')->getClone();
 						$CartItem->delete($orderItem->cartitem_id);
-						$orderitemattribute = F0FTable::getAnInstance('OrderItemAttribute', 'J2StoreTable')->getClone();
+						$orderitemattribute = J2Store::fof()->loadTable('OrderItemAttribute', 'J2StoreTable')->getClone();
 						$orderitemattribute->load(array(
 								'orderitem_id' => $item_id
 						));
@@ -751,7 +770,7 @@ class J2StoreControllerOrders extends F0FController
 						}
 					}
 					if($orderItem->delete()){
-						$msg = JText::sprintf('J2STORE_ORDERITEM_REMOVED',$item_name,$item_sku);
+						$msg = Text::sprintf('J2STORE_ORDERITEM_REMOVED',$item_name,$item_sku);
 						$order->add_history($msg);
 					}
 				}
@@ -759,26 +778,27 @@ class J2StoreControllerOrders extends F0FController
 				$order->getAdminTotals();
 			}
 		}else{
-			$json['error'] = JText::_('J2STORE_ORDER_NOT_FOUND_MISSING');
+			$json['error'] = Text::_('J2STORE_ORDER_NOT_FOUND_MISSING');
 		}
 		echo json_encode($json);
 		$app->close();
 	}
 
-	function updateInventry($type){
-		$app = JFactory::getApplication();
+	function updateInventry($type)
+  {
+		$app = Factory::getApplication();
 		$variant_id = $app->input->getInt('variant_id',0);
 		$qty = $app->input->getInt('qty',0);
 		$order_id = $app->input->get('order_id',0);
 
 		$json = array();
 		if(!empty($variant_id)){
-			$variant_model = F0FModel::getTmpInstance('Variants', 'J2StoreModel')->getClone();
+			$variant_model = J2Store::fof()->getModel('Variants', 'J2StoreModel')->getClone();
 			$variant = $variant_model->getItem($variant_id);
 
 			//product name
 			$product = J2Store::product()->setId($variant->product_id)->getProduct();
-			$product_model = F0FModel::getTmpInstance('Products', 'J2StoreModel');
+			$product_model = J2Store::fof()->getModel('Products', 'J2StoreModel');
 			$product_data = $product_model->getProduct($product);
 			$product_name = "";
 			if($product_data->j2store_product_id){
@@ -786,38 +806,40 @@ class J2StoreControllerOrders extends F0FController
 			}
 
 			F0FTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_j2store/tables');
-			$order = F0FTable::getInstance('Order', 'J2StoreTable')->getClone();
+			$order = J2Store::fof()->loadTable('Order', 'J2StoreTable')->getClone();
 			$order->load(array('order_id'=>$order_id));
 			if($variant && J2Store::product()->managing_stock($variant)) {
 				$old_qty = $product_data->variant->quantity;
-				if($type == "add"){
+				if($type === "add"){
 					$new_qty = $variant->increase_stock($qty);
-					$msg = JText::sprintf('J2STORE_ORDERITEM_STOCK_ADDED',$product_name,$old_qty,$new_qty);
+					$msg = Text::sprintf('J2STORE_ORDERITEM_STOCK_ADDED',$product_name,$old_qty,$new_qty);
 					$order->add_history($msg);
 					$json['success'] = $msg;
-				}elseif($type == "remove"){
+				}elseif($type === "remove"){
 					$new_qty = $variant->reduce_stock($qty);
-					$reduce_msg = JText::sprintf('J2STORE_ORDERITEM_STOCK_REDUCED',$product_name,$old_qty,$new_qty);
+					$reduce_msg = Text::sprintf('J2STORE_ORDERITEM_STOCK_REDUCED',$product_name,$old_qty,$new_qty);
 					$order->add_history($reduce_msg);
 					$json['success'] = $reduce_msg;
 				}
 			}else{
-				$json['error'] = JText::_('J2STORE_PRODUCT_STOCK_INVENTRY_NOT_AVAILABLE');
+				$json['error'] = Text::_('J2STORE_PRODUCT_STOCK_INVENTRY_NOT_AVAILABLE');
 
 			}
 		}
 		return $json;
 	}
 
-	function addInventry(){
-		$app = JFactory::getApplication();
+	function addInventry()
+  {
+		$app = Factory::getApplication();
 		$json = $this->updateInventry('add');
 		echo json_encode($json);
 		$app->close();
 	}
 
-	function removeInventry(){
-		$app = JFactory::getApplication();
+	function removeInventry()
+  {
+		$app = Factory::getApplication();
 		$json = $this->updateInventry('remove');
 		echo json_encode($json);
 		$app->close();

@@ -1,22 +1,25 @@
 <?php
 /**
- * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
- * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\HTML\Helpers\Category;
+use Joomla\CMS\HTML\Helpers\User;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
-
 
 class J2StoreControllerProductsBase extends F0FController
 {
-
 	protected $view = 'Products';
 
 	/**
@@ -24,11 +27,10 @@ class J2StoreControllerProductsBase extends F0FController
 	 * here the  product child tables will be deleted
 	 *
 	 */
-
     public function getFilterStates()
     {
         $app = J2Store::platform()->application();
-        $state = array();
+        $state = [];
         $state['search'] = $app->input->getString('search', '');
         $state['product_type'] = $app->input->getString('product_type', '');
         $state['visible'] = $app->input->getString('visible', null);
@@ -59,7 +61,7 @@ class J2StoreControllerProductsBase extends F0FController
         $product_id = $data['product_id'];
         $product_type = $data['product_type'];
 
-        $json = array();
+        $json = [];
         if (isset($data['product_id']) && $data['product_id']) {
             //allow plugins to run their events
             $json = J2Store::plugin()->eventWithArray('ChangeProductType', array($product_id, $product_type));
@@ -82,14 +84,10 @@ class J2StoreControllerProductsBase extends F0FController
     public function getRelatedProducts()
     {
         $app = J2Store::platform()->application();
-	    if (version_compare(JVERSION, '3.99.99', 'lt')) {
-		    $db = JFactory::getDbo();
-	    } else {
 		    $db = Factory::getContainer()->get('DatabaseDriver');
-	    }
         $q = $app->input->post->get('q', '', 'string');
         $ignore_product_id = $app->input->getInt('product_id');
-        $json = array();
+        $json = [];
         $model = $this->getModel('Products');
         $model->setState('search', $q);
         $query = $db->getQuery(true);
@@ -99,14 +97,14 @@ class J2StoreControllerProductsBase extends F0FController
         $query->where('#__j2store_variants.is_master=1');
         $query->where('#__j2store_products.enabled=1');
         $query->where('#__j2store_products.visibility=1');
-        $query->where('#__j2store_products.j2store_product_id !=' . $db->q($ignore_product_id));
+        $query->where('#__j2store_products.j2store_product_id !=' . $db->quote($ignore_product_id));
         $query->group('#__j2store_products.j2store_product_id');
         J2Store::plugin()->importCatalogPlugins();
         $app->triggerEvent('onJ2StoreAfterProductListQuery', array(&$query, &$model));
         //echo $query;
         $db->setQuery($query);
         $items = $db->loadObjectList();
-        $result = array();
+        $result = [];
         if (isset($items) && !empty($items)) {
             foreach ($items as $key => $item) {
                 if ($item->product_name) {
@@ -190,7 +188,7 @@ class J2StoreControllerProductsBase extends F0FController
             $poptionvalue->bind($product_option_value);
             $poptionvalue->store();
         }
-        $json = array();
+        $json = [];
         $json['success'] = true;
         echo json_encode($json);
         $app->close();
@@ -218,7 +216,7 @@ class J2StoreControllerProductsBase extends F0FController
             ->getList();
 
         $view->set('product_optionvalues', $product_optionvalues);
-        $parentopvalues = array();
+        $parentopvalues = [];
 
         if (isset($product_option->parent_id) && !empty($product_option->parent_id))
             $parentopvalues = $model->getParentOptionValues($product_option->parent_id, $product_option->product_id);
@@ -263,11 +261,7 @@ class J2StoreControllerProductsBase extends F0FController
         $platform = J2Store::platform();
         $app = $platform->application();
         $fof_helper = J2Store::fof();
-	    if (version_compare(JVERSION, '3.99.99', 'lt')) {
-		    $db = JFactory::getDbo();
-	    } else {
 		    $db = Factory::getContainer()->get('DatabaseDriver');
-	    }
         $data = $app->input->getArray($_POST);
 
         if (isset($data['product_optionvalue_attribs'])) {
@@ -365,7 +359,7 @@ class J2StoreControllerProductsBase extends F0FController
                 } catch (Exception $e) {
                     $message = $e->getMessage();
                     //throw new Exception($e->getMessage());
-                    if ($product->product_type == 'variable') {
+                    if ($product->product_type === 'variable') {
                         $message = Text::_('J2STORE_DELETE_VARIANT_OPTION_ERROR_MSG');
                     }
                     $msgType = 'error';
@@ -386,7 +380,7 @@ class J2StoreControllerProductsBase extends F0FController
         $poption_id = $app->input->getInt('pao_id');
         $product_type = $app->input->getint('product_type', '');
         $poptionValue = $fof_helper->loadTable('Productoption', 'J2StoreTable');
-        $result = array();
+        $result = [];
         $result['success'] = false;
         try {
             if ($poptionValue->delete($poption_id)) {
@@ -394,7 +388,7 @@ class J2StoreControllerProductsBase extends F0FController
             }
         } catch (\Exception $e) {
             $result['error'] = Text::_('J2STORE_DELETE_PRODUCT_OPTION_ERROR_MSG');
-            if (isset($product_type) && $product_type == 'variable') {
+            if (isset($product_type) && $product_type === 'variable') {
                 $result['error'] = Text::_('J2STORE_DELETE_VARIANT_OPTION_ERROR_MSG');
             }
         }
@@ -411,22 +405,18 @@ class J2StoreControllerProductsBase extends F0FController
         $cid = $app->input->get('cid', array(), 'array');
         $task = $app->input->getString('optiontask');
         $pov_id = $cid[0];
-        $json = array();
+        $json = [];
         $json['success'] = true;
         $product_id = $app->input->getInt('product_id');
         $productoption_id = $app->input->getInt('productoption_id');
         if ($product_id && $productoption_id && $pov_id) {
-	        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-		        $db = JFactory::getDbo();
-	        } else {
 		        $db = Factory::getContainer()->get('DatabaseDriver');
-	        }
             $query = $db->getQuery(true)->update('#__j2store_product_optionvalues')->set('product_optionvalue_default=0')
-                ->where('productoption_id=' . $db->q($productoption_id));
+                ->where('productoption_id=' . $db->quote($productoption_id));
             $db->setQuery($query)->execute();
             $row = $fof_helper->loadTable('ProductOptionvalue', 'J2StoreTable');
             $row->load($pov_id);
-            if ($task == 'unsetDefault') {
+            if ($task === 'unsetDefault') {
                 $row->product_optionvalue_default = 0;
             } else {
                 $row->product_optionvalue_default = 1;
@@ -450,7 +440,7 @@ class J2StoreControllerProductsBase extends F0FController
         $data = $app->input->getArray($_POST);
         $variant_id = $app->input->getInt('variant_id');
         $product_id = $app->input->getInt('product_id');
-        $nullDate = Factory::getDbo()->getNullDate();
+        $nullDate = Factory::getContainer()->get('DatabaseDriver')->getNullDate();
 
         $utility = J2Store::utilities();
         $data['date_from'] = (!isset($data['date_from']) || empty($data['date_from']) || $data['date_from'] == $nullDate) ? null : $utility->convert_current_to_utc($data['date_from']);
@@ -485,14 +475,14 @@ class J2StoreControllerProductsBase extends F0FController
         $app = $platform->application();
         //get variant id
         $variant_id = $app->input->getInt('variant_id', 0);
-        $prices = array();
-        $groups = array();
+        $prices = [];
+        $groups = [];
         $model = $fof_helper->getModel('ProductPrices', 'J2StoreModel');
 
         if ($variant_id) {
             $model->setState('variant_id', $variant_id);
             $prices = $model->getList();
-            $groups = JHtmlUser::groups(true);
+            $groups = User::groups(true);
         }
 
         $view = $this->getThisView();
@@ -522,7 +512,7 @@ class J2StoreControllerProductsBase extends F0FController
         $msg = Text::_('J2STORE_PRODUCT_PRICE_SAVED_SUCCESSFULLY');
         $msgType = "notice";
         $utility = J2Store::utilities();
-        $nullDate = Factory::getDbo()->getNullDate();
+        $nullDate = Factory::getContainer()->get('DatabaseDriver')->getNullDate();
         foreach ($items['jform']['prices'] as $item) {
             $item['date_from'] = (!isset($item['date_from']) || empty($item['date_from']) || $item['date_from'] == $nullDate) ? null : $utility->convert_current_to_utc($item['date_from']);
             $item['date_to'] = (!isset($item['date_to']) || empty($item['date_to']) || $item['date_to'] == $nullDate) ? null : $utility->convert_current_to_utc($item['date_to']);
@@ -530,7 +520,6 @@ class J2StoreControllerProductsBase extends F0FController
             $item['quantity_to'] = (!isset($item['quantity_to']) || empty($item['quantity_to'])) ? 0 : (int)$item['quantity_to'];
             $item['customer_group_id'] = (!isset($item['customer_group_id']) || empty($item['customer_group_id'])) ? 0 : (int)$item['customer_group_id'];
             $item['price'] = (!isset($item['price']) || empty($item['price'])) ? 0 : (float)$item['price'];
-
 
             if( isset(  $item['date_from']) && (  $item['date_from'] != '0000-00-00 00:00:00') && isset(  $item['date_to']) && (  $item['date_to'] != '0000-00-00 00:00:00') && (  $item['date_from'] >=   $item['date_to'] )){
                 $msg = Text::_('J2STORE_PRICE_VALID_FORM_DATE_NEED_TO_GREATER_THAN_PRICE_VALID_TO_DATE');
@@ -614,7 +603,6 @@ class J2StoreControllerProductsBase extends F0FController
 		$app->close();
 	}
 
-
 	/***
 	 * Method to delete files
 	*/
@@ -641,7 +629,8 @@ class J2StoreControllerProductsBase extends F0FController
 	/**
 	 * Method to generate variants for variable product
 	 */
-	function generateVariants() {
+	function generateVariants()
+  {
 
 		$model = $this->getModel('Products', 'J2StoreModel');
 		$json = $model->generateVariants();
@@ -728,7 +717,7 @@ class J2StoreControllerProductsBase extends F0FController
     {
         $app = J2Store::platform()->application();
         $fof_helper = J2Store::fof();
-        $json = array();
+        $json = [];
         $product_id = $app->input->getInt('product_id', 0);
         if ($product_id) {
             $product = $fof_helper->loadTable('Product', 'J2StoreTable');
@@ -761,7 +750,7 @@ class J2StoreControllerProductsBase extends F0FController
             $product = $fof_helper->loadTable('Product', 'J2StoreTable');
             if ($product->load($product_id)) {
                 $variants = $fof_helper->getModel('Variants', 'J2StoreModel')->product_id($product_id)->is_master(0)->getList();
-                $json = array();
+                $json = [];
                 $json ['success'] = true;
                 $variantTable = $fof_helper->loadTable('Variant', 'J2StoreTable');
                 foreach ($variants as $variant) {
@@ -812,16 +801,16 @@ class J2StoreControllerProductsBase extends F0FController
         $vid = $app->input->getInt('v_id');
         $product_id = $app->input->getint('product_id');
         $status = $app->input->getString('status');
-        $json = array();
+        $json = [];
         $json['success'] = false;
         if ($vid && $product_id) {
-            $db = Factory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
             $query = $db->getQuery(true);
             // Fields to update.
-            $fields = array($db->qn('isdefault_variant') . ' = 0');
+            $fields = array($db->quoteName('isdefault_variant') . ' = 0');
             // Conditions for which records should be updated.
             $conditions = array(
-                $db->qn('product_id') . ' =' . $db->q($product_id),
+                $db->quoteName('product_id') . ' =' . $db->quote($product_id),
             );
             $query->update($db->quoteName('#__j2store_variants'))->set($fields)->where($conditions);
             $db->setQuery($query);
@@ -829,7 +818,7 @@ class J2StoreControllerProductsBase extends F0FController
             $row = $fof_helper->loadTable('Variant', 'J2StoreTable');
             $variant = $fof_helper->loadTable('Variant', 'J2StoreTable');
             $variant->load($vid);
-            if ($status == 'unsetDefault') {
+            if ($status === 'unsetDefault') {
                 $variant->isdefault_variant = 0;
             } else {
                 $variant->isdefault_variant = 1;
@@ -936,7 +925,7 @@ class J2StoreControllerProductsBase extends F0FController
             $item->product_name = $product->product_name;
             $item->catid = $product->source->catid;
         }
-        $testproduct = array();
+        $testproduct = [];
         foreach ($items as $product) {
             if (empty($filter_category)) {
                 $testproduct[] = $product;
@@ -944,7 +933,7 @@ class J2StoreControllerProductsBase extends F0FController
                 $testproduct[] = $product;
             }
         }
-        $categories = JHtmlCategory::options('com_content');
+        $categories = Category::options('com_content');
         $view = $this->getThisView();
         $view->setModel($model, true);
         $view->set('state', $model->getState());
@@ -965,7 +954,7 @@ class J2StoreControllerProductsBase extends F0FController
         $model->getName();
         $json = $model->updateProduct();
         if ($json === false) {
-            $json = array();
+            $json = [];
             $json['errormsg'] = implode('/n', $model->getErrors());
             $json['error'] = 1;
         }
@@ -992,14 +981,14 @@ class J2StoreControllerProductsBase extends F0FController
         $view->set('_view', 'products');
         $view->set('_action', "index.php?option=com_j2store&view=products&task=setfiles&tmpl=component&id=" . $id);
         $view->setModel($model, true);
-        $view->assign('state', $model->getState());
-        $view->assign('row', $row);
-        $view->assign('items', $items);
-        $view->assign('files', $files);
-        $view->assign('error', $error);
-        $view->assign('total', $total);
-        $view->assign('pagination', $pagination);
-        $view->assign('product_id', $id);
+        $view->set('state', $model->getState());
+        $view->set('row', $row);
+        $view->set('items', $items);
+        $view->set('files', $files);
+        $view->set('error', $error);
+        $view->set('total', $total);
+        $view->set('pagination', $pagination);
+        $view->set('product_id', $id);
         $view->setLayout('default');
         $view->display();
     }
@@ -1016,25 +1005,21 @@ class J2StoreControllerProductsBase extends F0FController
             $product_type = $app->input->getString('product_type', 'simple');
             $filter_sku = $app->input->getString('filter_sku', '');
             $filter_id = $app->input->getString('filter_pid', '');
-            $product_list = array();
+            $product_list = [];
 
-	        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-		        $db = JFactory::getDbo();
-	        } else {
 		        $db = Factory::getContainer()->get('DatabaseDriver');
-	        }
             $query = $db->getQuery(true)->select('pa.product_id')->from('#__j2store_product_options AS pa')
-                ->where('pa.product_id !=' . $db->q($product_id))
+                ->where('pa.product_id !=' . $db->quote($product_id))
                 ->group('pa.product_id')
                 ->join('LEFT', '#__j2store_products AS p ON pa.product_id=p.j2store_product_id')
                 ->join('LEFT', '#__j2store_variants AS v ON v.product_id=p.j2store_product_id')
-                ->where('p.product_type = ' . $db->q($product_type));
+                ->where('p.product_type = ' . $db->quote($product_type));
 
-            $search_term = (!empty($filter_sku)) ? 'v.sku LIKE ' . $db->q('%' . $filter_sku . '%') : '';
+            $search_term = (!empty($filter_sku)) ? 'v.sku LIKE ' . $db->quote('%' . $filter_sku . '%') : '';
 
             if (!empty($filter_id)) {
                 $search_term .= (!empty($search_term)) ? ' OR ' : '';
-                $search_term .= 'p.j2store_product_id=' . $db->q($filter_id);
+                $search_term .= 'p.j2store_product_id=' . $db->quote($filter_id);
             }
             if (!empty($search_term)) {
                 $query->where($search_term);
@@ -1046,7 +1031,7 @@ class J2StoreControllerProductsBase extends F0FController
                 $error = $e->getMessage();
             }
 
-            $products = array();
+            $products = [];
             foreach ($product_list as $item) {
                 // run the getItem again
                 unset ($product);
@@ -1055,16 +1040,16 @@ class J2StoreControllerProductsBase extends F0FController
             }
 
             if (empty($filter_id) && empty($filter_sku)) {
-                $products = array();
+                $products = [];
             }
-            $view->assign('model', $model);
-            $view->assign('state', $model->getState());
-            $view->assign('products', $products);
+            $view->set('model', $model);
+            $view->set('state', $model->getState());
+            $view->set('products', $products);
             $row = $fof_helper->getModel('Products', 'J2StoreModel')->getItem($product_id);
-            $view->assign('row', $row);
-            $view->assign('productHelper', J2Store::product());
-            $view->assign('currency', J2Store::currency());
-            $view->assign('product_id', $product_id);
+            $view->set('row', $row);
+            $view->set('productHelper', J2Store::product());
+            $view->set('currency', J2Store::currency());
+            $view->set('product_id', $product_id);
         }
         $view->setLayout('paimport');
         $view->display();
@@ -1138,7 +1123,7 @@ class J2StoreControllerProductsBase extends F0FController
     public function getSFFilterStates()
     {
         $app = J2Store::platform()->application();
-        $state = array();
+        $state = [];
         $state['search'] = $app->input->getString('search', '');
         $state['product_type'] = $app->input->getString('product_type', '');
         $state['visible'] = $app->input->getString('visible', null);
@@ -1165,7 +1150,7 @@ class J2StoreControllerProductsBase extends F0FController
         $app = J2Store::platform()->application();
         $fof_helper = J2Store::fof();
         $params = J2Store::config();
-        $json = array();
+        $json = [];
         $product_id = $app->input->get('product_id');
         $form_prefix = $app->input->getString('form_prefix', 'jform[attribs][j2store]');
         $limit = 10;
@@ -1176,10 +1161,10 @@ class J2StoreControllerProductsBase extends F0FController
             $limitstart = $app->input->get('limitstart');
             $product_filter_model = $fof_helper->getModel('ProductFilters', 'J2StoreModel');
             $product_filter_list = $product_filter_model->product_id($product_id)->limit($limit)->limitstart($limitstart)->getList();
-            $product_filters = array();
+            $product_filters = [];
             foreach ($product_filter_list as $row) {
                 if (!isset($product_filters[$row->group_id])) {
-                    $product_filters[$row->group_id] = array();
+                    $product_filters[$row->group_id] = [];
                 }
                 $product_filters[$row->group_id]['group_name'] = $row->group_name;
                 $product_filters[$row->group_id]['filters'][] = $row;
@@ -1192,13 +1177,13 @@ class J2StoreControllerProductsBase extends F0FController
                 // Push the model into the view (as default)
                 $view->setModel($model, true);
             }
-            $view->assign('reinitialize', 1);
-            $view->assign('item', $item);
-            $view->assign('filter_limit', $limit);
-            $view->assign('product_filters', $product_filters);
-            $view->assign('params', $params);
-            $view->assign('form_prefix', $form_prefix);
-            $view->assign('productfilter_pagination', $product_filter_pagination);
+            $view->set('reinitialize', 1);
+            $view->set('item', $item);
+            $view->set('filter_limit', $limit);
+            $view->set('product_filters', $product_filters);
+            $view->set('params', $params);
+            $view->set('form_prefix', $form_prefix);
+            $view->set('productfilter_pagination', $product_filter_pagination);
             $view->setLayout('form_ajax_avfilter');
             ob_start();
             $view->display();
@@ -1219,9 +1204,9 @@ class J2StoreControllerProductsBase extends F0FController
         $app = J2Store::platform()->application();
         $fof_helper = J2Store::fof();
         $params = J2Store::config();
-        $json = array();
+        $json = [];
         $product_id = $app->input->get('product_id');
-        $global_config = Factory::getConfig();
+        $global_config = Factory::getApplication()->getConfig();
         $limit = $global_config->get('list_limit', 20);
         $form_prefix = $app->input->getString('form_prefix', 'jform[attribs][j2store]');
         if (!empty($product_id)) {
@@ -1242,15 +1227,15 @@ class J2StoreControllerProductsBase extends F0FController
                 $view->setModel($model, true);
             }
 
-            $view->assign('reinitialize', 1);
-            $view->assign('product', $item);
-            $view->assign('weights', $weights);
-            $view->assign('lengths', $lengths);
-            $view->assign('variant_list', $variant_list);
-            $view->assign('params', $params);
-            $view->assign('form_prefix', $form_prefix);
-            $view->assign('variant_pagination', $variant_pagination);
-            if (in_array($item->product_type, array('variable'))) {
+            $view->set('reinitialize', 1);
+            $view->set('product', $item);
+            $view->set('weights', $weights);
+            $view->set('lengths', $lengths);
+            $view->set('variant_list', $variant_list);
+            $view->set('params', $params);
+            $view->set('form_prefix', $form_prefix);
+            $view->set('variant_pagination', $variant_pagination);
+            if ($item->product_type === 'variable') {
                 $view->setLayout('form_ajax_avoptions');
             } elseif ($item->product_type == 'variablesubscriptionproduct') {
                 $view->setLayout('form_ajax_' . $item->product_type . '_options');
@@ -1320,11 +1305,10 @@ class J2StoreControllerProductsBase extends F0FController
 
             $headData = $document->getHeadData();
             $scripts = $headData['scripts'];
-            unset($scripts[JUri::root(true) . '/media/j2store/js/j2store.js']);
+            unset($scripts[Uri::root(true) . '/media/j2store/js/j2store.js']);
             $headData['scripts'] = $scripts;
             $document->setHeadData($headData);
             $platform->addScript('j2store_admin','/media/j2store/js/j2store_admin.js');
-           // $document->addScript(JUri::root(true) . '/media/j2store/js/j2store_admin.js');
         }
     }
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -9,7 +9,7 @@ defined('_JEXEC') or die;
 $platform = J2Store::platform();
 ?>
 <div class="j2store-shipping " id="shippingcost-pane">
-	<div id="onCheckoutShipping_wrapper">		
+	<div id="onCheckoutShipping_wrapper">
 		<h3>
 			<?php echo JText::_('J2STORE_ENTER_SHIPPING_DETAILS'); ?>
 		</h3>
@@ -34,7 +34,7 @@ $platform = J2Store::platform();
 					</td>
 				</tr>
 			</tbody>
-		</table>				
+		</table>
 	</div>
 </div>
 <div id='onCheckoutPayment_wrapper'>

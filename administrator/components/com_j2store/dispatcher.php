@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -20,7 +20,7 @@ class J2StoreDispatcher extends F0FDispatcher
     	   	require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/strapper.php');
 	       	J2StoreStrapper::addJS();
 	       	J2StoreStrapper::addCSS();
-	       	
+
 	       	require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2store.php');
 	       	J2Store::plugin()->event('BeforeDispatch');
 	       	require_once JPATH_ADMINISTRATOR.'/components/com_j2store/library/popup.php';

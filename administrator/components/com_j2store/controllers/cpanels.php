@@ -1,9 +1,12 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
 defined('_JEXEC') or die;
@@ -28,17 +31,17 @@ class J2StoreControllerCpanels extends F0FController
     $config = J2Store::config();
     $installation_complete = $config->get('installation_complete', 0);
     if(!$installation_complete) {
-      //installation not completed
+      //installation isn't completed
       Factory::getApplication()->redirect('index.php?option=com_j2store&view=postconfig');
     }
 
     $update_complete = $config->get('update_complete', 0);
     if (!$update_complete) {
       //first check if the currency table has a default records at least.
-      $rows = F0FModel::getTmpInstance('Currencies', 'J2StoreModel')->enabled(1)->getList();
+      $rows = J2Store::fof()->getModel('Currencies', 'J2StoreModel')->enabled(1)->getList();
       if(count($rows) < 1) {
         //no records found. Dumb default data
-        F0FModel::getTmpInstance('Currencies', 'J2StoreModel')->create_currency_by_code('USD', 'USD');
+        J2Store::fof()->getModel('Currencies', 'J2StoreModel')->create_currency_by_code('USD', 'USD');
       }
       //update schema
       $dbInstaller = new F0FDatabaseInstaller(array(
@@ -120,11 +123,6 @@ class J2StoreControllerCpanels extends F0FController
     // get prefix
     $prefix = $db->getPrefix ();
 
-    //correct the collation
-    // if (in_array ( $prefix . 'j2store_orderdiscounts', $tables )) {
-    //    $db->setQuery ( 'ALTER TABLE #_j2store_orderdiscounts CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci' );
-    //}
-
 		// let us back up the table first
 		if (! in_array ( $prefix . 'j2store_backup_ordercoupons', $tables ) && in_array ( $prefix . 'j2store_ordercoupons', $tables )) {
 			$db->setQuery ( 'CREATE TABLE #__j2store_backup_ordercoupons LIKE #__j2store_ordercoupons' );
@@ -143,7 +141,7 @@ class J2StoreControllerCpanels extends F0FController
 			if (count ( $ordercoupons ) > 0) {
 				foreach ( $ordercoupons as $coupon ) {
 					unset ( $table );
-					$table = F0FTable::getInstance ( 'Orderdiscount', 'J2StoreTable' )->getClone ();
+					$table = J2Store::fof()->loadTable( 'Orderdiscount', 'J2StoreTable' )->getClone ();
 					$table->load ( array (
 							'order_id' => $coupon->order_id,
 							'discount_type' => 'coupon'
@@ -171,7 +169,7 @@ class J2StoreControllerCpanels extends F0FController
 						$db->execute ();
 					} catch ( Exception $e ) {
 						// was not able to delete. So remove one by one.
-						$model = F0FModel::getTmpInstance ( 'Ordercoupons', 'J2StoreModel' );
+						$model = J2Store::fof()->getModel('Ordercoupons', 'J2StoreModel');
 						$model->setIds ( $migrated_coupons );
 						$model->delete ();
 					}
@@ -206,7 +204,7 @@ class J2StoreControllerCpanels extends F0FController
 			if (count ( $vouchers ) > 0) {
 				foreach ( $vouchers as $voucher ) {
 					unset ( $table );
-					$table = F0FTable::getInstance ( 'Orderdiscount', 'J2StoreTable' )->getClone ();
+					$table = J2Store::fof()->loadTable( 'Orderdiscount', 'J2StoreTable' )->getClone ();
 					$table->load ( array (
 							'order_id' => $voucher->order_id,
 							'discount_type' => 'voucher'
@@ -232,7 +230,7 @@ class J2StoreControllerCpanels extends F0FController
 						$db->execute ();
 					} catch ( Exception $e ) {
 						// was not able to delete. So remove one by one.
-						$model = F0FModel::getTmpInstance ( 'Voucherhistories', 'J2StoreModel' );
+						$model = J2Store::fof()->getModel('Voucherhistories', 'J2StoreModel');
 						$model->setIds ( $migrated_vouchers );
 						$model->delete ();
 					}
@@ -374,7 +372,7 @@ class J2StoreControllerCpanels extends F0FController
   public function getEupdates()
   {
 		$app = Factory::getApplication();
-		$eupdate_model = F0FModel::getTmpInstance('Eupdates','J2StoreModel');
+		$eupdate_model = J2Store::fof()->getModel('Eupdates','J2StoreModel');
 		$list = $eupdate_model->getUpdates();
 		$total = count($list);
 		$json =array();

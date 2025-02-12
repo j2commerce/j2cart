@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 defined ( '_JEXEC' ) or die ();
@@ -19,19 +19,19 @@ class J2StoreModelProductOptionvalues extends F0FModel {
 		$query->order('#__j2store_product_optionvalues.ordering ASC');
 		return $query;
 	}
-	
+
 	public function getTableFields()
 	{
 		$tableName = $this->getTable()->getTableName();
 		static $sets;
-		
+
 		if ( !is_array( $sets) )
 		{
 			$sets= array( );
 		}
-		
+
 		if(!isset($sets[$tableName])) {
-		
+
 			if (version_compare(JVERSION, '3.0', 'ge'))
 			{
 				$sets[$tableName] = $this->getDbo()->getTableColumns($tableName, true);
@@ -44,5 +44,5 @@ class J2StoreModelProductOptionvalues extends F0FModel {
 		}
 		return $sets[$tableName];
 	}
-	
+
 }

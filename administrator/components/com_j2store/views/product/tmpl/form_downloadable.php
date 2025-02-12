@@ -1,12 +1,16 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
-// No direct access
 defined('_JEXEC') or die;
+
 $this->variant = $this->item->variants;
 
 //lengths
@@ -14,6 +18,7 @@ $this->lengths = J2Html::select()->clearState()
     ->type('genericlist')
     ->name($this->form_prefix.'[length_class_id]')
     ->value($this->variant->length_class_id)
+	->attribs(array('class'=>'form-select'))
     ->setPlaceHolders(array(''=>JText::_('J2STORE_SELECT_OPTION')))
     ->hasOne('Lengths')
     ->setRelations(
@@ -31,6 +36,7 @@ $this->weights = J2Html::select()->clearState()
     ->type('genericlist')
     ->name($this->form_prefix.'[weight_class_id]')
     ->value($this->variant->weight_class_id)
+	->attribs(array('class'=>'form-select'))
     ->setPlaceHolders(array(''=>JText::_('J2STORE_SELECT_OPTION')))
     ->hasOne('Weights')
     ->setRelations(
@@ -47,6 +53,7 @@ $this->allow_backorder = J2Html::select()->clearState()
     ->type('genericlist')
     ->name($this->form_prefix.'[allow_backorder]')
     ->value($this->variant->allow_backorder)
+	->attribs(array('class'=>'form-select'))
     ->setPlaceHolders(
         array('0' => JText::_('COM_J2STORE_DO_NOT_ALLOW_BACKORDER'),
             '1' => JText::_('COM_J2STORE_DO_ALLOW_BACKORDER'),
@@ -58,6 +65,7 @@ $this->availability =J2Html::select()->clearState()
     ->type('genericlist')
     ->name($this->form_prefix.'[availability]')
     ->value($this->variant->availability)
+	->attribs(array('class'=>'form-select'))
     ->default(1)
     ->setPlaceHolders(
         array('0' => JText::_('COM_J2STORE_PRODUCT_OUT_OF_STOCK') ,

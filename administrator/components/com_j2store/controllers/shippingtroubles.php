@@ -1,11 +1,15 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
 defined('_JEXEC') or die;
+
 class J2storeControllerShippingtroubles extends F0FController
 {
 	public function browse()
@@ -13,7 +17,7 @@ class J2storeControllerShippingtroubles extends F0FController
         $platform = J2Store::platform();
         $app = $platform->application();
 		$layout = $app->input->getString('layout','default');
-		if($layout == 'default_shipping'){
+		if($layout === 'default_shipping'){
 			//before check shipping enable
 			$model = $this->getModel('Shippingtroubles');
 			$state = $this->getFilterStates();
@@ -37,10 +41,10 @@ class J2storeControllerShippingtroubles extends F0FController
 			}
 			$view = $this->getThisView();
 			$view->setModel($model);
-			$view->assign('shipping_available',$shipping);
-			$view->assign('shipping_messages',$messages);
+			$view->set('shipping_available',$shipping);
+			$view->set('shipping_messages',$messages);
 			$view->setLayout($layout);
-		}elseif ($layout=='default_shipping_product'){
+		}elseif ($layout === 'default_shipping_product'){
 			//before check shipping enable
 			$model = $this->getModel('Shippingtroubles');
 			$state = $this->getFilterStates();
@@ -56,16 +60,17 @@ class J2storeControllerShippingtroubles extends F0FController
 			}
 			$view = $this->getThisView();
 			$view->setModel($model);
-			$view->assign('shipping_available',$shipping);
-			$view->assign('products',$products);
-			$view->assign('state', $model->getState());
+			$view->set('shipping_available',$shipping);
+			$view->set('products',$products);
+			$view->set('state', $model->getState());
 			$view->setLayout($layout);
 		}
 		return parent::browse();
 	}
 
 	public function getFilterStates() {
-		$app = JFactory::getApplication();
+        $platform = J2Store::platform();
+        $app = $platform->application();
 		$state = array();
 		$state['search'] = $app->input->getString('search','');
 		$state['product_type']= $app->input->getString('product_type','');

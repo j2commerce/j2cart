@@ -1,23 +1,29 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access
+
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\Database\DatabaseDriver;
 
-class J2StoreModelApps extends F0FModel {
-
+class J2StoreModelApps extends F0FModel
+{
 	/**
 	 * Method to buildQuery to return list of data
 	 * @see F0FModel::buildQuery()
 	 * @return query
 	 */
-	public function buildQuery($overrideLimits = false) {
-
+	public function buildQuery($overrideLimits = false)
+    {
 		$app = Factory::getApplication();
         $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true);
@@ -35,7 +41,6 @@ class J2StoreModelApps extends F0FModel {
 	{
 		$query->select("app.extension_id,app.name,app.type,app.folder,app.element,app.params,app.enabled,app.ordering, app.manifest_cache")
 		->from("#__extensions as app");
-
 	}
 
 	protected function getWhereQuery(&$query)
@@ -50,19 +55,17 @@ class J2StoreModelApps extends F0FModel {
 			$query->where(
 					$db->qn('app.').'.'.$db->qn('name').' LIKE '.$db->q('%'.$search .'%')
 			);
-
 		}
-
-
 	}
 
-	public function getInserted($tablename){
+	public function getInserted($tablename)
+    {
         $db = Factory::getContainer()->get('DatabaseDriver');
 		$status = true;
-        $application = JFactory::getApplication();
+        $application = Factory::getApplication();
 		//Force parsing of SQL file since Joomla! does that only in install mode, not in upgrades
 		$sql = 'components/com_j2store/sql/install/mysql/'.$tablename.'.sql';
-		$queries = JDatabaseDriver::splitSql(file_get_contents($sql));
+		$queries = DatabaseDriver::splitSql(file_get_contents($sql));
 
 		foreach ($queries as $query)
 		{
@@ -72,14 +75,12 @@ class J2StoreModelApps extends F0FModel {
 				$db->setQuery($query);
 				if (!$db->execute())
 				{
-					$application->enqueueMessage(JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)), 'error');
+					$application->enqueueMessage(Text::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)), 'error');
 					$status  = false;
 				}
-
 			}
 		}
 
 		return $status;
-
 	}
 }

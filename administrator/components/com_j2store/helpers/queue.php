@@ -1,15 +1,17 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
-/**
- * J2Html class provides Form Inputs
- */
+use Joomla\CMS\Factory;
 
 class J2Queue extends JObject
 {
@@ -19,7 +21,6 @@ class J2Queue extends JObject
 	public function __construct ( $properties = null )
 	{
 		parent::__construct ( $properties );
-
 	}
 
 	public static function getInstance ( $properties = null )
@@ -31,18 +32,19 @@ class J2Queue extends JObject
 		return self::$instance;
 	}
 
-	public function deleteQueue($list){
+	public function deleteQueue($list)
+  {
 		if(isset($list->j2store_queue_id) && !empty($list->j2store_queue_id)) {
-			$queue_table = F0FTable::getInstance ( 'Queue', 'J2StoreTable' )->getClone ();
+			$queue_table = J2Store::fof()->loadTable( 'Queue', 'J2StoreTable' )->getClone ();
 			$queue_table->load ( $list->j2store_queue_id );
 			$queue_table->delete ();
 		}
 	}
 
-
-	function resetQueue($list,$day = 7){
+	function resetQueue($list,$day = 7)
+  {
 		if(isset($list->j2store_queue_id) && !empty($list->j2store_queue_id)){
-			$queue_table = F0FTable::getInstance('Queue', 'J2StoreTable')->getClone();
+			$queue_table = J2Store::fof()->loadTable('Queue', 'J2StoreTable')->getClone();
 			$queue_table->load($list->j2store_queue_id);
 			$new_table = clone $queue_table;
 
@@ -50,10 +52,10 @@ class J2Queue extends JObject
 			$queue_table->delete();
 
 			$new_table->j2store_queue_id = '';
-			$tz = JFactory::getConfig()->get('offset');
-			$current_date = JFactory::getDate('now', $tz)->toSql(true);
+			$tz = Factory::getApplication()->getConfig()->get('offset');
+			$current_date = Factory::getDate('now', $tz)->toSql(true);
 			$date_string = 'now +'.$day.' day';
-			$date = JFactory::getDate($date_string, $tz)->toSql(true);
+			$date = Factory::getDate($date_string, $tz)->toSql(true);
 			$new_table->status = 'Requeue';
 			$new_table->expired = $date;
 			$new_table->repeat_count += 1;
@@ -61,5 +63,4 @@ class J2Queue extends JObject
 			$new_table->store();
 		}
 	}
-
 }

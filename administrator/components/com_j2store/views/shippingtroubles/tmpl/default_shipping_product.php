@@ -1,25 +1,26 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
-
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
 $sidebar = JHtmlSidebar::render();
 $this->params = J2Store::config();
-$row_class = 'row';
-$col_class = 'col-md-';
+
 $info_class = $platform->getLabel('info');
 $warning_class = $platform->getLabel('warning');
 $success_class = $platform->getLabel('success');
@@ -28,37 +29,20 @@ $danger_class = $platform->getLabel('danger');
 HTMLHelper::_('bootstrap.offcanvas', '[data-bs-toggle="offcanvas"]');
 HTMLHelper::_('bootstrap.tooltip', '[data-bs-toggle="tooltip"]', ['placement' => 'left']);
 
-
 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
 $wa->useScript('table.columns');
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-    $info_class = 'label label-info';
-    $warning_class = 'label label-warning';
-    $success_class = 'label label-success';
-}
 
 $search = htmlspecialchars($this->state->search);
-
 ?>
-<div class="<?php echo $row_class; ?>">
 <?php if(!empty( $sidebar )): ?>
-   <div id="j-sidebar-container" class="<?php echo $col_class; ?>2">
+    <div id="j2c-menu" class="mb-4">
       <?php echo $sidebar ; ?>
    </div>
-   <div id="j-main-container" class="<?php echo $col_class; ?>6">
- <?php else : ?> 
+<?php endif;?>
 	<div class="j2store">
-  <?php endif;?>
 		<?php include 'default_steps.php';?>
-
-
-
-  <form action="index.php" method="post" name="adminForm" id="adminForm">
-
-
-      <div class="btn-toolbar w-100 justify-content-end mb-3">
+        <form action="index.php" method="post" name="adminForm" id="adminForm">
+        <div class="btn-toolbar w-100 justify-content-end mb-3">
           <div class="filter-search-bar btn-group flex-grow-1 flex-lg-grow-0 mb-2 mb-lg-0">
               <div class="input-group w-100 me-lg-2">
 	              <?php echo  J2Html::text('search',$search,array('id'=>'search' ,'class'=>'form-control j2store-product-filters','placeholder'=>Text::_('J2STORE_FILTER_SEARCH')));?>
@@ -72,8 +56,7 @@ $search = htmlspecialchars($this->state->search);
           <div class="ordering-select d-flex gap-2 ms-lg-2 flex-grow-1 flex-lg-grow-0">
 	          <?php echo $this->pagination->getLimitBox();?>
           </div>
-      </div>
-
+        </div>
   		<?php echo J2Html::hidden('option','com_j2store');?>
 		<?php echo J2Html::hidden('view','shippingtroubles');?>
 		<?php echo J2Html::hidden('layout','default_shipping_product');?>
@@ -281,17 +264,11 @@ $search = htmlspecialchars($this->state->search);
 		<?php else:?>
 		<div class="alert alert-message"><?php echo Text::sprintf('J2STORE_SHIPPING_TROUBLESHOOT_NOTE_MESSAGE','index.php?option=com_j2store&view=shippings',J2Store::buildHelpLink('support/user-guide/standard-shipping.html', 'shipping'));?></div>
 		<?php endif;?>
-  </form>
-  </div>
-        <div class="text-center mt-3">
-            <a class="btn btn-primary" href="<?php echo Route::_('index.php?option=com_j2store&view=shippingtroubles&layout=default_shipping'); ?>">
-                <span class="fas fa-solid fa-arrow-left me-2"></span><?php echo Text::_('JPREV');?>
-            </a>
-        </div>
-  
-            <?php if (!empty($sidebar)): ?>
-         </div>
-            <?php else: ?>
-        </div>
-    <?php endif; ?>
+        </form>
+    </div>
+    <div class="text-center mt-3">
+        <a class="btn btn-primary" href="<?php echo Route::_('index.php?option=com_j2store&view=shippingtroubles&layout=default_shipping'); ?>">
+            <span class="fas fa-solid fa-arrow-left me-2"></span><?php echo Text::_('JPREV');?>
+        </a>
+    </div>
 </div>

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
  * @license GNU GPL v3 or later
  */
@@ -19,7 +19,7 @@ use Joomla\CMS\Language\Text;
                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_VISIBILITY'), 'visibility'); ?></div>
 		        <?php echo J2Html::radioBooleanList($this->form_prefix.'[visibility]', $this->item->visibility ); ?>
             </div>
-            
+
             <div class="control-group">
                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_SKU'), 'sku'); ?></div>
 			    <div class="controls">

@@ -1,36 +1,42 @@
 <?php
 /**
- * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
- * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
+
 defined('_JEXEC') or die;
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 
-
-
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/message.php';
+
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
 $platform->loadExtra('behavior.formvalidator');
-$row_class = 'row';
-$col_class = 'col-md-';
 $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.Text::_('J2STORE_INVALID_INPUT_FIELD').'</div></div></joomla-alert>' ;
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-    $alert_html = '<div class="alert alert-error alert-danger">'.Text::_('J2STORE_INVALID_INPUT_FIELD').'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
-}
 ?>
 <script  type="text/javascript">
     function insertText(value) {
-        (function ($) {
-            Joomla.editors.instances['body'].replaceSelection(value);
-        })(j2store.jQuery);
+        const editorInstance = Joomla.editors.instances['body'];
+        if (editorInstance) {
+            const currentContent = editorInstance.getValue();
+            const selection = getSelectionText(editorInstance);
+            const newContent = currentContent.replace(selection, value);
+            editorInstance.setValue(newContent);
+        }
     }
+    function getSelectionText(editorInstance) {
+        const selection = editorInstance.getSelection();
+        return selection && selection.text ? selection.text : '';
+    }
+
     Joomla.submitbutton = function(pressbutton) {
         var form = document.adminForm;
         if (pressbutton == 'cancel') {
@@ -49,8 +55,8 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
         }
     }
 </script>
-<div class="<?php echo $row_class;?>">
-    <div class="<?php echo $col_class;?>12">
+<div class="row">
+    <div class="col-12">
         <div class="j2store_<?php echo $vars->view;?>_edit">
             <form id="adminForm" class="form-horizontal form-validate" action="<?php echo $vars->action_url?>" method="post" name="adminForm">
                 <?php echo J2Html::hidden('option','com_j2store');?>
@@ -60,20 +66,12 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                 <?php endif; ?>
                 <?php echo J2Html::hidden('task', '', array('id'=>'task'));?>
                 <?php echo HTMLHelper::_( 'form.token' ); ?>
-                <div class="<?php echo $row_class;?>">
+                <div class="row">
                     <?php if(isset($vars->field_sets) && !empty($vars->field_sets)):?>
-                        <?php if (version_compare(JVERSION, '3.99.99', 'lt')):?>
-                            <?php echo JHtml::_('bootstrap.startTabSet', 'myTab', array('active' => 'basic_options')); ?>
-                        <?php else: ?>
                             <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'basic_options', 'recall' => true, 'breakpoint' => 768]); ?>
-                        <?php endif; ?>
                         <?php foreach ($vars->field_sets as $field_set):?>
                             <?php if(isset($field_set['fields']) && !empty($field_set['fields'])):?>
-                                <?php if (version_compare(JVERSION, '3.99.99', 'lt')):?>
-                                    <?php echo JHtml::_('bootstrap.addTab', 'myTab', $field_set['id'], Text::_($field_set['label'])); ?>
-                                <?php else: ?>
                                     <?php echo HTMLHelper::_('uitab.addTab', 'myTab', $field_set['id'], Text::_($field_set['label'])); ?>
-                                <?php endif; ?>
                                 <fieldset <?php echo isset($field_set['id']) && $field_set['id'] ? 'id="'.$field_set['id'].'-fieldset"': '';?> class="options-form <?php echo isset($field_set['class']) && is_array($field_set['class']) ? ' '.implode(' ',$field_set['class']): '';?>">
                                     <legend><?php echo Text::_($field_set['label']);?></legend>
                                     <div class="form-grid">
@@ -84,8 +82,8 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		                                    $style = ''; ?>
 		                                    <?php foreach ($field_set['fields'] as $field_name => $field):?>
 			                                    <?php if($field_name == 'body'):?>
-                                                    <div class="<?php echo $row_class ?>">
-                                                        <div class="<?php echo $col_class ?>9">
+                                                    <div class="row">
+                                                        <div class="col-lg-9">
                                                             <div class="control-group" style="<?php echo isset($field['style']) && !empty($field['style']) ? $field['style']: '';?>">
                                                                 <div class="w-100">
 								                                    <?php if(isset($field['type']) && in_array($field['type'],array('number','text','email','password','textarea','file','radio','checkbox','button','submit','hidden'))):?>
@@ -104,13 +102,15 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 							                                    <?php echo include_once JPATH_ADMINISTRATOR.'/components/com_j2store/views/emailtemplate/tmpl/form_tags.php' ;?>
                                                             </div>
                                                         </div>
-                                                        <div class="<?php echo $col_class ?>3" style="<?php echo isset($field['style']) && !empty($field['style']) ? $field['style']: '';?>">
-                                                            <label class="control-label"><?php echo Text::_('J2STORE_TEMPLATE_INSERT_MESSAGE_TAGS');?></label>
-                                                            <div class="input-append">
-                                                                <a class="btn btn-success" onclick="insertText(jQuery('#message_tag').prop('value'));">
+                                                        <div class="col-lg-3" style="<?php echo isset($field['style']) && !empty($field['style']) ? $field['style']: '';?>">
+                                                            <fieldset class="options-form px-3">
+                                                                <legend><?php echo Text::_('J2STORE_TEMPLATE_INSERT_MESSAGE_TAGS');?></legend>
+
+                                                                <div class="input-append mx-2">
+                                                                    <a class="btn btn-primary mb-2" onclick="insertText(jQuery('#message_tag').prop('value'));">
                                                                     <i class="icon-arrow-left"></i>
                                                                 </a>
-                                                                <select id="message_tag" size="40">
+                                                                    <select id="message_tag" size="40" class="form-control">
 								                                    <?php $message_tags = J2StoreMessage::getMessageTags();?>
 								                                    <?php if(isset($message_tags) && !empty($message_tags)):?>
 									                                    <?php foreach($message_tags as $key => $option_group):?>
@@ -125,6 +125,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 								                                    <?php endif;?>
                                                                 </select>
                                                             </div>
+                                                            </fieldset>
                                                         </div>
                                                     </div>
 			                                    <?php else:?>
@@ -152,24 +153,14 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		                                    <?php endforeach; ?>
 	                                    <?php endif; ?>
                                     </div>
-
                                 </fieldset>
-                                <?php if (version_compare(JVERSION, '3.99.99', 'lt')):?>
-                                    <?php echo JHtml::_('bootstrap.endTab'); ?>
-                                <?php else: ?>
                                     <?php echo \Joomla\CMS\HTML\HTMLHelper::_('uitab.endTab'); ?>
-                                <?php endif; ?>
                             <?php endif; ?>
                         <?php endforeach;?>
-                        <?php if (version_compare(JVERSION, '3.99.99', 'lt')):?>
-                            <?php echo JHtml::_('bootstrap.endTabSet'); ?>
-                        <?php else: ?>
                             <?php echo \Joomla\CMS\HTML\HTMLHelper::_('uitab.endTabSet'); ?>
-                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </form>
         </div>
     </div>
 </div>
-

@@ -1,27 +1,32 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
+defined('_JEXEC') or die;
 
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Factory;
 
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerManufacturers extends F0FController
 {
     use list_view;
 
-    public function execute($task) {
+    public function execute($task)
+    {
         if(in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
         return parent::execute($task);
     }
+
     function add()
     {
         $platform = J2Store::platform();
@@ -30,7 +35,7 @@ class J2StoreControllerManufacturers extends F0FController
         $this->editToolBar();
         $vars->primary_key = 'j2store_manufacturer_id';
         $vars->id = $this->getPageId();
-        $manufacturer_table = F0FTable::getInstance('Manufacturer', 'J2StoreTable')->getClone ();
+        $manufacturer_table = J2Store::fof()->loadTable('Manufacturer', 'J2StoreTable')->getClone ();
         $manufacturer_table->load($vars->id);
         $vars->item = $manufacturer_table;
         $vars->field_sets = array();
@@ -166,8 +171,8 @@ class J2StoreControllerManufacturers extends F0FController
 			});
 			";
 	    $wa->addInlineScript($script, [], []);
-
     }
+
     public function browse()
     {
         $app = Factory::getApplication();

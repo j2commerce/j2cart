@@ -1,21 +1,32 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerLengths extends F0FController
 {
     use list_view;
-    public function execute($task) {
+
+    public function execute($task)
+    {
         if(in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
         return parent::execute($task);
     }
+
     function add()
     {
         $platform = J2Store::platform();
@@ -24,16 +35,14 @@ class J2StoreControllerLengths extends F0FController
         $this->editToolBar();
         $vars->primary_key = 'j2store_length_id';
         $vars->id = $this->getPageId();
-        $length_table = F0FTable::getInstance('Length', 'J2StoreTable')->getClone ();
+        $length_table = J2Store::fof()->loadTable('Length', 'J2StoreTable')->getClone ();
         $length_table->load($vars->id);
         $vars->item = $length_table;
         $vars->field_sets = array();
         $col_class = 'col-md-';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $col_class = 'span';
-        }
         $vars->field_sets[] = array(
             'id' => 'basic_information',
+            'label' => 'COM_J2STORE_TITLE_LENGTHS_EDIT',
             'class' => array(
                 $col_class.'6'
             ),
@@ -43,36 +52,37 @@ class J2StoreControllerLengths extends F0FController
                     'type' => 'text',
                     'name' => 'length_title',
                     'value' => $length_table->length_title,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'length_unit' => array(
                     'label' => 'J2STORE_LENGTH_UNIT_LABEL',
                     'type' => 'text',
                     'name' => 'length_unit',
                     'value' => $length_table->length_unit,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'length_value' => array(
                     'label' => 'J2STORE_LENGTH_VALUE_LABEL',
                     'type' => 'number',
                     'name' => 'length_value',
                     'value' => (float)$length_table->length_value,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
                     'type' => 'enabled',
                     'name' => 'enabled',
                     'value' => $length_table->enabled,
-                    'options' => array('class' => 'input-xlarge')
+                    'options' => array('class' => '')
                 ),
             )
         );
         echo $this->_getLayout('form', $vars,'edit');
     }
+
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['length_title'] = $app->input->getString('length_title','');
@@ -123,5 +133,4 @@ class J2StoreControllerLengths extends F0FController
         $vars->pagination = $model->getPagination();
         echo $this->_getLayout('default',$vars);
     }
-
 }

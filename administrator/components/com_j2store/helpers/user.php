@@ -1,28 +1,30 @@
 <?php
-/*------------------------------------------------------------------------
- # com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Ramesh Elamathi - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
 
+defined('_JEXEC') or die;
 
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
-
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Mail\MailerFactoryInterface;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\User\UserFactory;
+use Joomla\CMS\User\UserHelper;
 
-//F0FTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_j2store/tables');
 class J2User
 {
-
 	public static $instance;
 
-	public static function getInstance($properties=null) {
-
+	public static function getInstance($properties=null)
+  {
 		if (!self::$instance)
 		{
 			self::$instance = new self($properties);
@@ -31,14 +33,14 @@ class J2User
 		return self::$instance;
 	}
 
-	function addCustomer($post) {
-		$app = JFactory::getApplication();
-		$db = JFactory::getDBO();
-		$user = JFactory::getUser();
-
+	function addCustomer($post)
+  {
+		$app = Factory::getApplication();
+		$db = Factory::getContainer()->get('DatabaseDriver');
+		$user = Factory::getApplication()->getIdentity();
 
 		//first save data to the address table
-		$row = F0FTable::getAnInstance('Address', 'J2StoreTable');
+		$row = J2Store::fof()->loadTable('Address', 'J2StoreTable');
 
 		//set the id so that it updates the record rather than changing
 		if (!$row->bind($post)) {
@@ -71,7 +73,7 @@ class J2User
 		// TODO Make this use ->load()
 
 		$success = false;
-		$database = JFactory::getDBO();
+		$database = Factory::getContainer()->get('DatabaseDriver');
 		$query = "SELECT * FROM #__users WHERE username = ".$database->quoteuote($string)." LIMIT 1";
 		$database->setQuery($query);
 		$result = $database->loadObject();
@@ -95,7 +97,7 @@ class J2User
 		}
 
 		$success = false;
-		$database = JFactory::getDBO();
+		$database = Factory::getContainer()->get('DatabaseDriver');
 
 		$query = "SELECT * FROM $table WHERE email = ".$database->quote($string)." LIMIT 1";
 		$database->setQuery($query);
@@ -106,7 +108,6 @@ class J2User
 		return $result;
 	}
 
-
 	/**
 	 * Returns yes/no
 	 * @param mixed Boolean
@@ -115,55 +116,49 @@ class J2User
 	 */
 	function createNewUser( $details, &$msg )
 	{
-		$instance = JUser::getInstance();
-
-		jimport('joomla.application.component.helper');
-		$config = JComponentHelper::getParams('com_users');
+    $userFactory = Factory::getContainer()->get(UserFactory::class);
+    $user = $userFactory->loadUserById(0);
+		$config = ComponentHelper::getParams('com_users');
 		// Default to Registered.
 		$defaultUserGroup = $config->get('new_usertype', 2);
-		if(version_compare(JVERSION, '3.2.1', 'ge')) {
-			$md5_pass = JUserHelper::hashPassword($details['password']);
-		}else {
-			$md5_pass = md5($details['password']);
-		}
+    $md5_pass = UserHelper::hashPassword($details['password']);
 
-		$instance->set('id'         , 0);
-		$instance->set('name'           , $details['name']);
-		$instance->set('username'       , $details['email']);
-		$instance->set('password' 		, $md5_pass );
-		$instance->set('email'          , $details['email']);  // Result should contain an email (check)
-		$instance->set('usertype'       , 'deprecated');
-		$instance->set('groups'     , array($defaultUserGroup));
+        $user->set('id'         , 0);
+        $user->set('name'           , $details['name']);
+        $user->set('username'       , $details['email']);
+        $user->set('password' 		, $md5_pass );
+        $user->set('email'          , $details['email']);  // Result should contain an email (check)
+        $user->set('usertype'       , 'deprecated');
+        $user->set('groups'     , array($defaultUserGroup));
         $useractivation = 0;
 		//If autoregister is set let's register the user
 		$autoregister = isset($details['autoregister']) ? $details['autoregister'] :  $config->get('autoregister', 1);
-		J2Store::plugin ()->event ( 'BeforeRegisterUserSave', array(&$instance,&$details) );
+		J2Store::plugin ()->event ( 'BeforeRegisterUserSave', array(&$user,&$details) );
 		if ($autoregister) {
-			if (!$instance->save()) {
-                J2Store::platform()->raiseError(403,$instance->getError());
+			if (!$user->save()) {
+                J2Store::platform()->raiseError(403,$user->getError());
 			}
 		}
 		else {
 			// No existing user and autoregister off, this is a temporary user.
-			$instance->set('tmp_user', true);
+            $user->set('tmp_user', true);
 		}
 
-		//$useractivation = $config->get('useractivation',0);
-
 		// Send registration confirmation mail
-		$this->_sendMail( $instance, $details, $useractivation );
+		$this->_sendMail( $user, $details, $useractivation );
 
-		return $instance;
+		return $user;
 	}
     /**
      * Save joomla privacy consent
      * */
-	function savePrivacyConsent(){
-	    $app = JFactory::getApplication();
+	function savePrivacyConsent()
+  {
+	    $app = Factory::getApplication();
         $privacy_plugin = $app->input->post->get('privacyconsent',0);
-        $user = JFactory::getUser();
+        $user = Factory::getApplication()->getIdentity();
         if($privacy_plugin && $user->id){
-            $db = JFactory::getDBo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
             // Get the user's IP address
             $ip = $_SERVER['REMOTE_ADDR'];
 
@@ -174,8 +169,8 @@ class J2User
             $userNote = (object) array(
                 'user_id' => $user->id,
                 'subject' => 'PLG_SYSTEM_PRIVACYCONSENT_SUBJECT',
-                'body'    => JText::sprintf('PLG_SYSTEM_PRIVACYCONSENT_BODY', $ip, $userAgent),
-                'created' => JFactory::getDate()->toSql(),
+                'body'    => Text::sprintf('PLG_SYSTEM_PRIVACYCONSENT_BODY', $ip, $userAgent),
+                'created' => Factory::getDate()->toSql(),
             );
 
             try
@@ -197,14 +192,13 @@ class J2User
                 'username'    => $user->username,
                 'accountlink' => 'index.php?option=com_users&task=user.edit&id=' . $user->id,
             );
-
-            JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_actionlogs/models', 'ActionlogsModel');
-            /* @var ActionlogsModelActionlog $model */
-            $model = JModelLegacy::getInstance('Actionlog', 'ActionlogsModel');
+            $model = Factory::getApplication()->bootComponent('com_actionlogs')->getMVCFactory()->createModel('Actionlog', 'Administrator');
+            //JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_actionlogs/models', 'ActionlogsModel');
+            //* @var ActionlogsModelActionlog $model */
+            // $model = JModelLegacy::getInstance('Actionlog', 'ActionlogsModel');
             $model->addLog(array($message), 'PLG_SYSTEM_PRIVACYCONSENT_CONSENT', 'plg_system_privacyconsent', $user->id);
         }
     }
-
 
 	/**
 	 * Returns yes/no
@@ -213,11 +207,11 @@ class J2User
 	 *
 	 * @return array
 	 */
-	function login( $credentials, $remember=true, $return='' ) {
+	function login( $credentials, $remember=true, $return='' )
+  {
+		$mainframe  = Factory::getApplication();
 
-		$mainframe  = JFactory::getApplication();
-
-		if (strpos( $return, 'http' ) !== false && strpos( $return, JURI::base() ) !== 0) {
+		if (strpos( $return, 'http' ) !== false && strpos( $return, Uri::base() ) !== 0) {
 			$return = '';
 		}
 
@@ -244,15 +238,16 @@ class J2User
 	 * @param mixed Boolean
 	 * @return array
 	 */
-	function logout( $return='' ) {
-		$mainframe  = JFactory::getApplication();
+	function logout( $return='' )
+  {
+		$mainframe  = Factory::getApplication();
 
 		//preform the logout action//check to see if user has a joomla account
 		//if so register with joomla userid
 		//else create joomla account
 		$success = $mainframe->logout();
 
-		if (strpos( $return, 'http' ) !== false && strpos( $return, JURI::base() ) !== 0) {
+		if (strpos( $return, 'http' ) !== false && strpos( $return, Uri::base() ) !== 0) {
 			$return = '';
 		}
 
@@ -272,7 +267,8 @@ class J2User
 	 */
 	function unblockUser($user_id, $unblock = 1)
 	{
-		$user =JFactory::getUser( (int)$user_id );
+		$userFactory = Factory::getContainer()->get(UserFactory::class);
+        $user = $userFactory->loadUserById((int)$user_id);
 
 		if ($user->get('id')) {
 			$user->set('block', !$unblock);
@@ -294,9 +290,10 @@ class J2User
 	 * @param mixed Boolean
 	 * @return array
 	 */
-	function _sendMail( &$user, $details, $useractivation ) {
-		$mainframe  = JFactory::getApplication();
-		$config = JFactory::getConfig();
+	function _sendMail( &$user, $details, $useractivation )
+  {
+		$mainframe  = Factory::getApplication();
+		$config = Factory::getApplication()->getConfig();
 
 		$name 		= $user->get('name');
 		if(empty($name)) {
@@ -307,25 +304,25 @@ class J2User
 		$activation	= $user->get('activation');
 		$password 	= $details['password2']; // using the original generated pword for the email
 
-		$usersConfig 	= JComponentHelper::getParams( 'com_users' );
-		// $useractivation = $usersConfig->get( 'useractivation' );
+		$usersConfig 	= ComponentHelper::getParams( 'com_users' );
+
 		$sitename 		=$config->get( 'sitename' );
 		$mailfrom 		= $config->get( 'mailfrom' );
 		$fromname 		= $config->get( 'fromname' );
-		$siteURL		= JURI::base();
+		$siteURL		= Uri::base();
 
-		$subject 	= JText::sprintf('J2STORE_ACCOUNT_DETAILS', $name, $sitename);
+		$subject 	= Text::sprintf('J2STORE_ACCOUNT_DETAILS', $name, $sitename);
 		$subject 	= html_entity_decode($subject, ENT_QUOTES);
 
 		$send_password = $usersConfig->get('sendpassword', 0);
 
 		if ( $useractivation == 1 ){
-			$message = JText::sprintf( 'J2STORE_SEND_MSG_ACTIVATE', $name, $sitename, $siteURL."index.php?option=com_users&task=registration.activate&token=".$activation, $siteURL, $email, $password);
+			$message = Text::sprintf( 'J2STORE_SEND_MSG_ACTIVATE', $name, $sitename, $siteURL."index.php?option=com_users&task=registration.activate&token=".$activation, $siteURL, $email, $password);
 		} else {
 			if($send_password) {
-				$message = JText::sprintf('J2STORE_SEND_MSG', $name, $sitename, $siteURL, $email, $password );
+				$message = Text::sprintf('J2STORE_SEND_MSG', $name, $sitename, $siteURL, $email, $password );
 			}else {
-				$message = JText::sprintf('J2STORE_SEND_MSG_NOPW', $name, $sitename, $siteURL, $email );
+				$message = Text::sprintf('J2STORE_SEND_MSG_NOPW', $name, $sitename, $siteURL, $email );
 			}
 		}
 
@@ -345,7 +342,7 @@ class J2User
 	{
 		$success = false;
 
-		$message =JFactory::getMailer();
+		$message = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 		$message->addRecipient( $recipient );
 		$message->setSubject( $subject );
 		$message->setBody( $body );
@@ -371,7 +368,8 @@ class J2User
 	 * @param string $confirm_password 	confirm password
 	 * @param array  $json 				json as a reference
 	 * */
-	function validatePassword($password,$confirm_password,&$json){
+	function validatePassword($password,$confirm_password,&$json)
+  {
 		$config = J2Store::config();
 		$minimumLength    =  4;
 		$minimumIntegers  =  0;
@@ -379,7 +377,7 @@ class J2User
 		$minimumUppercase =  0;
 		$is_joomla_validate = $config->get('allow_password_validation',1);
 		if($is_joomla_validate){
-			$params = JComponentHelper::getParams('com_users');
+			$params = ComponentHelper::getParams('com_users');
 			if (!empty($params))
 			{
 				$minimumLengthp    = $params->get('minimum_length');
@@ -397,7 +395,7 @@ class J2User
 			// We set a maximum length to prevent abuse since it is unfiltered.
 			if ($valueLength > 4096)
 			{
-				$json['error']['password'] = JText::_('J2STORE_PASSWORD_TOO_LONG');//JFactory::getApplication()->enqueueMessage(JText::_('COM_USERS_MSG_PASSWORD_TOO_LONG'), 'warning');
+				$json['error']['password'] = Text::_('J2STORE_PASSWORD_TOO_LONG');//Factory::getApplication()->enqueueMessage(Text::_('COM_USERS_MSG_PASSWORD_TOO_LONG'), 'warning');
 			}
 
 			// We don't allow white space inside passwords
@@ -405,7 +403,7 @@ class J2User
 
 			if (strlen($valueTrim) != $valueLength)
 			{
-				$json['error']['password'] = JText::_('J2STORE_SPACES_IN_PASSWORD');
+				$json['error']['password'] = Text::_('J2STORE_SPACES_IN_PASSWORD');
 			}
 
 		}
@@ -417,7 +415,7 @@ class J2User
 
 			if ($nInts < $minimumIntegers)
 			{
-				$json['error']['password'] = JText::plural('J2STORE_NOT_ENOUGH_INTEGERS_N', $minimumIntegers);
+				$json['error']['password'] = Text::plural('J2STORE_NOT_ENOUGH_INTEGERS_N', $minimumIntegers);
 			}
 		}
 
@@ -428,7 +426,7 @@ class J2User
 
 			if ($nsymbols < $minimumSymbols)
 			{
-				$json['error']['password'] = JText::plural('J2STORE_NOT_ENOUGH_SYMBOLS_N', $minimumSymbols);
+				$json['error']['password'] = Text::plural('J2STORE_NOT_ENOUGH_SYMBOLS_N', $minimumSymbols);
 			}
 		}
 
@@ -439,7 +437,7 @@ class J2User
 
 			if ($nUppercase < $minimumUppercase)
 			{
-				$json['error']['password'] = JText::plural('J2STORE_NOT_ENOUGH_UPPERCASE_LETTERS_N', $minimumUppercase);
+				$json['error']['password'] = Text::plural('J2STORE_NOT_ENOUGH_UPPERCASE_LETTERS_N', $minimumUppercase);
 			}
 		}
 
@@ -448,18 +446,18 @@ class J2User
 		{
 			if (strlen((string) $password) < $minimumLength)
 			{
-				$json['error']['password'] = JText::plural('J2STORE_PASSWORD_TOO_SHORT_N', $minimumLength);
+				$json['error']['password'] = Text::plural('J2STORE_PASSWORD_TOO_SHORT_N', $minimumLength);
 			}
 		}
 
 		if(empty($password)){
-			$json['error']['password'] = JText::_('J2STORE_PASSWORD_REQUIRED');
+			$json['error']['password'] = Text::_('J2STORE_PASSWORD_REQUIRED');
 		}
 		if(empty($confirm_password)){
-			$json['error']['confirm'] = JText::_('J2STORE_PASSWORD_REQUIRED');
+			$json['error']['confirm'] = Text::_('J2STORE_PASSWORD_REQUIRED');
 		}
 		if ($password != $confirm_password) {
-			$json['error']['confirm'] = JText::_('J2STORE_PASSWORDS_DOESTNOT_MATCH');
+			$json['error']['confirm'] = Text::_('J2STORE_PASSWORDS_DOESTNOT_MATCH');
 		}
 	}
 
@@ -472,8 +470,9 @@ class J2User
 		if ($user_id == 0 ) {
 			return array();
 		}
-
-		$user_groups = JFactory::getUser($user_id)->getAuthorisedGroups();
+        $userFactory = Factory::getContainer()->get(UserFactory::class);
+        $user = $userFactory->loadUserById($user_id);
+		$user_groups = $user->getAuthorisedGroups();
 		$groupNames = array();
 		if ( is_array($user_groups) && count($user_groups) > 0 ) {
 			foreach ($user_groups as $groupId ){

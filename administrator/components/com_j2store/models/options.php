@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -34,7 +34,7 @@ class J2StoreModelOptions extends F0FModel {
         }
         return $option_unique_name;
     }
-	
+
 	public function onBeforeSave(&$data, &$table){
 		if(isset($data['option_params']) && !empty($data['option_params'])){
 			$data['option_params'] = json_encode($data['option_params']);
@@ -53,7 +53,7 @@ class J2StoreModelOptions extends F0FModel {
 		if (parent::save ( $data )) {
 			if ($this->otable->j2store_option_id) {
 				if(is_object($data)) {
-					$data = (array) $data; 
+					$data = (array) $data;
 				}
 				if (isset ( $data ['option_value'] ) && count ( $data ['option_value'] )) {
 
@@ -152,14 +152,14 @@ class J2StoreModelOptions extends F0FModel {
 			if($params->get('hide_pastdates', 0)) {
 				$now = JFactory::getDate('now', $tz);
 				$date = JFactory::getDate($value, $tz);
-				
+
 				$interval = $now->diff($date);
 				//	print_r($interval);
 				$val = (int) $interval->format('%R%a');
-				//echo $interval->format('%R%a');				
+				//echo $interval->format('%R%a');
 				if($val < 0) {
 					$errors['error']['option'][$option->j2store_productoption_id] = JText::_('J2STORE_DATE_VALIDATION_ERROR_PAST_DATE');
-				} 
+				}
 			}
 		}
 		J2Store::plugin()->event('ValidateOptionRules', array($value, $option, $errors));

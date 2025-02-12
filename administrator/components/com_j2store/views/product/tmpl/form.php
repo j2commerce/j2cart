@@ -1,21 +1,22 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
-
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/input.php');
+
 $platform = J2Store::platform();
-
-
-
 $app = Factory::getApplication();
 $option = $app->input->getString('option');
 $platform = J2Store::platform();
@@ -25,6 +26,9 @@ $col_class = 'col-md-';
 $product_type_class = 'badge bg-success';
 $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.Text::_('J2STORE_INVALID_INPUT_FIELD').'</div></div></joomla-alert>' ;
 
+$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+$style = '.j2store-product-edit-form .input-group .form-check.form-switch .form-check-input{min-width:0;}';
+$wa->addInlineStyle($style, [], []);
 ?>
 <script type="text/javascript">
     Joomla.submitbutton = function(pressbutton) {
@@ -61,7 +65,6 @@ $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" rol
     }
 </script>
 
-
 <div class="j2store">
     <div class="j2store-product-edit-form">
         <div class="<?php echo $row_class;?>">
@@ -74,7 +77,7 @@ $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" rol
                         <div class="form-grid">
                             <div class="control-group" id="j2store-product-enable">
                                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_TREAT_AS_PRODUCT'), 'enabled',array());?></div>
-		                        <?php echo J2Html::radioBooleanList($this->form_prefix.'[enabled]', $this->item->enabled, array('id'=>'j2store-product-enabled-radio-group', 'class'=>'form-check form-check-inline'));?>
+		                        <?php echo J2Html::radioBooleanList($this->form_prefix.'[enabled]', $this->item->enabled, array('id'=>'j2store-product-enabled-radio-group', 'class'=>'form-check form-check-inline','hide_label'=>true));?>
                             </div>
                             <div class="control-group" id="j2store-product-type">
 		                        <?php if(!empty($this->item->product_type)): ?>
@@ -147,12 +150,10 @@ $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" rol
         </div>
         <input type="hidden" name="<?php echo $this->form_prefix.'[j2store_product_id]'?>" value="<?php echo $this->item->j2store_product_id; ?>" />
 
-
-
         <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
             <div class="card j2store-product-shortcodes">
                 <div class="card-header justify-content-between">
-                    <h3 class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_DETAILS'); ?></h3>
+                    <h3 class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_TYPE_'.strtoupper($this->item->product_type)); ?></h3>
                 </div>
                 <div class="card-body">
                     <?php echo $this->loadTemplate($this->item->product_type); ?>
@@ -160,11 +161,10 @@ $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" rol
                 </div>
             </div>
         <?php endif; ?>
-    </div> <!--  end of J2Store Product Form -->
+    </div>
 </div>
 <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
     <script type="text/javascript">
-
         (function($) {
             $(document).on("click","#j2storeConfirmChange #changeTypeBtn", function(e) {
                 $.ajax({
@@ -216,6 +216,4 @@ $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" rol
         $('#j2store-product-enable').trigger('change');
 
     })(jQuery);
-
-
 </script>

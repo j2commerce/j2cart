@@ -1,18 +1,29 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Uri\Uri;
+
 /** Import library dependencies */
 if (!defined('F0F_INCLUDED')) {
     require_once JPATH_LIBRARIES . '/f0f/include.php';
 }
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/helpers/j2store.php');
 
-class J2StorePluginBase extends \JPlugin
+class J2StorePluginBase extends CMSPlugin
 {
     /**
      * @var $_element  string  Should always correspond with the plugin's filename,
@@ -102,7 +113,6 @@ class J2StorePluginBase extends \JPlugin
      */
     function _getLayout($layout, $vars = false, $plugin = '', $group = 'j2store')
     {
-
         if (empty($plugin)) {
             $plugin = $this->_element;
         }
@@ -115,7 +125,6 @@ class J2StorePluginBase extends \JPlugin
 
         return $html;
     }
-
 
     /**
      * Get the path to a layout file
@@ -135,8 +144,8 @@ class J2StorePluginBase extends \JPlugin
         $defaultPath = JPATH_SITE . '/plugins/' . $group . '/' . $plugin . '/' . $plugin . '/tmpl/' . $layout . '.php';
 
         // if the site template has a layout override, use it
-        jimport('joomla.filesystem.file');
-        if (JFile::exists($templatePath)) {
+
+        if (file_exists($templatePath)) {
             return $templatePath;
         } else {
             return $defaultPath;
@@ -170,7 +179,7 @@ class J2StorePluginBase extends \JPlugin
      */
     function _checkToken($suffix = '', $method = 'post')
     {
-        $token = JUtility::getToken();
+        $token = Session::getFormToken();
         $token .= "." . strtolower($suffix);
         $app = J2Store::platform()->application();
         if ($app->input->get($token, '', $method, 'alnum')) {
@@ -188,7 +197,7 @@ class J2StorePluginBase extends \JPlugin
      */
     function _getToken($suffix = '')
     {
-        $token = JSession::getFormToken();
+        $token = Session::getFormToken();
         $token .= "." . strtolower($suffix);
         $html = '<input type="hidden" name="' . $token . '" value="1" />';
         $html .= '<input type="hidden" name="tokenSuffix" value="' . $suffix . '" />';
@@ -223,7 +232,6 @@ class J2StorePluginBase extends \JPlugin
         $paths[] = JPATH_SITE . '/plugins/j2store/' . $this->_element . '/' . $this->_element . '/models';
     }
 
-
     /**
      * Include a particular Custom Model
      * @param $name - name of the model
@@ -241,7 +249,6 @@ class J2StorePluginBase extends \JPlugin
         }
         J2Store::fof()->loadModelFilePath(JPATH_SITE . '/plugins/j2store/' . $this->_element . '/' . $this->_element . '/models');
     }
-
 
     public function getCountryById($country_id)
     {
@@ -284,7 +291,7 @@ class J2StorePluginBase extends \JPlugin
      */
     function _getAdmins()
     {
-        $db = JFactory::getDBO();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('u.name, u.email');
         $query->from('#__users AS u');
@@ -295,7 +302,7 @@ class J2StorePluginBase extends \JPlugin
         $db->setQuery($query);
         $admins = $db->loadObjectList();
         if ($error = $db->getErrorMsg()) {
-            JFactory::getApplication()->enqueueMessage($error);
+            Factory::getApplication()->enqueueMessage($error);
             return false;
         }
 
@@ -316,7 +323,7 @@ class J2StorePluginBase extends \JPlugin
                 $text = json_encode($text);
             }
             $file = JPATH_ROOT . "/cache/{$this->_element}.log";
-            $date = JFactory::getDate();
+            $date = Factory::getDate();
 
             $f = fopen($file, 'a');
             fwrite($f, "\n\n" . $date->format('Y-m-d H:i:s'));
@@ -336,7 +343,7 @@ class J2StorePluginBase extends \JPlugin
             $plugin = $this->getPluginData($id);
             require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/helpers/license.php');
             $license_helper = J2License::getInstance();
-            $baseURL = str_replace('/administrator', '', JURI::base());
+            $baseURL = str_replace('/administrator', '', Uri::base());
             $params = array(
                 'license' => $license,
                 'url' => $baseURL,
@@ -346,7 +353,7 @@ class J2StorePluginBase extends \JPlugin
             $response = $license_helper->activateLicense($params);
             if(is_null($response)){
                 $data['success'] = false;
-                $data['message'] = JText::_('J2STORE_LICENSE_ACTIVATION_FAILED');
+                $data['message'] = Text::_('J2STORE_LICENSE_ACTIVATION_FAILED');
                 $data['response'] = $response;
                 $this->saveparams($plugin,$data);
                 echo json_encode($data);
@@ -354,21 +361,21 @@ class J2StorePluginBase extends \JPlugin
             }
             if (is_array($response) && $response['success'] == false) {
                 $data['success'] = false;
-                $data['message'] = JText::_('J2STORE_LICENSE_INVALID');
+                $data['message'] = Text::_('J2STORE_LICENSE_INVALID');
                 $data['response'] = $response;
                 $this->saveparams($plugin,$data);
                 echo json_encode($data);
                 exit;
             }
             $data['success'] = true;
-            $data['message'] = JText::_('J2STORE_LICENSE_ACTIVATED');
+            $data['message'] = Text::_('J2STORE_LICENSE_ACTIVATED');
             $data['response'] = $response;
             $this->saveparams($plugin,$data);
             echo json_encode($data);
             exit;
         }
         $data['success'] = false;
-        $data['message'] = JText::_('J2STORE_LICENSE_ACTIVATION_FAILED');
+        $data['message'] = Text::_('J2STORE_LICENSE_ACTIVATION_FAILED');
         echo json_encode($data);
         exit;
     }
@@ -384,7 +391,7 @@ class J2StorePluginBase extends \JPlugin
             $plugin = $this->getPluginData($id);
             require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/helpers/license.php');
             $license_helper = J2License::getInstance();
-            $baseURL = str_replace('/administrator', '', JURI::base());
+            $baseURL = str_replace('/administrator', '', Uri::base());
             $params = array(
                 'license' => $license,
                 'url' => $baseURL,
@@ -394,7 +401,7 @@ class J2StorePluginBase extends \JPlugin
             $response = $license_helper->deActivateLicense($params);
             if(is_null($response)){
                 $data['success'] = false;
-                $data['message'] = JText::_('J2STORE_LICENSE_DEACTIVATION_FAILED');
+                $data['message'] = Text::_('J2STORE_LICENSE_DEACTIVATION_FAILED');
                 $data['response'] = $response;
                 $this->saveparams($plugin,$data);
                 echo json_encode($data);
@@ -402,48 +409,52 @@ class J2StorePluginBase extends \JPlugin
             }
             if (is_array($response) && $response['success'] == false) {
                 $data['success'] = false;
-                $data['message'] = JText::_('J2STORE_LICENSE_DEACTIVATION_FAILED');
+                $data['message'] = Text::_('J2STORE_LICENSE_DEACTIVATION_FAILED');
                 $data['response'] = $response;
                 $this->saveparams($plugin,$data);
                 echo json_encode($data);
                 exit;
             }
             $data['success'] = true;
-            $data['message'] = JText::_('J2STORE_LICENSE_DEACTIVATED');
+            $data['message'] = Text::_('J2STORE_LICENSE_DEACTIVATED');
             $data['response'] = $response;
             $this->saveparams($plugin,$data);
             echo json_encode($data);
             exit;
         }
         $data['success'] = false;
-        $data['message'] = JText::_('J2STORE_LICENSE_DEACTIVATION_FAILED');
+        $data['message'] = Text::_('J2STORE_LICENSE_DEACTIVATION_FAILED');
         echo json_encode($data);
         exit;
     }
-    function getModuleParam($extension_name){
+
+    function getModuleParam($extension_name)
+    {
         if (empty($extension_name)) {
             return;
         }
-        $db = \Joomla\CMS\Factory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select("*")->from('#__modules')
             ->where($db->qn('module') . ' = ' . $db->q($extension_name));
         $db->setQuery($query);
         return $db->loadObject();
     }
+
     function getPluginData($extension_id)
     {
         if ($extension_id <= 0) {
             return;
         }
-        $db = \Joomla\CMS\Factory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select("*")->from('#__extensions')->where('extension_id=' . (int)$extension_id);
         $db->setQuery($query);
         return $db->loadObject();
     }
 
-    function saveparams($plugin,$data){
+    function saveparams($plugin,$data)
+    {
         $platform = J2Store::platform();
         $app = $platform->application();
         $post = $app->input->getArray($_POST);
@@ -461,7 +472,7 @@ class J2StorePluginBase extends \JPlugin
             $save_params = $platform->getRegistry(json_encode($plugin_data));
             $json = $save_params->toString();
         }
-        $db = JFactory::getDbo ();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         if($is_module){
             $query = $db->getQuery(true)->update($db->qn('#__modules'))->set($db->qn('params') . ' = ' . $db->q($json))->where($db->qn('id') . ' = ' . $db->q($plugin->id))->where($db->qn('module') . ' = ' . $db->q($plugin->element));
         }else{

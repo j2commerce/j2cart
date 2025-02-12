@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -113,7 +113,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 			</div>
 
 		</div>
-	</div>	
+	</div>
 		<div class="<?php echo $col_class ?>4">
 		<div id="baddress-info">
 			<?php

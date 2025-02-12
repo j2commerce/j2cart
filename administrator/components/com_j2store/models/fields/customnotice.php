@@ -1,25 +1,31 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
-/* class JFormFieldFieldtypes extends JFormField */
-class JFormFieldCustomNotice extends JFormField 
+
+use Joomla\CMS\Form\FormField;
+
+class JFormFieldCustomNotice extends FormField
 {
 	protected $type = 'customnotice';
-	
-	public function getInput() {
-		
+
+	public function getInput()
+    {
 		$html = '';
 		$html .= '<div class="alert alert-block alert-info"><strong>'.$this->getTitle().'</strong></div>';
 		return  $html;
 	}
-	
-	public function getLabel() {
+
+	public function getLabel()
+    {
 		return '';
 	}
-	
 }

@@ -1,12 +1,15 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
-/* class JFormFieldFieldtypes extends JFormField */
 
 class JFormFieldCustomerdetail extends F0FFormFieldText
 {
@@ -19,7 +22,7 @@ class JFormFieldCustomerdetail extends F0FFormFieldText
 
 	public function getRepeatable()
 	{
-		$orderinfo = F0FTable::getAnInstance('Orderinfo','J2StoreTable');
+		$orderinfo = J2Store::fof()->loadTable('Orderinfo','J2StoreTable');
 		$orderinfo->load(array('order_id' => $this->item->order_id));
 		$customer_name = $orderinfo->billing_first_name .' '. $orderinfo->billing_last_name;
 		$html ='';

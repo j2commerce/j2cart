@@ -1,27 +1,32 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Installer\Installer;
 
 class J2StoreControllerApps extends F0FController
 {
-	protected $cacheableTasks = array();
+	protected $cacheableTasks = [];
 
 	public function execute($task)
 	{
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		$appTask = $app->input->getCmd('appTask', '');
 		$values = $app->input->getArray($_POST);
         $this->uninstall_plugin();
 		// Check if we are in a report method view. If it is so,
-		// Try lo load the report plugin controller (if any)
-		if ( $task  == "view" && $appTask != '' )
+		// Try to load the report plugin controller (if any)
+		if ($task  === "view" && $appTask !== '' )
 		{
 			$model = $this->getModel('Apps');
 
@@ -70,12 +75,13 @@ class J2StoreControllerApps extends F0FController
 		}
 	}
 
-	function uninstall_plugin(){
-        $uninstall_plugins = array(
+	function uninstall_plugin()
+  {
+        $uninstall_plugins =  [
             'app_campaignrabbit' => 'j2store',
             'campaignrabbit' => 'system',
-            'app_retainfulcoupon' => 'j2store'
-        );
+            'app_retainfulcoupon' => 'j2store',
+        ];
         $db = Factory::getContainer()->get('DatabaseDriver');
         foreach ($uninstall_plugins as $plugin => $folder)
         {
@@ -99,7 +105,7 @@ class J2StoreControllerApps extends F0FController
             if ($id)
             {
                 try{
-                    $installer = new JInstaller;
+                    $installer = new Installer;
                     $installer->uninstall('plugin', $id, 1);
                 }catch (Exception $e){
 
@@ -109,7 +115,8 @@ class J2StoreControllerApps extends F0FController
         }
     }
 
-	function view(){
+	function view()
+  {
 		$model = $this->getThisModel();
 		$id = $this->input->getInt('id');
 		$row = $model->getItem($id);
@@ -119,7 +126,4 @@ class J2StoreControllerApps extends F0FController
 		$view->setLayout( 'view' );
 		$view->display();
 	}
-
-
-
 }

@@ -1,30 +1,39 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
 
 class J2StoreControllerCrons extends F0FController
 {
 
-	protected $cacheableTasks = array();
+	protected $cacheableTasks = [];
 
-	function __construct() {
+	function __construct()
+  {
 		$config['csrfProtection'] = 0;
 		parent::__construct($config);
-		$this->cacheableTasks = array();
+		$this->cacheableTasks = [];
 	}
 
-	function execute($task) {
+	function execute($task)
+  {
 		$this->cron();
 	}
 
-	public function cron(){
+	public function cron()
+  {
 		// Makes sure SiteGround's SuperCache doesn't cache the CRON view
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		$app->setHeader('X-Cache-Control', 'False', true);
 		$cron_key = J2Store::config ()->get ( 'queue_key','' );
 
@@ -46,8 +55,8 @@ class J2StoreControllerCrons extends F0FController
 			header('HTTP/1.1 501 Not implemented');
 			$app->close (501);
 		}
-        $tz = JFactory::getConfig()->get('offset');
-        $now_date = JFactory::getDate('now', $tz);
+        $tz = Factory::getApplication()->getConfig()->get('offset');
+        $now_date = Factory::getDate('now', $tz);
         $last_trigger = array(
             'date' => $now_date->toSql (),
             'url' => isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI']: '',

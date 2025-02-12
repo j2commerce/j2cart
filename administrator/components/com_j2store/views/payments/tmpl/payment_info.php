@@ -1,43 +1,47 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
-$row_class = 'row';
-$col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-}
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Language\Text;
 ?>
-<div class="payment-content inline-content">
-    <div class="<?php echo $row_class; ?>">
-        <div class="<?php echo $col_class ?>6">
+<div class="payment-content inline-content my-5">
+    <div class="row">
+        <div class="col-md-6 align-self-stretch mb-3 mb-lg-0">
+            <div class="d-flex flex-column text-center h-100">
+                <div class="mt-auto">
+                    <span class="fa-4x mb-2 fa-solid fas fa-circle-info"></span>
+                    <h2 class="fs-1 fw-bold"><?php echo Text::_('J2STORE_PAYMENT_HELP_TITLE');?></h2>
+                    <p class="fs-3 text-muted mb-5"><?php echo Text::_('J2STORE_PAYMENT_HELP_DESC');?></p>
+                </div>
 
-            <div class="hero-unit">
-                <h2>Need help in setting up payment methods ?</h2>
-                <p class="lead">
-                    Check our comprehensive user guide
-                </p>
-                <a onclick="return ! window.open(this.href);" class="btn btn-large btn-warning" href="<?php echo J2Store::buildHelpLink('support/user-guide.html', 'gateways'); ?>">User guide</a>
-                <a onclick="return ! window.open(this.href);" class="btn btn-large btn-info" href="<?php echo J2Store::buildHelpLink('support.html', 'gateways'); ?>">Support center</a>
+                <div class="text-center mt-auto mb-4">
+                    <a class="btn btn-outline-primary app-button-open" href="<?php echo J2Store::buildHelpLink('payment-methods', 'payment'); ?>" target="_blank"><span class="fas fa-solid fa-arrow-up-right-from-square me-2"></span><?php echo Text::_('J2STORE_PAYMENT_HELP_BUTTON_GUIDE_LABEL'); ?></a>
+                    <a class="btn btn-primary app-button-open" href="<?php echo J2Store::buildSiteLink('support', 'support'); ?>" target="_blank"><span class="fas fa-solid fa-arrow-up-right-from-square me-2"></span><?php echo Text::_('J2STORE_SHIPPING_HELP_BUTTON_SUPPORT_LABEL'); ?></a>
+                </div>
             </div>
 
         </div>
-        <div class="<?php echo $col_class ?>6">
-            <div class="hero-unit">
-                <h2>Looking for more payment options? Check our extensions directory</h2>
-                <p class="lead">
-                    J2Store is integrated with 65+ payment gateways across the world.
-                    <br>
-                    Find more at our extensions directory
-                </p>
-                <a onclick="return ! window.open(this.href);" class="btn btn-large btn-success" href="<?php echo J2Store::buildHelpLink('extensions/payment-plugins.html', 'gateways'); ?>">Get more payment plugins</a>
+        <div class="col-md-6 align-self-stretch">
+            <div class="d-flex flex-column text-center h-100">
+                <div class="mt-auto">
+                    <span class="fa-4x mb-2 fa-solid fas fa-credit-card"></span>
+                    <h2 class="fs-1 fw-bold"><?php echo Text::_('J2STORE_PAYMENT_APPS_TITLE');?></h2>
+                    <p class="fs-3 text-muted mb-5"><?php echo Text::_('J2STORE_PAYMENT_APPS_DESC');?></p>
+                </div>
+
+                <div class="text-center mt-auto mb-4">
+                    <a class="btn btn-outline-primary app-button-open" href="<?php echo J2Store::buildSiteLink('extensions/payment-plugins', 'gateways'); ?>" target="_blank"><span class="fas fa-solid fa-arrow-up-right-from-square me-2"></span><?php echo Text::_('J2STORE_PAYMENT_APPS_BUTTON_LABEL'); ?></a>
+                </div>
             </div>
         </div>
-
     </div>
 </div>

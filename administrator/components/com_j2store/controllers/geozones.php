@@ -1,19 +1,31 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+
 jimport('joomla.application.component.controllerform');
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerGeozones extends F0FController
 {
     use list_view;
+
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['geozone_name'] = $app->input->getString('geozone_name','');
@@ -53,21 +65,19 @@ class J2StoreControllerGeozones extends F0FController
         echo $this->_getLayout('default',$vars);
     }
 
-	function getZone() {
-
-	    $app=JFactory::getApplication();
+	function getZone()
+  {
+	    $app = Factory::getApplication();
 		$data = $app->input->post->get('jform',array(),'array');
 		$country_id =isset($data['country_id'])?$data['country_id']:$app->input->getInt('country_id', '0');
 		$zone_id = isset($data['zone_id'])?$data['zone_id']:$app->input->getInt('zone_id');
 		$z_fname =isset($data['field_name'])?$data['field_name']:$app->input->getString('field_name');
 		$z_id = isset($data['field_id'])?$data['field_id']:$app->input->getString('field_id');
 
-
-
 		// based on the country id, get zones and generate a select box
 		if(!empty($country_id))
 		{
-			$db = JFactory::getDBO();
+			$db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery(true);
 			$query->select('j2store_zone_id,zone_name');
 			$query->from('#__j2store_zones');
@@ -75,18 +85,18 @@ class J2StoreControllerGeozones extends F0FController
 			$db->setQuery((string)$query);
 			$zoneList = $db->loadObjectList();
 			$options = array();
-			$options[] = JHtml::_('select.option', 0,JTEXT::_('J2STORE_ALL_ZONES'));
+			$options[] = HTMLHelper::_('select.option', 0,Text::_('J2STORE_ALL_ZONES'));
 			if ($zoneList)
 			{
 				foreach($zoneList as $zone)
 				{
 					// this is only to generate the <option> tag inside select tag da i have told n times
-					$options[] = JHtml::_('select.option', $zone->j2store_zone_id,$zone->zone_name);
+					$options[] = HTMLHelper::_('select.option', $zone->j2store_zone_id,$zone->zone_name);
 				}
 			}
 			// now we must generate the select list and echo that... wait
 			//$z_fname='jform[state_id]';
-			$zoneList = JHtml::_('select.genericlist', $options, $z_fname, '', 'value', 'text',$zone_id,$z_id);
+			$zoneList = HTMLHelper::_('select.genericlist', $options, $z_fname, '', 'value', 'text',$zone_id,$z_id);
 			echo $zoneList;
 		}
 		$app->close();
@@ -97,22 +107,20 @@ class J2StoreControllerGeozones extends F0FController
 	 * Geo Rule of GeoZones
 	 * @params
 	 */
-
-	function removeGeozoneRule(){
-
-		$app = JFactory::getApplication();
+	function removeGeozoneRule()
+  {
+		$app = Factory::getApplication();
 		$post = $app->input->getArray($_POST);
 		$georule_id = $post['rule_id'];
-		$georuleTable = F0FTable::getInstance('geozonerule','Table');
+		$georuleTable = J2Store::fof()->loadTable('geozonerule','Table');
 		$json=array();
 		if(!$georuleTable->delete($georule_id)){
 			$json['msg'] = $georuleTable->getError();
 		}else{
-			$json['msg'] = JText::_('J2STORE_GEORULE_DELETED_SUCCESSFULLY');
+			$json['msg'] = Text::_('J2STORE_GEORULE_DELETED_SUCCESSFULLY');
 		}
 		echo json_encode($json);
 		$app->close();
-
 	}
 
 	/**
@@ -129,7 +137,7 @@ class J2StoreControllerGeozones extends F0FController
         $cids = $app->input->get('cid', array(), 'ARRAY');
         $link = 'index.php?option=com_j2store&view=geozones';
         $msg_type = 'warning';
-        $msg = JText::_('J2STORE_ERROR_IN_IMPORTING');
+        $msg = Text::_('J2STORE_ERROR_IN_IMPORTING');
         if (isset($geozone_id) && $geozone_id) {
 
             foreach ($cids as $cid) {
@@ -139,17 +147,15 @@ class J2StoreControllerGeozones extends F0FController
                 $geozoneRule->zone_id = 0;
                 try {
                     $geozoneRule->store();
-                    $msg = JText::_('J2STORE_IMPORTED_SUCCESSFULLY');
+                    $msg = Text::_('J2STORE_IMPORTED_SUCCESSFULLY');
                 } catch (Exception $e) {
                     //$msg = $e;
                 }
             }
             $link = 'index.php?option=com_j2store&view=countries&layout=modal&task=elements&tmpl=component&geozone_id=' . $geozone_id;
             $msg_type = 'message';
-
         }
         $platform->redirect($link, $msg, $msg_type);
-
     }
 
 	/**
@@ -165,7 +171,7 @@ class J2StoreControllerGeozones extends F0FController
         $cids = $app->input->get('cid', array(), 'ARRAY');
         $link = 'index.php?option=com_j2store&view=geozones';
         $msg_type = 'warning';
-        $msg = JText::_('J2STORE_ERROR_IN_IMPORTING');
+        $msg = Text::_('J2STORE_ERROR_IN_IMPORTING');
         if (isset($geozone_id) && $geozone_id && isset($country_id) && $country_id) {
             foreach ($cids as $cid) {
                 $geozoneRule = $fof_helper->loadTable('Geozonerule', 'J2StoreTable');
@@ -176,7 +182,7 @@ class J2StoreControllerGeozones extends F0FController
             }
             $link = 'index.php?option=com_j2store&view=zones&layout=modal&task=elements&tmpl=component&geozone_id=' . $geozone_id;
             $msg_type = 'message';
-            $msg = JText::_('J2STORE_IMPORTED_SUCCESSFULLY');
+            $msg = Text::_('J2STORE_IMPORTED_SUCCESSFULLY');
         }
         $platform->redirect($link, $msg, $msg_type);
     }

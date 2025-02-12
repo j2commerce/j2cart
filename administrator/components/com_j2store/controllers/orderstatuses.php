@@ -1,21 +1,34 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerOrderstatuses extends F0FController
 {
     use list_view;
-    public function execute($task) {
+
+    public function execute($task)
+    {
         if(in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
         return parent::execute($task);
     }
+
     function add()
     {
         $platform = J2Store::platform();
@@ -24,16 +37,14 @@ class J2StoreControllerOrderstatuses extends F0FController
         $this->editToolBar();
         $vars->primary_key = 'j2store_orderstatus_id';
         $vars->id = $this->getPageId();
-        $orderstatus_table = F0FTable::getInstance('Orderstatus', 'J2StoreTable')->getClone ();
+        $orderstatus_table = J2Store::fof()->loadTable('Orderstatus', 'J2StoreTable')->getClone ();
         $orderstatus_table->load($vars->id);
         $vars->item = $orderstatus_table;
         $vars->field_sets = array();
         $col_class = 'col-md-';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $col_class = 'span';
-        }
         $vars->field_sets[] = array(
             'id' => 'basic_information',
+            'label' => 'COM_J2STORE_TITLE_ORDERSTATUSES_EDIT',
             'class' => array(
                 $col_class.'12'
             ),
@@ -43,29 +54,30 @@ class J2StoreControllerOrderstatuses extends F0FController
                     'type' => 'text',
                     'name' => 'orderstatus_name',
                     'value' => $orderstatus_table->orderstatus_name,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'orderstatus_cssclass' => array(
                     'label' => 'J2STORE_ORDERSTATUS_LABEL',
                     'type' => 'text',
                     'name' => 'orderstatus_cssclass',
                     'value' => $orderstatus_table->orderstatus_cssclass,
-                    'options' => array('class' => 'inputbox')
+                    'options' => array('class' => 'form-control')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
                     'type' => 'enabled',
                     'name' => 'enabled',
                     'value' => $orderstatus_table->enabled,
-                    'options' => array('class' => 'input-xlarge')
+                    'options' => array('class' => '')
                 ),
             )
         );
         echo $this->_getLayout('form', $vars,'edit');
     }
+
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['orderstatus_name'] = $app->input->getString('orderstatus_name','');
@@ -83,11 +95,11 @@ class J2StoreControllerOrderstatuses extends F0FController
         $vars->state = $model->getState();
         $option = $app->input->getCmd('option', 'com_foobar');
         $subtitle_key = strtoupper($option . '_TITLE_' . $app->input->getCmd('view', 'cpanel'));
-        JToolBarHelper::title(JText::_(strtoupper($option)) . ': ' . JText::_($subtitle_key), str_replace('com_', '', $option));
-        JToolBarHelper::addNew();
-        JToolBarHelper::editList();
-        $msg = JText::_($option . '_CONFIRM_DELETE');
-        JToolBarHelper::deleteList(strtoupper($msg));
+        ToolbarHelper::title(Text::_(strtoupper($option)) . ': ' . Text::_($subtitle_key), str_replace('com_', '', $option));
+        ToolbarHelper::addNew();
+        ToolbarHelper::editList();
+        $msg = Text::_($option . '_CONFIRM_DELETE');
+        ToolbarHelper::deleteList(strtoupper($msg));
         $header = array(
             'j2store_orderstatus_id' => array(
                 'type' => 'rowselect',
@@ -119,5 +131,4 @@ class J2StoreControllerOrderstatuses extends F0FController
         $vars->pagination = $model->getPagination();
         echo $this->_getLayout('default',$vars);
     }
-
 }

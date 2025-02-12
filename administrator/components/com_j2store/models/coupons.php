@@ -1,21 +1,27 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 
-class J2StoreModelCoupons extends F0FModel {
-
+class J2StoreModelCoupons extends F0FModel
+{
 	public $code = '';
 	public $coupon = false;
 	public $limit_usage_to_x_items = '';
 
-	protected function onBeforeSave(&$data, &$table) {
+	protected function onBeforeSave(&$data, &$table)
+    {
         $status = true ;
         $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true)
@@ -26,22 +32,22 @@ class J2StoreModelCoupons extends F0FModel {
         $db->setQuery($query);
         $coupon_code = $db->loadResult();
         if(isset($coupon_code) && !empty ($coupon_code)){
-            $this->setError(JText::_("J2STORE_COUPON_CODE_IS_ALREADY_USED"));
+            $this->setError(Text::_("J2STORE_COUPON_CODE_IS_ALREADY_USED"));
             $status = false;
         }
 
         if((isset($data['coupon_name']) && empty($data['coupon_name'])) || (isset($data['coupon_code']) && empty($data['coupon_code']))){
-            $this->setError(JText::_("J2STORE_REQUIRED_FIELD_EMPTY"));
+            $this->setError(Text::_("J2STORE_REQUIRED_FIELD_EMPTY"));
             $status = false;
         }
 
         if( isset($data['valid_from']) && ($data['valid_from'] != '0000-00-00 00:00:00') && isset($data['valid_to']) && ($data['valid_to'] != '0000-00-00 00:00:00') && ($data['valid_from'] >= $data['valid_to'] )){
-              $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
+              $this->setError(Text::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
               $status = false;
         }
 
         if( ($data['valid_to'] != '0000-00-00 00:00:00' && $data['valid_from'] == '0000-00-00 00:00:00' )){
-            $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
+            $this->setError(Text::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
             $status = false;
         }
 
@@ -91,8 +97,8 @@ class J2StoreModelCoupons extends F0FModel {
 		$record->user_group = explode(',',$record->user_group);
 	}
 
-	public function init() {
-
+	public function init()
+    {
 		// sanity check
 		$this->code = $this->get_coupon ();
 		if (empty ( $this->code ))
@@ -102,7 +108,7 @@ class J2StoreModelCoupons extends F0FModel {
 		if(!is_array($couponsets)) $couponsets = array();
 
 		if (!isset($couponsets[$this->code])) {
-			$db = JFactory::getDbo ();
+			$db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery ( true )->select ( '*' )->from ( '#__j2store_coupons' )->where ( 'coupon_code = ' . $db->q ( $this->code ) )->where('enabled = 1');
 			$db->setQuery ( $query );
 			try {
@@ -120,8 +126,8 @@ class J2StoreModelCoupons extends F0FModel {
 		return true;
 	}
 
-	public function get_coupon_history($coupon_id, $user_id='') {
-
+	public function get_coupon_history($coupon_id, $user_id='')
+    {
 		static $history;
 		if(!is_array($history)) $history= array();
 
@@ -142,8 +148,8 @@ class J2StoreModelCoupons extends F0FModel {
 		return $history[$coupon_id][$user_id];
 	}
 
-
-	public function is_valid($order) {
+	public function is_valid($order)
+    {
 		try {
             $coupon_status = false;
             J2Store::plugin()->event('BeforeCouponIsValid', array($this, $order,&$coupon_status));
@@ -163,14 +169,13 @@ class J2StoreModelCoupons extends F0FModel {
 			//allow plugins to run their own course.
 			$results = J2Store::plugin()->event('CouponIsValid', array($this, $order));
 			if (in_array(false, $results, false)) {
-				throw new Exception( JText::_('J2STORE_COUPON_NOT_APPLICABLE'));
+				throw new Exception( Text::_('J2STORE_COUPON_NOT_APPLICABLE'));
 				$this->remove_coupon();
 				return false;
 			}
 		} catch ( Exception $e ) {
 			$this->setError($e->getMessage());
-			//var_dump($e->getMessage());
-			JFactory::getApplication()->enqueueMessage($e->getMessage());
+			Factory::getApplication()->enqueueMessage($e->getMessage());
 			//clear the coupon code
 			$this->remove_coupon();
 			return false;
@@ -178,7 +183,8 @@ class J2StoreModelCoupons extends F0FModel {
 		return true;
 	}
 
-	public function is_admin_valid($order){
+	public function is_admin_valid($order)
+    {
 		try {
 			$this->validate_enabled ();
 			$this->validate_exists();
@@ -188,14 +194,14 @@ class J2StoreModelCoupons extends F0FModel {
 			//allow plugins to run their own course.
 			$results = J2Store::plugin()->event('CouponIsValid', array($this, $order));
 			if (in_array(false, $results, false)) {
-				throw new Exception( JText::_('J2STORE_COUPON_NOT_APPLICABLE'));
+				throw new Exception( Text::_('J2STORE_COUPON_NOT_APPLICABLE'));
 				$this->remove_coupon();
 				return false;
 			}
 		}catch (Exception $e){
 			$this->setError($e->getMessage());
 			//var_dump($e->getMessage());
-			JFactory::getApplication()->enqueueMessage($e->getMessage());
+			Factory::getApplication()->enqueueMessage($e->getMessage());
 			//clear the coupon code
 			$this->remove_coupon();
 			return false;
@@ -208,12 +214,13 @@ class J2StoreModelCoupons extends F0FModel {
 	 *
 	 * @return bool
 	 */
-	public function is_valid_for_cart() {
+	public function is_valid_for_cart()
+    {
 		return $this->is_type( array( 'fixed_cart', 'percentage_cart' ));
 	}
 
-
-	public function is_valid_for_product($product) {
+	public function is_valid_for_product($product)
+    {
 		if (! $this->is_type ( array (
 				'fixed_product',
 				'percentage_product'
@@ -248,7 +255,7 @@ class J2StoreModelCoupons extends F0FModel {
 		if (count ( $coupon_categories_data ) > 0 && $product->product_source == 'com_content') {
 
 			//selected categories only
-			$db = JFactory::getDbo ();
+			$db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery ( true );
 			$query->select ( '*' )->from ( '#__content' )->where ( 'id=' . $db->q ( $product->product_source_id ) );
 			//->where ( 'catid=' . $db->q ( $category_id ) );
@@ -262,7 +269,6 @@ class J2StoreModelCoupons extends F0FModel {
 					break;
 				}
 			}
-
 		}
 
 		//manufacturers / brands
@@ -286,51 +292,56 @@ class J2StoreModelCoupons extends F0FModel {
 		return $valid;
 	}
 
-	private function validate_enabled() {
+	private function validate_enabled()
+    {
 		$params = J2Store::config();
 		if($params->get('enable_coupon', 0) == 0) {
-			throw new Exception( JText::_('J2STORE_COUPON_DOES_NOT_EXIST') );
+			throw new Exception( Text::_('J2STORE_COUPON_DOES_NOT_EXIST') );
 		}
 	}
 
 	/**
 	 * Ensure coupon exists or throw exception
 	 */
-	private function validate_exists() {
+	private function validate_exists()
+    {
 		if ( ! $this->coupon) {
-			throw new Exception( JText::_('J2STORE_COUPON_DOES_NOT_EXIST') );
+			throw new Exception( Text::_('J2STORE_COUPON_DOES_NOT_EXIST') );
 		}
 	}
 
 	/**
 	 * Ensure coupon usage limit is valid or throw exception
 	 */
-	private function validate_usage_limit() {
+	private function validate_usage_limit()
+    {
 		$total = $this->get_coupon_history($this->coupon->j2store_coupon_id);
 		if ($this->coupon->max_uses > 0 && ($total >= $this->coupon->max_uses)) {
-			throw new Exception( JText::_('J2STORE_COUPON_USAGE_LIMIT_HAS_REACHED') );
+			throw new Exception( Text::_('J2STORE_COUPON_USAGE_LIMIT_HAS_REACHED') );
 		}
 
 	}
 
-	private function validate_user_logged() {
-		$user = JFactory::getUser();
+	private function validate_user_logged()
+    {
+		$user = Factory::getApplication()->getIdentity();
 		// is customer logged in
 		if ($this->coupon->logged && ! $user->id) {
-			throw new Exception( JText::_('J2STORE_COUPON_APPLICABLE_ONLY_FOR_LOGGED_IN_CUSTOMERS') );
+			throw new Exception( Text::_('J2STORE_COUPON_APPLICABLE_ONLY_FOR_LOGGED_IN_CUSTOMERS') );
 		}
 	}
 
-	private function validate_users() {
-		$user = JFactory::getUser ();
+	private function validate_users()
+    {
+		$user = Factory::getApplication()->getIdentity();
 		if ($this->coupon->users) {
             if($user->id <= 0){
-                throw new Exception ( JText::_ ( 'J2STORE_COUPON_NOT_APPLICABLE' ) );
+                throw new Exception ( Text::_ ( 'J2STORE_COUPON_NOT_APPLICABLE' ) );
             }
 			$users = explode ( ',', $this->coupon->users );
 			if (count ( $users )){
                 if (! in_array ( $user->id, $users )) {
-                    throw new Exception ( JText::_ ( 'J2STORE_COUPON_NOT_APPLICABLE' ) );
+                    throw new Exception ( Text::_ ( 'J2STORE_COUPON_NOT_APPLICABLE' ) );
                 }
             }
 
@@ -340,11 +351,12 @@ class J2StoreModelCoupons extends F0FModel {
 	/**
 	 * Method to validate the user group of the user as set in the coupon
 	 * */
-	private function validate_user_group() {
-		$user = JFactory::getUser ();
+	private function validate_user_group()
+    {
+		$user = Factory::getApplication()->getIdentity();
 		if ($this->coupon->user_group && count($user->groups) ) {
 			if (! count(  array_intersect(explode(',', $this->coupon->user_group), $user->groups) ) ) {
-				throw new Exception ( JText::_ ( 'J2STORE_COUPON_NOT_APPLICABLE' ) );
+				throw new Exception ( Text::_ ( 'J2STORE_COUPON_NOT_APPLICABLE' ) );
 			}
 		}
 	}
@@ -355,12 +367,13 @@ class J2StoreModelCoupons extends F0FModel {
 	 * Per user usage limit - check here if user is logged in (against user IDs)
 	 * Checked again for emails later on in WC_Cart::check_customer_coupons()
 	 */
-	private function validate_user_usage_limit() {
-		$user = JFactory::getUser();
+	private function validate_user_usage_limit()
+    {
+		$user = Factory::getApplication()->getIdentity();
 		if ($user->id) {
 			$customer_total = $this->get_coupon_history($this->coupon->j2store_coupon_id, $user->id);
 			if ($this->coupon->max_customer_uses > 0 && ($customer_total >= $this->coupon->max_customer_uses)) {
-				throw new Exception( JText::_('J2STORE_COUPON_INDIVIDUAL_USAGE_LIMIT_HAS_REACHED') );
+				throw new Exception( Text::_('J2STORE_COUPON_INDIVIDUAL_USAGE_LIMIT_HAS_REACHED') );
 			}
 		}
 	}
@@ -368,34 +381,35 @@ class J2StoreModelCoupons extends F0FModel {
 	/**
 	 * Ensure coupon date is valid or throw exception
 	 */
-	private function validate_expiry_date() {
+	private function validate_expiry_date()
+    {
         $db = Factory::getContainer()->get('DatabaseDriver');
 		$nullDate = $db->getNullDate();
-		$tz = JFactory::getConfig()->get('offset');
-		$now = JFactory::getDate('now', $tz)->toSql(true);
-		$valid_from = JFactory::getDate($this->coupon->valid_from, $tz)->toSql(true);
-		$valid_to = JFactory::getDate($this->coupon->valid_to, $tz)->toSql(true);
+		$tz = Factory::getApplication()->getConfig()->get('offset');
+		$now = Factory::getDate('now', $tz)->toSql(true);
+		$valid_from = Factory::getDate($this->coupon->valid_from, $tz)->toSql(true);
+		$valid_to = Factory::getDate($this->coupon->valid_to, $tz)->toSql(true);
 		if(
 		($this->coupon->valid_from == $nullDate || $valid_from <= $now) &&
 		 ($this->coupon->valid_to == $nullDate || $valid_to >= $now)
 		){
 			return true;
 		}else {
-			throw new Exception( JText::_('J2STORE_COUPON_EXPIRED'));
+			throw new Exception( Text::_('J2STORE_COUPON_EXPIRED'));
 		}
 	}
 
 	/**
 	 * Ensure coupon amount is valid or throw exception
 	 */
-	private function validate_minimum_amount($order) {
-
+	private function validate_minimum_amount($order)
+    {
 		// is subtotal above min subtotal restriction.
 		if (isset ( $this->coupon->min_subtotal ) && ( float ) $this->coupon->min_subtotal > 0) {
 			$subtotal = $order->subtotal;
 			//echo round($row->min_subtotal,0);
 			if (!empty($this->coupon->min_subtotal) && (float) $this->coupon->min_subtotal  > (float) $subtotal) {
-				throw new Exception( JText::sprintf('J2STORE_COUPON_MINIMUM_SPEND_LIMIT_NOT_REACHED', $this->coupon->min_subtotal));
+				throw new Exception( Text::sprintf('J2STORE_COUPON_MINIMUM_SPEND_LIMIT_NOT_REACHED', $this->coupon->min_subtotal));
 			}
 		}
 	}
@@ -403,8 +417,9 @@ class J2StoreModelCoupons extends F0FModel {
 	/**
 	 * Ensure coupon is valid for products in the cart is valid or throw exception
 	 */
-	private function validate_product_ids() {
-		$db = JFactory::getDbo ();
+	private function validate_product_ids()
+    {
+		$db = Factory::getContainer()->get('DatabaseDriver');
 
 		$coupon_products_data = $this->get_selected_products ();
 
@@ -475,15 +490,16 @@ class J2StoreModelCoupons extends F0FModel {
 			}
 
 			if (! $valid_for_cart) {
-				throw new Exception ( JText::_ ( 'J2STORE_COUPON_NOT_VALID_FOR_PRODUCT' ) );
+				throw new Exception ( Text::_ ( 'J2STORE_COUPON_NOT_VALID_FOR_PRODUCT' ) );
 			}
 		}
 	}
 
-	public function validate_admin_product_ids($order){
+	public function validate_admin_product_ids($order)
+    {
 		// coupon validation during admin order edit
-		$app = JFactory::getApplication();
-		$db = JFactory::getDbo ();
+		$app = Factory::getApplication();
+		$db = Factory::getContainer()->get('DatabaseDriver');
         $platform = J2Store::platform();
 		$coupon_products_data = $this->get_selected_products ();
 
@@ -553,13 +569,14 @@ class J2StoreModelCoupons extends F0FModel {
 				}
 
 				if ( !$valid_for_cart ) {
-					throw new Exception ( JText::_ ( 'J2STORE_COUPON_NOT_VALID_FOR_PRODUCT' ) );
+					throw new Exception ( Text::_ ( 'J2STORE_COUPON_NOT_VALID_FOR_PRODUCT' ) );
 				}
 			}
 		}
 	}
 
-	public function get_selected_products() {
+	public function get_selected_products()
+    {
 		$products = array();
 		if (!empty($this->coupon->products)) {
 			$products = explode ( ',', $this->coupon->products);
@@ -567,10 +584,9 @@ class J2StoreModelCoupons extends F0FModel {
 		return $products;
 	}
 
-
-
-	public function getCouponByCode($code) {
-		$db = JFactory::getDbo ();
+	public function getCouponByCode($code)
+    {
+		$db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery ( true );
 		$query->select ( '*' )->from ( '#__j2store_coupons' )->where ( 'coupon_code=' . $db->q ( $code ) )->where ( 'enabled=1' );
 		$db->setQuery ( $query );
@@ -589,11 +605,12 @@ class J2StoreModelCoupons extends F0FModel {
 		return ( $this->coupon->value_type == $type || ( is_array( $type ) && in_array( $this->coupon->value_type, $type ) ) ) ? true : false;
 	}
 
-	public function get_discount_amount($discounting_amount, $cartitem, $order, $single = true) {
+	public function get_discount_amount($discounting_amount, $cartitem, $order, $single = true)
+    {
 		$discount = 0;
-		$app = JFactory::getApplication ();
+		$app = Factory::getApplication ();
 		$params = J2Store::config ();
-		$session = JFactory::getSession ();
+		$session = Factory::getApplication()->getSession();
 		$cart_item_qty = is_null ( $cartitem ) ? 1 : $cartitem->orderitem_quantity;
 
 		if ($this->is_type ( array ('percentage_product','percentage_cart') )) {
@@ -660,8 +677,9 @@ class J2StoreModelCoupons extends F0FModel {
 		return $discount;
 	}
 
-	public function getCouponHistory() {
-		$app = JFactory::getApplication();
+	public function getCouponHistory()
+    {
+		$app = Factory::getApplication();
 		$id = $app->input->getInt('coupon_id', 0);
 		if($id < 1) return array();
 		$coupon_history_model = F0FModel::getTmpInstance('Orderdiscounts', 'J2StoreModel');
@@ -680,47 +698,49 @@ class J2StoreModelCoupons extends F0FModel {
 	 * Method to get coupon discount types. Third party developers can override by introducing new coupon value types.
 	 * @return array A list of key value pair
 	 */
-
-
-	public function getCouponDiscountTypes() {
+	public function getCouponDiscountTypes()
+    {
 		$list = array (
-				'percentage_cart' => JText::_ ( 'J2STORE_VALUE_TYPE_CART_DISCOUNT_PERCENTAGE' ),
-				'fixed_cart' => JText::_ ( 'J2STORE_VALUE_TYPE_CART_DISCOUNT_FIXED_PRICE' ),
-				'percentage_product' => JText::_ ( 'J2STORE_VALUE_TYPE_PRODUCT_PERCENTAGE' ),
-				'fixed_product' => JText::_ ( 'J2STORE_VALUE_TYPE_PRODUCT_FIXED_PRICE' )
+				'percentage_cart' => Text::_ ( 'J2STORE_VALUE_TYPE_CART_DISCOUNT_PERCENTAGE' ),
+				'fixed_cart' => Text::_ ( 'J2STORE_VALUE_TYPE_CART_DISCOUNT_FIXED_PRICE' ),
+				'percentage_product' => Text::_ ( 'J2STORE_VALUE_TYPE_PRODUCT_PERCENTAGE' ),
+				'fixed_product' => Text::_ ( 'J2STORE_VALUE_TYPE_PRODUCT_FIXED_PRICE' )
 		);
 		//allow plugins to modify
 		J2Store::plugin()->event('GetCouponDiscountTypes', array(&$list));
 		return $list;
 	}
 
-	public function get_coupon(){
+	public function get_coupon()
+    {
 		$cart_model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
         $cart_table = $cart_model->getCart();
 		if(isset( $cart_table->cart_coupon ) && !empty( $cart_table->cart_coupon ) ){
-			$session = JFactory::getSession ();
+			$session = Factory::getApplication()->getSession();
 			$session->set('coupon', $cart_table->cart_coupon, 'j2store');
 			$coupon_code = $cart_table->cart_coupon;
 		}else{
-			$session = JFactory::getSession ();
+			$session = Factory::getApplication()->getSession();
 			$coupon_code = $session->get ( 'coupon', '', 'j2store' );
 		}
 
 		return $coupon_code;
 	}
 
-	public function has_coupon(){
+	public function has_coupon()
+    {
 		$cart_model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
         $cart_table = $cart_model->getCart();
-		$session = JFactory::getSession ();
+		$session = Factory::getApplication()->getSession();
 		if(isset( $cart_table->cart_coupon ) && !empty( $cart_table->cart_coupon ) ){
 			$session->set('coupon', $cart_table->cart_coupon, 'j2store');
 		}
 		return $session->has ( 'coupon', 'j2store' );
 	}
 
-	public function set_coupon($post_coupon=''){
-		$session = JFactory::getSession ();
+	public function set_coupon($post_coupon='')
+    {
+		$session = Factory::getApplication()->getSession();
 		$session->set('coupon', $post_coupon, 'j2store');
 		$cart_model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
 		$cart_table = $cart_model->getCart();
@@ -730,8 +750,9 @@ class J2StoreModelCoupons extends F0FModel {
 		}
 	}
 
-	public function remove_coupon() {
-		JFactory::getSession()->clear('coupon', 'j2store');
+	public function remove_coupon()
+    {
+		Factory::getApplication()->getSession()->clear('coupon', 'j2store');
 		$cart_model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
         $cart_table = $cart_model->getCart();
 

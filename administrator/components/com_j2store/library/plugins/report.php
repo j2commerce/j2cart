@@ -1,15 +1,16 @@
 <?php
-/*------------------------------------------------------------------------
- # com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Ramesh Elamathi - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
--------------------------------------------------------------------------*/
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
 
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/_base.php');
 if (!class_exists('J2StoreReportPlugin')) {
     class J2StoreReportPlugin extends J2StorePluginBase
@@ -30,11 +31,13 @@ if (!class_exists('J2StoreReportPlugin')) {
             self::$platform = empty(self::$platform) ? J2Store::platform() : self::$platform;
             $this->includeCustomModels();
         }
+
         protected function includeCustomModels()
         {
             self::$fof_helper->loadModelFilePath(JPATH_ADMINISTRATOR . '/components/com_j2store/models');
             self::$fof_helper->loadModelFilePath(JPATH_SITE . '/plugins/j2store/' . $this->_element . '/' . $this->_element . '/models');
         }
+
         /************************************
          * Note to 3pd:
          *
@@ -44,14 +47,12 @@ if (!class_exists('J2StoreReportPlugin')) {
          *
          ************************************/
 
-
         public function onJ2StoreGetReportView($row)
         {
             if (!$this->_isMe($row)) {
                 return null;
             }
         }
-
 
         /************************************
          * Note to 3pd:
@@ -105,7 +106,7 @@ if (!class_exists('J2StoreReportPlugin')) {
          */
         function _getState()
         {
-            $state = new JObject();
+            $state = new \stdClass();
             $app = J2Store::platform()->application();
             foreach ($state->getProperties() as $key => $value) {
                 $new_value = $app->input->get($key);
@@ -117,5 +118,4 @@ if (!class_exists('J2StoreReportPlugin')) {
             return $state;
         }
     }
-
 }

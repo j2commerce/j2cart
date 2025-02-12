@@ -1,22 +1,18 @@
 <?php
-/*------------------------------------------------------------------------
- # com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Sasi varna kumar - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
 
-
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
 class J2Plugins
 {
-
-
 	public static $instance = null;
 
 	public function __construct($properties=null) {
@@ -40,7 +36,7 @@ class J2Plugins
 	 * @param $folder
 	 * @return array of JTable objects
 	 */
-public function getPluginsWithEvent( $eventName, $folder='J2Store' )
+  public function getPluginsWithEvent( $eventName, $folder='J2Store' )
 	{
 		$return = array();
 		if ($plugins = $this->getPlugins( $folder ))
@@ -87,28 +83,29 @@ public function getPluginsWithEvent( $eventName, $folder='J2Store' )
 		$data = $database->loadObjectList();
 		return $data;
 	}
-	
+
 	/**
 	 * Returns an active Plugin
-	 * 
+	 *
 	 * @param
 	 *        	mixed Boolean
 	 * @param
 	 *        	mixed Boolean
 	 * @return array
 	 */
-	public static function getPlugin($element, $folder = 'j2store') {
+	public static function getPlugin($element, $folder = 'j2store')
+  {
 		if (empty ( $element ))
 			return false;
 		$row = false;
-		$db = JFactory::getDBO ();
-		
+		$db = Factory::getContainer()->get('DatabaseDriver');
+
 		$folder = strtolower ( $folder );
 		$query = $db->getQuery ( true )->select ( '*' )->from ( '#__extensions' )
 						->where ( $db->qn ( 'enabled' ) . ' = ' . $db->q ( 1 ) )
 						->where ( $db->qn ( 'folder' ) . ' = ' . $db->q ( $folder ) )
 						->where ( $db->qn ( 'element' ) . ' = ' . $db->q ( $element ) );
-		
+
 		$db->setQuery ( $query );
 		try {
 			$row = $db->loadObject ();
@@ -135,18 +132,18 @@ public function getPluginsWithEvent( $eventName, $folder='J2Store' )
 
 		$args = array();
 
-		$results = JFactory::getApplication()->triggerEvent( $event, $options );
+		$results = Factory::getApplication()->triggerEvent( $event, $options );
 
-		if ( !count($results) > 0 ) {
+		if ((!count($results)) > 0) {
 			return $text;
 		}
 
 		// grab content
 		switch( strtolower($method) ) {
 			case "vertical":
-				for ($i=0; $i<count($results); $i++) {
+				for ($i=0, $iMax = count($results); $i< $iMax; $i++) {
 					$result = $results[$i];
-					$title = $result[1] ? JText::_( $result[1] ) : JText::_( 'Info' );
+					$title = $result[1] ? Text::_( $result[1] ) : Text::_( 'Info' );
 					$content = $result[0];
 
 					// Vertical
@@ -179,9 +176,9 @@ public function getPluginsWithEvent( $eventName, $folder='J2Store' )
 		}
 
 		// Check if they have a particular event
-		$import 	= JPluginHelper::importPlugin( strtolower('J2Store'), $element->element );
+		$import = PluginHelper::importPlugin( strtolower('J2Store'), $element->element );
 
-		$result 	= JFactory::getApplication()->triggerEvent( $eventName, array( $element ) );
+		$result = Factory::getApplication()->triggerEvent( $eventName, array( $element ) );
 		if (in_array(true, $result, true))
 		{
 			$success = true;
@@ -189,8 +186,9 @@ public function getPluginsWithEvent( $eventName, $folder='J2Store' )
 		return $success;
 	}
 
-	public function enableJ2StorePlugin() {
-		$db = JFactory::getDBO();
+	public function enableJ2StorePlugin()
+  {
+		$db = Factory::getContainer()->get('DatabaseDriver');
 
 		$folder = strtolower( 'j2store');
 
@@ -202,20 +200,22 @@ public function getPluginsWithEvent( $eventName, $folder='J2Store' )
 		return true;
 	}
 
-	public function importCatalogPlugins() {
-		JPluginHelper::importPlugin('content');
+	public function importCatalogPlugins()
+  {
+		PluginHelper::importPlugin('content');
 	}
-	public function event($event, $args=array(), $prefix='onJ2Store') {
+
+	public function event($event, $args=array(), $prefix='onJ2Store')
+  {
 		if(empty($event)) return '';
 		$this->importCatalogPlugins();
-		JPluginHelper::importPlugin('j2store');
+		PluginHelper::importPlugin('j2store');
         $platform = J2Store::platform();
         $result = $platform->eventTrigger($prefix.$event, $args);
-		/*$app = JFactory::getApplication();
+		/*$app = Factory::getApplication();
         $result = $app->triggerEvent($prefix.$event, $args);*/
 		return $result;
 	}
-
 
 	/**
 	 * Method to get the html output of an event
@@ -223,11 +223,11 @@ public function getPluginsWithEvent( $eventName, $folder='J2Store' )
 	 * @param array $args
 	 * @return string
 	 */
-
-	public function eventWithHtml($event, $args=array(), $prefix='onJ2Store') {
+	public function eventWithHtml($event, $args=array(), $prefix='onJ2Store')
+  {
 		if(empty($event)) return '';
-		JPluginHelper::importPlugin('j2store');
-		$app = JFactory::getApplication();
+		PluginHelper::importPlugin('j2store');
+		$app = Factory::getApplication();
 		$html = '';
         $platform = J2Store::platform();
         $results = $platform->eventTrigger($prefix.$event, $args);
@@ -237,10 +237,11 @@ public function getPluginsWithEvent( $eventName, $folder='J2Store' )
 		return $html;
 	}
 
-	public function eventWithArray($event, $args=array(), $prefix='onJ2Store') {
+	public function eventWithArray($event, $args=array(), $prefix='onJ2Store')
+  {
 		if(empty($event)) return '';
-		JPluginHelper::importPlugin('j2store');
-		$app = JFactory::getApplication();
+		PluginHelper::importPlugin('j2store');
+		$app = Factory::getApplication();
         $platform = J2Store::platform();
         $results = $platform->eventTrigger($prefix.$event, $args);
 		$array = array();

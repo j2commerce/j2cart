@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -32,7 +32,7 @@ class J2StoreModelTaxprofiles extends F0FModel {
 		}
 
 	}
-	
+
 	protected function onProcessList(&$resultArray) {
 		//allow plugins to modify the data
 		J2Store::plugin()->event('AfterGetTaxprofiles', array(&$resultArray));
@@ -78,7 +78,7 @@ class J2StoreModelTaxprofiles extends F0FModel {
 		return true;
 	}
 
-	public function initialize() {		
+	public function initialize() {
 		$config = J2Store::config();
 		$session = JFactory::getSession();
 
@@ -94,8 +94,8 @@ class J2StoreModelTaxprofiles extends F0FModel {
 			$this->setBillingAddress($config->get('country_id'), $config->get('zone_id'), $config->get('store_zip'));
 		}
 	//	if ($config->get('config_tax_default') == 'store') {
-			$this->setStoreAddress($config->get('country_id'), $config->get('zone_id'), $config->get('store_zip'));			
-	//	}		
+			$this->setStoreAddress($config->get('country_id'), $config->get('zone_id'), $config->get('store_zip'));
+	//	}
 	}
 
 	public function setShippingAddress($country_id, $zone_id, $postcode) {
@@ -190,7 +190,7 @@ class J2StoreModelTaxprofiles extends F0FModel {
 			$taxtotal = $total;
 		} else {
 			$total = 0;
-			$tax_rates = $this->getTaxRates($value, $rates);			
+			$tax_rates = $this->getTaxRates($value, $rates);
 			foreach ($tax_rates as $tax_rate) {
 				$return[$tax_rate['taxrate_id']]['name'] = $tax_rate['name'];
 				$return[$tax_rate['taxrate_id']]['rate'] = $tax_rate['rate'];
@@ -202,12 +202,12 @@ class J2StoreModelTaxprofiles extends F0FModel {
 
 		$item = new JObject();
 		$item->taxes = $return;
-		$item->taxtotal = $taxtotal;	
-			
+		$item->taxtotal = $taxtotal;
+
 		//allow plugins to modify the data
 		J2Store::plugin()->event('AfterGetTaxwithRates', array(&$item,$type));
 		return $item;
-		
+
 	}
 
 	public function getRates($taxprofile_id) {
@@ -287,10 +287,10 @@ class J2StoreModelTaxprofiles extends F0FModel {
             }
 			$ratesets[$address_type][$country_id][$zone_id][$postcode][$taxprofile_id] = $result;
 		}
-		
+
 		//allow plugins to modify the data
 		J2Store::plugin()->event('AfterGetTaxRateItems', array(&$ratesets[$address_type][$country_id][$zone_id][$postcode][$taxprofile_id], $address_type, $country_id, $zone_id, $postcode, $taxprofile_id));
-		
+
 		return $ratesets[$address_type][$country_id][$zone_id][$postcode][$taxprofile_id];
 	}
 
@@ -316,21 +316,21 @@ class J2StoreModelTaxprofiles extends F0FModel {
 		}
 		return $tax_rate_data;
 	}
-	
-	
+
+
 	public function getBaseTaxRates($value, $taxprofile_id, $includes_tax = false) {
 			$return = array();
-		
+
 			if(!$taxprofile_id) return $return;
-			
+
 			$rates = array();
 			$config = J2Store::config();
 			//$this->setStoreAddress($config->get('country_id'), $config->get('zone_id'));
-			
+
 			$taxrates_items = $this->getTaxRateItems($config->get('config_tax_default'), $config->get('country_id'), $config->get('zone_id'), $config->get('store_zip'), $taxprofile_id);
-			//var_dump($taxrates_items);			
+			//var_dump($taxrates_items);
 			if(isset($taxrates_items)){
-			
+
 				foreach ($taxrates_items as $trate) {
 					$rates[$trate->j2store_taxrate_id] = array(
 							'taxrate_id' => $trate->j2store_taxrate_id,
@@ -339,12 +339,12 @@ class J2StoreModelTaxprofiles extends F0FModel {
 					);
 				}
 			}
-			
+
 			//allow plugins to modify the data
 			J2Store::plugin()->event('AfterGetTaxRates', array(&$rates,$taxprofile_id));
-			
+
 			$taxtotal = 0;
-		
+
 			if($includes_tax) {
 				$total = 0;
 				//first get rates
@@ -367,11 +367,11 @@ class J2StoreModelTaxprofiles extends F0FModel {
 				}
 				$taxtotal = $total;
 			}
-		
+
 			$result = array();
 			$result['taxes'] = $return;
 			$result['taxtotal'] = $taxtotal;
-		
+
 			return (object) $result;
 	}
 
@@ -383,7 +383,7 @@ class J2StoreModelTaxprofiles extends F0FModel {
 				$regular_rates[ $key ] = $single_rate['rate'];
 			}
 		}
-		
+
 		$regular_tax_rate = 1 + ( array_sum( $regular_rates ) / 100 );
 
 		$the_rate       = ( $rate['rate'] / 100 ) / $regular_tax_rate;

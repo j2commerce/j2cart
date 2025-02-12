@@ -1,22 +1,34 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
-class JFormFieldCustomLink extends JFormField {
+
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\Language\Text;
+
+class JFormFieldCustomLink extends FormField
+{
 	protected $type = 'customlink';
-	
-	public function getInput() {
-		
+
+	public function getInput()
+    {
 		$html = '';
-		$html .= '<a class="btn btn-warning" id="'.$this->id.'" href="#">'.JText::_($this->element['text']).'</a>';
+		$html .= '<btn type="button" class="btn btn-dark btn-sm" id="'.$this->id.'">';
+		$html .= Text::_($this->element['text']);
+		$html .= '</button>';
 		return  $html;
 	}
-	
-	public function getLabel() {
+
+	public function getLabel()
+    {
 		return '';
 	}
 }

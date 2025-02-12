@@ -1,14 +1,17 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
-use Joomla\CMS\Language\Text;
 
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Language\Text;
 ?>
 <style>
     .j2store-bs .modal{
@@ -77,9 +80,9 @@ use Joomla\CMS\Language\Text;
             </tbody>
         </table>
     </fieldset>
-    <div class="alert alert-block alert-info my-3">
-        <h4 class="alert-heading"><?php echo Text::_('J2STORE_QUICK_HELP'); ?></h4>
-		<?php echo Text::_('J2STORE_FLEXIVARIANT_GENERATION_HELP_TEXT'); ?>
+    <div class="alert alert-info d-flex align-items-center my-3" role="alert">
+        <span class="fas fa-solid fa-exclamation-circle me-3"></span>
+        <div><?php echo Text::_('J2STORE_FLEXIVARIANT_GENERATION_HELP_TEXT'); ?></div>
     </div>
 </div>
 <script type="text/javascript">
@@ -87,8 +90,6 @@ use Joomla\CMS\Language\Text;
         (function ($) {
             var option_value = $('#option_select_id').val();
             var option_name = $('#option_select_id option[value='+option_value+']').html();
-            console.log(option_value);
-            console.log(option_name);
             $('<tr><td class=\"addedOption\">' + option_name+ '</td><td><input class=\"form-control form-control-sm\" name=\"<?php echo $this->form_prefix.'[item_options]' ;?>['+ option_value+'][ordering]\" value=\"0\"></td><td><span class=\"optionRemove\" onclick=\"j2store.jQuery(this).parent().parent().remove();\"><span class=\"icon icon-trash\"></span></span><input type=\"hidden\" value=\"' + option_value+ '\" name=\"<?php echo $this->form_prefix; ?>[item_options]['+ option_value+'][option_id]\" /><input type=\"hidden\" value="" name=\"<?php echo $this->form_prefix; ?>[item_options]['+ option_value+'][j2store_productoption_id]\" /></td></tr>').insertBefore('.j2store_a_options');
         })(j2store.jQuery);
 

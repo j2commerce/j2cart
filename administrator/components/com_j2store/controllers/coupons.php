@@ -1,25 +1,39 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\Toolbar;
+use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Helper\UserGroupsHelper;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerCoupons extends F0FController
 {
-
     use list_view;
 
-    public function execute($task) {
+    public function execute($task)
+    {
         if (in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
         return parent::execute($task);
     }
 
-    public function onBeforeApplySave(&$data){
+    public function onBeforeApplySave(&$data)
+    {
         if(is_array($data)){
             $data['valid_from'] = isset($data['valid_from']) && !empty($data['valid_from']) ? $data['valid_from']:'0000-00-00 00:00:00';
             $data['valid_to'] = isset($data['valid_to']) && !empty($data['valid_to']) ? $data['valid_to']:'0000-00-00 00:00:00';
@@ -38,26 +52,23 @@ class J2StoreControllerCoupons extends F0FController
         $vars = $this->getBaseVars();
         if(J2Store::isPro()) {
             $this->editToolBar();
-            JToolBarHelper::divider();
+            ToolbarHelper::divider();
             if($task == 'edit') {
                 // Hide the content
-                JToolbarHelper::save2copy('copy');
-                $bar = JToolBar::getInstance('toolbar');
-                $bar->appendButton('Link', 'list', JText::_('J2STORE_COUPON_HISTORY'), 'index.php?option=com_j2store&view=coupon&task=history&coupon_id=' . $app->input->getInt('id'));
+                ToolbarHelper::save2copy('copy');
+                $bar = Toolbar::getInstance('toolbar');
+                $bar->appendButton('Link', 'list', Text::_('J2STORE_COUPON_HISTORY'), 'index.php?option=com_j2store&view=coupon&task=history&coupon_id=' . $app->input->getInt('id'));
             }
         }else {
             $this->noToolbar();
         }
         $vars->primary_key = 'j2store_coupon_id';
         $vars->id = $this->getPageId();
-        $coupon_table = F0FTable::getInstance('Coupon', 'J2StoreTable')->getClone ();
+        $coupon_table = J2Store::fof()->loadTable('Coupon', 'J2StoreTable')->getClone ();
         $coupon_table->load($vars->id);
         $vars->item = $coupon_table;
         $vars->field_sets = array();
         $col_class = 'col-md-';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $col_class = 'span';
-        }
 
         $vars->field_sets[] = array(
             'id' => 'basic_options',
@@ -92,7 +103,7 @@ class J2StoreControllerCoupons extends F0FController
                     'desc' => 'J2STORE_COUPON_FREE_SHIPPING_HELP_TEXT',
                     'value' => $coupon_table->free_shipping,
                     'default' => '0',
-                    'options' => array('option' => array( 0 => JText::_('J2STORE_NO'), 1 => JText::_('J2STORE_YES')))
+                    'options' => array('option' => array( 0 => Text::_('J2STORE_NO'), 1 => Text::_('J2STORE_YES')))
                 ),
                 'value' => array(
                     'label' => 'J2STORE_COUPON_VALUE',
@@ -108,7 +119,7 @@ class J2StoreControllerCoupons extends F0FController
                     'source_class'=> 'J2StoreModelCoupons',
                     'source_file'=>'admin://components/com_j2store/models/coupons.php',
                     'value' => $coupon_table->value_type,
-                    'options' => array('id' => 'disount_type','class' => 'input-xlarge')
+                    'options' => array('id' => 'disount_type','class' => 'form-select')
                 ),
                 'valid_from' => array(
                     'label' => 'J2STORE_COUPON_VALID_FROM',
@@ -138,15 +149,16 @@ class J2StoreControllerCoupons extends F0FController
                 ),
             ),
         );
-        $groupList = JHtmlUser::groups ();
+	      $userGroupsHelper = UserGroupsHelper::getInstance();
+	      $groupList = $userGroupsHelper->getAll();
         $group_options = array();
-        $group_options [] =  JText::_ ( 'JALL' ) ;
-        foreach ( $groupList as $row ) {
-            $group_options[$row->value] =JText ::_ ( strtoupper( $row->text));
+        $group_options [] =  Text::_ ( 'JALL' ) ;
+	      foreach ($groupList as $group) {
+		        $group_options[$group->id] = Text::_(strtoupper($group->title));
         }
-        $items =  F0FModel::getTmpInstance('Manufacturers','J2StoreModel')->getItemList();
+        $items =  J2Store::fof()->getModel('Manufacturers','J2StoreModel')->getItemList();
         $new_options  = array();
-        $new_options[] = JText::_('J2STORE_ALL');
+        $new_options[] = Text::_('J2STORE_ALL');
         foreach($items as $brand){
             $new_options[$brand->j2store_manufacturer_id] = $brand->company;
         }
@@ -191,7 +203,7 @@ class J2StoreControllerCoupons extends F0FController
                     'desc' => 'J2STORE_COUPON_LOGGED_HELP_TEXT',
                     'name' => 'logged',
                     'value' =>$coupon_table->logged,
-                    'options' => array('class' => 'btn-group','options' => array(0 => JText::_('J2STORE_NO'), 1 => JText::_('J2STORE_YES')))
+                    'options' => array('class' => 'btn-group','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES')))
                 ),
                 'user_group' => array(
                     'label' => 'J2STORE_CUSTOMER_GROUPS',
@@ -257,7 +269,7 @@ class J2StoreControllerCoupons extends F0FController
 
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['coupon_name'] = $app->input->getString('coupon_name','');
@@ -331,7 +343,7 @@ class J2StoreControllerCoupons extends F0FController
 
 function setProducts(){
 		//get variant id
-		$model = F0FModel::getTmpInstance('Products', 'J2StoreModel');
+		$model = J2Store::fof()->getModel('Products', 'J2StoreModel');
 		$limit = $this->input->getInt('limit',20);
 		$limitstart = $this->input->getInt('limitstart',0);
 
@@ -354,7 +366,7 @@ function setProducts(){
 	}
 
 	public function history() {
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		$coupon_id = $app->input->getInt('coupon_id');
 		$view = $this->getThisView();
 		if($coupon_id > 0) {

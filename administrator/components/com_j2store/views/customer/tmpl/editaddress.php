@@ -1,12 +1,19 @@
 <?php
-defined('_JEXEC') or die( 'Restricted access' );
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+defined('_JEXEC') or die;
+
 $address = $this->address;
 $row_class = 'row';
 $col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-}
 ?>
 <style>
     .form-search input, .form-search textarea, .form-search select, .form-search .help-inline, .form-search .uneditable-input, .form-search .input-prepend, .form-search .input-append, .form-inline input, .form-inline textarea, .form-inline select, .form-inline .help-inline, .form-inline .uneditable-input, .form-inline .input-prepend, .form-inline .input-append, .form-horizontal input, .form-horizontal textarea, .form-horizontal select, .form-horizontal .help-inline, .form-horizontal .uneditable-input, .form-horizontal .input-prepend, .form-horizontal .input-append {
@@ -16,7 +23,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
     }
 </style>
 <div class="j2store">
-    <form class="form-horizontal" id="j2storeaddressForm" name="addressForm" method="post" action="<?php echo 'index.php'; ?>" >
+    <form id="j2storeaddressForm" name="addressForm" method="post" action="<?php echo 'index.php'; ?>" >
         <h3><?php echo JText::_('J2STORE_ADDRESS_EDIT');?></h3>
         <div id="address">
             <div class="j2store-address-alert">

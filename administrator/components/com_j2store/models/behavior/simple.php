@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -197,7 +197,7 @@ class J2StoreModelProductsBehaviorSimple extends F0FModelBehavior {
                 //save product filters
                 F0FTable::getAnInstance('ProductFilter', 'J2StoreTable' )->addFilterToProduct ( $this->_rawData ['productfilter_ids'], $table->j2store_product_id );
             }
-            
+
 		}
 
 	}
@@ -290,7 +290,7 @@ class J2StoreModelProductsBehaviorSimple extends F0FModelBehavior {
 			} catch ( Exception $e ) {
 				// do nothing
 			}
-		}		
+		}
 	}
 
 	public function onUpdateProduct(&$model, &$product) {

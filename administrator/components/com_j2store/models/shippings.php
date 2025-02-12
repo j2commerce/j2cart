@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -75,7 +75,7 @@ class J2StoreModelShippings extends F0FModel {
 	public function getShippingRates(&$order)
 	{
 		static $rates;
-		
+
 		if (empty($rates) || !is_array($rates))
 		{
 			$rates = array();
@@ -101,7 +101,7 @@ class J2StoreModelShippings extends F0FModel {
 				$shippingOptions = $app->triggerEvent( "onJ2StoreGetShippingOptions", array( $plugin->element, $order  ) );
 				if (in_array(true, $shippingOptions, true))
 				{
-					$results = $app->triggerEvent( "onJ2StoreGetShippingRates", array( $plugin->element, $order  ) );					
+					$results = $app->triggerEvent( "onJ2StoreGetShippingRates", array( $plugin->element, $order  ) );
 					foreach ($results as $result)
 					{
 						if(is_array($result))

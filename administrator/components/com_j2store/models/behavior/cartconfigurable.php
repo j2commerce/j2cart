@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -32,13 +32,13 @@ class J2StoreModelCartsBehaviorCartConfigurable extends F0FModelBehavior {
 			$options =  array_filter($options );
 		} else {
 			$options = array();
-		}	
-			 
+		}
+
 		$reloaded_product_options = F0FModel::getTmpInstance('ProductOptions', 'J2StoreModel')->product_id($product->j2store_product_id)->parent_id(null)->getList();
 
 		unset($product->product_options);
 		$product->product_options = $reloaded_product_options;
-		
+
 		$product_options = $product_helper->getProductOptions($product);
 		$ommit_check = array();
 		//iterate through stored options for this product and validate
@@ -51,36 +51,36 @@ class J2StoreModelCartsBehaviorCartConfigurable extends F0FModelBehavior {
 			{
 				if(is_array($options[$product_option['productoption_id']])) {
 					foreach($options[$product_option['productoption_id']] as $optionvalue) {
-						
+
 						$child= $product_helper->getChildProductOptions($product->j2store_product_id,$check_require->option_id,$optionvalue);
 						if(!empty($child))
 						{
 							foreach($child as $index => $attr){
-									
+
 								if(is_array($attr['optionvalue']) && count($attr['optionvalue']) > 0 && $attr['required'] && !array_key_exists($attr['productoption_id'],$options)) // if optionvalue exist or not. then only display form.otherwise form display only heading without option name
 								{
 									array_push($ommit_check,$attr['productoption_id']);
 								}
 							}
 						}
-						
+
 					}
-				} else {	
+				} else {
 					$child= $product_helper->getChildProductOptions($product->j2store_product_id,$check_require->option_id,$options[$product_option['productoption_id']]);
 					if(!empty($child))
-					{		
+					{
 						foreach($child as $index => $attr){
-			
+
 							if(is_array($attr['optionvalue']) && count($attr['optionvalue']) > 0 && $attr['required'] && !array_key_exists($attr['productoption_id'],$options)) // if optionvalue exist or not. then only display form.otherwise form display only heading without option name
 							{
 								array_push($ommit_check,$attr['productoption_id']);
 							}
 						}
 					}
-				}	
+				}
 			}
 		}
-		
+
 		$cart = $model->getCart();
 		if(!$errors && $cart->cart_type != 'wishlist') {
 			//before validating, get the total quantity of this variant in the cart
@@ -95,9 +95,9 @@ class J2StoreModelCartsBehaviorCartConfigurable extends F0FModelBehavior {
 			//validate inventory
 			if($product_helper->check_stock_status($product->variants, $cart_total_qty+$quantity) === false) {
 				if ( $product->variants->quantity > 0 ) {
-					$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $product->variants->quantity ); 
+					$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $product->variants->quantity );
 				}else{
-					$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK'); 
+					$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK');
 				}
 			}
 		}
@@ -152,27 +152,27 @@ class J2StoreModelCartsBehaviorCartConfigurable extends F0FModelBehavior {
 		$json->result = $errors;
 
 	}
-	
+
 	public function onGetCartItems(&$model, &$item) {
-	
+
 		//sanity check
 		if($item->product_type != 'configurable') return;
-	
+
 		$product_helper = J2Store::product();
 		//Options
 		//print_r(base64_decode($item->product_options));
-	
+
 		if (isset($item->product_options)) {
 			$options = unserialize(base64_decode($item->product_options));
 		} else {
 			$options = array();
 		}
-	
+
 		$product = $product_helper->setId($item->product_id)->getProduct();
 		$product_option_data = $product_helper->getOptionPrice($options, $product->j2store_product_id);
 		//print_r($product_option_data);
-	
-	
+
+
 		$item->product_name = $product->product_name;
 		$item->product_view_url = $product->product_view_url;
 		$item->options = $product_option_data['option_data'];
@@ -184,23 +184,23 @@ class J2StoreModelCartsBehaviorCartConfigurable extends F0FModelBehavior {
 			$group_id = $item->group_id;
 		}
 		$item->pricing = $product_helper->getPrice($item, $item->product_qty,$group_id);
-	
+
 	}
-	
+
 	public function onValidateCart(&$model, $cartitem, $quantity) {
-	
+
 		//sanity check
 		if($cartitem->product_type != 'configurable') return;
-	
+
 		$product_helper = J2Store::product();
 		$product = $product_helper->setId($cartitem->product_id)->getProduct();
 		$variant = F0FModel::getTmpInstance('Variants', 'J2StoreModel')->getItem($cartitem->variant_id);
 		$errors = array();
-	
+
 		//before validating, get the total quantity of this variant in the cart
 		$cart_total_qty  = $product_helper->getTotalCartQuantity($variant->j2store_variant_id);
-	
-	
+
+
 		//get the quantity difference. Because we are going to check the total quantity
 		$difference_qty = $quantity - $cartitem->product_qty;
 
@@ -209,12 +209,12 @@ class J2StoreModelCartsBehaviorCartConfigurable extends F0FModelBehavior {
 		if(!empty($error)) {
 			$errors[] = $error;
 		}
-	
+
 		//validate inventory
 		if($product_helper->check_stock_status($variant, $cart_total_qty+$difference_qty) === false) {
 			$errors[] = JText::_('J2STORE_OUT_OF_STOCK');
 		}
-	
+
 		if(is_array($errors) && count($errors)) {
 			throw new Exception(implode('/n', $errors));
 			return false;

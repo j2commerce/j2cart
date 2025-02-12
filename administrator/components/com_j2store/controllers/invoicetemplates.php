@@ -1,18 +1,30 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined ( '_JEXEC' ) or die ();
+
+defined ('_JEXEC') or die;
+
+use Joomla\CMS\Access\Access;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Language\LanguageHelper;
+use Joomla\CMS\HTML\Helpers\User;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
 
-
-class J2StoreControllerInvoicetemplates extends F0FController {
-
+class J2StoreControllerInvoicetemplates extends F0FController
+{
     use list_view;
-    public function execute($task) {
+
+    public function execute($task)
+    {
         if (in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
@@ -21,7 +33,6 @@ class J2StoreControllerInvoicetemplates extends F0FController {
 
     function add()
     {
-
         $platform = J2Store::platform();
         $app = $platform->application();
         $vars = $this->getBaseVars();
@@ -36,34 +47,34 @@ class J2StoreControllerInvoicetemplates extends F0FController {
         $order_status_model = F0FModel::getTmpInstance('Orderstatuses', 'J2StoreModel');
         $default_order_status_list = $order_status_model->enabled(1)->getList();
         $order_status = array();
-        $order_status['*'] = JText::_('JALL');
+        $order_status['*'] = Text::_('JALL');
         foreach ($default_order_status_list as $status) {
-            $order_status[$status->j2store_orderstatus_id] = JText::_(strtoupper($status->orderstatus_name));
+            $order_status[$status->j2store_orderstatus_id] = Text::_(strtoupper($status->orderstatus_name));
         }
 
         $payment_model = F0FModel::getTmpInstance('Payments', 'J2StoreModel');
         $default_payment_list = $payment_model->enabled(1)->getList();
         $payment_list = array();
-        $payment_list['*'] = JText::_('JALL');
-        $payment_list['free'] = JText::_('J2STORE_FREE_PAYMENT');
+        $payment_list['*'] = Text::_('JALL');
+        $payment_list['free'] = Text::_('J2STORE_FREE_PAYMENT');
         foreach ($default_payment_list as $payment) {
-            $payment_list[$payment->element] = JText::_(strtoupper($payment->element));
+            $payment_list[$payment->element] = Text::_(strtoupper($payment->element));
         }
 
 
-        $groupList = JHtmlUser::groups ();
+        $groupList = User::groups();
         $group_options = array();
-        $group_options [''] =  JText::_ ( 'JALL' ) ;
+        $group_options [''] =  Text::_ ( 'JALL' ) ;
         foreach ( $groupList as $row ) {
-            $group_options [  $row->value ] = JText::_ ( $row->text ) ;
+            $group_options [  $row->value ] = Text::_ ( $row->text ) ;
         }
 
 
-        $languages = JLanguageHelper::getLanguages ( );
+        $languages = LanguageHelper::getLanguages ( );
         $language_list = array ();
-        $language_list ['*'] = JText::_ ( 'JALL_LANGUAGE' ) ;
+        $language_list ['*'] = Text::_ ( 'JALL_LANGUAGE' ) ;
         foreach ( $languages as  $lang ) {
-            $language_list [$lang->lang_code] =JText ::_ ( strtoupper( $lang->title_native));
+            $language_list [$lang->lang_code] = Text ::_(strtoupper( $lang->title_native));
         }
 
 
@@ -76,7 +87,7 @@ class J2StoreControllerInvoicetemplates extends F0FController {
                     'type' => 'text',
                     'name' => 'title',
                     'value' => $Invoicetemplate_table->title,
-                    'options' => array('class' => 'input-xlarge','required'=> true)
+                    'options' => array('class' => 'form-control','required'=> true)
                 ),
                 'orderstatus_id' => array(
                     'label' => 'J2STORE_EMAILTEMPLATE_ORDERSTATUS',
@@ -116,8 +127,7 @@ class J2StoreControllerInvoicetemplates extends F0FController {
                     'label' => 'J2STORE_ENABLED',
                     'type' => 'enabled',
                     'name' => 'enabled',
-                    'value' => $Invoicetemplate_table->enabled,
-                    'options' => array('class' => 'input-xlarge')
+                    'value' => $Invoicetemplate_table->enabled
                 ),
             )
         );
@@ -136,6 +146,7 @@ class J2StoreControllerInvoicetemplates extends F0FController {
         );
         echo $this->_getLayout('email_tab', $vars , 'edit');
     }
+
     public function browse()
     {
         $app = J2Store::platform()->application();
@@ -203,5 +214,4 @@ class J2StoreControllerInvoicetemplates extends F0FController {
         $vars->pagination = $model->getPagination();
         echo $this->_getLayout('default',$vars);
     }
-
 }

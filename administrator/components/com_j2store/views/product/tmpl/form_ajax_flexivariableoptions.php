@@ -1,17 +1,23 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/library/popup.php';
+
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
 $row_class = 'row';
@@ -21,10 +27,10 @@ $btn_class = 'btn-sm';
 $star_icon = 'far fa-regular fa-star';
 
 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
-$style='.variant-item .variant-button{color:inherit;position: relative;}.variant-item .variant-button:focus,.variant-item .variant-button:active,.variant-button:not(.collapsed){box-shadow:none;background-color:transparent;}.variant-item .variant-button:hover,.variant-item .variant-button:focus,.variant-button:not(.collapsed){color:var(--accordion-active-color);}.variant-item .variant-button:after{width:1rem;height:1rem;background-size:1rem;margin-left: auto;margin-right:1rem;color:var(--accordion-active-color);position: absolute;left: 0.5rem;}.variant-item .control-group .control-label{width:160px;font-size: 0.825rem;font-weight: 500;}';
+$style='.variant-item .variant-button{color:inherit;position: relative;}.variant-item .variant-button:focus,.variant-item .variant-button:active,.variant-button:not(.collapsed){box-shadow:none;background-color:transparent;}.variant-item .variant-button:hover,.variant-item .variant-button:focus,.variant-button:not(.collapsed){color:var(--accordion-active-color);}.variant-item .variant-button:after{width:1rem;height:1rem;background-size:1rem;margin-left: auto;margin-right:1rem;color:var(--accordion-active-color);position: absolute;left: 0.5rem;}.variant-item .control-group .control-label{width:160px;font-size: 0.825rem;font-weight: 500;}.j2commerce-variant-general .input-group>.input-group-text{border-radius: var(--border-radius-sm);padding: .25rem .5rem;font-size: .8rem;}.j2commerce-variant-general .input-group>.form-control{border-radius: var(--border-radius-sm);padding: .25rem .5rem;font-size: .8rem;}';
 $wa->addInlineStyle($style, [], []);
+$enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
 ?>
-
 <?php if(isset($this->variant_list)): ?>
     <?php $this->i = 0; ?>
     <?php $this->canChange = 1; ?>
@@ -209,6 +215,12 @@ $wa->addInlineStyle($style, [], []);
                             <fieldset class="options-form px-3">
                                 <legend class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_TAB_INVENTORY');?></legend>
 	                            <?php if(J2Store::isPro() == 1) : ?>
+                                    <?php if($enable_inventory == 0):?>
+                                        <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                            <span class="fas fa-solid fa-exclamation-triangle flex-shrink-0 me-2"></span>
+                                            <div><?php echo Text::sprintf('J2STORE_PRODUCT_INVENTORY_WARNING',Route::_('index.php?option=com_j2store&view=configuration'));?></div>
+                                        </div>
+                                    <?php endif;?>
                                     <div class="control-group">
                                         <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_MANAGE_STOCK'), 'manage_stock'); ?></div>
                                         <div class="controls">
@@ -402,7 +414,7 @@ $wa->addInlineStyle($style, [], []);
                 variant_id: variant_id
             };
             $.ajax({
-                url  : '<?php echo JRoute::_('index.php');?>',
+                url  : '<?php echo Route::_('index.php');?>',
                 data : delete_var_data,
                 beforeSend:function(){
                     $("#deleteVariant-"+variant_id).attr('value','<?php echo Text::_('J2STORE_DELETING')?>');
@@ -416,4 +428,3 @@ $wa->addInlineStyle($style, [], []);
         })(j2store.jQuery);
     }
 </script>
-

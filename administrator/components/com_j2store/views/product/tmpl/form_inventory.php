@@ -1,27 +1,31 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
-use Joomla\CMS\Factory;
+
+defined('_JEXEC') or die;
+
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
-
-$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
-$style = '.j2store-product-inventory .input-group .form-check.form-switch .form-check-input{min-width:0;}';
-
-$wa->addInlineStyle($style, [], []);
+$enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
 ?>
-
-
 <?php if(J2Store::isPro() == 1) : ?>
     <div class="j2store-product-inventory">
         <fieldset class="options-form">
             <legend><?php echo Text::_('J2STORE_PRODUCT_TAB_INVENTORY');?></legend>
+            <?php if($enable_inventory == 0):?>
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <span class="fas fa-solid fa-exclamation-triangle flex-shrink-0 me-2"></span>
+                    <div><?php echo Text::sprintf('J2STORE_PRODUCT_INVENTORY_WARNING',Route::_('index.php?option=com_j2store&view=configuration'));?></div>
+                </div>
+            <?php endif;?>
             <div class="form-grid">
                 <div class="control-group">
                     <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_MANAGE_STOCK'),'manage_stock'); ?></div>
@@ -29,12 +33,6 @@ $wa->addInlineStyle($style, [], []);
                 </div>
                 <div class="control-group">
                     <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_QUANTITY'), 'quantity');?></div>
-                    <div class="controls">
-			            <?php echo J2Html::text($this->form_prefix.'[sku]',(isset($this->variant->sku))?$this->variant->sku:'',array('class'=>'form-control')); ?>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_SKU'), 'sku'); ?></div>
                     <div class="controls">
 	                    <?php echo J2Html::hidden($this->form_prefix.'[quantity][j2store_productquantity_id]', (isset($this->variant->j2store_productquantity_id)) ? $this->variant->j2store_productquantity_id:'',array('class'=>'input')); ?>
 	                    <?php echo J2Html::text($this->form_prefix.'[quantity][quantity]', (isset($this->variant->quantity))?$this->variant->quantity:'',array('class'=>'form-control','field_type'=>'integer')); ?>

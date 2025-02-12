@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -43,7 +43,7 @@ class J2StoreModelProductsBehaviorConfigurable extends F0FModelBehavior {
 		}catch (Exception $e) {
 			$this->setError($e->getMessage());
 		}
-		
+
 		$registry = $platform->getRegistry($record->params);
 		$record->params = $registry;
 
@@ -58,7 +58,7 @@ class J2StoreModelProductsBehaviorConfigurable extends F0FModelBehavior {
 		if(!isset( $data['visibility'] )){
 			$data['visibility'] = 1;
 		}
-		
+
 		if(isset($data['cross_sells'])) {
 			$data['cross_sells'] = $utility_helper->to_csv($data['cross_sells']);
 		}else{

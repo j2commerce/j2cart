@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -14,7 +14,7 @@ class J2StoreModelCartsBehaviorCartDownloadable extends F0FModelBehavior {
 		$product_helper = J2Store::product();
 		$values = $app->input->getArray($_REQUEST);
 		$errors = array();
-	
+
 		//run quantity check
 		$quantity = $app->input->get('product_qty');
 		if (isset($quantity )) {
@@ -30,7 +30,7 @@ class J2StoreModelCartsBehaviorCartDownloadable extends F0FModelBehavior {
 		} else {
 			$options = array();
 		}
-	
+
 		//iterate through stored options for this product and validate
 		foreach($product->product_options as $product_option) {
 			//check option type should not be file
@@ -45,23 +45,23 @@ class J2StoreModelCartsBehaviorCartDownloadable extends F0FModelBehavior {
 		if(!$errors && $cart->cart_type != 'wishlist') {
 			//before validating, get the total quantity of this variant in the cart
 			$cart_total_qty = $product_helper->getTotalCartQuantity($product->variants->j2store_variant_id);
-	
+
 			//validate minimum / maximum quantity
 			$error = $product_helper->validateQuantityRestriction($product->variants, $cart_total_qty, $quantity);
 			if(!empty($error)) {
 				$errors['error']['stock'] = $error;
 			}
-	
+
 			//validate inventory
 			if($product_helper->check_stock_status($product->variants, $cart_total_qty+$quantity) === false) {
 				if ( $product->variants->quantity > 0 ) {
-					$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $product->variants->quantity ); 
+					$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $product->variants->quantity );
 				}else{
-					$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK'); 
+					$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK');
 				}
 			}
 		}
-	
+
 		if(!$errors) {
 			//all good. Add the product to cart
 			// create cart object out of item properties
@@ -75,9 +75,9 @@ class J2StoreModelCartsBehaviorCartDownloadable extends F0FModelBehavior {
 			$item->vendor_id   = isset($product->vendor_id) ? $product->vendor_id : '0';
 			// onAfterCreateItemForAddToCart: plugin can add values to the item before it is being validated /added
 			// once the extra field(s) have been set, they will get automatically saved
-	
+
 			$results = J2Store::plugin()->event("AfterCreateItemForAddToCart", array( $item, $values ) );
-	
+
 			foreach ($results as $result)
 			{
 				foreach($result as $key=>$value)
@@ -85,7 +85,7 @@ class J2StoreModelCartsBehaviorCartDownloadable extends F0FModelBehavior {
 					$item->set($key,$value);
 				}
 			}
-	
+
 			// no matter what, fire this validation plugin event for plugins that extend the checkout workflow
 			$results = array();
 			$results =  J2Store::plugin()->event( "BeforeAddToCart", array( $item, $values, $product, $product->product_options) );
@@ -94,12 +94,12 @@ class J2StoreModelCartsBehaviorCartDownloadable extends F0FModelBehavior {
 					$errors['error']['general'] = $result['error'];
 				}
 			}
-	
+
 			// when there is some error from the plugin then the cart item should not be added
 			if(!$errors){
 				//add item to cart
 				$cartTable = $model->addItem($item);
-	
+
 				if($cartTable === false) {
 					//adding to cart is failed
 					$errors['success'] = 0;
@@ -109,33 +109,33 @@ class J2StoreModelCartsBehaviorCartDownloadable extends F0FModelBehavior {
 					$errors['cart_id'] = $cartTable->j2store_cart_id;
 				}
 			}
-	
+
 		}
-	
+
 		$json->result = $errors;
-	
+
 	}
-	
+
 	public function onGetCartItems(&$model, &$item) {
-	
+
 		//sanity check
 		if($item->product_type != 'downloadable') return;
-	
+
 		$product_helper = J2Store::product();
 		//Options
 		//print_r(base64_decode($item->product_options));
-	
+
 		if (isset($item->product_options)) {
 			$options = unserialize(base64_decode($item->product_options));
 		} else {
 			$options = array();
 		}
-	
+
 		$product = $product_helper->setId($item->product_id)->getProduct();
 		$product_option_data = $product_helper->getOptionPrice($options, $product->j2store_product_id);
 		//print_r($product_option_data);
-	
-	
+
+
 		$item->product_name = $product->product_name;
 		$item->product_view_url = $product->product_view_url;
 		$item->options = $product_option_data['option_data'];
@@ -147,43 +147,43 @@ class J2StoreModelCartsBehaviorCartDownloadable extends F0FModelBehavior {
 			$group_id = $item->group_id;
 		}
 		$item->pricing = $product_helper->getPrice($item, $item->product_qty,$group_id);
-	
+
 	}
-	
+
 	public function onValidateCart(&$model, $cartitem, $quantity) {
-	
+
 		//sanity check
 		if($cartitem->product_type != 'downloadable') return;
-	
+
 		$product_helper = J2Store::product();
 		$product = $product_helper->setId($cartitem->product_id)->getProduct();
 		$variant = F0FModel::getTmpInstance('Variants', 'J2StoreModel')->getItem($cartitem->variant_id);
 		$errors = array();
-	
+
 		//before validating, get the total quantity of this variant in the cart
 		$cart_total_qty  = $product_helper->getTotalCartQuantity($variant->j2store_variant_id);
-	
-	
+
+
 		//get the quantity difference. Because we are going to check the total quantity
 		$difference_qty = $quantity - $cartitem->product_qty;
-	
+
 		//validate minimum / maximum quantity
 		$error = $product_helper->validateQuantityRestriction($variant , $cart_total_qty, $difference_qty);
 		if(!empty($error)) {
 			$errors[] = $error;
 		}
-	
+
 		//validate inventory
 		if($product_helper->check_stock_status($variant, $cart_total_qty+$difference_qty) === false) {
 			$errors[] = JText::_('J2STORE_OUT_OF_STOCK');
 		}
-	
+
 		if(count($errors)) {
 			throw new Exception(implode('/n', $errors));
 			return false;
 		}
 		return true;
 	}
-	
+
 }
 

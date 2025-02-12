@@ -1,18 +1,30 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined ( '_JEXEC' ) or die ();
-$order_state_save_link = JRoute::_('index.php?option=com_j2store&view=orders&task=orderstatesave');
 
+defined('_JEXEC') or die;
+
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
+
+HTMLHelper::_('bootstrap.collapse', '[data-bs-toggle="collapse"]');
+
+$order_state_save_link = Route::_('index.php?option=com_j2store&view=orders&task=orderstatesave');
+$attr = array('class'=>'form-select form-select-sm');
 $this->order_state =J2Html::select()
 	->type('genericlist')
 	->name('order_state_id')
 	->value($this->item->order_state_id)
 	->idTag("order_state_id_".$this->item->j2store_order_id)
+	->attribs($attr)
 	->setPlaceHolders(array(''=>JText::_('J2STORE_SELECT_OPTION')))
 	->hasOne('Orderstatuses')
 	->ordering('ordering')
@@ -25,51 +37,28 @@ $this->order_state =J2Html::select()
 			)
 		)
 	)->getHtml();
-
 ?>
-
-	<div class="panel-body">
-		<div class="control-group">
-			<?php echo  J2Html::label(JText::_('J2STORE_ORDER_STATUS'),'order_status',array('class'=>'control-label'));?>
-			<?php echo $this->order_state; ?>
+<div class="j2-right-top d-flex align-items-center mb-1 justify-content-lg-end">
+    <div class="d-flex">
+        <div class="status-selector">
+            <div class="input-group input-group-sm mb-0">
+                <div class="d-flex align-items-center me-lg-2 mb-2 mb-lg-0">
+                    <div class="form-check form-switch me-2 me-lg-3 pt-0">
+                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" name="notify_customer" id="notify_customer" value="1">
+                        <label class="form-check-label cursor-pointer small" for="notify_customer"><?php echo Text::_('J2STORE_NOTIFY_CUSTOMER');?></label>
+                    </div>
+                    <div class="form-check form-switch me-2 me-lg-3 pt-0">
+                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" name="reduce_stock" id="reduce_stock" value="1">
+                        <label class="form-check-label cursor-pointer small" for="reduce_stock"><?php echo Text::_('J2STORE_REDUCE_STOCK');?></label>
+                    </div>
+                    <div class="form-check form-switch me-2 me-lg-3 pt-0">
+                        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" name="increase_stock" id="increase_stock" value="1">
+                        <label class="form-check-label cursor-pointer small" for="increase_stock"><?php echo Text::_('J2STORE_INCREASE_STOCK');?></label>
+                    </div>
+                </div>
+			    <?php echo $this->order_state; ?>
+                <button class="btn btn-primary btn-sm" type="submit" onclick="jQuery('#task').attr('value','saveOrderstatus');"><?php echo Text::_('J2STORE_ORDER_STATUS_SAVE'); ?></button>
+		    </div>
 		</div>
-
-		 <div class="control-group">
-			<label class="control-label">
-				<input type="checkbox" name="notify_customer" value="1" />
-					<?php echo JText::_('J2STORE_NOTIFY_CUSTOMER');?>
-			</label>
-
-			<label class="control-label">
-				<input type="checkbox" name="reduce_stock" value="1" />
-					<?php echo JText::_('J2STORE_REDUCE_STOCK');?>
-			</label>
-			<label class="control-label">
-				<input type="checkbox" name="increase_stock" value="1" />
-					<?php echo JText::_('J2STORE_INCREASE_STOCK');?>
-			</label>
-
-			<?php if($this->order->has_downloadable_item()): ?>
-				<label class="control-label">
-					<input type="checkbox" name="grant_download_access" value="1" />
-					<?php echo JText::_('J2STORE_GRANT_DOWNLOAD_PERMISSION');?>
-				</label>
-
-				<label class="control-label">
-					<input type="checkbox" name="reset_download_expiry" value="1" />
-					<?php echo JText::_('J2STORE_RESET_DOWNLOAD_EXPIRY');?>
-				</label>
-
-                <label class="control-label">
-                    <input type="checkbox" name="reset_download_limit" value="1" />
-                    <?php echo JText::_('J2STORE_RESET_DOWNLOAD_LIMIT');?>
-                </label>
-			<?php endif;?>
-		</div>
-
-		<div class="control-group">
-			<input class="btn btn-large btn-success" type="submit" onclick="jQuery('#task').attr('value','saveOrderstatus');"
-				value="<?php echo JText::_('J2STORE_ORDER_STATUS_SAVE'); ?>" />
-		</div>
-
-	</div>
+    </div>
+</div>

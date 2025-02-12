@@ -1,11 +1,18 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
 class J2StoreControllerCountries extends F0FController
 {
@@ -24,14 +31,12 @@ class J2StoreControllerCountries extends F0FController
         $this->editToolBar();
         $vars->primary_key = 'j2store_country_id';
         $vars->id = $this->getPageId();
-        $country_table = F0FTable::getInstance('Country', 'J2StoreTable')->getClone ();
+        $country_table = J2Store::fof()->loadTable('Country', 'J2StoreTable')->getClone ();
         $country_table->load($vars->id);
         $vars->item = $country_table;
         $vars->field_sets = array();
         $col_class = 'col-md-';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $col_class = 'span';
-        }
+
         $vars->field_sets[] = array(
             'id' => 'basic_information',
             'class' => array(
@@ -44,28 +49,28 @@ class J2StoreControllerCountries extends F0FController
                     'type' => 'text',
                     'name' => 'country_name',
                     'value' => $country_table->country_name,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'country_isocode_2' => array(
                     'label' => 'J2STORE_COUNTRY_CODE2',
                     'type' => 'text',
                     'name' => 'country_isocode_2',
                     'value' => $country_table->country_isocode_2,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'country_isocode_3' => array(
                     'label' => 'J2STORE_COUNTRY_CODE3',
                     'type' => 'text',
                     'name' => 'country_isocode_3',
                     'value' => $country_table->country_isocode_3,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
                     'type' => 'enabled',
                     'name' => 'enabled',
                     'value' => $country_table->enabled,
-                    'options' => array('class' => 'input-xlarge')
+                    'options' => array('class' => '')
                 ),
             )
         );
@@ -73,7 +78,7 @@ class J2StoreControllerCountries extends F0FController
     }
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['country_name'] = $app->input->getString('country_name','');
@@ -127,8 +132,8 @@ class J2StoreControllerCountries extends F0FController
 	 */
 	function elements(){
 		$geozone_id = $this->input->getInt('geozone_id');
-		$model = F0FModel::getTmpInstance('Countries','J2StoreModel');
-		$filter =array();
+		$model = J2Store::fof()->getModel('Countries','J2StoreModel');
+		$filter = [];
 		$filter['limit'] = $this->input->getInt('limit',20);
 		$filter['limitstart'] = $this->input->getInt('limitstart');
 		$filter['search'] = $this->input->getString('search','');
@@ -141,10 +146,10 @@ class J2StoreControllerCountries extends F0FController
 			$view = $this->getThisView();
 			$state = $model->getState();
 			$view->setModel($this->getThisModel(),true);
-			$view->assign('countries',$model->enabled(1)->country_name($filter['country_name'])->getItemList());
-			$view->assign('pagination',$model->getPagination());
-			$view->assign('geozone_id',$geozone_id);
-			$view->assign('state',$model->getState());
+			$view->set('countries',$model->enabled(1)->country_name($filter['country_name'])->getItemList());
+			$view->set('pagination',$model->getPagination());
+			$view->set('geozone_id',$geozone_id);
+			$view->set('state',$model->getState());
 			$view->setLayout('modal');
 			$view->display();
 		}else{

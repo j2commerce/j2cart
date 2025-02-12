@@ -1,20 +1,31 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined ( '_JEXEC' ) or die ();
 
+defined ('_JEXEC') or die;
+
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Associations;
+use Joomla\CMS\Router\Route;
+use Joomla\Filter\OutputFilter;
+use \J2Commerce\Helper\J2StoreRouterHelper;
 
-class J2Article {
-
+class J2Article
+{
 	public static $instance = null;
 	protected $state;
 
-	public function __construct($properties=null) {
+	public function __construct($properties=null)
+  {
 
 	}
 
@@ -35,38 +46,37 @@ class J2Article {
 			return;
 		}
 		//try loading language associations
-		if(version_compare(JVERSION, '3.3', 'gt')) {
 			$id = $this->getAssociatedArticle($articleid);
 			if($id && is_int($id)) {
 				$articleid = $id;
 			}
-		}
 		$item = $this->getArticle($articleid);
 		// Return html if the load fails
 		if (!$item->id)
 		{
 			return $html;
 		}
-	
-		$item->title = JFilterOutput::ampReplace($item->title);
-	
+
+		$item->title = OutputFilter::ampReplace($item->title);
+
 		$item->text = '';
-	
+
 		$item->text = $item->introtext . chr(13).chr(13) . $item->fulltext;
 
 		$prepare_content = J2Store::config()->get('prepare_content', 0);
 		if($prepare_content) {
-			$html .= JHtml::_('content.prepare', $item->text);
+			$html .= HTMLHelper::_('content.prepare', $item->text);
 		}else {
 			$html .= $item->text;
-		}	
-	
+		}
+
 		return $html;
 	}
-	
-	public function getArticle($id) {
+
+	public function getArticle($id)
+  {
 		static $sets;
-	
+
 		if ( !is_array( $sets ) )
 		{
 			$sets = array( );
@@ -82,7 +92,8 @@ class J2Article {
 		return $sets[$id];
 	}
 
-	public function getArticleLink($id = 0){
+	public function getArticleLink($id = 0)
+  {
 	    $link = '';
 	    if(empty($id)){
 	        return $link;
@@ -93,21 +104,17 @@ class J2Article {
         if (!class_exists('ContentHelperRoute')) {
             require_once $com_path.'helpers/route.php';
         }
-        if (!class_exists('ContentRouter')) {
-            if (version_compare(JVERSION, '3.99.99', 'lt')) {
-                include $com_path . 'router.php';
-            }
-        }
-        return JRoute::_(ContentHelperRoute::getArticleRoute($article->id, $article->catid, $article->language));
+        return Route::_(ContentHelperRoute::getArticleRoute($article->id, $article->catid, $article->language));
     }
 
-	public function loadFalangAliasById($id,$lang_id){
+	public function loadFalangAliasById($id,$lang_id)
+  {
 		if (empty($id) || empty($lang_id)){
 			return '';
 		}
 
 		//get default language
-        $params               = JComponentHelper::getParams('com_languages');
+        $params = ComponentHelper::getParams('com_languages');
         $lang = $params->get('site');
 		$default_lang_id = J2StoreRouterHelper::getLanguageId($lang);
         $db = Factory::getContainer()->get('DatabaseDriver');
@@ -129,7 +136,7 @@ class J2Article {
 		$alias = $db->loadResult();
 		return $alias;
 	}
-	
+
 	public function getArticleByAlias($alias, $categories = array())
 	{
 		static $sets;
@@ -140,7 +147,6 @@ class J2Article {
 		}
 		if ( ! isset( $sets[ $alias ] ) )
 		{
-
 			$content_id = 0;
 			if ( $this->isFalangInstalled() )
 			{
@@ -152,7 +158,7 @@ class J2Article {
 				}
 			}
 
-            $db = Factory::getContainer()->get('DatabaseDriver');
+      $db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery( true );
 			$query->select( '*' )->from( '#__content' );
 			if ( $content_id > 0 )
@@ -161,7 +167,7 @@ class J2Article {
 			} else
 			{
 				$query->where( $db->quoteName( 'alias' ) . ' = ' . $db->quote( $alias ) );
-				$tag = JFactory::getLanguage()->getTag();
+				$tag = Factory::getApplication()->getLanguage()->getTag();
 				if ( $tag != '*' && ! empty( $tag ) )
 				{
 					$query->where( $db->quoteName( 'language' ) . ' IN (' . $db->quote( $tag ) . ',' . $db->quote( '*' ) . ' )' );
@@ -197,9 +203,10 @@ class J2Article {
 	 * Check if Falang is installed
 	 * @return bool true if falng is installed
 	 * */
-	public function isFalangInstalled() {
-		if(JComponentHelper::isInstalled('com_falang')) {
-			if(JComponentHelper::isEnabled('com_falang')) {
+	public function isFalangInstalled()
+  {
+		if(ComponentHelper::isInstalled('com_falang')) {
+			if(ComponentHelper::isEnabled('com_falang')) {
 				return true;
 			}
 		}
@@ -211,7 +218,8 @@ class J2Article {
 	 * @param string $alias article or product alias
 	 * @return int    		content_id of the corresponding article or 0 if none
 	 * */
-	public function loadFalangContentID($alias='') {
+	public function loadFalangContentID($alias='')
+  {
 		if (empty($alias)){
 			return 0;
 		}
@@ -230,16 +238,12 @@ class J2Article {
 		return $content_id;
 	}
 
-
-    public function getAssociatedArticle($id,$tag='') {
-
+    public function getAssociatedArticle($id,$tag='')
+    {
         $associated_id =0;
 
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            require_once JPATH_SITE . '/components/com_content/helpers/route.php';
-        }
         if(empty($tag)){
-            $tag = JFactory::getLanguage()->getTag();
+            $tag = Factory::getApplication()->getLanguage()->getTag();
         }
         $result = $this->getAssociations($id, 'article',$tag);
         if(isset($result[$tag])) {
@@ -258,29 +262,26 @@ class J2Article {
      * @param   string   $view  Name of the view
      *
      * @return  array   Array of associations for the item
-     *
-     * @since  3.0
      */
-    public function getAssociations($id = 0, $view = null,$currecnt_tag = '')
+    public function getAssociations($id = 0, $view = null, $current_tag = '')
     {
-        $user   = JFactory::getUser();
+        $user   = Factory::getApplication()->getIdentity();
         $groups = implode(',', $user->getAuthorisedViewLevels());
 
         if ( $view === 'article' && !empty($id) )
         {
             if ($id)
             {
-                $associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $id);
+                $associations = Associations::getAssociations('com_content', '#__content', 'com_content.item', $id);
 
                 $return = array();
-                if(empty($currecnt_tag)){
-                    $tag = JFactory::getLanguage()->getTag();
+                if(empty($current_tag)){
+                    $tag = Factory::getApplication()->getLanguage()->getTag();
                 }
-                //$currecnt_tag = JFactory::getLanguage()->getTag();
                 foreach ($associations as $tag => $item)
                 {
                     // no need to run other language
-                    if($currecnt_tag == $tag){
+                    if($current_tag === $tag){
                         $arrId   = explode(':', $item->id);
                         $assocId = $arrId[0];
 
@@ -309,50 +310,24 @@ class J2Article {
         return array();
     }
 
-	
-
-	/*public function getAssociatedArticle($id,$tag = '') {
-		$associated_id =0;
-		require_once JPATH_SITE . '/components/com_content/helpers/route.php';
-	
-		require_once(JPATH_SITE.'/components/com_content/helpers/association.php');
-		$result = ContentHelperAssociation::getAssociations($id, 'article');
-		if(empty($tag)){
-            $tag = JFactory::getLanguage()->getTag();
-        }
-		if(isset($result[$tag])) {
-			$parts = JString::parse_url($result[$tag]);
-			parse_str($parts['query'], $vars);
-			if(isset($vars['id'])) {
-				$splits = explode(':', $vars['id']);
-			}
-			$associated_id = (int) $splits[0];
-		}
-	
-		if(isset($associated_id) && $associated_id) {
-			$id = $associated_id;
-		}
-		return $id;
-	}*/
-	
-	public function getCategoryById($id) {
+	public function getCategoryById($id)
+  {
 		if (! is_numeric ( $id ) || empty ( $id ))
 			return new stdClass();
-		
+
 		static $csets;
-		
+
 		if (! is_array ( $csets )) {
 			$csets = array ();
 		}
 		if (! isset ( $csets [$id] )) {
-			$db = JFactory::getDbo ();
+			$db = Factory::getContainer()->get('DatabaseDriver');
 			$query = $db->getQuery ( true );
 			$query->select ( '*' )->from ( '#__categories' )->where ( $db->quoteName ( 'id' ) . ' = ' . $db->quote ( $id ) );
 			$db->setQuery ( $query );
 			$csets [$id] = $db->loadObject ();
 		}
-		
+
 		return $csets [$id];
 	}
-	
-}	
+}

@@ -1,28 +1,31 @@
 <?php
 /**
- * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
- * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
 
-defined ( '_JEXEC' ) or die ();
+defined('_JEXEC') or die;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\Filesystem\File;
 use Joomla\Filesystem\Path;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Toolbar\Toolbar;
 
-
-class J2StoreControllerEmailtemplates extends F0FController {
-
-
+class J2StoreControllerEmailtemplates extends F0FController
+{
     use list_view;
 
-    public function execute($task) {
+    public function execute($task)
+    {
         if (in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
@@ -46,19 +49,19 @@ class J2StoreControllerEmailtemplates extends F0FController {
 
 		$vars->primary_key = 'j2store_emailtemplate_id';
 		$vars->id = $this->getPageId();
-		$emailtemplateTable = F0FTable::getInstance('Emailtemplate', 'J2StoreTable')->getClone();
+		$emailtemplateTable = J2Store::fof()->loadTable('Emailtemplate', 'J2StoreTable')->getClone();
 		$emailtemplateTable->load($vars->id);
 		$vars->item = $emailtemplateTable;
 		$vars->field_sets = [];
 
-		$orderStatusModel = F0FModel::getTmpInstance('Orderstatuses', 'J2StoreModel');
+		$orderStatusModel = J2Store::fof()->getModel('Orderstatuses', 'J2StoreModel');
 		$defaultOrderStatusList = $orderStatusModel->enabled(1)->getList();
 		$orderStatus = ['*' => Text::_('JALL')];
 		foreach ($defaultOrderStatusList as $status) {
 			$orderStatus[$status->j2store_orderstatus_id] = Text::_(strtoupper($status->orderstatus_name));
 		}
 
-		$paymentModel = F0FModel::getTmpInstance('Payments', 'J2StoreModel');
+		$paymentModel = J2Store::fof()->getModel('Payments', 'J2StoreModel');
 		$defaultPaymentList = $paymentModel->enabled(1)->getList();
 		$paymentList = ['*' => Text::_('JALL'), 'free' => Text::_('J2STORE_FREE_PAYMENT')];
 		foreach ($defaultPaymentList as $payment) {
@@ -166,10 +169,10 @@ class J2StoreControllerEmailtemplates extends F0FController {
 		$source_hide = '';
 		$body_source_file = '';
 		$body_hide = '';
-		if($body_source == 'html'){
+		if($body_source === 'html'){
 			$source_hide = 'display:none;';
 			$body_source_file = 'display:none;';
-		}elseif ($body_source == 'file'){
+		}elseif ($body_source === 'file'){
             if(empty($emailtemplateTable->body_source_file)){
 				$source_hide = 'display:none;';
 			}
@@ -311,7 +314,6 @@ class J2StoreControllerEmailtemplates extends F0FController {
 	 *
 	 * @return  boolean  True to allow the method to run
 	 */
-
 	protected function onBeforeBrowse()
 	{
 		if (parent::onBeforeBrowse()) {
@@ -322,7 +324,7 @@ class J2StoreControllerEmailtemplates extends F0FController {
 
 			// Check if default.php exists; if not, copy from default.tpl if it exists
 			if (!is_file(Path::clean($defaultPhp)) && is_file(Path::clean($defaultTpl))) {
-				Joomla\Filesystem\File::copy($defaultTpl, $defaultPhp);
+				File::copy($defaultTpl, $defaultPhp);
 			}
 
 			return true;
@@ -333,7 +335,6 @@ class J2StoreControllerEmailtemplates extends F0FController {
 
 	function sendtest()
 	{
-
 		$app = Factory::getApplication();
 		$platform = J2Store::platform();
 		// Retrieve template ID from request

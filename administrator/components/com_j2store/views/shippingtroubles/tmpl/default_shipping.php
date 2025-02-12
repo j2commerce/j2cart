@@ -1,16 +1,18 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
+
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-
 use Joomla\CMS\Router\Route;
 
 $platform = J2Store::platform();
@@ -21,18 +23,13 @@ $this->params = J2Store::config();
 
 $this->tab_name = 'com-j2store-wizard';
 ?>
-<div class="<?php echo $row_class; ?>">
-    <?php if (!empty($sidebar)): ?>
-        <div id="j-sidebar-container" class="<?php echo $col_class ?>2">
-            <?php echo $sidebar; ?>
-        </div>
-        <div id="j-main-container" class="<?php echo $col_class ?>10">
-    <?php else : ?>
-        <div class="j2store">
-    <?php endif; ?>
-
+<?php if (!empty($sidebar)): ?>
+    <div id="j2c-menu" class="mb-4">
+        <?php echo $sidebar; ?>
+    </div>
+<?php endif;?>
+<div class="j2store">
     <?php include 'default_steps.php';?>
-
     <?php if ($this->shipping_available): ?>
         <?php echo HTMLHelper::_('uitab.startTabSet', $this->tab_name, ['active' => 'editor', 'recall' => true, 'breakpoint' => 768]); ?>
             <?php if (isset($this->shipping_messages) && !empty($this->shipping_messages)): ?>
@@ -76,11 +73,4 @@ $this->tab_name = 'com-j2store-wizard';
             <?php echo Text::_('JNEXT');?><span class="fas fa-solid fa-arrow-right ms-2"></span>
         </a>
     </div>
-    <?php if (!empty($sidebar)): ?>
-        </div>
-    <?php else: ?>
-    </div>
-<?php endif; ?>
 </div>
-
-

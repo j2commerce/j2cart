@@ -1,62 +1,73 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
 $platform = J2Store::platform();
 $platform->loadExtra('bootstrap.tooltip');
 $platform->loadExtra('behavior.framework',true);
 
-$app = JFactory::getApplication();
+$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+$wa->useStyle('searchtools');
+
+$app = $platform->application();
 $db = Factory::getContainer()->get('DatabaseDriver');
 $function  = $app->input->getString('function', 'jSelectProduct');
 $field = $app->input->getString('field');
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
-$button_class = 'btn btn-dark';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $button_class = 'btn btn-inverse';
-}
 ?>
+<form action="<?php echo Route::_('index.php?option=com_j2store&view=coupons&task=setProducts');?>" method="post" name="adminForm" id="productadminForm">
+    <fieldset class="options-form">
+        <legend><?php echo Text::_('COM_J2STORE_PRODUCTS');?></legend>
+        <div class="js-stools">
+            <button class="btn btn-primary align-self-center text-capitalize" id="setAllProductsBnt" type="button" style="display:none;"><?php echo Text::_('J2STORE_SET_VALUES');?></button>
+            <div class="js-stools-container-bar mb-0">
+                <div class="btn-toolbar">
 
-
-<form action="<?php echo JRoute::_('index.php?option=com_j2store&view=coupons&task=setProducts');?>" method="post" name="adminForm" id="productadminForm" class="form-inline">
-	<h5><?php echo JText::_('COM_J2STORE_PRODUCTS');?></h5>
-	<div class="row-fluid">
-		<table class="adminlist table table-striped ">
-			<tr>
-				<td>
-					<div class="input-prepend">
-						<span class="add-on"><?php echo JText::_( 'J2STORE_PRODUCT_SKU' ); ?></span>
-						<?php echo J2Html::text('search',htmlspecialchars($this->state->search),array('id'=>'search') );?>
-						<?php echo J2Html::button('go',JText::_( 'J2STORE_FILTER_GO' ) ,array('class'=>'btn btn-success','onclick'=>'this.form.submit();'));?>
-						<?php echo J2Html::button('reset',JText::_( 'J2STORE_FILTER_RESET' ),array('id'=>'reset-filter-search','class'=>$button_class,"onclick"=>"jQuery('#search').val('');this.form.submit();"));?>
+                    <div class="filter-search-bar btn-group">
+                        <div class="input-group">
+                            <?php echo J2Html::text('search',htmlspecialchars($this->state->search),array('id'=>'search','class'=>'form-control','placeholder'=>Text::_('J2STORE_PRODUCT_SKU')));?>
+                            <?php echo J2Html::buttontype('go','<span class="filter-search-bar__button-icon icon-search" aria-hidden="true"></span>' ,array('class'=>'btn btn-primary','onclick'=>'this.form.submit();'));?>
+                            <?php echo J2Html::buttontype('reset', Text::_('JCLEAR'), array('id' => 'reset-filter-search', 'class' => 'filter-search-actions__button btn btn-primary js-stools-btn-clear')); ?>
 					</div>
-				</td>
-				<td>
+                    </div>
+                    <div class="ordering-select">
+                        <div class="js-stools-field-list">
+                            <span class="visually-hidden">
+                                <label id="limit-lbl" for="limit"><?php echo Text::_('JGLOBAL_LIST_LIMIT');?></label>
+                            </span>
 					<?php echo $this->pagination->getLimitBox(); ?>
-				</td>
-			<tr>
-		</table>
-		<table class="table table-striped table-bordered">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table itemList">
 			<thead>
 				<tr>
-					<th>
-						<input class="btn btn-success" id="setAllProductsBnt" type="button" value="<?php echo JText::_('J2STORE_SET_VALUES');?>"  style="display:none;"/>
-						<br>
-						<?php echo JHtml::_('grid.checkall'); ?>
+                    <th scope="col" class="w-1 text-center">
+                        <?php echo HTMLHelper::_('grid.checkall'); ?>
 					</th>
-					<th class="title">
-						<?php echo JText::_('J2STORE_PRODUCT_NAME'); ?>
+                    <th scope="col" class="w-30 title">
+                        <?php echo Text::_('J2STORE_PRODUCT_NAME'); ?>
 					</th>
-					<th class="center nowrap">
-						<?php echo JText::_('J2STORE_PRODUCT_SKU'); ?>
+                    <th scope="col" class="center nowrap">
+                        <?php echo Text::_('J2STORE_PRODUCT_SKU'); ?>
 					</th>
 				</tr>
 			</thead>
@@ -72,17 +83,17 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 				<?php $canChange  = 1;?>
 				<tr>
 					<td>
-						<input data-product-title="<?php echo addslashes($item->product_name);?>" id="cb<?php echo $item->j2store_product_id;?>" type="checkbox" onclick="Joomla.isChecked(this.checked);" value="<?php echo $item->j2store_product_id;?>" name="cid[]">
+                            <input data-product-title="<?php echo $item->product_name;?>" id="cb<?php echo $item->j2store_product_id;?>" type="checkbox" onclick="Joomla.isChecked(this.checked);" value="<?php echo $item->j2store_product_id;?>" name="cid[]" class="form-check-input">
 						<?php echo J2html::hidden('tmp_product_title['.$item->j2store_product_id.']', $item->product_name ,array('class'=>'tmp_product_title')); ?>
 					</td>
 					<td>
-						<a href="javascript:if (window.parent) window.parent.<?php echo $db->escape($function);?>('<?php echo $item->j2store_product_id; ?>','<?php echo $db->escape($item->product_name);?>' ,'<?php echo $field;?>');">
+                            <a href="javascript:if (window.parent) window.parent.<?php echo $db->escape($function);?>('<?php echo $item->j2store_product_id; ?>','<?php echo $item->product_name;?>' ,'<?php echo $field;?>');">
 							<?php echo $item->product_name; ?>
 						</a>
 					</td>
 					<td>
 						<?php if($item->product_type == 'variable'):?>
-						<h5 class="text text-warning"><?php echo JText::_('J2STORE_HAS_VARIANTS'); ?></h5>
+                                <h5 class="fs-5"><?php echo Text::_('J2STORE_HAS_VARIANTS'); ?></h5>
 								<?php
 										$variant_model = F0FModel::getTmpInstance('Variants', 'J2StoreModel');
 										$variant_model->setState('product_type', $item->product_type);
@@ -91,22 +102,25 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 													->getList();
 										if(isset($variants) && count($variants)):?>
 
-										<?php foreach($variants as $variant):?>
-											<?php if(!empty($variant->sku)):?>
-												<?php echo $variant->sku; ?>
-												<br>
-											<?php endif;?>
-
-										<?php endforeach;?>
+                                    <?php
+                                    $skus = []; // Initialize an array to store SKUs
+                                    foreach ($variants as $variant) {
+                                        if (!empty($variant->sku)) {
+                                            $skus[] = '<small>' . htmlspecialchars($variant->sku) . '</small>';
+                                        }
+                                    }
+                                    echo implode(', ', $skus);
+                                    ?>
 										<?php endif;?>
 						<?php else:?>
-							<?php echo $item->sku; ?>
+                                <small><?php echo $item->sku; ?></small>
 						<?php endif;?>
 					</td>
 				</tr>
 				<?php endforeach;?>
 			</tbody>
 		</table>
+        </div>
 		<?php echo J2Html::hidden('option','com_j2store');?>
 		<?php echo J2Html::hidden('view','coupons');?>
 		<?php echo J2Html::hidden('tmpl','component');?>
@@ -116,8 +130,8 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		<?php echo J2Html::hidden('filter_order',$listOrder);?>
 		<?php echo J2Html::hidden('filter_order_Dir',$listDirn);?>
 		<?php echo J2Html::hidden('field',$field);?>
-		<?php echo JHtml::_('form.token'); ?>
-	</div>
+        <?php echo HTMLHelper::_('form.token'); ?>
+    </fieldset>
 </form>
 <script>
 var newArray =new Array();
@@ -178,9 +192,6 @@ Joomla.isChecked=function(a,d){
 	}
 };
 
-
-
-
 (function($){
 	$("input[name=checkall-toggle]").click(function(){
 		$("#setAllProductsBnt").toggle(this.checked);
@@ -230,4 +241,3 @@ Joomla.isChecked=function(a,d){
 	}
 })(j2store.jQuery);
 </script>
-

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 defined ( '_JEXEC' ) or die ();
@@ -40,7 +40,7 @@ $platform = J2Store::platform();
 							</span>
 						<?php endif; ?>
 						<span class="cart-product-name">
-							<?php echo $item->orderitem_name; ?>  
+							<?php echo $item->orderitem_name; ?>
 						</span>
 						<br>
 						<?php if(isset($item->orderitemattributes)): ?>
@@ -78,7 +78,7 @@ $platform = J2Store::platform();
 						<?php if($this->params->get('show_price_field', 1)): ?>
 
 							<span class="cart-product-unit-price">
-								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>								
+								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>
 								<span class="cart-item-value">
 									<?php echo $currency->format($this->order->get_formatted_order_lineitem_price($item, $this->params->get('checkout_price_display_options', 1)), $this->order->currency_code, $this->order->currency_value);?>
 								</span>
@@ -102,9 +102,9 @@ $platform = J2Store::platform();
 				</tr>
 				<?php endforeach; ?>
 			</tbody>
-		 	
+
 			<tfoot class="cart-footer">
-		<?php $colmspan = 3;?>		
+		<?php $colmspan = 3;?>
 			<tr>
 			<td colspan="<?php echo $colmspan;?>">
 			<?php  echo $this->loadTemplate('voucher'); ?>
@@ -148,7 +148,7 @@ $platform = J2Store::platform();
 			</tr>
 			<?php endif; ?>
 			<!-- shipping tax -->
-			<?php foreach ( $this->order->get_fees() as $fee ) :?>			
+			<?php foreach ( $this->order->get_fees() as $fee ) :?>
 			<tr>
 				<td colspan="<?php echo $colmspan;?>"><?php echo JText::_($fee->name); ?><a class="j2store-remove remove-icon" href="javascript:void(0)" onClick="removeFee('<?php echo $fee->j2store_orderfee_id;?>')">X</a>
 				</td>
@@ -157,13 +157,13 @@ $platform = J2Store::platform();
 			</tr>
 			<?php endforeach;?>
 			<!-- surcharge -->
-			<?php if($this->order->order_surcharge > 0):?> 
+			<?php if($this->order->order_surcharge > 0):?>
 			<tr>
 				<td colspan="<?php echo $colmspan;?>"><?php echo JText::_('J2STORE_CART_SURCHARGE'); ?>
 				</td>
 				<td><?php echo $this->currency->format($this->order->order_surcharge, $this->order->currency_code, $this->order->currency_value); ?>
 				</td>
-			</tr>		
+			</tr>
 			<?php endif;?>
 			<!-- discount -->
 			<?php foreach($this->order->getOrderDiscounts() as $discount):?>
@@ -177,9 +177,9 @@ $platform = J2Store::platform();
 							<?php echo JText::sprintf('J2STORE_VOUCHER_TITLE', $discount->discount_title); ?>
 							<a class="j2store-remove remove-icon" href="javascript:void(0)" onClick="removeVouchers()">X</a>
 						<?php else:?>
-							<?php echo JText::sprintf('J2STORE_DISCOUNT_TITLE', $discount->discount_title); ?>							
+							<?php echo JText::sprintf('J2STORE_DISCOUNT_TITLE', $discount->discount_title); ?>
 						<?php endif;?>
-						</td>						
+						</td>
 						<td><?php echo $this->currency->format($this->order->get_formatted_discount($discount, $this->params->get('checkout_price_display_options', 1)), $this->order->currency_code, $this->order->currency_value); ?>
 						</td>
 					</tr>
@@ -215,7 +215,7 @@ $platform = J2Store::platform();
 				</td>
 				<td><?php echo $this->currency->format($this->order->get_formatted_grandtotal(),$this->order->currency_code, $this->order->currency_value); ?>
 				</td>
-				
+
 			</tr>
 			<tr class="add_fee_con">
 
@@ -249,14 +249,14 @@ $platform = J2Store::platform();
 					</span>
 				</td>
 			</tr>
-		</tfoot>				
+		</tfoot>
 	</table>
-	
+
 <?php else :?>
 <span class="cart-no-items">
 				<?php echo JText::_('J2STORE_CART_NO_ITEMS'); ?>
 </span>
-<?php endif;?>	
+<?php endif;?>
 <script type="text/javascript">
 	function addAdditionalFee() {
 		(function ($) {
@@ -329,23 +329,23 @@ $platform = J2Store::platform();
 		var data1 = {
 				option: 'com_j2store',
 				view: 'orders',
-				task: 'calculateTax',	
-				oid: '<?php echo $this->order->j2store_order_id;?>'			
+				task: 'calculateTax',
+				oid: '<?php echo $this->order->j2store_order_id;?>'
 			};
 		$.ajax({
 			type : 'post',
 			url :  'index.php',
-			data : data1,		
+			data : data1,
 			dataType: 'json',
-			success : function(json) {	
-				
+			success : function(json) {
+
 				if(json['error']){
-					//$('.j2store-remove').after('<span>'+json['error']+'</span>');			
+					//$('.j2store-remove').after('<span>'+json['error']+'</span>');
 				}
 				if(json['success']){
-					 window.location = json['redirect']; 
+					 window.location = json['redirect'];
 				}
-						
+
 			},
 		 error: function(xhr, ajaxOptions, thrownError) {
              //alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -354,7 +354,7 @@ $platform = J2Store::platform();
 		});
 	})(j2store.jQuery);
 
-function removeCoupon(){	
+function removeCoupon(){
 	(function($){
 		/* $('#task').attr('value','displayAdminProduct');
 		$('#view').attr('value','products'); */
@@ -362,30 +362,30 @@ function removeCoupon(){
 		var data1 = {
 				option: 'com_j2store',
 				view: 'carts',
-				task: 'removeCoupon',				
+				task: 'removeCoupon',
 			};
 		$.each( post_data, function( key, value ) {
-			
+
 			 if (!(value['name'] in data1) ){
-				 data1[value['name']] = value['value'];	
+				 data1[value['name']] = value['value'];
 			}
-			
+
 		});
 		console.log(data1);
 		$.ajax({
 			type : 'post',
 			url :  'index.php',
-			data : data1,		
+			data : data1,
 			dataType: 'json',
-			success : function(json) {	
-				
+			success : function(json) {
+
 				if(json['error']){
-					//$('.j2store-remove').after('<span>'+json['error']+'</span>');			
+					//$('.j2store-remove').after('<span>'+json['error']+'</span>');
 				}
 				if(json['success']){
-					 window.location = json['redirect']; 
+					 window.location = json['redirect'];
 				}
-						
+
 			},
 		 error: function(xhr, ajaxOptions, thrownError) {
              //alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -401,30 +401,30 @@ function removeVouchers(){
 		var data1 = {
 				option: 'com_j2store',
 				view: 'carts',
-				task: 'removeVoucher',				
+				task: 'removeVoucher',
 			};
 		$.each( post_data, function( key, value ) {
-			
+
 			 if (!(value['name'] in data1) ){
-				 data1[value['name']] = value['value'];	
+				 data1[value['name']] = value['value'];
 			}
-			
+
 		});
 		//console.log(data1);
 		$.ajax({
 			type : 'post',
 			url :  'index.php',
-			data : data1,		
+			data : data1,
 			dataType: 'json',
-			success : function(json) {	
-				
+			success : function(json) {
+
 				if(json['error']){
-					//$('.j2store-remove').after('<span>'+json['error']+'</span>');			
+					//$('.j2store-remove').after('<span>'+json['error']+'</span>');
 				}
 				if(json['success']){
-					 window.location = json['redirect']; 
+					 window.location = json['redirect'];
 				}
-						
+
 			},
 		 error: function(xhr, ajaxOptions, thrownError) {
              //alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);

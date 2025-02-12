@@ -1,21 +1,30 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerWeights extends F0FController
 {
     use list_view;
-    public function execute($task) {
+
+    public function execute($task)
+    {
         if(in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
         return parent::execute($task);
     }
+
     function add()
     {
         $platform = J2Store::platform();
@@ -24,16 +33,15 @@ class J2StoreControllerWeights extends F0FController
         $this->editToolBar();
         $vars->primary_key = 'j2store_weight_id';
         $vars->id = $this->getPageId();
-        $weight_table = F0FTable::getInstance('Weight', 'J2StoreTable')->getClone ();
+        $weight_table = J2Store::fof()->loadTable('Weight', 'J2StoreTable')->getClone ();
         $weight_table->load($vars->id);
         $vars->item = $weight_table;
         $vars->field_sets = array();
         $col_class = 'col-md-';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $col_class = 'span';
-        }
+
         $vars->field_sets[] = array(
             'id' => 'basic_information',
+            'label' => 'COM_J2STORE_TITLE_WEIGHTS_EDIT',
             'class' => array(
                 $col_class.'6'
             ),
@@ -43,36 +51,37 @@ class J2StoreControllerWeights extends F0FController
                     'type' => 'text',
                     'name' => 'weight_title',
                     'value' => $weight_table->weight_title,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'weight_unit' => array(
                     'label' => 'J2STORE_WEIGHT_UNIT_LABEL',
                     'type' => 'text',
                     'name' => 'weight_unit',
                     'value' => $weight_table->weight_unit,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'weight_value' => array(
                     'label' => 'J2STORE_WEIGHT_VALUE_LABEL',
                     'type' => 'number',
                     'name' => 'weight_value',
                     'value' => (float)$weight_table->weight_value,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
                     'type' => 'enabled',
                     'name' => 'enabled',
                     'value' => $weight_table->enabled,
-                    'options' => array('class' => 'input-xlarge')
+                    'options' => array('class' => '')
                 ),
             )
         );
         echo $this->_getLayout('form', $vars,'edit');
     }
+
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['weight_title'] = $app->input->getString('weight_title','');
@@ -119,5 +128,4 @@ class J2StoreControllerWeights extends F0FController
         $vars->pagination = $model->getPagination();
         echo $this->_getLayout('default',$vars);
     }
-
 }

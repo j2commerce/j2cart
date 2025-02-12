@@ -1,14 +1,25 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
-JHTML::_('behavior.modal');
+
+use Joomla\CMS\Environment\Browser;
+use Joomla\CMS\Language\Text;
+
+$platform = J2Store::platform();
+$platform->loadExtra('behavior.modal');
+
 class JFormFieldPrint extends F0FFormFieldText
-{	/**
+{
+    /**
 	 * The field type.
 	 *
 	 * @var		string
@@ -17,12 +28,11 @@ class JFormFieldPrint extends F0FFormFieldText
 
 	public function getRepeatable()
 	{
-
 		$html ='';
 		$html .='<script type="text/javascript">';
 		$html .="function j2storeOpenModal(url){";
 
-		if(JBrowser::getInstance()->getBrowser() == "msie") {
+		if(Browser::getInstance()->getBrowser() === "msie") {
 				$html .='var options = {size:{x:document.documentElement.­clientWidth-80, y: document.documentElement.­clientHeight-80}};';
 
 		}else{
@@ -33,26 +43,18 @@ class JFormFieldPrint extends F0FFormFieldText
 		}
 		$html .='</script>';
 
-
 		require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/browser.php');
 		$url = J2Store::platform()->getMyprofileUrl(array('task' => 'printOrder','layout' => 'order','tmpl' => 'component','order_id' => $this->item->order_id));
-		 if(JBrowser::getInstance()->getBrowser() == 'msie'){
+		 if(Browser::getInstance()->getBrowser() === 'msie'){
 			$html .='<a class="btn btn-primary btn-small" href="'.$url.'" target="_blank">';
-			$html .=JText::_( "J2STORE_PRINT_INVOICE" );'test';
+			$html .= Text::_( "J2STORE_PRINT_INVOICE" );'test';
 			$html .='</a>';
 		 }else{
 			$html .='<a  onclick="j2storeOpenModal('.stripslashes($url).')">';
-			$html .=JText::_( "J2STORE_PRINT_INVOICE" );
+			$html .= Text::_( "J2STORE_PRINT_INVOICE" );
 			$html .='</a>';
 		  }
 
 		 return $html;
-
 	}
 }
-
-
-
-
-
-

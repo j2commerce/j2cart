@@ -1,18 +1,28 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerFiltergroups extends F0FController
 {
     use list_view;
+
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['group_name'] = $app->input->getString('group_name','');
@@ -57,17 +67,18 @@ class J2StoreControllerFiltergroups extends F0FController
 	 * @params int filtervalueid
 	 * @return array json
 	 */
-	function deleteproductfiltervalues(){
+	function deleteproductfiltervalues()
+  {
 		$o_id = $this->input->getInt('productfiltervalue_id');
-		$productfilter = F0FTable::getAnInstance('filter','J2StoreTable');
+		$productfilter = J2Store::fof()->loadTable('filter','J2StoreTable');
 		$json = array();
 		$json['success'] = true;
-		$json['msg'] = JText::_('J2STORE_PRODUCT_FILTER_VALUE_DELETE_SUCCESS');
+		$json['msg'] = Text::_('J2STORE_PRODUCT_FILTER_VALUE_DELETE_SUCCESS');
 		if(!$productfilter->delete($o_id)){
 			$json['success'] = false;
-			$json['msg'] = JText::_('J2STORE_PRODUCT_FILTER_VALUE_DELETE_ERROR');
+			$json['msg'] = Text::_('J2STORE_PRODUCT_FILTER_VALUE_DELETE_ERROR');
 		}
 		echo json_encode($json);
-		JFactory::getApplication()->close();
+		Factory::getApplication()->close();
 	}
 }

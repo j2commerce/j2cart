@@ -1,37 +1,29 @@
 <?php
 /**
- * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
- * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
- * @author  Ramesh Elamathi (weblogicxindia.com)
- * @author  Adam Melcher adam@j2commerce.com
- * @author  Olivier Buisard olivier@j2commerce.com
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Field\ListField;
-use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 
-FormHelper::loadFieldClass('list');
-
-
-class JFormFieldTagTemplateList extends ListField {
-
+class JFormFieldTagTemplateList extends ListField
+{
 	protected $type = 'TagTemplateList';
 
-	public function getInput() {
-
+	public function getInput()
+    {
 		$fieldName = $this->name;
-		if (version_compare(JVERSION, '3.99.99', 'lt')) {
-			$db = JFactory::getDbo();
-		} else {
 			$db = Factory::getContainer()->get('DatabaseDriver');
-		}
 
 		// Query to get the default template
 		$query = $db->getQuery(true)
@@ -64,7 +56,7 @@ class JFormFieldTagTemplateList extends ListField {
 		foreach ($folders as $folder) {
 			foreach ($include_array as $include){
 				$substring = substr ( $folder,0,strlen ( $include )  );
-				if(($substring != $include) || ($folder == 'tag_default')){
+				if(($substring != $include) || ($folder === 'tag_default')){
 					continue 2;
 				}
 			}
@@ -74,7 +66,6 @@ class JFormFieldTagTemplateList extends ListField {
 		}
 		array_unshift($options, HTMLHelper::_('select.option', 'tag_default', Text::_('J2STORE_USE_DEFAULT')));
 		return HTMLHelper::_('select.genericlist', $options, $fieldName, 'class="form-select"', 'value', 'text', $this->value, $this->control_name . $this->name);
-		
-	}
 
+	}
 }

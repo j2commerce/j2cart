@@ -1,37 +1,34 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
+defined('_JEXEC') or die;
 
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Factory;
 
-
-class J2Currency {
+class J2Currency
+{
   	private $code;
   	private $currencies = array();
   	private $input;
   	private $session;
-	/*
-	 * J2StoreCurrency instance
-	 *
-	 * since 2.6
-	 */
-
   	protected static $instance;
 
-  	public function __construct($config=array()) {
+  	public function __construct($config=array())
+    {
 
 		$this->session = Factory::getApplication()->getSession();
 		$this->input = Factory::getApplication()->input;
 
 		if(count($this->currencies) < 1) {
-			$rows = F0FModel::getTmpInstance('Currencies', 'J2StoreModel')->enabled(1)->getList();
+			$rows = J2Store::fof()->getModel('Currencies', 'J2StoreModel')->enabled(1)->getList();
 	    	foreach ($rows as $result) {
 	      		$this->currencies[$result->currency_code] = (array) $result;
 	    	}
@@ -57,8 +54,8 @@ class J2Currency {
   		return self::$instance;
   	}
 
-
-  	public function set($currency) {
+  	public function set($currency)
+    {
     	$this->code = $currency;
 
     	if (!$this->session->has('currency', 'j2store') || ($this->session->get('currency', '', 'j2store') != $currency)) {
@@ -66,7 +63,8 @@ class J2Currency {
     	}
   	}
 
-  	public function format($number, $currency = '', $value = '', $format = true) {
+  	public function format($number, $currency = '', $value = '', $format = true)
+    {
 		if ($currency && $this->has($currency)) {
 			$currency_position  = $this->currencies[$currency]['currency_position'];
 			$currency_symbol  = $this->currencies[$currency]['currency_symbol'];
@@ -93,7 +91,7 @@ class J2Currency {
 
     	$string = '';
 
-    	if (($currency_position == 'pre') && ($format)) {
+    	if (($currency_position === 'pre') && ($format)) {
       		$string .= $currency_symbol;
     	}
 
@@ -118,14 +116,16 @@ class J2Currency {
     	return $string;
   	}
 
-  	public function convert($value, $from, $to) {
+  	public function convert($value, $from, $to)
+    {
 		if (isset($this->currencies[$from])) {
 			$from = $this->currencies[$from]['currency_value'];
 		} else {
 			$from = 0;
 		}
 
-		if (isset($this->currencies[$to])) {
+		if (isset($this->currencies[$to]))
+    {
 			$to = $this->currencies[$to]['currency_value'];
 		} else {
 			$to = 0;
@@ -134,7 +134,8 @@ class J2Currency {
 		return $value * ($to / $from);
   	}
 
-  	public function getId($currency = '') {
+  	public function getId($currency = '')
+    {
 		if (!$currency) {
 			return $this->currencies[$this->code]['j2store_currency_id'];
 		} elseif ($currency && isset($this->currencies[$currency])) {
@@ -144,7 +145,8 @@ class J2Currency {
 		}
   	}
 
-	public function getSymbol($currency = '') {
+	public function getSymbol($currency = '')
+  {
 		if (!$currency) {
 			return $this->currencies[$this->code]['currency_symbol'];
 		} elseif ($currency && isset($this->currencies[$currency])) {
@@ -154,7 +156,8 @@ class J2Currency {
 		}
   	}
 
-	public function getSymbolPosition($currency = '') {
+	public function getSymbolPosition($currency = '')
+  {
 		if (!$currency) {
 			return $this->currencies[$this->code]['currency_position'];
 		} elseif ($currency && isset($this->currencies[$currency])) {
@@ -164,7 +167,8 @@ class J2Currency {
 		}
   	}
 
-	public function getDecimalPlace($currency = '') {
+	public function getDecimalPlace($currency = '')
+  {
 		if (!$currency) {
 			return $this->currencies[$this->code]['currency_num_decimals'];
 		} elseif ($currency && isset($this->currencies[$currency])) {
@@ -174,7 +178,8 @@ class J2Currency {
 		}
   	}
 
-	public function getThousandSymbol($currency=''){
+	public function getThousandSymbol($currency='')
+  {
 		if (!$currency) {
 			return $this->currencies[$this->code]['currency_thousands'];
 		} elseif ($currency && isset($this->currencies[$currency])) {
@@ -183,15 +188,19 @@ class J2Currency {
 			return 0;
 		}
 	}
-	public function getThousandSysmbol($currency=''){ // kept for backwards compatibility with those who use layout overrides on the template
+
+	public function getThousandSysmbol($currency='')
+  { // kept for backwards compatibility with those who use layout overrides on the template
 		return $this->getThousandSymbol($currency);
 	}
 
-  	public function getCode() {
+  	public function getCode()
+    {
     	return $this->code;
   	}
 
-  	public function getValue($currency = '') {
+  	public function getValue($currency = '')
+    {
 		if (!$currency) {
 			return $this->currencies[$this->code]['currency_value'];
 		} elseif ($currency && isset($this->currencies[$currency])) {
@@ -201,11 +210,13 @@ class J2Currency {
 		}
   	}
 
-  	public function has($currency) {
+  	public function has($currency)
+    {
     	return isset($this->currencies[$currency]);
   	}
 
-  	public static function getNumericCurrencies(){
+  	public static function getNumericCurrencies()
+    {
   		$currencies = self::getNumericCode();
   		$result = array();
   		foreach($currencies as $key => $value){
@@ -214,7 +225,8 @@ class J2Currency {
   		return $result;
   	}
 
-  	public static function getCurrenciesNumericCode($code){
+  	public static function getCurrenciesNumericCode($code)
+    {
   		$result = self::getNumericCode();
   		if(isset($code)){
   			$result = $result[$code];
@@ -223,18 +235,15 @@ class J2Currency {
   		return $result;
   	}
 
-
-
-
-
-
   	/**
   	 * Method to get Numerice code
   	 * @param string $code alpha 3 digit code
   	 * @return int numeric code
   	 */
-  	public static function getNumericCode(){
-  		$result = array('AFN' => 4,
+  	public static function getNumericCode()
+    {
+  		$result = [
+          'AFN' => 4,
   				'ALL' => 8,
   				'DZD' => 12,
   				'USD' => 581,
@@ -395,8 +404,8 @@ class J2Currency {
   				'YER' => 887,
   				'ZMK' => 894,
   				'ZWD' => 716,
-		    'BTC'=> 999
-  		);
+		      'BTC' => 999,
+  		];
 
   		return $result;
   	}

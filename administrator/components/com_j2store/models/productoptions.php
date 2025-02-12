@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 defined ( '_JEXEC' ) or die ();
@@ -10,7 +10,7 @@ class J2StoreModelProductOptions extends F0FModel {
 
 	public function buildQuery($overrideLimits = false) {
 
-		$query = parent::buildQuery($overrideLimits);		
+		$query = parent::buildQuery($overrideLimits);
 		$query->select('#__j2store_options.option_unique_name, #__j2store_options.option_name, #__j2store_options.type, #__j2store_options.option_params')
 			->join('LEFT OUTER','#__j2store_options ON #__j2store_options.j2store_option_id = #__j2store_product_options.option_id');
 
@@ -20,7 +20,7 @@ class J2StoreModelProductOptions extends F0FModel {
 			$query->where($this->_db->qn('#__j2store_product_options.parent_id').' = '.$this->_db->q($parent_id));
 		}
 		$query->clear('order');
-		$query->order('#__j2store_product_options.ordering ASC');		
+		$query->order('#__j2store_product_options.ordering ASC');
 		return $query;
 	}
 

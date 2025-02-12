@@ -1,14 +1,16 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
+defined('_JEXEC') or die;
 
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -19,32 +21,28 @@ $wa->useScript('table.columns');
 
 $sidebar = JHtmlSidebar::render();
 $row_class = 'row';
-$col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-}
-?>
-<div class="<?php echo $row_class;?>">
-<?php if(!empty( $sidebar )): ?>
-<div id="j-sidebar-container" class="<?php echo $col_class;?>2">
-    <?php echo $sidebar ; ?>
-</div>
-<div id="j-main-container" class="<?php echo $col_class;?>10">
-<?php else : ?>
-<div class="j2store">
-<?php endif;?>
+$col_class = 'col-lg-';
 
-<script type="text/javascript">
+
+$wa  = Factory::getApplication()->getDocument()->getWebAssetManager();
+$wa->addInlineScript("
     Joomla.submitbutton = function(pressbutton) {
         if(pressbutton === 'edit' || pressbutton === 'add') {
-            document.getElementById('j2_view').value = '<?php echo $vars->edit_view;?>';
+                document.getElementById('j2_view').value = '".$vars->edit_view."';
         }
         Joomla.submitform(pressbutton);
         return true;
     }
-</script>
-     <?php if($vars->view == 'payments' || $vars->view == 'shippings') {
+");
+
+?>
+<?php if(!empty( $sidebar )): ?>
+    <div id="j2c-menu">
+        <?php echo $sidebar ; ?>
+    </div>
+<?php endif;?>
+<div class="j2store">
+     <?php if($vars->view === 'payments' || $vars->view === 'shippings') {
             echo ' <div class="alert alert-info">'.Text::_('COM_J2STORE_EXTENSIONS_ALERT').'</div>';
         }
      ?>
@@ -59,8 +57,4 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
         <?php include 'default_filters.php';?>
         <?php include 'default_items.php';?>
     </form>
-<?php if (!empty($sidebar)): ?>
-    </div>
-<?php else: ?>
 </div>
-<?php endif; ?>

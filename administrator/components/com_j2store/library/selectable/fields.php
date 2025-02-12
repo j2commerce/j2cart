@@ -1,9 +1,12 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
 defined('_JEXEC') or die;
@@ -15,13 +18,14 @@ use Joomla\CMS\Plugin\PluginHelper;
 
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/selectable/base.php');
 
-class J2StoreSelectableFields {
-
+class J2StoreSelectableFields
+{
 	protected static $instance;
 	var $allValues;
 	var $externalValues;
 
-	function __construct($args=array()) {
+	function __construct($args=array())
+    {
 		$this->externalValues = null;
 	}
 
@@ -35,7 +39,8 @@ class J2StoreSelectableFields {
 		return self::$instance;
 	}
 
-	function load($type=''){
+	function load($type='')
+    {
 		$this->allValues = array();
 		$this->allValues["text"] = Text::_('J2STORE_TEXT');
 		$this->allValues["email"] = Text::_('J2STORE_EMAIL');
@@ -65,7 +70,8 @@ class J2StoreSelectableFields {
 		}
 	}
 
-	function addJS(){
+	function addJS()
+    {
 		$externalJS = '';
 		if(!empty($this->externalValues)){
 			foreach($this->externalValues as $value) {
@@ -107,11 +113,12 @@ class J2StoreSelectableFields {
 		jQuery(document).ready(function(){
 			updateFieldType();
 		});";
-		$doc = Factory::getApplication()->getDocument();
-		$doc->addScriptDeclaration( $js );
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa->addInlineScript($js, [], []);
 	}
 
-	public function display($map,$value,$type){
+	public function display($map,$value,$type)
+    {
 		$this->load($type);
 		$this->addJS();
 		$this->values = array();
@@ -119,12 +126,14 @@ class J2StoreSelectableFields {
 			$this->values[] = HTMLHelper::_('select.option', $oneType,$oneVal);
 		}
 
-		return HTMLHelper::_('select.genericlist', $this->values, $map , 'size="1" onchange="updateFieldType();"', 'value', 'text', (string) $value,'fieldtype');
+		return HTMLHelper::_('select.genericlist', $this->values, $map , 'class="form-select" onchange="updateFieldType();"', 'value', 'text', (string) $value,'fieldtype');
     }
 }
 
-class j2storeZoneType {
-	function load($form=false){
+class j2storeZoneType
+{
+	function load($form=false)
+    {
 		$this->values = array();
 		if(!$form){
 			$this->values[] = HTMLHelper::_('select.option', '', Text::_('J2STORE_ALL_ZONES') );
@@ -133,15 +142,16 @@ class j2storeZoneType {
 		$this->values[] = HTMLHelper::_('select.option', 'zone',Text::_('J2STORE_ZONES'));
 	}
 
-	function display($map,$value,$form=false){
+	function display($map,$value,$form=false)
+    {
 		$this->load($form);
 		$dynamic = ($form ? '' : 'onchange="document.adminForm.submit( );"');
-		return HTMLHelper::_('select.genericlist',   $this->values, $map, 'class="form-select" size="1"'. $dynamic, 'value', 'text', $value );
+		return HTMLHelper::_('select.genericlist',   $this->values, $map, 'class="form-select"'. $dynamic, 'value', 'text', $value );
 	}
 }
 
-
-class j2storeCountryType{
+class j2storeCountryType
+{
 	var $type = 'country';
 	var $published = false;
 	var $allName = 'J2STORE_ALL_ZONES';
@@ -149,8 +159,8 @@ class j2storeCountryType{
 	var $country_id = '';
 	protected $country_list = null;
 
-	function load(){
-
+	function load()
+    {
 		if($this->type == 'country') {
 			static $sets;
 			if ( !is_array( $sets) )
@@ -188,9 +198,7 @@ class j2storeCountryType{
 				$query->select('a.*')->from('#__j2store_zones AS a');
 				$query->where('a.enabled=1')
 					->order('a.zone_name ASC');
-				//if(isset($this->country_id)) {
 					$query->where('a.country_id='.$db->q($this->country_id));
-				//}
 				$db->setQuery($query);
 				$sets1[$this->country_id] = $db->loadObjectList();
 			}
@@ -200,7 +208,8 @@ class j2storeCountryType{
 		return $list;
 	}
 
-	function display($map, $value, $form = true, $options = 'class="form-select" size="1"',$id=false){
+	function display($map, $value, $form = true, $options = 'class="form-select"',$id=false)
+    {
 		$countries = $this->load();
 		$this->values = array();
 		if($form){
@@ -213,8 +222,8 @@ class j2storeCountryType{
 		return HTMLHelper::_('select.genericlist', $this->values, $map, $options, 'value', 'text', (int)$value, $id );
 	}
 
-
-	function displayZone($map, $value, $form = true, $options = 'class="form-select" size="1"',$id=false){
+	function displayZone($map, $value, $form = true, $options = 'class="form-select"',$id=false)
+    {
 		$zones = $this->load();
 		$this->values = array();
 		if($form){
@@ -227,5 +236,4 @@ class j2storeCountryType{
 		return HTMLHelper::_('select.genericlist', $this->values, $map, $options, 'value', 'text', (int)$value, $id );
 
 	}
-
 }

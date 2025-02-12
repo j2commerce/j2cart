@@ -1,28 +1,41 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Document\Document;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2storeControllerReports extends F0FController
 {
     public $csvHeader = true;
     use list_view;
-	public function __construct($config) {
+
+	public function __construct($config)
+  {
 		parent::__construct($config);
 		$this->registerTask('apply', 'save');
 		$this->registerTask('saveNew', 'save');
- 		/* $task = JFactory::getApplication()->input->getString('task');
+ 		/* $task = Factory::getApplication()->input->getString('task');
 		if($task=='view') $this->view(); */
 	}
 
 	public function execute($task)
 	{
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		$reportTask = $app->input->getCmd('reportTask', '');
 		$values = $app->input->getArray($_POST);
 		// Check if we are in a report method view. If it is so,
@@ -81,7 +94,7 @@ class J2storeControllerReports extends F0FController
 			} else{
 				parent::execute($task);
 			}
-		} elseif(isset($values['format']) && $values['format'] == 'csv'){
+		} elseif(isset($values['format']) && $values['format'] === 'csv'){
             $view = $this->getThisView();
             $platform = F0FPlatform::getInstance();
             $document = $platform->getDocument();
@@ -89,10 +102,10 @@ class J2storeControllerReports extends F0FController
             $report_id = $app->input->getInt('report_id');
             $row = $model->getItem($report_id);
             $csvFilename = 'report_'.$row->element.'_'.date('Y-m-d').'_'.time().'.csv';
-            JPluginHelper::importPlugin('j2store');
+            PluginHelper::importPlugin('j2store');
             $results = $app->triggerEvent('onJ2StoreGetReportExported', array( $row ) );
             $items = $results[0];
-            if ($document instanceof JDocument)
+            if ($document instanceof Document)
             {
                 $document->setMimeEncoding('text/csv');
             }
@@ -246,9 +259,10 @@ class J2storeControllerReports extends F0FController
 		}
 		return parent::onBeforeBrowse();
 	}
+
     function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['name'] = $app->input->getString('name','');
@@ -264,13 +278,13 @@ class J2storeControllerReports extends F0FController
         $vars->state = $model->getState();
         $option = $app->input->getCmd('option', 'com_foobar');
         $subtitle_key = strtoupper($option . '_TITLE_' . $app->input->getCmd('view', 'cpanel'));
-        JToolBarHelper::title(JText::_(strtoupper($option)) . ': ' . JText::_($subtitle_key), str_replace('com_', '', $option));
+        ToolbarHelper::title(Text::_(strtoupper($option)) . ': ' . Text::_($subtitle_key), str_replace('com_', '', $option));
         // Set toolbar icons
-        $msg = JText::_($this->input->getCmd('option', 'com_foobar') . '_CONFIRM_DELETE');
-        JToolBarHelper::deleteList(strtoupper($msg));
-        JToolbarHelper::publish();
-        JToolbarHelper::unpublish();
-        JToolBarHelper::back();
+        $msg = Text::_($this->input->getCmd('option', 'com_foobar') . '_CONFIRM_DELETE');
+        ToolbarHelper::deleteList(strtoupper($msg));
+        ToolbarHelper::publish();
+        ToolbarHelper::unpublish();
+        ToolbarHelper::back();
         $header = array(
             'extension_id' => array(
                 'type' => 'rowselect',
@@ -307,8 +321,8 @@ class J2storeControllerReports extends F0FController
         echo $this->_getLayout('default',$vars);
     }
 
-    function view(){
-
+    function view()
+    {
 		    if(!$this->checkACL('j2store.reports'))
 		    {
 			 	return false;
@@ -323,5 +337,4 @@ class J2storeControllerReports extends F0FController
 	    	$view->setLayout( 'view' );
 	    	$view->display();
 	    }
-
 }

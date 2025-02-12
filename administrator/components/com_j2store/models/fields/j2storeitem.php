@@ -1,14 +1,23 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\Language\Text;
+
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2html.php');
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/popup.php');
-class JFormFieldJ2storeitem extends  JFormField
+
+class JFormFieldJ2storeitem extends FormField
 {
 	/**
 	 * The field type.
@@ -17,18 +26,16 @@ class JFormFieldJ2storeitem extends  JFormField
 	 */
 	protected $type = 'J2storeitem';
 
-	protected function getInput(){
-
-		//print_r($this);
+	protected function getInput()
+    {
         $platform = J2Store::platform();
 		$html ='';
 		$fieldId = isset($this->element['id']) ? $this->element['id'] : 'jform_product_list';
-
-		$products = F0FModel::getTmpInstance('Products' ,'J2StoreModel')->enabled(1)->getList();
-		$productarray =array();
-		$value =array();
+		$products = J2Store::fof()->getModel('Products' ,'J2StoreModel')->enabled(1)->getList();
+		$productarray = [];
+		$value = [];
 		$link = 'index.php?option=com_j2store&amp;view=products&amp;task=setProducts&amp;tmpl=component&amp;object='.$this->name;
-		$selected_value =array();
+		$selected_value = [];
 		if(isset($this->value) && !empty($this->value)){
 			$selected_value = (isset($this->value['ids']) && !empty($this->value['ids'])) ? $this->value['ids'] : array();
 		}
@@ -46,24 +53,51 @@ class JFormFieldJ2storeitem extends  JFormField
 
 		$js = "
 		function jSelectItem(id, title, object) {
-		var exists = jQuery('#j2store-product-li-'+id).html();
+                // Check if the item already exists
+                var exists = document.getElementById('j2store-product-li-' + id);
 			if(!exists){
-				var container = jQuery('<li/>' ,{'id' :'j2store-product-li-'+id,'class':'j2store-product-list-menu'}).appendTo(jQuery('#j2store-product-item-list'));
-				var span = jQuery('<label/>',{'class':'label label-info'}).html(title).appendTo(container);
-				var input =jQuery('<input/>',{value:id, type:'hidden', name:'jform[request][j2store_item][ids][]'}).appendTo(container);
-				var remove = jQuery('<a/>',{'class':'btn btn-danger btn-mini' ,'onclick':'jQuery(this).closest(\"li\").remove();' }).html('<i class=\"icon icon-remove\"></i>').appendTo(container);
+                    var container = document.createElement('li');
+                    container.id = 'j2store-product-li-' + id;
+                    container.className = 'j2store-product-list-menu';
+                    document.getElementById('j2store-product-item-list').appendChild(container);
+
+                    var span = document.createElement('label');
+                    span.className = 'label label-info';
+                    span.textContent = title;
+                    container.appendChild(span);
+
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'jform[request][j2store_item][ids][]';
+                    input.value = id;
+                    container.appendChild(input);
+
+                    var remove = document.createElement('a');
+                    remove.className = 'btn btn-link btn-sm';
+                    remove.innerHTML = '<span class=\"icon icon-remove text-danger\"></span>';
+                    remove.onclick = function () {
+                        container.remove();
+                    };
+                    container.appendChild(remove);
 				}else{
-					alert('". JText::_('J2STORE_PRODUCT_ALREADY_EXISTS')."');
+                    alert('".Text::_("J2STORE_PRODUCT_ALREADY_EXISTS")."');
 				}
-		if(typeof(window.parent.SqueezeBox.close=='function')){
+
+                // Close the SqueezeBox if it exists
+                if (typeof window.parent.SqueezeBox !== 'undefined' && typeof window.parent.SqueezeBox.close === 'function') {
 			window.parent.SqueezeBox.close();
+                } else {
+                    var sboxWindow = document.getElementById('sbox-window');
+                    if (sboxWindow && typeof sboxWindow.close === 'function') {
+                        sboxWindow.close();
 		}
-		else {
-			document.getElementById('sbox-window').close();
 			}
 		}
 		function removeProductList(id){
-			jQuery('#j2store-product-li-'+id).remove();
+                var element = document.getElementById('j2store-product-li-' + id);
+                if (element) {
+                    element.remove();
+                }
 		}
 		";
 		$css ='#j2store-product-item-list{
@@ -74,16 +108,14 @@ class JFormFieldJ2storeitem extends  JFormField
 
         $platform->addInlineScript($js);
         $platform->addStyle($js);
-//		JFactory::getDocument()->addScriptDeclaration($js);
-//		JFactory::getDocument()->addStyleDeclaration($css);
-		$html .=JHTML::_('behavior.modal', 'a.modal');
+		$html .= J2Store::platform()->loadExtra('behavior.modal','a.modal');
 		$html .='<div id="'.$fieldId.'">';
 		$html .='<label class="control-label"></label>';
 		$html .= '<span class="input-append">';
 		$html .='<input type="text" id="'.$this->name.'" name=""  disabled="disabled"/>';
-		$html .='<a class="modal btn btn-primary" title="'.JText::_('J2STORE_SELECT_AN_ITEM').'"  href="'.$link.'" rel="{handler: \'iframe\', size: {x: 700, y: 450}}"><i class="icon-list"></i>  '.JText::_('J2STORE_SELECT_PRODUCT').'</a>';
-		$html .=J2StorePopup::popup("index.php?option=com_j2store&view=coupons&task=setProducts&layout=products&tmpl=component&function=jSelectProduct&field=".$fieldId, JText::_( "J2STORE_SET_PRODUCTS" ), array('width'=>800 ,'height'=>400));
-		$html .'</span>';
+		$html .= '<a class="modal btn btn-primary" title="'.Text::_('J2STORE_SELECT_AN_ITEM').'"  href="'.$link.'" rel="{handler: \'iframe\', size: {x: 700, y: 450}}"><i class="icon-list"></i>  '.Text::_('J2STORE_SELECT_PRODUCT').'</a>';
+		$html .= J2StorePopup::popup("index.php?option=com_j2store&view=coupons&task=setProducts&layout=products&tmpl=component&function=jSelectProduct&field=".$fieldId, Text::_( "J2STORE_SET_PRODUCTS" ), array('width'=>800 ,'height'=>400));
+		$html .= '</span>';
 		$html .='<ul id="j2store-product-item-list" >';
 		foreach($productarray as $key => $value){
 			$html .='<li class="j2store-product-list-menu" id="j2store-product-li-'.$key.'">';
@@ -91,8 +123,8 @@ class JFormFieldJ2storeitem extends  JFormField
 			$html .=$value;
 			$html .='<input type="hidden" value="'.$key.'" name="jform[request][j2store_item][ids][]">';
 			$html .='</label>';
-			$html .='<a class="btn btn-danger btn-mini" onclick="removeProductList('.$key.');">';
-			$html .='<i class="icon icon-remove"></i>';
+			$html .= '<a class="btn btn-danger btn-link" onclick="removeProductList('.$key.');">';
+			$html .= '<span class="icon icon-remove text-danger"></span>';
 			$html .='</a>';
 			$html .='</li>';
 		}
@@ -101,5 +133,4 @@ class JFormFieldJ2storeitem extends  JFormField
 		$html .='</div>';
 		return $html ;
 	}
-
 }

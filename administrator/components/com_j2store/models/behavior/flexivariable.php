@@ -1,21 +1,26 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c)2024 J2Commerce, LLC . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 
-class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
+class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior
+{
+    private $_rawData = [];
 
-    private $_rawData = array();
-
-    public function onAfterGetItem(&$model, &$record) {
+    public function onAfterGetItem(&$model, &$record)
+    {
         $platform = J2Store::platform();
         //we just have the products. Get the variants
         $variantModel = F0FModel::getTmpInstance('Variants', 'J2StoreModel');
@@ -68,7 +73,8 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         $record->app_detail = $this->getAppDetails();
     }
 
-    public function getAppDetails(){
+    public function getAppDetails()
+    {
         $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('*')->from('#__extensions')
@@ -147,7 +153,6 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
             }
         }
 
-
         //bind existing params
         if($data['j2store_product_id'] ){
             $product = F0FTable::getAnInstance('Product','J2StoreTable');
@@ -170,8 +175,8 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         $this->_rawData = $data;
     }
 
-    public function onAfterSave(&$model) {
-
+    public function onAfterSave(&$model)
+    {
         if($this->_rawData) {
 
             $table = $model->getTable();
@@ -250,7 +255,6 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
                         $item->params = '{}';
                     }
 
-
                     $variantChild = F0FTable::getInstance('Variant', 'J2StoreTable')->getClone();
                     $variantChild->is_master = 0;
                     $item->product_id = $table->j2store_product_id;
@@ -270,7 +274,6 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
                     }
                 }
             }
-
 
             //save product images
             $images = F0FTable::getInstance('ProductImage', 'J2StoreTable');
@@ -302,7 +305,8 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         }
     }
 
-    public function runIndexes($table) {
+    public function runIndexes($table)
+    {
         //first get all the variants for the product
         $variants = F0FModel::getTmpInstance('variants', 'J2StoreModel')->product_id($table->j2store_product_id)->is_master(0)->getList();
         $min_price            = null;
@@ -338,10 +342,10 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         } else {
             $db->insertObject('#__j2store_productprice_index', $object);
         }
-
     }
 
-    public function onBeforeDelete(&$model) {
+    public function onBeforeDelete(&$model)
+    {
         $id = $model->getId();
         if(!$id) return;
         $product = F0FTable::getAnInstance('Product', 'J2StoreTable')->getClone();
@@ -357,7 +361,8 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         }
     }
 
-    public function onAfterGetProduct(&$model, &$product) {
+    public function onAfterGetProduct(&$model, &$product)
+    {
         //sanity check
         if($product->product_type != 'flexivariable') return;
 
@@ -469,9 +474,6 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
                 if ($product_helper->validateFlexivariants($product->variants, $product->options) === false) {
                     $product->visibility = 0;
                 }
-
-
-
             }catch (Exception $e) {
                 $product->visibility = 0;
                 return false;
@@ -480,11 +482,8 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         //validation failed, dont display the product at all.
         if($product->visibility == 0) return false;
 
-
-
         $registry = $platform->getRegistry($product->params);
         $product->params = $registry;
-
 
         $variant_ids = array();
         foreach($product->variants as &$one_variant) {
@@ -513,14 +512,11 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
             if($is_main_as_thum){
                 $product->thumb_image = isset( $main_image ) && !empty( $main_image ) ? $main_image: (isset($product->thumb_image) ? $product->thumb_image: '');
             }
-
         }
-
 
         //only if the product has options and variations
         if($product->has_options && $product->variants) {
             try {
-
                 $db = Factory::getContainer()->get('DatabaseDriver');
                 //get all the variants
                 $query = $db->getQuery(true)->select('#__j2store_product_variant_optionvalues.variant_id as variant_id, #__j2store_product_variant_optionvalues.product_optionvalue_ids')->from('#__j2store_product_variant_optionvalues')
@@ -540,10 +536,10 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
                 //do nothing
             }
         }
-
     }
 
-    protected function getDefaultVariant($variants){
+    protected function getDefaultVariant($variants)
+    {
         $variant = new stdClass();
         foreach ($variants as $one_variant){
             if($one_variant->isdefault_variant == 1){
@@ -553,12 +549,15 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         return $variant;
     }
 
-    protected function getVariantName($variant){
+    protected function getVariantName($variant)
+    {
         $product_variant = F0FTable::getAnInstance('ProductVariantoptionvalue','J2StoreTable')->getClone();
         $product_variant->load(array('variant_id'=>$variant->j2store_variant_id));
         return $product_variant->product_optionvalue_ids;
     }
-    public function onUpdateProduct(&$model, &$product) {
+
+    public function onUpdateProduct(&$model, &$product)
+    {
         $platform = J2Store::platform();
         $app = $platform->application();
         $product_helper = J2Store::product();
@@ -582,7 +581,6 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
             ->product_id($product->j2store_product_id)
             ->is_master(0)
             ->getList();
-
 
         $product_optionvalues = array();
         foreach ($options as $product_option_id => $option_value_id){
@@ -709,7 +707,5 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         $return['weight_title'] = $variant->weight_title . ($variant->weight > 1 ? 's' : '');
         J2Store::plugin()->event('AfterUpdateProductReturn',array(&$return,$product,$params));
         return $return;
-
     }
-
 }

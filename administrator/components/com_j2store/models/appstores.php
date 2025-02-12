@@ -1,16 +1,22 @@
 <?php
 /**
- * @package     J2Store
- * @author      Alagesan, J2Store <support@j2store.org>
- * @copyright   Copyright (c) 2018 J2Store . All rights reserved.
- * @license     GNU GPL v3 or later
- * */
-// No direct access to this file
-defined('_JEXEC') or die;
-class J2StoreModelAppStores extends F0FModel {
-    protected $_sflist = array();
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
 
-    public function &getItemList($overrideLimits = false, $group = ''){
+defined('_JEXEC') or die;
+
+class J2StoreModelAppStores extends F0FModel
+{
+    protected $_sflist = [];
+
+    public function &getItemList($overrideLimits = false, $group = '')
+    {
         if (empty($this->_sflist))
         {
             $this->_sflist = $this->_getJ2List($this->getState('limitstart',20), $this->getState('limit',20));
@@ -25,10 +31,11 @@ class J2StoreModelAppStores extends F0FModel {
         return $total;
     }
 
-    protected function _getJ2List($start,$limit,$type=''){
+    protected function _getJ2List($start,$limit,$type='')
+    {
         $config = J2Store::config();
         $plugin_update_date = $config->get('plugin_check_date','');
-        $new_date = JFactory::getDate('now')->format('Y-m-d');
+        $new_date = Factory::getDate('now')->format('Y-m-d');
         $update_date = false;
         if(empty($plugin_update_date)){
             $update_date = true;
@@ -38,29 +45,27 @@ class J2StoreModelAppStores extends F0FModel {
             $dateDiff = $date2 - $date1;
             $fullDays = floor($dateDiff/(60*60*24));
             if($fullDays){
-                //$config->saveOne('plugin_check_date',$new_date);
                 $update_date = true;
             }
 
         }
         $file_path = JPATH_ADMINISTRATOR.'/components/com_j2store/backup/plugin.json';
-        if(!JFile::exists($file_path) || $update_date){
+        if(!file_exists($file_path) || $update_date){
             //get from server and store in local copy
             $json_data = $this->get_external_stream('https://cdn.j2store.net/plugins.json');
             if(!empty($json_data)){
-                if(JFile::exists($file_path)){
-                    JFile::delete($file_path);
+                if(file_exists($file_path)){
+                    File::delete($file_path);
                 }
-                JFile::write($file_path, $json_data);
+                File::write($file_path, $json_data);
                 $config->saveOne('plugin_check_date',$new_date);
             }
 
         }
         $file_data = '{}';
-        if(JFile::exists($file_path)) {
+        if(file_exists($file_path)) {
             $file_data = file_get_contents($file_path);
         }
-
 
         if(!empty($file_data)){
             $file_data = json_decode($file_data,true);
@@ -86,7 +91,7 @@ class J2StoreModelAppStores extends F0FModel {
         $current_page = $this->getState('current_page','popular');
         if(!empty($file_data) && (!empty($search) || !empty($plugin_type) || !empty($current_page))){
             $condition_data = array();
-            $db = JFactory::getDBo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
             $query = $db->getQuery(true);
             $query->select('element,manifest_cache')->from('#__extensions')
                 ->where('folder='.$db->q('j2store'));
@@ -112,13 +117,13 @@ class J2StoreModelAppStores extends F0FModel {
                 }
 
                 $current_page_status = false;
-                if($current_page == 'popular' && isset($file_dat['is_popular']) && $file_dat['is_popular']){
+                if($current_page === 'popular' && isset($file_dat['is_popular']) && $file_dat['is_popular']){
                     $current_page_status = true;
-                }elseif ($current_page == 'free' && isset($file_dat['is_free']) && $file_dat['is_free']){
+                }elseif ($current_page === 'free' && isset($file_dat['is_free']) && $file_dat['is_free']){
                     $current_page_status = true;
-                }elseif ($current_page == 'installed' && isset($file_dat['element']) && in_array($file_dat['element'],$installed_data)){
+                }elseif ($current_page === 'installed' && isset($file_dat['element']) && in_array($file_dat['element'], $installed_data, true)){
                     $current_page_status = true;
-                }elseif ($current_page == 'all'){
+                }elseif ($current_page === 'all'){
                     $current_page_status = true;
                 }
                 if($plugin_type_status && $search_status && $current_page_status){
@@ -128,7 +133,7 @@ class J2StoreModelAppStores extends F0FModel {
             $file_data = $condition_data;
         }
 
-        if($type == 'total'){
+        if($type === 'total'){
             return count($file_data);
         }
 
@@ -136,7 +141,7 @@ class J2StoreModelAppStores extends F0FModel {
         if(count($file_data)){
             $file_data = array_values($file_data);
         }
-        for ($i = $start; $i < count($file_data); $i++ ){
+        for ($i = $start, $iMax = count($file_data); $i < $iMax; $i++ ){
             $final_data[] = $file_data[$i];
             $limit--;
             if($limit == 0){
@@ -146,16 +151,16 @@ class J2StoreModelAppStores extends F0FModel {
         return $final_data;
     }
 
-    protected function get_external_stream($path) {
+    protected function get_external_stream($path)
+    {
         $ch = curl_init($path);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $content = curl_exec($ch);
 
         if(curl_errno($ch)){
             $content = '';
         }
-
 
         curl_close($ch);
 
@@ -164,9 +169,5 @@ class J2StoreModelAppStores extends F0FModel {
         }
 
         return $content;
-
-
     }
-
-
 }

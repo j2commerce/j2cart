@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -55,9 +55,9 @@ class J2StoreModelCartsBehaviorCartSimple extends F0FModelBehavior {
 			//validate inventory
 			if($product_helper->check_stock_status($product->variants, $cart_total_qty+$quantity) === false) {
 				if ( $product->variants->quantity > 0 ) {
-					$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $product->variants->quantity ); 
+					$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $product->variants->quantity );
 				}else{
-					$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK'); 
+					$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK');
 				}
 			}
 		}

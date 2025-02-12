@@ -1,11 +1,15 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 
@@ -13,21 +17,22 @@ require_once JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2html.php';
 
 class J2StoreViewProduct extends F0FViewHtml
 {
-	public function preRender() {
+	public function preRender()
+    {
 		$view = $this->input->getCmd('view', 'cpanel');
 		$task = $this->getModel()->getState('task', 'browse');
 
 		$renderer = $this->getRenderer();
 		$renderer->preRender($view, $task, $this->input, $this->config);
-
 	}
 
-	protected function onEdit($tpl = null) {
+	protected function onEdit($tpl = null)
+    {
 		return $this->onAdd($tpl);
 	}
 
-
-	protected function onAdd($tpl = null) {
+	protected function onAdd($tpl = null)
+    {
 		$platform = J2Store::platform();
         $platform->application()->set('hidemainmenu',true);
 		$model = $this->getModel();
@@ -38,7 +43,6 @@ class J2StoreViewProduct extends F0FViewHtml
 		$this->product_types = JHtml::_('select.genericlist', $model->getProductTypes(), $this->form_prefix.'[product_type]', array(), 'value', 'text', $this->item->product_type);
 
 		if($this->item->j2store_product_id) {
-
 			//manufacturers
 			$this->manufacturers = J2Html::select()->clearState()
 						->type('genericlist')
@@ -131,7 +135,8 @@ class J2StoreViewProduct extends F0FViewHtml
 		return true;
 	}
 
-	public function getProductOptionList($product_type){
+	public function getProductOptionList($product_type)
+    {
         $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('j2store_option_id, option_unique_name, option_name');

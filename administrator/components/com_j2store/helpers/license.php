@@ -1,10 +1,15 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2023 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
 
 class J2License
 {
@@ -22,9 +27,10 @@ class J2License
 
         return self::$instance;
     }
+
     protected function sendRequest($api_params)
     {
-        $api_url = 'https://www.j2store.org/edd-api';
+        $api_url = 'https://www.j2commerce.com/edd-api';
         $license_data = array();
         if (empty($api_url) || empty($api_params)) {
             return $license_data;

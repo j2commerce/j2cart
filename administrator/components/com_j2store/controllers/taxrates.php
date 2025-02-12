@@ -1,21 +1,32 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerTaxrates extends F0FController
 {
     use list_view;
-    public function execute($task) {
+
+    public function execute($task)
+    {
         if(in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
         return parent::execute($task);
     }
+
     function add()
     {
         $platform = J2Store::platform();
@@ -24,14 +35,12 @@ class J2StoreControllerTaxrates extends F0FController
         $this->editToolBar();
         $vars->primary_key = 'j2store_taxrate_id';
         $vars->id = $this->getPageId();
-        $taxrate_table = F0FTable::getInstance('Taxrate', 'J2StoreTable')->getClone ();
+        $taxrate_table = J2Store::fof()->loadTable('Taxrate', 'J2StoreTable')->getClone ();
         $taxrate_table->load($vars->id);
         $vars->item = $taxrate_table;
         $vars->field_sets = array();
         $col_class = 'col-md-';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $col_class = 'span';
-        }
+
         $vars->field_sets[] = array(
             'id' => 'basic_information',
             'class' => array(
@@ -44,36 +53,37 @@ class J2StoreControllerTaxrates extends F0FController
                     'type' => 'text',
                     'name' => 'taxrate_name',
                     'value' => $taxrate_table->taxrate_name,
-                    'options' => array('required' => 'true','class' => 'input-xlarge')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'tax_percent' => array(
                     'label' => 'J2STORE_TAXRATE_PERCENT',
                     'type' => 'text',
                     'name' => 'tax_percent',
                     'value' => $taxrate_table->tax_percent,
-                    'options' => array('required' => 'true','class' => 'input-xlarge')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'geozone_id' => array(
                     'label' => 'J2STORE_TAXRATE_GEOZONE_NAME_LABEL',
                     'type' => 'fieldsql',
                     'name' => 'geozone_id',
                     'value' => $taxrate_table->geozone_id,
-                    'options' => array('required' => 'true', 'id' => 'j2store_geozone_id', 'key_field' => 'j2store_geozone_id', 'value_field' => 'geozone_name', 'has_one' => 'geozone')
+                    'options' => array('required' => 'true', 'id' => 'j2store_geozone_id', 'key_field' => 'j2store_geozone_id', 'value_field' => 'geozone_name', 'has_one' => 'geozone','class'=>'form-select')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
                     'type' => 'enabled',
                     'name' => 'enabled',
                     'value' => $taxrate_table->enabled,
-                    'options' => array('class' => 'input-xlarge')
+                    'options' => array('class' => '')
                 ),
             )
         );
         echo $this->_getLayout('form', $vars,'edit');
     }
+
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['taxrate_name'] = $app->input->getString('taxrate_name','');
@@ -126,5 +136,4 @@ class J2StoreControllerTaxrates extends F0FController
         $vars->pagination = $model->getPagination();
         echo $this->_getLayout('default',$vars);
     }
-
 }

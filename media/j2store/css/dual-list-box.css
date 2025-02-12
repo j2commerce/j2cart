@@ -8,17 +8,10 @@
  */
 .bootstrap-duallistbox-container .buttons {
     width: 100%;
-    margin-bottom: -1px;
 }
 
 .bootstrap-duallistbox-container label {
     display: block;
-}
-
-.bootstrap-duallistbox-container .info {
-    display: inline-block;
-    margin-bottom: 5px;
-    font-size: 11px;
 }
 
 .bootstrap-duallistbox-container .clear1,
@@ -62,18 +55,9 @@
     padding: 0;
 }
 
-.bootstrap-duallistbox-container .filter {
-    display: inline-block;
-    width: 100%;
-    height: 31px;
-    margin: 0 0 5px 0;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-.bootstrap-duallistbox-container .filter.placeholder {
-    color: #aaa;
+.bootstrap-duallistbox-container .form-select option {
+    padding: 10px;
+    border-bottom: 1px solid #efefef;
 }
 
 .bootstrap-duallistbox-container.moveonselect .move,

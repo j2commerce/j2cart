@@ -1,32 +1,29 @@
 <?php
 /**
-* @package J2Store
-* @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
-* @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
-* @license GNU GPL v3 or later
-*/
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
 
+defined('_JEXEC') or die;
 
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Uri\Uri;
 
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.formvalidator');
 $row_class = 'row';
 $col_class = 'col-md-';
 $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.Text::_('J2STORE_INVALID_INPUT_FIELD').'</div></div></joomla-alert>' ;
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-    $alert_html = '<div class="alert alert-error alert-danger">'.Text::_('J2STORE_INVALID_INPUT_FIELD').'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
-}
-?>
-    <script  type="text/javascript">
-        Joomla.submitbutton = function(pressbutton) {
+
+
+$wa  = Factory::getApplication()->getDocument()->getWebAssetManager();
+$script = "Joomla.submitbutton = function(pressbutton) {
             var form = document.adminForm;
             if (pressbutton == 'cancel') {
                 document.adminForm.task.value = pressbutton;
@@ -42,8 +39,9 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                     document.getElementById('system-message-container').innerHTML =  msg.join('\n') ;
                 }
             }
-        }
-    </script>
+        }";
+$wa->addInlineScript($script, [], []);
+?>
 
     <div class="j2store_<?php echo $vars->view; ?>_edit">
         <div class="main-card card">
@@ -94,7 +92,5 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                     </div>
                 </form>
             </div>
-        </div>                
+        </div>
     </div>
-
-

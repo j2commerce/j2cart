@@ -1,11 +1,16 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
 class J2StoreViewInventories extends F0FViewHtml
 {
 	/**
@@ -22,7 +27,7 @@ class J2StoreViewInventories extends F0FViewHtml
 	 *
 	 * @return  boolean|null False if we can't render anything
 	 */
-	
+
 	/**
 	 * Executes before rendering a generic page, default to actions necessary
 	 * for the Browse task.
@@ -34,31 +39,17 @@ class J2StoreViewInventories extends F0FViewHtml
 	protected function onDisplay($tpl = null)
 	{
 		$view = $this->input->getCmd('view', 'cpanel');
-	
+
 		if (in_array($view, array('cpanel', 'cpanels')))
 		{
 			return;
 		}
-	
+
 		// Load the model
 		$model = $this->getModel();
-	
-		// ...ordering
-		//$this->lists->set('order', $model->getState('filter_order', 'id', 'cmd'));
-		//$this->lists->set('order_Dir', $model->getState('filter_order_Dir', 'DESC', 'cmd'));
-	
-		// Assign data to the view
-		//$this->items      = $model->getItemList();
+
 		$this->pagination = $model->getInventoryPagination();
-	
-		// Pass page params on frontend only
-		//if (F0FPlatform::getInstance()->isFrontend())
-		//{
-		//	$params = JFactory::getApplication()->getParams();
-		//	$this->params = $params;
-		//}
-	
+
 		return true;
 	}
-
 }

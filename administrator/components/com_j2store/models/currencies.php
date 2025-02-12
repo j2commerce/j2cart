@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -33,7 +33,7 @@ class J2StoreModelCurrencies extends F0FModel {
 	 			));
 	 			if($currency->j2store_currency_id > 0){
 	 				$message = JText::_("J2STORE_CURRENCY_CODE_ALREADY_EXIST");
-	 				$app->enqueueMessage($message,'error');	 				
+	 				$app->enqueueMessage($message,'error');
 	 				return false;
 	 			}
 	 		}
@@ -108,19 +108,19 @@ class J2StoreModelCurrencies extends F0FModel {
         }
 
     }
-	
+
 	public function getTableFields()
 	{
 		$tableName = $this->getTable()->getTableName();
 		static $sets;
-	
+
 		if ( !is_array( $sets) )
 		{
 			$sets= array( );
 		}
-	
+
 		if(!isset($sets[$tableName])) {
-	
+
 			if (version_compare(JVERSION, '3.0', 'ge'))
 			{
 				$sets[$tableName] = $this->getDbo()->getTableColumns($tableName, true);

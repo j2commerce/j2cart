@@ -1,32 +1,25 @@
 <?php
-/*------------------------------------------------------------------------
-# com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Ramesh Elamathi - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
 
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 
-class J2Length {
-
-	private $lengths = array();
-
-	/*
-	 * J2StoreWeight instance
-	*
-	* since 2.6
-	*/
-
+class J2Length
+{
+	private $lengths = [];
 	protected static $instance;
 
-	public function __construct() {
+	public function __construct()
+  {
         $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery(true)->select('*')
 					->from('#__j2store_lengths');
@@ -53,8 +46,8 @@ class J2Length {
   		return self::$instance;
   	}
 
-
-  	public function convert($value, $from, $to) {
+  	public function convert($value, $from, $to)
+    {
 		if ($from == $to) {
       		return $value;
 		}
@@ -70,11 +63,12 @@ class J2Length {
 		} else {
 			$to = 1;
 		}
-		
+
 		return $value * ($to / $from);
   	}
 
-	public function format($value, $length_class_id, $decimal_point = '.', $thousand_point = ',') {
+	public function format($value, $length_class_id, $decimal_point = '.', $thousand_point = ',')
+  {
 		if (isset($this->lengths[$length_class_id])) {
     		return number_format($value, 2, $decimal_point, $thousand_point) . $this->lengths[$length_class_id]['unit'];
 		} else {
@@ -82,7 +76,8 @@ class J2Length {
 		}
 	}
 
-	public function getUnit($length_class_id) {
+	public function getUnit($length_class_id)
+  {
 		if (isset($this->lengths[$length_class_id])) {
     		return $this->lengths[$length_class_id]['unit'];
 		} else {

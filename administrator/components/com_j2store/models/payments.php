@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -47,7 +47,7 @@ class J2StoreModelPayments extends F0FModel {
 		if(isset($name) && !empty($name)) {
 			$query->where('payment.name LIKE '. $this->_db->q('%'.$name.'%') );
 		}
-		
+
 	}
 
 	public function buildOrderbyQuery(&$query){

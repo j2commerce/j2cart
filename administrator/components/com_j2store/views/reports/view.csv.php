@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
@@ -88,13 +88,13 @@ class J2StoreViewReports extends F0FViewCsv
 			$keys    = get_object_vars($item);
 			$keys    = array_keys($keys);
 			$items[] = $item;
-		
+
 			reset($items);
-				
+
 			$max = 1;
-			//which item having more fields that will be csv fields		
+			//which item having more fields that will be csv fields
 			foreach($items as $item) {
-			
+
 				$order_field_count = count(get_object_vars($item));
 				if($order_field_count > $max) {
 					$max = $order_field_count;

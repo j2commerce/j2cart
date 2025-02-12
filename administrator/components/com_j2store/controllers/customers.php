@@ -1,33 +1,43 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
-jimport('joomla.mail.helper');
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Mail\MailHelper;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Uri\Uri;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerCustomers extends F0FController
 {
     use list_view;
 
-	public function __construct($config =array())
-	{
-
-		parent::__construct($config);
-		$this->registerTask('confirmchangeEmail','changeEmail');
-	}
+	  public function __construct($config = [])
+	  {
+		    parent::__construct($config);
+		    $this->registerTask('confirmchangeEmail','changeEmail');
+	  }
 
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $option = $app->input->getCmd('option', '');
-        $msg = JText::_($option . '_CONFIRM_DELETE');
-        JToolBarHelper::deleteList(strtoupper($msg));
+        $msg = Text::_($option . '_CONFIRM_DELETE');
+        ToolBarHelper::deleteList(strtoupper($msg));
         $this->exportButton('customers');
         $model = $this->getThisModel();
-        $state = array();
+        $state = [];
         $state['customer_name'] = $app->input->getstring('customer_name','');
         $state['email'] = $app->input->getString('email','');
         $state['address_1'] = $app->input->getString('address_1','');
@@ -101,26 +111,25 @@ class J2StoreControllerCustomers extends F0FController
         $this->setHeader($header,$vars);
         $vars->pagination = $model->getPagination();
         $format = $app->input->get('format','html');
-        if($format == 'csv'){
+        if($format === 'csv'){
             $this->display();
         }else{
             echo $this->_getLayout('default',$vars);
         }
     }
 
-
 	/**
 	 *
 	 * @return boolean
 	 */
-	function viewOrder(){
+	function viewOrder()
+  {
 		$email  = $this->input->getString('email_id');
 		$user_id = $this->input->getInt('user_id');
 		$this->layout='view';
 		$this->display();
 		return true;
 	}
-
 
 	/**
 	 * Delete selected item(s)
@@ -130,23 +139,23 @@ class J2StoreControllerCustomers extends F0FController
 	public function remove()
 	{
 		// Initialise the App variables
-		$app=JFactory::getApplication();
+		$app = Factory::getApplication();
 		$cids = $app->input->get('cid',array(),'ARRAY');
 		if(!empty( $cids ) && J2Store::platform()->isClient('administrator') ){
 			foreach ($cids as $cid){
 				// store the table in the variable
-				$address = F0FTable::getInstance('Address', 'J2StoreTable')->getClone ();
+				$address = J2Store::fof()->loadTable('Address', 'J2StoreTable')->getClone ();
 				$address->load($cid);
-				$addresses = F0FModel::getTmpInstance('Addresses','J2StoreModel')->email($address->email)->getList();
+				$addresses = J2Store::fof()->getModel('Addresses','J2StoreModel')->email($address->email)->getList();
 
 				foreach ($addresses as $e_address){
-					$address = F0FTable::getInstance('Address', 'J2StoreTable')->getClone ();
+					$address = J2Store::fof()->loadTable('Address', 'J2StoreTable')->getClone ();
 					$address->load($e_address->j2store_address_id);
 					$address->delete ();
 				}
 			}
 		}
-		$msg = JText::_('J2STORE_ITEMS_DELETED');
+		$msg = Text::_('J2STORE_ITEMS_DELETED');
 		$link = 'index.php?option=com_j2store&view=customers';
 		$this->setRedirect($link, $msg);
 	}
@@ -157,18 +166,18 @@ class J2StoreControllerCustomers extends F0FController
 	function delete()
 	{
 		// Initialise the App variables
-		$app=JFactory::getApplication();
+		$app = Factory::getApplication();
 		// Assign the get Id to the Variable
 		$id=$app->input->getInt('id');
 
 		if($id && J2Store::platform()->isClient('administrator'))
 		{	// store the table in the variable
-			$address = F0FTable::getInstance('Address', 'J2StoreTable');
+			$address = J2Store::fof()->loadTable('Address', 'J2StoreTable');
 			$address->load($id);
 			$email = $address->email;
 			try {
 				$address->delete();
-				$msg = JText::_('J2STORE_ITEMS_DELETED');
+				$msg = Text::_('J2STORE_ITEMS_DELETED');
 			} catch (Exception $error) {
 				$msg = $error->getMessage();
 			}
@@ -176,22 +185,22 @@ class J2StoreControllerCustomers extends F0FController
 
 		$link = 'index.php?option=com_j2store&view=customer&task=viewOrder&email_id='.$email;
 		$this->setRedirect($link, $msg);
-
 	}
 
-	function editAddress(){
+	function editAddress()
+  {
 		// Initialise the App variables
-		$app = JFactory::getApplication();
+		$app = Factory::getApplication();
 		// Assign the get Id to the Variable
 		$id = $app->input->getInt('id',0);
 		if($id && J2Store::platform()->isClient('administrator')) {    // store the table in the variable
-			$address = F0FTable::getAnInstance('Address','J2StoreTable');
+			$address = J2Store::fof()->loadTable('Address','J2StoreTable');
 			$address->load($id);
 			$address_type = $address->type;
 			if(empty( $address_type )){
 				$address_type = 'billing';
 			}
-			$model = F0FModel::getTmpInstance('Customers','J2StoreModel');
+			$model = J2Store::fof()->getModel('Customers','J2StoreModel');
 			$view = $this->getThisView();
 			$view->setModel($model, true);
 			$view->addTemplatePath(JPATH_ADMINISTRATOR.'/components/com_j2store/views/customer/tmpl/');
@@ -208,14 +217,14 @@ class J2StoreControllerCustomers extends F0FController
 		}else{
 			$this->redirect ('index.php?option=com_j2store&view=customers');
 		}
-
 	}
 
-    function saveCustomer(){
-        $app = JFactory::getApplication ();
+    function saveCustomer()
+    {
+        $app = Factory::getApplication ();
         $data = $app->input->getArray($_POST);
         $address_id = $app->input->getInt('j2store_address_id');
-        $address = F0FTable::getAnInstance('Address','J2StoreTable');
+        $address = J2Store::fof()->loadTable('Address','J2StoreTable');
         $address->load($address_id);
         $data['id'] = $data['j2store_address_id'];
         unset( $data['j2store_address_id'] );
@@ -228,12 +237,12 @@ class J2StoreControllerCustomers extends F0FController
         $data['admin_display_error'] = true;
         $json = $selectableBase->validate($data, $data['type'], 'address');
         if(empty($json['error'])){
-            $msg =JText::_('J2STORE_ADDRESS_SAVED_SUCCESSFULLY');
+            $msg = Text::_('J2STORE_ADDRESS_SAVED_SUCCESSFULLY');
             $msgType='message';
             $address->bind($data);
             if($address->save($data)){
                 $json['success']['url'] = "index.php?option=com_j2store&view=customer&task=editAddress&id=".$address->j2store_address_id."&tmpl=component";
-                $json['success']['msg'] = JText::_('J2STORE_ADDRESS_SAVED_SUCCESSFULLY');
+                $json['success']['msg'] = Text::_('J2STORE_ADDRESS_SAVED_SUCCESSFULLY');
                 $json['success']['address_id'] = $address->j2store_address_id;
                 $json['success']['msgType']='success';
             }else{
@@ -245,30 +254,31 @@ class J2StoreControllerCustomers extends F0FController
         $app->close();
     }
 
-	function changeEmail(){
+	function changeEmail()
+  {
 		// Initialise the App variables
-		$app=JFactory::getApplication();
+		$app = Factory::getApplication();
 		if(J2Store::platform()->isClient('administrator')){
-			$json = array();
+			$json = [];
 			$model = $this->getThisModel();
 			// Assign the get Id to the Variable
 			$email_id=$app->input->getString('email');
 			$new_email=$app->input->getString('new_email');
 
-			if(empty($new_email) && !JMailHelper::isEmailAddress($new_email) ){
-				$json = array('msg' => JText::_('Invalid Email Address'), 'msgType' => 'warning');
+			if(empty($new_email) && !MailHelper::isEmailAddress($new_email) ){
+				$json = array('msg' => Text::_('Invalid Email Address'), 'msgType' => 'warning');
 			}else{
 				//incase an account already exists ?
-				if($app->input->getString('task') == 'changeEmail'){
+				if($app->input->getString('task') === 'changeEmail'){
 
-					$json = array('msg' => JText::_('J2STORE_EMAIL_UPDATE_NO_WARNING'), 'msgType' => 'message');
+					$json = array('msg' => Text::_('J2STORE_EMAIL_UPDATE_NO_WARNING'), 'msgType' => 'message');
 					$json = $this->validateEmailexists($new_email);
 
-				}elseif($app->input->getString('task') == 'confirmchangeEmail'){
+				}elseif($app->input->getString('task') === 'confirmchangeEmail'){
 
-					$json = array( 'redirect' => JUri::base().'index.php?option=com_j2store&view=customer&task=viewOrder&email_id='.$new_email, 'msg' => JText::_('J2STORE_SUCCESS_SAVING_EMAIL'), 'msgType' => 'message');
+					$json = array( 'redirect' => Uri::base().'index.php?option=com_j2store&view=customer&task=viewOrder&email_id='.$new_email, 'msg' => Text::_('J2STORE_SUCCESS_SAVING_EMAIL'), 'msgType' => 'message');
 					if(!$model->savenewEmail()){
-						$json = array('msg' => JText::_('J2STORE_ERROR_SAVING_EMAIL'), 'msgType' => 'warning' );
+						$json = array('msg' => Text::_('J2STORE_ERROR_SAVING_EMAIL'), 'msgType' => 'warning' );
 					}
 				}
 
@@ -278,20 +288,21 @@ class J2StoreControllerCustomers extends F0FController
 		}
 	}
 
-	function validateEmailexists($new_email){
-		$json = array();
+	function validateEmailexists($new_email)
+  {
+		$json = [];
 		$success = true;
 		$model = $this->getThisModel();
 
 		if(J2Store::user()->emailExists($new_email)){
 			$success = false;
-			$json = array('msg' => JText::_('J2STORE_EMAIL_UPDATE_ERROR_WARNING'), 'msgType' => 'warning');
+			$json = array('msg' => Text::_('J2STORE_EMAIL_UPDATE_ERROR_WARNING'), 'msgType' => 'warning');
 		}
 
 		if($success){
-			$json = array( 'redirect' => JUri::base().'index.php?option=com_j2store&view=customer&task=viewOrder&email_id='.$new_email, 'msg' => JText::_('J2STORE_SUCCESS_SAVING_EMAIL'), 'msgType' => 'message');
+			$json = array( 'redirect' => Uri::base().'index.php?option=com_j2store&view=customer&task=viewOrder&email_id='.$new_email, 'msg' => Text::_('J2STORE_SUCCESS_SAVING_EMAIL'), 'msgType' => 'message');
 			if(!$model->savenewEmail()){
-				$json = array('msg' => JText::_('J2STORE_ERROR_SAVING_EMAIL'), 'msgType' => 'warning' );
+				$json = array('msg' => Text::_('J2STORE_ERROR_SAVING_EMAIL'), 'msgType' => 'warning' );
 			}
 		}
 		return $json;

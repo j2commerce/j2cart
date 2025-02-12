@@ -1,42 +1,47 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
 defined('_JEXEC') or die;
-// load tooltip behavior
-JHtml::_('bootstrap.tooltip');
-JHtml::_('behavior.multiselect');
+
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+
+$platform = J2Store::platform();
+$platform->loadExtra('bootstrap.tooltip');
+$platform->loadExtra('behavior.framework',true);
 
 $sidebar = JHtmlSidebar::render();
 $row_class = 'row';
 $col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-}
 ?>
-<?php if(!empty( $sidebar )): ?>
-<div class = "<?php echo $row_class ?>">
-    <div id="j-sidebar-container" class="<?php echo $col_class ?>2">
+<div class="j2store j2store-coupon-history">
+    <div id="j2c-menu">
         <?php echo $sidebar ; ?>
     </div>
-    <div id="j-main-container" class="<?php echo $col_class ?>10">
-        <?php else : ?>
-        <div id="j-main-container">
-            <?php endif;?>
-	<h3><?php echo JText::_('J2STORE_COUPON_HISTORY'); ?> : <?php echo $this->coupon->coupon_code?></h3>
-
-<table class="table table-bordered table-striped">
+    <div class="js-stools mt-4 mb-3">
+        <div class="js-stools-container-bar">
+            <div class="btn-toolbar gap-2 align-items-center">
+                <h2><?php echo Text::_('J2STORE_COUPON_HISTORY'); ?> : <?php echo $this->coupon->coupon_code;?></h2>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table itemList align-middle">
 	<thead>
 		<tr>
-			<th><?php echo JText::_('J2STORE_INVOICE')?></th>
-			<th><?php echo JText::_('J2STORE_ORDER_ID')?></th>
-			<th><?php echo JText::_('J2STORE_CUSTOMER')?></th>
-			<th><?php echo JText::_('J2STORE_AMOUNT')?></th>
-			<th><?php echo JText::_('J2STORE_DATE')?></th>
+            <th scope="col"><?php echo Text::_('J2STORE_INVOICE')?></th>
+            <th scope="col"><?php echo Text::_('J2STORE_ORDER_ID')?></th>
+            <th scope="col"><?php echo Text::_('J2STORE_CUSTOMER')?></th>
+            <th scope="col"><?php echo Text::_('J2STORE_AMOUNT')?></th>
+            <th scope="col"><?php echo Text::_('J2STORE_DATE')?></th>
 		</tr>
 
 	</thead>
@@ -65,13 +70,17 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 					<?php echo $this->currency->format($item->discount_amount, $item->order->currency_code, $item->order->currency_value); ?>
 				<?php endif;?>
 				</td>
-				<td><?php echo JHtml::_('date', $item->order->created_on, $this->params->get('date_format', JText::_('DATE_FORMAT_LC1'))); ?></td>
+                        <td><?php echo HTMLHelper::_('date', $item->order->created_on, $this->params->get('date_format', Text::_('DATE_FORMAT_LC1'))); ?></td>
 			</tr>
 		<?php endforeach;?>
-	<?php else:?>
-		<?php echo JText::_('J2STORE_NO_RESULTS_FOUND');?>
-	<?php endif;?>
-	</tbody>
-</table>
-</table>
-        </div>
+	        <?php else:?>
+                <tr>
+                    <td colspan="5">
+                        <?php echo Text::_('J2STORE_NO_RESULTS_FOUND');?>
+                    </td>
+                </tr>
+	        <?php endif;?>
+	        </tbody>
+        </table>
+    </div>
+</div>

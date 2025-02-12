@@ -1,21 +1,29 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
 
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\Filesystem\File;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\User\UserFactory;
 
-class J2Invoice {
-
+class J2Invoice
+{
 	public static $instance = null;
 	protected $state;
 
-	public function __construct($properties=null) {
+	public function __construct($properties=null)
+  {
 
 	}
 
@@ -29,8 +37,8 @@ class J2Invoice {
 		return self::$instance;
 	}
 
-	public function loadInvoiceTemplate($order) {
-
+	public function loadInvoiceTemplate($order)
+  {
 		// Initialise
 		$templateText = '';
 		$subject = '';
@@ -38,15 +46,15 @@ class J2Invoice {
 		$isHTML = false;
 
 		// Look for desired languages
-		$jLang = JFactory::getLanguage();
+		$jLang = Factory::getApplication()->getLanguage();
 		$userLang = $order->customer_language;
-		if(empty($userLang) && (JFactory::getUser($order->user_id)->id > 0)){
-			$userLang = JFactory::getUser($order->user_id)->getParam('language','');
-		}		
-		
-		$languages = array(
-				$userLang, $jLang->getTag(), $jLang->getDefault(), 'en-GB', '*'
-		);
+        $userFactory = Factory::getContainer()->get(UserFactory::class);
+        $user = $userFactory->loadUserById($order->user_id);
+		if(empty($userLang) && ($user->id > 0)){
+			$userLang = $user->getParam('language','');
+		}
+
+		$languages = [$userLang, $jLang->getTag(), $jLang->getDefault(), 'en-GB', '*'];
 
 		//load all templates
 		$allTemplates = $this->getInvoiceTemplates($order);
@@ -81,14 +89,13 @@ class J2Invoice {
 				}
 			}
 		} else {
-			$templateText = JText::_('J2STORE_DEFAULT_INVOICE_TEMPLATE_TEXT');
+			$templateText = Text::_('J2STORE_DEFAULT_INVOICE_TEMPLATE_TEXT');
 		}
 		return $templateText;
 	}
 
-	public function getInvoiceTemplates($order) {
-
-
+	public function getInvoiceTemplates($order)
+  {
         $db = Factory::getContainer()->get('DatabaseDriver');
 
 			$query = $db->getQuery(true)
@@ -100,7 +107,7 @@ class J2Invoice {
 						END
 					');
 			if(isset($order->customer_group) && !empty($order->customer_group)) {
-				$app = JFactory::getApplication ();
+            $app = Factory::getApplication();
 				if(J2Store::platform()->isClient('site')){
 					$query->where(' CASE WHEN group_id IN( '.$order->customer_group.') THEN group_id IN('.$order->customer_group.')
 									ELSE group_id ="*" OR group_id ="1" OR group_id =""
@@ -123,15 +130,16 @@ class J2Invoice {
 		return $allTemplates;
 	}
 
-	public function	getFormatedInvoice($order){
+	public function	getFormatedInvoice($order)
+  {
 		$text = $this->loadInvoiceTemplate($order);
-		$template =  J2Store::email()->processTags($text, $order, $extras=array());
+		$template =  J2Store::email()->processTags($text, $order, $extras = []);
 		return $template;
 	}
 
-	public function processInlineImages($templateText) {
-
-		$baseURL = str_replace('/administrator', '', JURI::base());
+	public function processInlineImages($templateText)
+  {
+		$baseURL = str_replace('/administrator', '', Uri::base());
 		//replace administrator string, if present
 		$baseURL = ltrim($baseURL, '/');
 		// Include inline images
@@ -156,13 +164,13 @@ class J2Invoice {
 					// External link, skip
 					$temp .= $url;
 				} else {
-					$ext = strtolower(JFile::getExt($url));
-					if(!JFile::exists($url)) {
+					$ext = strtolower(File::getExt($url));
+					if(!file_exists($url)) {
 						// Relative path, make absolute
 						$url = $baseURL.ltrim($url,'/');
 					}
-					if( !JFile::exists($url) || !in_array($ext, array('jpg','png','gif')) ) {
-						// Not an image or inexistent file
+					if( !file_exists($url) || !in_array($ext, array('jpg','png','gif','webp')) ) {
+						// Not an image or nonexistent file
 						$temp .= $url;
 					} else {
 						// Image found, substitute

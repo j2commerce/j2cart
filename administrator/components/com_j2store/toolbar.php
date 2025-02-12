@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -63,7 +63,7 @@ class J2StoreToolbar extends F0FToolbar
 					array('name'=>'currencies','icon'=>'fa fa-list-ol'),
 					array('name'=>'payments','icon'=>'fa fa-list-ol'),
 					array('name'=>'shippings','icon'=>'fa fa-truck'),
-					array('name'=>'shippingtroubles','icon'=>'fa fa-bug'),						
+					array('name'=>'shippingtroubles','icon'=>'fa fa-bug'),
 					array('name'=>'customfields','icon'=>'fa fa-list-ol'),
 				),
 				'J2STORE_MAINMENU_APPLICATIONS' => array(
@@ -423,7 +423,7 @@ class J2StoreToolbar extends F0FToolbar
 
 		}
 	}
-	
+
 	public function onShippingtroublesBrowse(){
 		$option = $this->input->getCmd('option', 'com_foobar');
 		$componentName = str_replace('com_', '', $option);

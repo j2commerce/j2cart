@@ -1,23 +1,25 @@
 <?php
-/*------------------------------------------------------------------------
- # com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Sasi varna kumar - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
 
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
-//require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/selectable/fields.php');
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
 class J2StoreViewCustomfields extends F0FViewHtml
 {
 	protected function onAdd($tpl = null)
 	{
-		$app=JFactory::getApplication();
-		$doc = JFactory::getDocument();
+		$app = Factory::getApplication();
+		$doc = Factory::getApplication()->getDocument();
 		$model=$this->getModel('Customfields');
 		$this->item=$model->getTable();
 		$this->item->field_table = 'address';
@@ -41,12 +43,12 @@ class J2StoreViewCustomfields extends F0FViewHtml
 		$this->allFields = $allFields;
 		$this->field = $field;
 
-		
+
 		//get the field type
 		$fieldtype =  J2Store::getSelectableFields();
 		$this->assignRef('fieldtype', $fieldtype);
 		$this->assignRef('fieldClass', $selectableBase);
-		
+
 		//country, zone type
 		$zoneType = new j2storeZoneType();
 		$this->assignRef('zoneType', $zoneType);
@@ -71,8 +73,8 @@ class J2StoreViewCustomfields extends F0FViewHtml
 		input.name = \'field_values[title][]\';
 		input2.name = \'field_values[value][]\';
 		input3.name = \'field_values[disabled][]\';
-		option1.text= \''.JText::_('J2STORE_NO',true).'\';
-		option2.text= \''.JText::_('J2STORE_YES',true).'\';
+		option1.text= \''.Text::_('JNO',true).'\';
+		option2.text= \''.Text::_('JYES',true).'\';
 		try { input3.add(option1, null); } catch(ex) { input3.add(option1); }
 		try { input3.add(option2, null); } catch(ex) { input3.add(option2); }
 		column.appendChild(input);
@@ -101,8 +103,8 @@ class J2StoreViewCustomfields extends F0FViewHtml
 				document.getElementById(\'category_field\').style.display = \'none\';
 			}
 		}';
-
-		$doc->addScriptDeclaration($script);
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa->addInlineScript($script, [], []);
 		return true;
 	}
 }

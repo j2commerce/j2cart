@@ -1,14 +1,16 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
+defined('_JEXEC') or die;
 
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\LanguageHelper;
@@ -18,10 +20,9 @@ use Joomla\CMS\Language\Text;
  * J2Store helper.
  */
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2store.php');
-class J2StoreHelperSelect {
 
-
-
+class J2StoreHelperSelect
+{
 	/**
 	 * Method to get array
 	 * @param unknown_type $view
@@ -30,9 +31,10 @@ class J2StoreHelperSelect {
 	 * @param unknown_type $value1
 	 * @return multitype:string NULL
 	 */
-	function getSelectArrayOptions($view,$key,$value,$value1=''){
-		$items =F0FModel::getTmpInstance(ucfirst($view),'J2storeModel')->enabled(1)->getList();
-		$result = array();
+	function getSelectArrayOptions($view,$key,$value,$value1='')
+  {
+		$items = J2Store::fof()->getModel(ucfirst($view),'J2storeModel')->enabled(1)->getList();
+		$result = [];
 		$result[''] = Text::_('J2STORE_SELECT_OPTION');
 		foreach($items as $item){
 			$result[$item->$key] = $item->$value;
@@ -42,7 +44,6 @@ class J2StoreHelperSelect {
 		}
 		return $result;
 	}
-
 
 	public static function productattributeoptionprefix( $selected, $name = 'filter_prefix', $attribs = array('class' => 'j2storeprefix form-select', 'size' => '1'), $idtag = null, $allowAny = false, $title = 'Select Prefix' )
 	{
@@ -57,9 +58,8 @@ class J2StoreHelperSelect {
 		return self::genericlist($list, $name, $attribs, 'value', 'text', $selected, $idtag );
 	}
 
-
-	protected static function genericlist($list, $name, $attribs, $selected, $idTag) {
-
+	protected static function genericlist($list, $name, $attribs, $selected, $idTag)
+  {
 		if (empty($attribs)) {
 			$attribs = [];
 		}
@@ -73,12 +73,12 @@ class J2StoreHelperSelect {
 		return HTMLHelper::_('select.genericlist', $list, $name, $attribs, 'value', 'text', $selected, $idTag);
 	}
 
-
 	// get countries
-	public static function getCountries() {
+	public static function getCountries()
+  {
 		$options = array ();
 		$enabled = 1;
-		$countries = F0FModel::getTmpInstance ( 'countries', 'J2StoreModel' )->enabled ( $enabled )->getList ();
+		$countries = J2Store::fof()->getModel('countries', 'J2StoreModel')->enabled($enabled)->getList();
 		foreach ( $countries as $country ) {
 			$options [$country->j2store_country_id] = Text::_($country->country_name);
 		}
@@ -86,10 +86,11 @@ class J2StoreHelperSelect {
 	}
 
 	// get taxrates
-	public static function getTaxRates() {
+	public static function getTaxRates()
+  {
 		$options = array ();
 		$enabled = 1;
-		$taxrates = F0FModel::getTmpInstance ( 'taxrates', 'J2StoreModel' )->enabled ( $enabled )->getList ();
+		$taxrates = J2Store::fof()->getModel('taxrates', 'J2StoreModel')->enabled($enabled)->getList();
 
 		foreach ( $taxrates as $taxrate ) {
 			$options [$taxrate->j2store_taxrate_id] = $taxrate->taxrate_name;
@@ -98,8 +99,8 @@ class J2StoreHelperSelect {
 	}
 
 	// get languages
-	public static function languages($selected = null, $id = 'language', $attribs = array()) {
-
+	public static function languages($selected = null, $id = 'language', $attribs = array())
+  {
 		$languages = LanguageHelper::getLanguages('lang_code');
 		$options = array ();
 
@@ -119,7 +120,8 @@ class J2StoreHelperSelect {
 	}
 
 	// get orderstatus
-	public static function OrderStatus($selected = null, $id = '', $attribs = array(), $default_option = null) {
+	public static function OrderStatus($selected = null, $id = '', $attribs = array(), $default_option = null)
+  {
 		$orderstatus_options [] = HTMLHelper::_( 'select.option', '', Text::_( 'JALL' ) );
 
 		$orderlist = self::getOrderStatus ( $default_option, true );
@@ -132,9 +134,10 @@ class J2StoreHelperSelect {
 	/**
 	 * Static method that return only the orderstatus.
 	 */
-	public static function getOrderStatus($default_option = null, $asObject = false) {
+	public static function getOrderStatus($default_option = null, $asObject = false)
+  {
 		$enabled = 1;
-		$orderstatus = F0FModel::getTmpInstance ( 'orderstatuses', 'J2StoreModel' )->enabled ( $enabled )->getList ( true );
+		$orderstatus = J2Store::fof()->getModel('orderstatuses', 'J2StoreModel')->enabled($enabled)->getList(true);
 		return $orderstatus;
 	}
 
@@ -142,10 +145,6 @@ class J2StoreHelperSelect {
 	public static function GroupList($selected = null, $id = '', $attribs = array(), $default_option = null) {
 		$group_options [] = HTMLHelper::_( 'select.option', '', Text::_ ( 'JALL' ) );
 
-		if (version_compare ( JVERSION, '3.0', 'lt' )) {
-			require_once (JPATH_LIBRARIES . '/joomla/html/html/user.php');
-		}
-		//$groupList = JHtmlUser::groups ();
 		$groupList = HTMLHelper::_('user.groups');
 
 		foreach ( $groupList as $row ) {
@@ -156,7 +155,8 @@ class J2StoreHelperSelect {
 	}
 
 	// get paymentlist
-	public static function PaymentList($selected = null, $id = '', $attribs = array(), $default_option = null) {
+	public static function PaymentList($selected = null, $id = '', $attribs = array(), $default_option = null)
+  {
 		$paymentmethod_options [] = HTMLHelper::_( 'select.option', '', Text::_ ('JALL') );
 
 		return self::genericlist ( $paymentmethod_options, $id, $attribs, $selected, $id );
@@ -164,7 +164,7 @@ class J2StoreHelperSelect {
 
 	public static function publish($name, $selected = '', $attribs = array())
 	{
-		$options = array();
+		$options = [];
 
 		$options[] = HTMLHelper::_('select.option', '1'  ,Text::_('JYES'));
 		$options[] = HTMLHelper::_('select.option', '0'  ,Text::_('JNO'));
@@ -172,38 +172,34 @@ class J2StoreHelperSelect {
 		return self::genericlist($options, $name, $attribs, $selected, $name);
 	}
 
-
-
 	// get countries
-	public static function getCurrencies() {
+	public static function getCurrencies()
+  {
 		$options = array ();
 		$enabled = 1;
-		$currencies = F0FModel::getTmpInstance ( 'currencies', 'J2StoreModel' )->enabled ( $enabled )->getList ();
+		$currencies = J2Store::fof()->getModel('currencies', 'J2StoreModel')->enabled($enabled)->getList();
 		foreach ( $currencies as $currency ) {
 			$options [$currency->j2store_currency_id] = $currency->currency_name;
 		}
 		return $options;
 	}
 
-
 	public static function ruleFormatType($name, $selected = '', $attribs = array())
 	{
-		$options = array();
+		$options = [];
 		$options[] = HTMLHelper::_('select.option', ''  ,Text::_('J2STORE_SELECT_OPTION'));
 		$options[] = HTMLHelper::_('select.option', 'product'  ,Text::_('J2STORE_RULE_PRODUCT'));
 		$options[] = HTMLHelper::_('select.option', 'discount'  ,Text::_('J2STORE_RULE_DISCOUNT'));
 		return self::genericlist($options, $name, $attribs, $selected, $name);
 	}
 
-
-
-
-	public static function getParentOption($variant_id,$default_par_id_array,$same_option) {
-		$model = F0FModel::getTmpInstance('Options','J2StoreModel');
+	public static function getParentOption($variant_id,$default_par_id_array,$same_option)
+  {
+		$model = J2Store::fof()->getModel('Options','J2StoreModel');
 		//get parent
 		$pa_options= $model->getList();
 		//generate parent filter list
-		$parent_options = array();
+		$parent_options = [];
 		$parent_options[]=Text::_('J2STORE_SELECT_PARENT_OPTION');
 		if(!empty($pa_options))
 		{
@@ -216,7 +212,6 @@ class J2StoreHelperSelect {
 		return $parent_options;
 	}
 
-
 	/**
 	 * Generates shipping method type list
 	 *
@@ -225,9 +220,9 @@ class J2StoreHelperSelect {
 	 * @param mixed The key that is selected
 	 * @returns string HTML for the radio list
 	 */
-	public static function shippingtype( $selected, $name = 'filter_shipping_method_type', $attribs = array('class' => 'inputbox'), $idtag = null, $allowAny = false, $title = 'J2STORE_SELECT_SHIPPING_TYPE')
+	public static function shippingtype( $selected, $name = 'filter_shipping_method_type', $attribs = array('class' => 'form-select'), $idtag = null, $allowAny = false, $title = 'J2STORE_SELECT_SHIPPING_TYPE')
 	{
-		$list = array();
+		$list = [];
 		if($allowAny) {
 			$list[] =  self::option('', "- ".Text::_( $title )." -" );
 		}
@@ -250,13 +245,12 @@ class J2StoreHelperSelect {
 	 * @param unknown_type $idtag
 	 * @return unknown_type
 	 */
-	public static function shippingmethod( $selected, $name = 'filter_shipping_method', $attribs = array('class' => 'inputbox'), $idtag = null )
+	public static function shippingmethod( $selected, $name = 'filter_shipping_method', $attribs = array('class' => 'form-select'), $idtag = null )
 	{
-		$list = array();
+		$list = [];
 
 		F0FModel::addIncludePath( JPATH_ADMINISTRATOR.'/components/com_j2store/models' );
-		//JModelLegacy::addIncludePath( JPATH_ADMINISTRATOR.'/components/com_j2store/models' );
-		$model = F0FModel::getAnInstance('Shippingmethods', 'J2StoreModel' );
+		$model = J2Store::fof()->getModel('Shippingmethods', 'J2StoreModel' );
 
 		$model->setState('filter_enabled', true);
 		$items = $model->getList();
@@ -267,11 +261,14 @@ class J2StoreHelperSelect {
 		return HTMLHelper::_('select.radiolist', $list, $name, $attribs, 'value', 'text', $selected, $idtag);
 	}
 
-	public static function taxclass($default, $name) {
-
+	public static function taxclass($default, $name)
+  {
+        $attr = [];
+        $attr['class']= 'form-select';
 		return J2Html::select()->clearState()
 		->type('genericlist')
 		->name($name)
+      ->attribs($attr)
 		->value($default)
 		->setPlaceHolders(
 				array(''=>Text::_('J2STORE_SELECT_OPTION'))
@@ -284,13 +281,17 @@ class J2StoreHelperSelect {
 				)
 		)
 		)->getHtml();
-
 	}
 
-	public static function geozones($default, $name) {
+	public static function geozones($default, $name)
+  {
+        $attr = [];
+        $attr['class']= 'form-select';
+
 		return J2Html::select()->clearState()
 		->type('genericlist')
 		->name($name)
+        ->attribs($attr)
 		->value($default)
 		->setPlaceHolders(
 				array(''=>Text::_('J2STORE_SELECT_OPTION'))
@@ -303,10 +304,7 @@ class J2StoreHelperSelect {
 				)
 		)
 		)->getHtml();
-
 	}
-
-
 
 	/**
 	 * Returns an array of categories for the given extension.
@@ -322,11 +320,7 @@ class J2StoreHelperSelect {
 	{		$config = array('filter.published' => array(0, 1));
 			$extension ='com_content';
 			$config = (array) $config;
-			if (version_compare(JVERSION, '3.99.99', 'lt')) {
-				$db = JFactory::getDbo();
-			} else {
 				$db = Factory::getContainer()->get('DatabaseDriver');
-			}
 			$query = $db->getQuery(true)
 			->select('a.id, a.title, a.level, a.parent_id')
 			->from('#__categories AS a')
@@ -356,21 +350,21 @@ class J2StoreHelperSelect {
 			return $items;
 	}
 
-
-	public static function getManufacturers(){
-		$items =  F0FModel::getTmpInstance('Manufacturers','J2StoreModel')->getItemList();
-		$new_options  = array();
+	public static function getManufacturers()
+  {
+		$items =  J2Store::fof()->getModel('Manufacturers','J2StoreModel')->getItemList();
+		$new_options  = [];
 		$new_options[] = Text::_('J2STORE_ALL');
 		foreach($items as $brand){
 			$new_options[$brand->j2store_manufacturer_id] = $brand->company;
 		}
 		return $new_options;
 	}
-	
-	
-	public static function getOptionTypesList($name, $id, $item) {
+
+	public static function getOptionTypesList($name, $id, $item)
+  {
 		$groups = array ();
-		
+
 		$types = self::getOptionTypes ();
 		foreach ( $types as $type_key => $typeitems ) {
 			$groups [$type_key] = array ();
@@ -380,7 +374,7 @@ class J2StoreHelperSelect {
 				$groups [$type_key] ['items'] [] = HTMLHelper::_( 'select.option', $type, Text::_( 'J2STORE_' . strtoupper ( $type ) ) );
 			}
 		}
-		
+
 		$attr = array (
 				'id' => $id,
 				'list.select' => $item->type,
@@ -392,12 +386,13 @@ class J2StoreHelperSelect {
 				$id,
 				$item,
 				$groups,
-				$attr 
+				$attr
 		) );
 		return HTMLHelper::_( 'select.groupedlist', $groups, $name, $attr);
 	}
-	
-	public static function getOptionTypes() {
+
+	public static function getOptionTypes()
+  {
 		$types = array ();
 		$choose = array ();
 		$choose [] = 'select';
@@ -405,23 +400,22 @@ class J2StoreHelperSelect {
 		if (J2Store::isPro ()) {
 			$choose [] = 'checkbox';
 		}
-		
+
 		$types ['choose'] = $choose;
-		
+
 		if (J2Store::isPro ()) {
 			$types ['input'] = array (
 					'text',
 					'textarea',
-					'file' 
+					'file'
 			);
 			$types ['date'] = array (
 					'date',
 					'time',
-					'datetime' 
+					'datetime'
 			);
 		}
 		J2Store::plugin ()->event('GetOptionTypes', array (&$types));
 		return $types;
 	}
 }
-

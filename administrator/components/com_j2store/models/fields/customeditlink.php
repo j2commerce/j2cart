@@ -1,12 +1,19 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
-/* class JFormFieldFieldtypes extends JFormField */
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+
 class JFormFieldCustomeditlink extends F0FFormFieldText
 {
 	protected $type = 'customeditlink';
@@ -41,17 +48,17 @@ class JFormFieldCustomeditlink extends F0FFormFieldText
 			$format_string = (string) $this->element['format'];
 		}
 
-		if ($this->element['show_link'] == 'true')
+		if ($this->element['show_link'] === 'true')
 		{
 			$show_link = true;
 		}
 
-		if ($this->element['format_if_not_empty'] == 'true')
+		if ($this->element['format_if_not_empty'] === 'true')
 		{
 			$format_if_not_empty = true;
 		}
 
-		if ($this->element['parse_value'] == 'true')
+		if ($this->element['parse_value'] === 'true')
 		{
 			$parse_value = true;
 		}
@@ -67,7 +74,7 @@ class JFormFieldCustomeditlink extends F0FFormFieldText
 
 		if (!empty($empty_replacement) && empty($this->value))
 		{
-			$value = JText::_($empty_replacement);
+			$value = Text::_($empty_replacement);
 		}
 
 		if ($parse_value)
@@ -87,10 +94,10 @@ class JFormFieldCustomeditlink extends F0FFormFieldText
 
 		// Create the HTML
 		$html = '<span class="' . $class . '">';
-		$view =  JFactory::getApplication()->input->getString('view');
-		if($this->item->element == 'shipping_standard'|| 
-		$this->item->element == 'shipping_postcode' || 
-		$this->item->element == 'shipping_flatrate_advanced'
+		$view =  Factory::getApplication()->input->getString('view');
+		if($this->item->element === 'shipping_standard'||
+		$this->item->element === 'shipping_postcode' ||
+		$this->item->element === 'shipping_flatrate_advanced'
 		){
 			$link_url = 'index.php?option=com_j2store&view='.$view.'&task=view&layout=view&id='.$this->item->extension_id;
 			$html .= '<a href="' . $link_url . '">';
@@ -104,5 +111,4 @@ class JFormFieldCustomeditlink extends F0FFormFieldText
 		$html .= '</span>';
 		return $html;
 	}
-
 }

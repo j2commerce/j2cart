@@ -1,42 +1,53 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
+
 $row_class = 'row';
 $col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-}
+
+$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+
+$script = "document.addEventListener('DOMContentLoaded',function(){const countryElement=document.querySelector('#address #country_id');if(countryElement){countryElement.addEventListener('change',function(){if(this.value==='')return;const loader=document.createElement('span');loader.className='wait';loader.innerHTML='&nbsp;<img src=\"" . Uri::root(true) . "/media/j2store/images/loader.gif\" alt=\"\" />';countryElement.after(loader);fetch('index.php?option=com_j2store&view=orders&task=getCountry&country_id='+this.value,{method:'GET',headers:{'Accept':'application/json'}}).then(response=>{if(!response.ok){throw new Error('Network response was not ok');}return response.json();}).then(json=>{document.querySelectorAll('.wait').forEach(el=>el.remove());const postcodeRequired=document.getElementById('shipping-postcode-required');if(postcodeRequired){postcodeRequired.style.display=json['postcode_required']==='1'?'block':'none';}let html='<option value=\"\">" . Text::_('J2STORE_SELECT_OPTION') . "</option>';if(json['zone']&&json['zone'].length>0){json['zone'].forEach(zone=>{html+='<option value=\"'+zone.j2store_zone_id+'\"';if(zone.j2store_zone_id===' " . $this->orderinfo->zone_id . " '){html+=' selected=\"selected\"';}html+='>'+zone.zone_name+'</option>';});}else{html+='<option value=\"0\" selected=\"selected\">" . Text::_('J2STORE_CHECKOUT_NONE') . "</option>';}const zoneElement=document.querySelector('#address #" . $this->address_type . "_zone_id');if(zoneElement){zoneElement.innerHTML=html;}}).catch(error=>{console.error('Fetch error:',error);});});}});document.addEventListener('DOMContentLoaded',function(){const countryElement=document.querySelector('#address #country_id');if(countryElement){countryElement.dispatchEvent(new Event('change'));}});";
+
+//$wa->addInlineScript($script, [], []);
 ?>
-<style>
-	.form-search input, .form-search textarea, .form-search select, .form-search .help-inline, .form-search .uneditable-input, .form-search .input-prepend, .form-search .input-append, .form-inline input, .form-inline textarea, .form-inline select, .form-inline .help-inline, .form-inline .uneditable-input, .form-inline .input-prepend, .form-inline .input-append, .form-horizontal input, .form-horizontal textarea, .form-horizontal select, .form-horizontal .help-inline, .form-horizontal .uneditable-input, .form-horizontal .input-prepend, .form-horizontal .input-append {
-    display: block;
-    margin-bottom: 0;
-    vertical-align: middle;
-}
-</style>
+
 <div class="j2store">
-<form class="form-horizontal" id="j2storeaddressForm" name="addressForm" method="post" action="<?php echo 'index.php'; ?>" >
-	<h3><?php echo JText::_('J2STORE_ADDRESS_EDIT');?></h3>
+    <form id="j2storeaddressForm" name="addressForm" method="post" action="<?php echo 'index.php'; ?>">
+        <fieldset class="order-general-information options-form">
+            <legend><?php echo Text::_('J2STORE_ADDRESS_EDIT');?></legend>
 	<div id="address">
 		<div class="j2store-address-alert">
 		</div>
-		 <div class="pull-right">
-			 <input type="submit" onclick="jQuery('#task').attr('value','saveOrderinfo');" value="<?php echo JText::_('JAPPLY'); ?>"  class="button btn btn-success" />
+                <div class="mb-3">
+                    <input type="submit" onclick="document.getElementById('task').setAttribute('value', 'saveOrderinfo');" value="<?php echo Text::_('JAPPLY'); ?>" class="btn btn-success btn-sm" />
 	  	</div>
 	<?php
-	//$html = $this->storeProfile->store_billing_layout;
 	$html ='';
 	if(empty($html) || strlen($html) < 5) {
 		//we dont have a profile set in the store profile. So use the default one.
 		$html = '<div class="'.$row_class.'">
-			<div class="'.$col_class.'6">[first_name] [last_name] [phone_1] [phone_2] [company] [tax_number]</div>
-			<div class="'.$col_class.'6">[address_1] [address_2] [city] [zip] [country_id] [zone_id]</div>
+                                <div class="col-md-6">[first_name]</div>
+                                <div class="col-md-6">[last_name]</div>
+                                <div class="col-md-6">[address_1]</div>
+                                <div class="col-md-6">[address_2]</div>
+                                <div class="col-md-6">[city]</div>
+                                <div class="col-md-6">[zip]</div>
+                                <div class="col-md-6">[country_id]</div>
+                                <div class="col-md-6">[zone_id]</div>
+                                <div class="col-md-6">[phone_1]</div>
+                                <div class="col-md-6">[phone_2]</div>
+                                <div class="col-md-6">[company]</div>
+                                <div class="col-md-6">[tax_number]</div>
 			</div>';
 	}
 	//first find all the checkout fields
@@ -95,15 +106,14 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 	  	</div>
 		<?php endif; ?>
 	</div>
-
-
+        </fieldset>
   <input type="hidden" name="option" value="com_j2store" />
   <input type="hidden" name="view" value="orders" />
   <input type="hidden" id="task" name="task" value="" />
   <input type="hidden" name="address_type" value="<?php echo $this->address_type;?>" />
   <input type="hidden" name="order_id" value="<?php echo $this->item->order_id;?>" />
   <input type="hidden" name="j2store_orderinfo_id" value="<?php echo $this->item->j2store_orderinfo_id;?>" />
-  <?php echo JHTML::_( 'form.token' ); ?>
+        <?php echo HTMLHelper::_( 'form.token' ); ?>
   </form>
 </div>
 <script type="text/javascript">

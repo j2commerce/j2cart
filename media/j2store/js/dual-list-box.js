@@ -29,36 +29,36 @@
     // Create the defaults once
     var pluginName = 'bootstrapDualListbox',
         defaults = {
-            filterTextClear: 'show all',
+            filterTextClear: 'Show All',
             filterPlaceHolder: 'Filter',
-            moveSelectedLabel: 'Move selected',
-            moveAllLabel: 'Move all',
-            removeSelectedLabel: 'Remove selected',
-            removeAllLabel: 'Remove all',
+            moveSelectedLabel: 'Move Selected',
+            moveAllLabel: 'Move All',
+            removeSelectedLabel: 'Remove Selected',
+            removeAllLabel: 'Remove All',
             moveOnSelect: true,                                                                 // true/false (forced true on androids, see the comment later)
             moveOnDoubleClick: true,                                                            // true/false (forced false on androids, cause moveOnSelect is forced to true)
             preserveSelectionOnMove: false,                                                     // 'all' / 'moved' / false
             selectedListLabel: false,                                                           // 'string', false
             nonSelectedListLabel: false,                                                        // 'string', false
             helperSelectNamePostfix: '_helper',                                                 // 'string_of_postfix' / false
-            selectorMinimalHeight: 100,
+            selectorMinimalHeight: 160,
             showFilterInputs: true,                                                             // whether to show filter inputs
             nonSelectedFilter: '',                                                              // string, filter the non selected options
             selectedFilter: '',                                                                 // string, filter the selected options
-            infoText: 'Showing all {0}',                                                        // text when all options are visible / false for no info text
+            infoText: 'Showing All {0}',                                                        // text when all options are visible / false for no info text
             infoTextFiltered: '<span class="badge badge-warning">Filtered</span> {0} from {1}', // when not all of the options are visible due to the filter
-            infoTextEmpty: 'Empty list',                                                        // when there are no options present in the list
+            infoTextEmpty: 'Empty List',                                                        // when there are no options present in the list
             filterOnValues: false,                                                              // filter by selector's values, boolean
             sortByInputOrder: false,
             eventMoveOverride: false,                                                           // boolean, allows user to unbind default event behaviour and run their own instead
             eventMoveAllOverride: false,                                                        // boolean, allows user to unbind default event behaviour and run their own instead
             eventRemoveOverride: false,                                                         // boolean, allows user to unbind default event behaviour and run their own instead
             eventRemoveAllOverride: false,                                                      // boolean, allows user to unbind default event behaviour and run their own instead
-            btnClass: 'btn-outline-secondary',                                                  // sets the button style class for all the buttons
+            btnClass: 'btn-outline-secondary btn-light rounded-top-1',                                                  // sets the button style class for all the buttons
             btnMoveText: '&gt;',                                                                // string, sets the text for the "Move" button
             btnRemoveText: '&lt;',                                                              // string, sets the text for the "Remove" button
-            btnMoveAllText: '&gt;&gt;',                                                         // string, sets the text for the "Move All" button
-            btnRemoveAllText: '&lt;&lt;'                                                        // string, sets the text for the "Remove All" button
+            btnMoveAllText: '<span class="fas fa-solid fa-angles-right"></span>',                                                         // string, sets the text for the "Move All" button
+            btnRemoveAllText: '<span class="fas fa-solid fa-angles-left"></span>'                                                        // string, sets the text for the "Remove All" button
         },
         // Selections are invisible on android if the containing select is styled with CSS
         // http://code.google.com/p/android/issues/detail?id=16922
@@ -404,28 +404,28 @@
                 ' <div class="box1 col-md-6">' +
                 '   <label></label>' +
                 '   <span class="info-container">' +
-                '     <span class="info"></span>' +
+                '     <div class="info small mb-2"></div>' +
                 '     <button type="button" class="btn btn-sm clear1" style="float:right!important;"></button>' +
                 '   </span>' +
-                '   <input class="form-control filter" type="text">' +
-                '   <div class="btn-group buttons">' +
+                '   <input class="form-control filter mb-2" type="text">' +
+                '   <div class="btn-group buttons mb-1">' +
                 '     <button type="button" class="btn moveall"></button>' +
                 '     <button type="button" class="btn move"></button>' +
                 '   </div>' +
-                '   <select multiple="multiple"></select>' +
+                '   <select multiple="multiple" class="form-select"></select>' +
                 ' </div>' +
                 ' <div class="box2 col-md-6">' +
                 '   <label></label>' +
                 '   <span class="info-container">' +
-                '     <span class="info"></span>' +
+                '     <div class="info small mb-2"></div>' +
                 '     <button type="button" class="btn btn-sm clear2" style="float:right!important;"></button>' +
                 '   </span>' +
-                '   <input class="form-control filter" type="text">' +
-                '   <div class="btn-group buttons">' +
+                '   <input class="form-control filter mb-2" type="text">' +
+                '   <div class="btn-group buttons mb-1">' +
                 '     <button type="button" class="btn remove"></button>' +
                 '     <button type="button" class="btn removeall"></button>' +
                 '   </div>' +
-                '   <select multiple="multiple"></select>' +
+                '   <select multiple="multiple" class="form-select"></select>' +
                 ' </div>' +
                 '</div>')
                 .insertBefore(this.element);

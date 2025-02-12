@@ -1,29 +1,37 @@
 <?php
-/*------------------------------------------------------------------------
- # com_j2store - J2Store
-# ------------------------------------------------------------------------
-# author    Sasi varna kumar - Weblogicx India http://www.weblogicxindia.com
-# copyright Copyright (C) 2014 - 19 Weblogicxindia.com. All Rights Reserved.
-# @license - http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
-# Websites: http://j2store.org
-# Technical Support:  Forum - http://j2store.org/forum/index.html
--------------------------------------------------------------------------*/
-// No direct access to this file
-defined('_JEXEC') or die('Restricted access');
+/**
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+
 jimport('joomla.application.component.controllerform');
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
+
 class J2StoreControllerVouchers extends F0FController
 {
     use list_view;
 
-    public function execute($task) {
+    public function execute($task)
+    {
         if(in_array($task, array('edit', 'add'))) {
             $task = 'add';
         }
         return parent::execute($task);
     }
 
-    public function onBeforeApplySave(&$data){
+    public function onBeforeApplySave(&$data)
+    {
         if(is_array($data)){
             $data['valid_from'] = isset($data['valid_from']) && !empty($data['valid_from']) ? $data['valid_from']:null;
             $data['valid_to'] = isset($data['valid_to']) && !empty($data['valid_to']) ? $data['valid_to']:null;
@@ -41,19 +49,16 @@ class J2StoreControllerVouchers extends F0FController
         if(J2Store::isPro()) {
             $this->editToolBar();
             if(!empty($id)) {
-                JToolbarHelper::save2copy('copy');
+                ToolbarHelper::save2copy('copy');
             }
         }
         $vars->primary_key = 'j2store_voucher_id';
         $vars->id = $this->getPageId();
-        $voucher_table = F0FTable::getInstance('Voucher', 'J2StoreTable')->getClone ();
+        $voucher_table = J2Store::fof()->loadTable('Voucher', 'J2StoreTable')->getClone();
         $voucher_table->load($vars->id);
         $vars->item = $voucher_table;
         $vars->field_sets = array();
         $col_class = 'col-md-';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $col_class = 'span';
-        }
         $vars->field_sets[] = array(
             'name' => 'basic_information',
             'label' => 'J2STORE_VOUCHER_BASIC_INFORMATION',
@@ -63,28 +68,28 @@ class J2StoreControllerVouchers extends F0FController
                     'type' => 'text',
                     'name' => 'voucher_code',
                     'value' => $voucher_table->voucher_code,
-                    'options' => array('required' => 'true','class' => 'input-xlarge')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'email_to' => array(
                     'label' => 'J2STORE_VOUCHER_TO_EMAIL_LABEL',
                     'type' => 'text',
                     'name' => 'email_to',
                     'value' => $voucher_table->email_to,
-                    'options' => array('required' => 'true','class' => 'input-xlarge')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'voucher_value' => array(
                     'label' => 'J2STORE_VOUCHER_VALUE_LABEL',
                     'type' => 'text',
                     'name' => 'voucher_value',
                     'value' => $voucher_table->voucher_value,
-                    'options' => array('required' => 'true','class' => 'input-xlarge')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'type' => array(
                     'label' => 'J2STORE_VOUCHER_TYPE_LABEL',
                     'type' => 'list',
                     'name' => 'voucher_type',
                     'value' => $voucher_table->voucher_type,
-                    'options' => array('options' => array('giftcard'=> JText::_('J2STORE_VOUCHER_TYPE_GIFT_CARD')))
+                    'options' => array('class'=> 'form-select','options' => array('giftcard'=> Text::_('J2STORE_VOUCHER_TYPE_GIFT_CARD')))
 
                 ),
                 'valid_from' => array(
@@ -92,30 +97,22 @@ class J2StoreControllerVouchers extends F0FController
                     'type' => 'calendar',
                     'name' => 'valid_from',
                     'value' => $voucher_table->valid_from,
-                    'options' => array('class'=> 'input','format' => '%Y-%m-%d %H:%M:%S')
+                    'options' => array('required' => 'true','class'=> 'form-control','format' => '%Y-%m-%d %H:%M:%S')
                 ),
                 'valid_to' => array(
                     'label' => 'J2STORE_PR_VALIDTO',
                     'type' => 'calendar',
                     'name' => 'valid_to',
                     'value' => $voucher_table->valid_to,
-                    'options' => array('class'=> 'input','format' => '%Y-%m-%d %H:%M:%S')
+                    'options' => array('required' => 'true','class'=> 'form-control','format' => '%Y-%m-%d %H:%M:%S')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
                     'type' => 'enabled',
                     'name' => 'enabled',
                     'value' => $voucher_table->enabled,
-                    'options' => array('class' => 'input-xlarge')
+                    'options' => array('class' => 'form-control')
                 ),
-                'subject' => array(
-                    'label' => 'J2STORE_VOUCHER_MESSAGE_LABEL',
-                    'type' => 'text',
-                    'name' => 'subject',
-                    'value' => $voucher_table->subject,
-                    'options' => array('required' => 'true','class' => 'input-xlarge')
-                ),
-
             ),
         );
         $vars->field_sets[] = array(
@@ -123,6 +120,13 @@ class J2StoreControllerVouchers extends F0FController
 
             'label' => 'J2STORE_VOUCHER_ADVANCED_INFORMATION',
             'fields' => array(
+                'subject' => array(
+                    'label' => 'J2STORE_VOUCHER_MESSAGE_LABEL',
+                    'type' => 'text',
+                    'name' => 'subject',
+                    'value' => $voucher_table->subject,
+                    'options' => array('required' => 'true','class' => 'form-control')
+                ),
                 'email_body' => array(
                     'label' => 'J2STORE_VOUCHER_BODY_LABEL',
                     'type' => 'editor',
@@ -134,9 +138,10 @@ class J2StoreControllerVouchers extends F0FController
         );
         echo $this->_getLayout('form', $vars,'edit');
     }
+
     public function browse()
     {
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
         $state = array();
         $state['voucher_code'] = $app->input->getString('voucher_code','');
@@ -154,8 +159,8 @@ class J2StoreControllerVouchers extends F0FController
         $vars->state = $model->getState();
         if(J2Store::isPro()) {
             $this->addBrowseToolBar();
-            JToolbarHelper::custom('history','list','',JText::_('J2STORE_VOUCHER_HISTORY'));
-            JToolbarHelper::custom('send','mail','',JText::_('J2STORE_VOUCHER_SEND'));
+            ToolbarHelper::custom('history','list','',Text::_('J2STORE_VOUCHER_HISTORY'));
+            ToolbarHelper::custom('send','mail','',Text::_('J2STORE_VOUCHER_SEND'));
         }else {
             $this->noToolbar();
         }
@@ -204,49 +209,50 @@ class J2StoreControllerVouchers extends F0FController
         $vars->pagination = $model->getPagination();
         echo $this->_getLayout('default',$vars);
     }
+
 	/**
 	 * Method to send Voucher Email
 	 */
-	public function send(){
-		$app = JFactory::getApplication();
-		$cids = $app->input->get('cid',array(),'');		
+	public function send()
+  {
+		$app = Factory::getApplication();
+		$cids = $app->input->get('cid',array(),'');
 		if(count($cids)) {
 			$model = $this->getModel('Vouchers');
 			if($model->sendVouchers($cids) === false) {
-				$msg = JText::_('J2STORE_VOUCHERS_SENDING_FAILED');
+				$msg = Text::_('J2STORE_VOUCHERS_SENDING_FAILED');
 				$msgType = 'warning';
 			}else {
-				$msg = JText::_('J2STORE_VOUCHERS_SENDING_SUCCESSFUL');
+				$msg = Text::_('J2STORE_VOUCHERS_SENDING_SUCCESSFUL');
 				$msgType = 'message';
 			}
-		}	
+		}
 		$this->setRedirect('index.php?option=com_j2store&view=vouchers' ,$msg, $msgType);
 	}
-	
-	public function history() {
-		
-		$app = JFactory::getApplication();
+
+	public function history()
+  {
+		$app = Factory::getApplication();
 		$cid = $app->input->get('cid', array(), 'array');
 		//take the first one
 		$id = isset($cid[0]) ? $cid[0] : 0;
 		if($id > 0) {
-			
+
 			$view = $this->getThisView();
-			
+
 			if ($model = $this->getThisModel())
 			{
 				// Push the model into the view (as default)
 				$view->setModel($model, true);
 			}
-			$voucher = F0FTable::getAnInstance('Voucher', 'J2StoreTable');
+			$voucher = J2Store::fof()->loadTable('Voucher', 'J2StoreTable');
 			$voucher->load($id);
-			$view->assign('voucher', $voucher);
+			$view->set('voucher', $voucher);
 			$voucher_history = $model->getVoucherHistory($id);
-			$view->assign('vouchers', $voucher_history);
-			$view->assign('params', J2Store::config());
+			$view->set('vouchers', $voucher_history);
+			$view->set('params', J2Store::config());
 		}
 		$view->setLayout('history');
 		$view->display();
-		
 	}
 }
