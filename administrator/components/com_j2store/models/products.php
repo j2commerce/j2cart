@@ -441,7 +441,15 @@ class J2StoreModelProducts extends F0FModel {
                     exit;
                 }
                 // Find the parent path to our subfolder
-                $parent = JPath::clean( @realpath($folder.'/'.$subfolder.'/..') );
+
+				$realpath = @realpath($folder.'/'.$subfolder.'/..');
+				// realpath may return false which cannot be used as entry value for Path::clean
+				if ($realpath) {
+					$parent = JPath::clean($realpath);
+				} else {
+					$parent = '';
+				}
+
                 $parent = trim( str_replace(JPath::clean($folder), '', $parent) , '/\\' );
                 $folder = JPath::clean ( $folder . '/' . $subfolder );
 
