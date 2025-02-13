@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" group="j2store" method="upgrade">
-	<name>PLG_J2STORE_APP_FLEXIVARIABLE</name>
-	<author>J2Commerce</author>
-	<creationDate>DEC 2024</creationDate>
-	<copyright>(C) 2018 Cartrabbit International Pte Ltd</copyright>
-	<copyright>(C) 2024 J2Commerce, LLC</copyright>
-	<license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later</license>
-	<authorEmail>support@j2commerce.com</authorEmail>
-	<authorUrl>https://www.j2commerce.com</authorUrl>
-	<version>4.0.1</version>
+	<name>Flexible Variable</name>
+    <author>J2Commerce</author>
+    <creationDate>JAN 2025</creationDate>
+    <copyright>(C) 2015 J2Store</copyright>
+    <copyright>(C) 2025 J2Commerce, LLC</copyright>
+    <license>GNU General Public License v3 or later versions</license>
+    <authorEmail>support@j2commerce.com</authorEmail>
+    <authorUrl>https://www.j2commerce.com</authorUrl>
+    <version>4.1.0</version>
 	<description>PLG_J2STORE_APP_FLEXIVARIABLE_DESC</description>
 	<files>
 		<filename plugin="app_flexivariable">app_flexivariable.php</filename>
@@ -19,34 +19,7 @@
 		<language tag="en-GB">en-GB.plg_j2store_app_flexivariable.sys.ini</language>
 	</languages>
     <media folder="media" destination="plg_j2store_app_flexivariable">
-        <folder>js</folder>
         <folder>images</folder>
+        <folder>js</folder>
     </media>
-    <updateservers>
-        <server type="extension" priority="2" name="J2Commerce Flex Variant">
-            https://updates.j2commerce.com/j2store/plg_j2store_app_flexivariable.xml
-        </server>
-    </updateservers>
-    <config>
-        <fields name="params">
-            <fieldset name="basic" label="J2STORE_BASIC_SETTINGS">
-                <field
-                    type="customnotice"
-                    label="J2STORE_APP_FLEXIVARIABLE_NOTES"
-                    addfieldpath="/administrator/components/com_j2store/models/fields"
-                />
-                <field
-                    type="radio"
-                    name="enable_price_range"
-                    default="1"
-                    label="J2STORE_APP_FLEXIVARIABLE_ENABLE_PRICERANGE"
-                    description="J2STORE_APP_FLEXIVARIABLE_ENABLE_PRICERANGE_DESC"
-                    layout="joomla.form.field.radio.switcher" filter="integer"
-                >
-                    <option value="0">JNO</option>
-                    <option value="1">JYES</option>
-                </field>
-            </fieldset>
-        </fields>
-    </config>
 </extension>

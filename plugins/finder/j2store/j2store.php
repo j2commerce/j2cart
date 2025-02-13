@@ -1,14 +1,24 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseQuery;
 
 require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php';
 require_once JPATH_ADMINISTRATOR . '/components/com_j2store/helpers/j2store.php';
+
 /**
  * Smart Search adapter for com_j2store.
  *
@@ -83,12 +93,11 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 	public function onFinderCategoryChangeState($extension, $pks, $value)
 	{
 		// Make sure we're handling com_j2store categories.
-		if ($extension == 'com_j2store')
+		if ($extension === 'com_j2store')
 		{
 			$this->categoryStateChange($pks, $value);
 		}
 	}
-
 
 	/**
 	 * Method to update index data on category access level changes
@@ -107,7 +116,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		* published state so we need to look up all published states
 		* before we change anything.
 		*/
-		$db = JFactory::getDbo();
+		$db = Factory::getContainer()->get('DatabaseDriver');
 		foreach ($pks as $pk)
 		{
 			$query = clone($this->getStateQuery());
@@ -133,7 +142,6 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 			}
 		}
 	}
-
 
 	/**
 	 * Method to change the value of a content item's property in the links
@@ -184,11 +192,11 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 	 */
 	public function onFinderAfterDelete($context, $table)
 	{
-		if ($context == 'com_j2store.product')
+		if ($context === 'com_j2store.product')
 		{
 			$id = $table->id;
 		}
-		elseif ($context == 'com_finder.index')
+		elseif ($context === 'com_finder.index')
 		{
 			$id = $table->link_id;
 		}
@@ -219,7 +227,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 	public function onFinderAfterSave($context, $row, $isNew)
 	{
 		// We only want to handle articles here.
-		if ($context == 'com_j2store.article' || $context == 'com_j2store.product')
+		if ($context === 'com_j2store.article' || $context === 'com_j2store.product')
 		{
 			// Check if the access levels are different.
 			if (!$isNew && $this->old_access != $row->access)
@@ -233,7 +241,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		}
 
 		// Check for access changes in the category.
-		if ($context == 'com_categories.category')
+		if ($context === 'com_categories.category')
 		{
 			// Check if the access levels are different.
 			if (!$isNew && $this->old_cataccess != $row->access)
@@ -261,7 +269,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 	public function onFinderBeforeSave($context, $row, $isNew)
 	{
 		// We only want to handle articles here.
-		if ($context == 'com_j2store.article' || $context == 'com_j2store.product')
+		if ($context === 'com_j2store.article' || $context === 'com_j2store.product')
 		{
 			// Query the database for the old access level if the item isn't new.
 			if (!$isNew)
@@ -271,7 +279,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		}
 
 		// Check for access levels from the category.
-		if ($context == 'com_categories.category')
+		if ($context === 'com_categories.category')
 		{
 			// Query the database for the old access level if the item isn't new.
 			if (!$isNew)
@@ -299,18 +307,17 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 	public function onFinderChangeState($context, $pks, $value)
 	{
 		// We only want to handle articles here.
-		if ($context == 'com_j2store.article' || $context == 'com_j2store.product' )
+		if ($context === 'com_j2store.article' || $context === 'com_j2store.product' )
 		{
 			$this->itemStateChange($pks, $value);
 		}
 
 		// Handle when the plugin is disabled.
-		if ($context == 'com_plugins.plugin' && $value === 0)
+		if ($context === 'com_plugins.plugin' && $value === 0)
 		{
 			$this->pluginDisable($pks);
 		}
 	}
-
 
 	/**
 	 * Method to get the page title of any menu item that is linked to the
@@ -328,7 +335,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		$return = null;
 
 		// Set variables
-		$user = JFactory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$groups = implode(',', $user->getAuthorisedViewLevels());
 
 		// Build a query to get the menu params.
@@ -360,6 +367,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 
 		return $return;
 	}
+
 	/**
 	 * Method to index an item. The item must be a FinderIndexerResult object.
 	 *
@@ -373,17 +381,16 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 	 */
 	protected function index(FinderIndexerResult $item, $format = 'html')
 	{
-
 		$item->setLanguage();
 		// Check if the extension is enabled.
-		if (JComponentHelper::isEnabled($this->extension) == false)
+		if (ComponentHelper::isEnabled($this->extension) === false)
 		{
 			return;
 		}
         $platform = J2Store::platform();
 		// Initialise the item parameters.
 		$registry = $platform->getRegistry($item->params);
-		$item->params = JComponentHelper::getParams('com_j2store', true);
+		$item->params = ComponentHelper::getParams('com_j2store', true);
 		$item->params->merge($registry);
 
 		$registry = $platform->getRegistry($item->metadata);
@@ -394,7 +401,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		$item->body = FinderIndexerHelper::prepareContent($item->body, $item->params);
 
 		//let us get the redirect choice
-		if($this->params->get('redirect_to','j2store') =='article'){
+		if($this->params->get('redirect_to','j2store') ==='article'){
 			// Build the necessary route and path information.
 			$item->url = $this->getURL($item->id, $this->extension, $this->layout);
 			$item->route = ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->language);
@@ -408,14 +415,12 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 				'task' => 'view',
 				'id' => $item->j2store_product_id
 			);
-			$pro_menu = J2StoreRouterHelper::findProductMenu ( $qoptions );
+			$pro_menu = \J2Commerce\Helper\J2StoreRouterHelper::findProductMenu($qoptions);
 			$menu_id = isset($pro_menu->id) ? $pro_menu->id : $menu_id;
 			$item->url =  $this->getJ2StoreURL($item->j2store_product_id, $this->extension, $this->layout);
 			$item->route = 'index.php?option=com_j2store&view=products&task=view&id='.$item->j2store_product_id.'&Itemid='.$menu_id;
             $item->path = $this->getContentPath($item->route);
-
 		}
-
 
 		// Get the menu title if it exists.
 		$title = $this->getItemMenuTitle($item->url);
@@ -435,8 +440,6 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metaauthor');
 		$item->addInstruction(FinderIndexer::META_CONTEXT, 'author');
 		$item->addInstruction(FinderIndexer::META_CONTEXT, 'created_by_alias');
-
-
 
 		// Translate the state. Articles should only be published if the category is published.
 		$item->state = $this->translateState($item->state, $item->cat_state);
@@ -467,13 +470,15 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 
     protected function getContentPath($url)
     {
-        $router = JRouter::getInstance('site');
+        $classname = 'JRouter' . ucfirst('site');
+        $router = Factory::getContainer()->get($classname);
         // Build the relative route.
         $uri   = $router->build($url);
         $route = $uri->toString(array('path', 'query', 'fragment'));
-        $route = str_replace(JUri::base(true) . '/', '', $route);
+        $route = str_replace(Uri::base(true) . '/', '', $route);
         return $route;
     }
+
 	/**
 	 * Method to setup the indexer to be run.
 	 *
@@ -492,18 +497,18 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 	/**
 	 * Method to get the SQL query used to retrieve the list of content items.
 	 *
-	 * @param   mixed  $query  A JDatabaseQuery object or null.
+	 * @param   mixed  $query  A DatabaseQuery object or null.
 	 *
-	 * @return  JDatabaseQuery  A database object.
+	 * @return  DatabaseQuery  A database object.
 	 *
 	 * @since   2.5
 	 */
 	protected function getListQuery($query = null)
 	{
-		$db = JFactory::getDbo();
+		$db = Factory::getContainer()->get('DatabaseDriver');
 
 		// Check if we can use the supplied SQL query.
-		$query = $query instanceof JDatabaseQuery ? $query : $db->getQuery(true)
+		$query = $query instanceof DatabaseQuery ? $query : $db->getQuery(true)
 			->select('a.id, a.title, a.alias, a.introtext AS summary, a.fulltext AS body')
 			->select('a.state, a.catid, a.created AS start_date, a.created_by')
 			->select('a.created_by_alias, a.modified, a.modified_by, a.attribs AS params')
@@ -515,7 +520,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		$case_when_item_alias = ' CASE WHEN ';
 		$case_when_item_alias .= $query->charLength('a.alias', '!=', '0');
 		$case_when_item_alias .= ' THEN ';
-		$a_id = $query->castAsChar('a.id');
+        $a_id = 'CAST(' . $db->quoteName('a.id') . ' AS CHAR)';
 		$case_when_item_alias .= $query->concatenate(array($a_id, 'a.alias'), ':');
 		$case_when_item_alias .= ' ELSE ';
 		$case_when_item_alias .= $a_id . ' END as slug';
@@ -524,18 +529,18 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		$case_when_category_alias = ' CASE WHEN ';
 		$case_when_category_alias .= $query->charLength('c.alias', '!=', '0');
 		$case_when_category_alias .= ' THEN ';
-		$c_id = $query->castAsChar('c.id');
+        $c_id = 'CAST(' . $db->quoteName('c.id') . ' AS CHAR)';
 		$case_when_category_alias .= $query->concatenate(array($c_id, 'c.alias'), ':');
 		$case_when_category_alias .= ' ELSE ';
 		$case_when_category_alias .= $c_id . ' END as catslug';
 		$query->select($case_when_category_alias)
 			->select('u.name AS author')
 			->from('#__content AS a');
-			$query->join('INNER', '#__j2store_products ON #__j2store_products.product_source='.$db->q('com_content').' AND #__j2store_products.product_source_id = a.id AND #__j2store_products.enabled=1');
-			$query->select('#__j2store_manufacturers.* ');
-			$query->join('LEFT', '#__j2store_manufacturers ON #__j2store_manufacturers.j2store_manufacturer_id= #__j2store_products.manufacturer_id');
+        $query->join('INNER', '#__j2store_products as p ON p.product_source='.$db->quote('com_content').' AND p.product_source_id = a.id AND p.enabled=1');
+        $query->select('*')->from('#__j2store_manufacturers');
+        $query->join('LEFT', '#__j2store_manufacturers as m ON m.j2store_manufacturer_id = p.manufacturer_id');
 			$query->select('#__j2store_addresses.company as brand');
-			$query->join('LEFT', '#__j2store_addresses ON #__j2store_addresses.j2store_address_id= #__j2store_manufacturers.address_id');
+        $query->join('LEFT', '#__j2store_addresses as ad ON ad.j2store_address_id= m.address_id');
 			$query->join('LEFT', '#__categories AS c ON c.id = a.catid')
 			->join('LEFT', '#__users AS u ON u.id = a.created_by');
 

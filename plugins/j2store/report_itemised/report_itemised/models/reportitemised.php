@@ -1,11 +1,19 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Plugin
+ * @subpackage  J2Commerce.report_itemized
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Pagination\Pagination;
 
 class J2StoreModelReportItemised extends F0FModel
 {
@@ -26,7 +34,6 @@ class J2StoreModelReportItemised extends F0FModel
      * @var object
      */
     var $_pagination = null;
-
 
     /**
      *
@@ -52,7 +59,6 @@ class J2StoreModelReportItemised extends F0FModel
 
         return $this->_data;
     }
-
 
     /**
      * Get the number of all items
@@ -83,20 +89,17 @@ class J2StoreModelReportItemised extends F0FModel
     public function getPagination()
     {
         if (empty($this->pagination)) {
-            // Import the pagination library
-            JLoader::import('joomla.html.pagination');
             // Prepare pagination values
             $total = $this->getTotal();
             $limitstart = $this->getState('limitstart');
             $limit = $this->getState('limit');
 
             // Create the pagination object
-            $this->pagination = new JPagination($total, $limitstart, $limit);
+            $this->pagination = new Pagination($total, $limitstart, $limit);
         }
 
         return $this->pagination;
     }
-
 
     /**
      * Method to buildQuery
@@ -106,7 +109,7 @@ class J2StoreModelReportItemised extends F0FModel
     {
         // Get the WHERE and ORDER BY clauses for the query
 
-        $query = JFactory::getDbo()->getQuery(true);
+        $query = Factory::getContainer()->get('DatabaseDriver')->getQuery(true);
         $query->select('oi.j2store_orderitem_id,oi.orderitem_name,oi.product_id,oi.orderitem_quantity');
         $query->select('count(oi.product_id) AS count');
         $query->select('product.product_source_id');
@@ -124,7 +127,7 @@ class J2StoreModelReportItemised extends F0FModel
 
     public function buildQuery($overrideLimits = false)
     {
-        $query = JFactory::getDbo()->getQuery(true);
+        $query = Factory::getContainer()->get('DatabaseDriver')->getQuery(true);
         $query->select('oi.*');
         $query->select('count(oi.product_id) AS count');
         $query->select('SUM(oi.orderitem_quantity) AS sum');
@@ -144,7 +147,7 @@ class J2StoreModelReportItemised extends F0FModel
         $mainframe = J2Store::platform()->application();
         $option = 'com_j2store';
         $ns = $option . '.report';
-        $db = JFactory::getDBO();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $filter_order = $this->getState('filter_order');//$mainframe->getUserStateFromRequest( $ns.'filter_order',		'filter_order',		'oi.order_id',	'cmd' );
         $filter_order_Dir = $this->getState('filter_order_Dir', 'ASC');//$mainframe->getUserStateFromRequest( $ns.'filter_order_Dir',	'filter_order_Dir',	'ASC',				'word' );
         $filter_orderstate = $mainframe->getUserStateFromRequest($ns . 'filter_orderstate', 'filter_orderstate', '', 'word');
@@ -241,21 +244,19 @@ class J2StoreModelReportItemised extends F0FModel
 
     function _getOrderID($id)
     {
-        $db = JFactory::getDBO();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = "SELECT order_id FROM #__j2store_orders WHERE id={$id}";
         $db->setQuery($query);
         return $db->loadResult();
-
     }
 
     function _getOrderItemIDs($id)
     {
-
         //first get the order_id
         $order_id = $this->_getOrderID($id);
 
         //get the order item ids
-        $db = JFactory::getDBO();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = "SELECT orderitem_id FROM #__j2store_orderitems WHERE order_id=" . $db->Quote($order_id);
         $db->setQuery($query);
         return $db->loadResultArray();
@@ -295,13 +296,12 @@ class J2StoreModelReportItemised extends F0FModel
     {
         J2Store::platform()->application()->getLanguage()->load('plg_j2store_report_itemised', JPATH_ADMINISTRATOR);
         $data = array();
-        $data[] = JText::_("J2STORE_PRODUCT_ID");
-        $data[] = JText::_("J2STORE_PRODUCT_NAME");
-        $data[] = JText::_("J2STORE_PRODUCT_OPTIONS");
-        $data[] = JText::_("JCATEGORY");
-        $data[] = JText::_("J2STORE_QUANTITY");
-        $data[] = JText::_("J2STORE_REPORTS_ITEMISED_PURCHASES");
+        $data[] = Text::_("J2STORE_PRODUCT_ID");
+        $data[] = Text::_("J2STORE_PRODUCT_NAME");
+        $data[] = Text::_("J2STORE_PRODUCT_OPTIONS");
+        $data[] = Text::_("JCATEGORY");
+        $data[] = Text::_("J2STORE_QUANTITY");
+        $data[] = Text::_("J2STORE_REPORTS_ITEMISED_PURCHASES");
         return $data;
     }
-
 }

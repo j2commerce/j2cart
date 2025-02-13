@@ -1,11 +1,18 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Plugin
+ * @subpackage  J2Commerce.app_localization_data
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Language\Text;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/appcontroller.php');
 
 class J2StoreControllerAppLocalization_data extends J2StoreAppController
@@ -27,12 +34,12 @@ class J2StoreControllerAppLocalization_data extends J2StoreAppController
         $model = $this->getModel('AppLocalizationdata', 'J2StoreModel');
         $tablename = $app->input->getString('table');
         $msgType = 'message';
-        $msg = JText::_('J2STORE_TABLE_VALUE_INSERTED_SUCCESSFULLY');
+        $msg = Text::_('J2STORE_TABLE_VALUE_INSERTED_SUCCESSFULLY');
         try {
             $model->getInstallerTool($tablename);
         } catch (Exception $e) {
             $msgType = 'warning';
-            $msg = JText::_('J2STORE_TABLE_VALUE_INSERTION_ERROR');
+            $msg = Text::_('J2STORE_TABLE_VALUE_INSERTION_ERROR');
         }
         $platform->redirect($this->baseLink(), $msg, $msgType);
     }

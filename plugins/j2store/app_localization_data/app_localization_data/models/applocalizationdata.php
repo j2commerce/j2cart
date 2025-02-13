@@ -1,11 +1,19 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Plugin
+ * @subpackage  J2Commerce.app_localization_data
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\Database\DatabaseDriver;
 
 class J2StoreModelAppLocalizationdata extends F0FModel
 {
@@ -19,7 +27,7 @@ class J2StoreModelAppLocalizationdata extends F0FModel
         $status = false;
 
         //Get database
-        $db = JFactory::getDBO();
+        $db = Factory::getContainer()->get('DatabaseDriver');
 
         //incase table is metrics
         if ($tablename == 'metrics') {
@@ -46,13 +54,13 @@ class J2StoreModelAppLocalizationdata extends F0FModel
      */
     public function getTruncateTable($tablename)
     {
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = "TRUNCATE TABLE " . $db->quoteName('#__j2store_' . $tablename);
         $db->setQuery($query);
         $status = true;
         $app = J2Store::platform()->application();
         if (!$db->execute()) {
-            $app->enqueueMessage(JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)), 'error');
+            $app->enqueueMessage(Text::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)), 'error');
             $status = false;
         }
         if ($status) {
@@ -71,19 +79,19 @@ class J2StoreModelAppLocalizationdata extends F0FModel
      */
     public function getInserted($tablename)
     {
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $status = true;
 
         //Force parsing of SQL file since Joomla! does that only in install mode, not in upgrades
         $sql = JPATH_ADMINISTRATOR . '/components/com_j2store/sql/install/mysql/' . $tablename . '.sql';
-        $queries = JDatabaseDriver::splitSql(file_get_contents($sql));
+        $queries = DatabaseDriver::splitSql(file_get_contents($sql));
         $app = J2Store::platform()->application();
         foreach ($queries as $query) {
             $query = trim($query);
-            if ($query != '' && $query{0} != '#') {
+            if ($query != '' && $query[0] != '#') {
                 $db->setQuery($query);
                 if (!$db->execute()) {
-                    $app->enqueueMessage(JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)), 'error');
+                    $app->enqueueMessage(Text::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)), 'error');
                     $status = false;
                 }
             }

@@ -1,42 +1,48 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined ( '_JEXEC' ) or die ();
+
+defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Menu\AbstractMenu;
 
-// Load FOF
-// Include F0F
 if(!defined('F0F_INCLUDED')) {
 	require_once JPATH_LIBRARIES . '/f0f/include.php';
 }
 
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/router.php');
 
-function J2StoreBuildRoute(&$query) {
-
+function J2StoreBuildRoute(&$query)
+{
 	$router = new J2StoreRouter();
 	return $router->build($query);
 }
 
-function J2StoreParseRoute($segments) {
+function J2StoreParseRoute($segments)
+{
 	$router = new J2StoreRouter();
 	return $router->parse($segments);
 }
 
-class J2StoreRouter extends JComponentRouterBase {
-
-	public function build(&$query) {
+class J2StoreRouter extends JComponentRouterBase
+{
+	public function build(&$query)
+    {
 		$segments = array ();
 		// If there is only the option and Itemid, let Joomla! decide on the naming scheme
 		if (isset ( $query ['option'] ) && isset ( $query ['Itemid'] ) && ! isset ( $query ['view'] ) && ! isset ( $query ['task'] ) && ! isset ( $query ['layout'] ) && ! isset ( $query ['id'] ) && ! isset ( $query ['filter_tag'] )) {
 			return $segments;
 		}
-		$menus = JMenu::getInstance ( 'site' );
+
+        $menus = AbstractMenu::getInstance('site');
 		$view = J2StoreRouterHelper::getAndPop ( $query, 'view', 'carts' );
 		$task = J2StoreRouterHelper::getAndPop ( $query, 'task' );
 		$layout = J2StoreRouterHelper::getAndPop ( $query, 'layout' );
@@ -52,8 +58,6 @@ class J2StoreRouter extends JComponentRouterBase {
             $langu = Factory::getApplication()->getLanguage();
             $lang = $langu->getTag();
         }
-		// $orderpayment_type = J2StoreRouterHelper::getAndPop($query, 'orderpayment_type');
-		// $paction = J2StoreRouterHelper::getAndPop($query, 'paction');
 		$qoptions = array (
 			'option' => 'com_j2store',
 			'view' => $view,
@@ -131,15 +135,8 @@ class J2StoreRouter extends JComponentRouterBase {
 					if (isset ( $task )) {
 						$segments [] = $task;
 					}
-					// if(isset($orderpayment_type)) {
-					// $segments[] = $orderpayment_type;
-					// }
 
-					// if(isset($paction)) {
-					// $segments[] = $paction;
-					// }
 				} else {
-					// sometimes we need task
 					$is_task_set = false;
 					if (isset ( $mTask )) {
 						if (!empty($mTask))
@@ -157,10 +154,6 @@ class J2StoreRouter extends JComponentRouterBase {
 						}
 
 					}
-					// add the order payment type
-					/*
-					 * if(isset($mOPType)) { $segments[] = $mOPType; } if(isset($mPaction)) { $segments[] = $mPaction; }
-					 */
 					// Joomla! will let the menu item naming work its magic
 					$query ['Itemid'] = $Itemid;
 				}
@@ -172,8 +165,7 @@ class J2StoreRouter extends JComponentRouterBase {
 					$menu = $menus->getItem ( $Itemid );
 					$mView = isset ( $menu->query ['view'] ) ? $menu->query ['view'] : 'myprofile';
 					$mTask = isset ( $menu->query ['task'] ) ? $menu->query ['task'] : '';
-					// $mOPType = isset($menu->query['orderpayment_type']) ? $menu->query['orderpayment_type'] : '';
-					// $mPaction = isset($menu->query['paction']) ? $menu->query['paction'] : '';
+
 					// No, we have to find another root
 					if (($mView != 'myprofile'))
 						$Itemid = null;
@@ -193,7 +185,7 @@ class J2StoreRouter extends JComponentRouterBase {
 						$segments [] = $task;
 					}
 				} else {
-					// sometimes we need task					
+					// sometimes we need task
 					if (isset ( $mTask ) && ! empty ( $mTask ) && $mView != 'checkout') {
 						$segments [] = $mTask;
 					} elseif (isset ( $qoptions ['task'] ) && $mView != 'checkout') {
@@ -230,7 +222,7 @@ class J2StoreRouter extends JComponentRouterBase {
                 }
 
 				if (empty ( $Itemid )) {
-					// special find. Needed because we will be using order links under checkout view
+					// Needed because we will be using order links under checkout view.
 					$menu = J2StoreRouterHelper::findProductMenu ( $qoptions );
 					$mView = isset ( $menu->query ['view'] ) ? $menu->query ['view'] : 'products';
 					$mTask = isset ( $menu->query ['task'] ) ? $menu->query ['task'] : $task;
@@ -319,7 +311,7 @@ class J2StoreRouter extends JComponentRouterBase {
 					}
 					if (isset ( $id )) {
 						if (strpos ( $id, ':' ) === false) {
-							if(count ( $segments ) == 1){
+							if(count ( $segments ) === 1){
 								$segments [] = 	J2StoreRouterHelper::getTagAliasByItem ( $id );
 							}
 							$segments [] = J2StoreRouterHelper::getItemAlias ( $id, $lang );
@@ -337,7 +329,7 @@ class J2StoreRouter extends JComponentRouterBase {
 					}
 
 				} else {
-					
+
 					if (isset ( $mId )) {
 
 						//we have an id. That indicates a product detail view. Set the task to view
@@ -355,9 +347,6 @@ class J2StoreRouter extends JComponentRouterBase {
 					}
 					$query ['Itemid'] = $Itemid;
 				}
-
-
-
 				break;
 		}
 
@@ -371,11 +360,11 @@ class J2StoreRouter extends JComponentRouterBase {
 	 */
 	public function parse(&$segments)
     {
-		$menus = JMenu::getInstance ( 'site' );
+        $menus = AbstractMenu::getInstance('site');
 		$menu = $menus->getActive ();
-		$vars = array ();
+		$vars = [];
 		if (is_null ( $menu ) && count ( $segments )) {
-			if (isset($segments [0]) && ($segments [0] == 'cart' || $segments [0] == 'carts')) {
+			if (isset($segments [0]) && ($segments[0] === 'cart' || $segments[0] === 'carts')) {
 				$vars ['view'] = $segments [0];
 				if (isset ( $segments [1] )) {
 					$vars ['task'] = $segments [1];
@@ -384,7 +373,7 @@ class J2StoreRouter extends JComponentRouterBase {
                 unset($segments[0]);
 			}
 
-			if (isset($segments [0]) && ($segments [0] == 'checkout' || $segments [0] == 'checkouts')) {
+			if (isset($segments [0]) && ($segments [0] === 'checkout' || $segments [0] === 'checkouts')) {
 				$vars ['view'] = $segments [0];
 				if (isset ( $segments [1] )) {
 					$vars ['task'] = $segments [1];
@@ -393,7 +382,7 @@ class J2StoreRouter extends JComponentRouterBase {
                 unset($segments[0]);
 			}
 
-			if (isset($segments [0]) && $segments [0] == 'myprofile') {
+			if (isset($segments [0]) && $segments [0] === 'myprofile') {
 				$vars ['view'] = $segments [0];
 				if (isset ( $segments [1] )) {
 					$vars ['task'] = $segments [1];
@@ -402,7 +391,7 @@ class J2StoreRouter extends JComponentRouterBase {
                 unset($segments[0]);
 			}
 
-			if (isset($segments [0]) && $segments [0] == 'products') {
+			if (isset($segments [0]) && $segments [0] === 'products') {
 				$vars ['view'] = $segments [0];
 				$other_tasks = array('compare','wishlist', 'removeproductprice', 'deleteProductOptionvalues');
 				if ( isset ( $segments [1] ) && in_array($segments [1], $other_tasks) ) {
@@ -413,7 +402,7 @@ class J2StoreRouter extends JComponentRouterBase {
 					// fixed for mod_j2products showed in home page
 					$vars ['id'] = J2StoreRouterHelper::getArticleByAlias($segments [1]);
                     unset($segments[1]);
-				}elseif(isset($segments[1]) && $segments[1] == 'view') {
+				}elseif(isset($segments[1]) && $segments[1] === 'view') {
 					// old routing pattern detected. Send the customer to the correct page
 					$vars ['task'] = 'view';
 					if(isset($segments[2])) {
@@ -426,7 +415,7 @@ class J2StoreRouter extends JComponentRouterBase {
                 unset($segments[0]);
 			}
 
-			if (isset($segments [0]) && $segments [0] == 'producttags') {
+			if (isset($segments [0]) && $segments [0] === 'producttags') {
 				$vars ['view'] = $segments [0];
 
 				$vars ['task'] = 'browse';
@@ -447,14 +436,14 @@ class J2StoreRouter extends JComponentRouterBase {
 			if (count ( $segments )) {
 
 				$mView = $menu->query ['view'];
-				if (isset ( $mView ) && ($mView == 'cart' || $mView == 'carts')) {
+				if (isset ( $mView ) && ($mView === 'cart' || $mView === 'carts')) {
 					$vars ['view'] = $mView;
 					if (isset ( $segments [0] )) {
 						$vars ['task'] = $segments [0];
                         unset($segments[0]);
 					}
 
-				} elseif (isset($segments [0]) && ($segments [0] == 'cart' || $segments [0] == 'carts')) {
+				} elseif (isset($segments [0]) && ($segments [0] === 'cart' || $segments [0] === 'carts')) {
 					$vars ['view'] = $segments [0];
 					if (isset ( $segments [1] )) {
 						$vars ['task'] = $segments [1];
@@ -463,13 +452,13 @@ class J2StoreRouter extends JComponentRouterBase {
                     unset($segments[0]);
 				}
 
-				if (isset ( $mView ) && ($mView == 'checkout' || $mView == 'checkouts')) {
+				if (isset ( $mView ) && ($mView === 'checkout' || $mView === 'checkouts')) {
 					$vars ['view'] = $mView;
 					if (isset ( $segments [0] )) {
 						$vars ['task'] = $segments [0];
                         unset($segments[0]);
 					}
-				} elseif (isset($segments [0]) && ($segments [0] == 'checkout' || $segments [0] == 'checkouts')) {
+				} elseif (isset($segments [0]) && ($segments [0] === 'checkout' || $segments [0] === 'checkouts')) {
 					$vars ['view'] = $segments [0];
 					if (isset ( $segments [1] )) {
 						$vars ['task'] = $segments [1];
@@ -478,13 +467,13 @@ class J2StoreRouter extends JComponentRouterBase {
                     unset($segments[0]);
 				}
 
-				if (isset ( $mView ) && $mView == 'myprofile') {
+				if (isset ( $mView ) && $mView === 'myprofile') {
 					$vars ['view'] = $mView;
 					if (isset ( $segments [0] )) {
 						$vars ['task'] = $segments [0];
                         unset($segments[0]);
 					}
-				} elseif (isset($segments [0]) && $segments [0] == 'myprofile') {
+				} elseif (isset($segments [0]) && $segments [0] === 'myprofile') {
 					$vars ['view'] = $segments [0];
 					if (isset ( $segments [1] )) {
 						$vars ['task'] = $segments [1];
@@ -493,7 +482,7 @@ class J2StoreRouter extends JComponentRouterBase {
                     unset($segments[0]);
 				}
 
-				if (isset ( $mView ) && $mView == 'products') {
+				if (isset ( $mView ) && $mView === 'products') {
 					$vars ['view'] = 'products';
 					$other_tasks = array('compare','wishlist');
 					if ( isset ( $segments [0] ) && in_array($segments [0], $other_tasks) ) {
@@ -503,7 +492,7 @@ class J2StoreRouter extends JComponentRouterBase {
 						$vars ['task'] = 'view';
 						$vars ['id'] = J2StoreRouterHelper::getArticleByAlias($segments [0], $menu->query['catid']);
                         unset($segments[0]);
-					}elseif(isset($segments[0]) && $segments[0] == 'view') {
+					}elseif(isset($segments[0]) && $segments[0] === 'view') {
 						//old routing pattern. Re-route correct
 						$vars['task'] = 'view';
 						if (isset ( $segments [1] )) {
@@ -513,7 +502,7 @@ class J2StoreRouter extends JComponentRouterBase {
                         unset($segments[0]);
 					}
 
-				} elseif (isset($segments [0]) && $segments [0] == 'products') {
+				} elseif (isset($segments [0]) && $segments [0] === 'products') {
 					$vars ['view'] = $segments [0];
 					$other_tasks = array('compare','wishlist');
 					if ( isset ( $segments [1] ) && in_array($segments [1], $other_tasks) ) {
@@ -525,7 +514,7 @@ class J2StoreRouter extends JComponentRouterBase {
 						$vars ['id'] = J2StoreRouterHelper::getArticleByAlias($segments [2], $menu->query['catid']);
                         unset($segments[2]);
                         unset($segments[1]);
-					}elseif (isset ( $segments [1] ) && $segments[1] == 'view') {
+					}elseif (isset ( $segments [1] ) && $segments[1] === 'view') {
 						$vars ['task'] = 'view';
 						if (isset ( $segments [2] )) {
 							$vars ['id'] = J2StoreRouterHelper::getArticleByAlias($segments[2], $menu->query['catid']);
@@ -536,12 +525,11 @@ class J2StoreRouter extends JComponentRouterBase {
                     unset($segments[0]);
 				}
 
-				if (isset ( $mView ) && $mView == 'producttags') {
+				if (isset ( $mView ) && $mView === 'producttags') {
 					$vars ['view'] = 'producttags';
 
 					if(isset($segments[0])) {
 						$vars['task'] = 'view';
-						//we also have an id
 						$vars['id'] = J2StoreRouterHelper::getArticleByAlias($segments [0]);
 						$vars['tag'] = $menu->query['tag'];
                         unset($segments[0]);
@@ -551,5 +539,4 @@ class J2StoreRouter extends JComponentRouterBase {
 		}
 		return $vars;
 	}
-
 }

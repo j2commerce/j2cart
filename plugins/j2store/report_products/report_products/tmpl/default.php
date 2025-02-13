@@ -1,19 +1,23 @@
 <?php
 /**
- * --------------------------------------------------------------------------------
- * Report Plugin - Products
- * --------------------------------------------------------------------------------
- * @package     Joomla 3.x
- * @subpackage  J2 Store
- * @author      Alagesan, J2Store <support@j2store.org>
- * @copyright   Copyright (c) 2015 J2Store . All rights reserved.
- * @license     GNU/GPL license: http://www.gnu.org/licenses/gpl-2.0.html
- * @link        http://j2store.org
- * --------------------------------------------------------------------------------
+ * @package     Joomla.Plugin
+ * @subpackage  J2Commerce.report_products
  *
- * */
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die ('Restricted access');
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+
+HTMLHelper::_('bootstrap.tooltip', '[data-bs-toggle="tooltip"]', ['placement' => 'top']);
+HTMLHelper::_('bootstrap.collapse', '[data-bs-toggle="collapse"]', '');
+
 $check_order_id = array();
 
 $platform = J2Store::platform();
@@ -22,20 +26,20 @@ $platform->loadExtra('behavior.multiselect');
 
 $row_class = 'row';
 $col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-}
-?>
-<?php
+
 unset ($listOrder);
 $listOrder = $vars->state->get('filter_order', 'orderitem.j2store_orderitem_id');
 $listDirn = $vars->state->get('filter_order_Dir');
 $order_status = $vars->state->get('filter_orderstatus');
 $currency = J2Store::currency();
-?>
-    <script type="text/javascript">
-        Joomla.submitbutton = function(pressbutton) {
+$currency_symbol = J2Store::currency()->getSymbol();
+
+$wa  = Factory::getApplication()->getDocument()->getWebAssetManager();
+$wa->useScript('table.columns');
+$wa->usePreset('choicesjs');
+$wa->useScript('webcomponent.field-fancy-select');
+
+$script = "Joomla.submitbutton = function(pressbutton) {
             if(pressbutton === 'cancel') {
                 document.querySelectorAll('.csvdiv').forEach(function(element) {
                     element.innerHTML = '';
@@ -43,121 +47,121 @@ $currency = J2Store::currency();
             }
             Joomla.submitform(pressbutton);
             return true;
-        }
-    </script>
-<?php $form = $vars->form; ?>
-    <link rel="stylesheet"
-          href="<?php echo JUri::root() . "plugins/j2store/report_products/report_products/css/material-charts.css" ?>">
-    <script src="<?php echo JUri::root() . "plugins/j2store/report_products/report_products/js/material-charts.js" ?>"></script>
-    <div class="j2store">
+        }";
+$wa->addInlineScript($script, [], []);
+$form = $vars->form;
 
+$style = 'joomla-field-fancy-select .choices{min-width: 220px;}.chart-body{max-height:500px!important;}.chart-body #barChart{height:400px!important;width:100%!important;};';
+$wa->addInlineStyle($style, [], []);
+
+$wa->registerAndUseScript('com_j2commerce.chart', 'com_j2commerce/chart.js', [], ['defer' => true]);
+?>
+    <div class="j2store">
         <form class="form-horizontal" method="post"
               action="<?php echo $form['action']; ?>" name="adminForm" id="adminForm">
-            <div class="<?php echo $col_class; ?> 6">
-                <div class="<?php echo $col_class; ?> 12" style="margin-bottom: 10px; margin-left: 12px;">
-			<span class="<?php echo $col_class; ?> 6"> <label> <strong><?php echo JText::_('J2STORE_FILTER_PRODUCTS_SEARCH'); ?></strong>
-			</label> <input type="text" name="filter_search" value="<?php echo htmlspecialchars($vars->state->get('filter_search')); ?>" id="search"/>
-				<button class="btn btn-inverse"
-                        onclick="document.getElementById('search').value='';jQuery('.csvdiv').html('');this.form.submit();">
-					<i class="icon icon-remove"></i>
+            <div class="js-stools">
+                <div class="js-stools-container-bar">
+                    <div class="btn-toolbar w-100 justify-content-end mb-3">
+                        <div id="toolbar-icon icon-download" class="me-auto">
+                            <button class="btn btn-success" onclick="jQuery('.csvdiv').html('<input type=\'hidden\' name=\'format\' value=\'csv\'>');this.form.submit();"><span class="icon-icon icon-download me-2"></span><?php echo Text::_('JTOOLBAR_EXPORT');?>
 				</button>
-
-			</span>
-                    <span class="<?php echo $col_class; ?> 6">
-				<label> <strong><?php echo JText::_('J2STORE_FILTER_ORDERSTATUS'); ?></strong>
-			</label>
-				<?php
-                $attribs = array(
-                    'class' => 'input',
-                    'multiple' => 'multiple'
-                );
-                echo JHtml::_('select.genericlist', $vars->orderStatus, 'filter_orderstatus[]', $attribs, 'value', 'text', $vars->state->get('filter_orderstatus'));
-                ?>
-			</span>
                 </div>
-                <div class="<?php echo $col_class; ?> 12" style="margin-bottom: 10px;">
-			<span class="<?php echo $col_class; ?> 6"> <label> <strong><?php echo JText::_('J2STORE_FILTER_DURATION'); ?></strong>
-			</label>
-				<?php
-                $attribs = array(
-                    'class' => 'input',
-                    'onchange' => "jQuery('.csvdiv').html('');this.form.submit();"
-                );
-                echo JHtml::_('select.genericlist', $vars->orderDateType, 'filter_datetype', $attribs, 'value', 'text', $vars->state->get('filter_datetype'));
-                ?>
-			</span>
-
+                        <div class="filter-search-bar btn-group flex-grow-1 flex-lg-grow-0 mb-2 mb-lg-0">
+                            <div class="input-group w-100">
+                                <input type="text" name="filter_search" id="search" value="<?php echo htmlspecialchars($vars->state->get('filter_search')); ?>" class="text_area form-control j2store-product-filters" onchange="document.adminForm.submit();" placeholder="<?php echo Text::_( 'J2STORE_FILTER_SEARCH' ); ?>"/>
+                                <button type="button" class="btn btn-primary" onclick="jQuery('.csvdiv').html('');this.form.submit();"><span class="filter-search-bar__button-icon icon-search" aria-hidden="true" title="<?php echo Text::_( 'J2STORE_FILTER_GO' ); ?>"></span></button>
+                                <button class="btn btn-primary" onclick="document.getElementById('search').value='';jQuery('.csvdiv').html('');this.form.submit();"><?php echo Text::_( 'J2STORE_FILTER_RESET' ); ?></button>
+                            </div>
                 </div>
-                <div class="<?php echo $col_class; ?> 12" style="margin-bottom: 10px;">
-			<span class="<?php echo $col_class; ?> 6">
 				<?php if ($vars->state->get('filter_datetype') == 'custom'): ?>
-                    <label> <strong><?php echo JText::_('J2STORE_ORDERS_EXPORT_FROM_DATE'); ?></strong>
-				</label>
-					 	<?php echo JHtml::calendar($vars->state->get('filter_order_from_date'), 'filter_order_from_date', 'filter_order_from_date', '%Y-%m-%d', array('class' => 'input-mini')); ?>
-
-					<label> <strong><?php echo JText::_('J2STORE_ORDERS_EXPORT_TO_DATE'); ?></strong>
-				</label>
-						<?php echo JHtml::calendar($vars->state->get('filter_order_to_date'), 'filter_order_to_date', 'filter_order_to_date', '%Y-%m-%d', array('class' => 'input-mini')); ?>
-
-                    <button class="btn btn-inverse"
-                            onclick="document.getElementById('filter_order_from_date').value='',document.getElementById('filter_order_to_date').value='';this.form.submit();">
-					<i class="icon icon-remove"></i>
+                            <div class="filter-search-actions btn-group ms-lg-2 flex-grow-1 flex-lg-grow-0 mb-2 mb-lg-0">
+                                <button type="button" class="filter-search-actions__button btn btn-primary js-stools-btn-filter w-100" data-bs-toggle="collapse" data-bs-target="#advanced-search-controls" aria-expanded="false" aria-controls="advanced-search-controls">
+                                    <?php echo Text::_('JFILTER_OPTIONS');?><span class="icon-angle-down ms-1" aria-hidden="true"></span>
 				</button>
+                            </div>
                 <?php endif; ?>
-			</span>
 
+                            <div class="ordering-select d-flex gap-2 ms-lg-2 flex-grow-1 flex-lg-grow-0">
+                                <?php
+                                $attribs = [
+                                    'list.select' => $vars->state->get('filter_orderstatus'),
+                                    'name' => 'filter_orderstatus[]',
+                                    'multiple' => 'multiple',
+                                    'id' => 'filter_orderstatus'
+                                ];
+                                ?>
+                                <joomla-field-fancy-select search-placeholder="<?= Text::_('J2STORE_FILTER_ORDERSTATUS_SEARCH_PLACEHOLDER') ?>">
+                                    <?=
+                                    HTMLHelper::_('select.genericlist', $vars->orderStatus, 'filter_orderstatus[]', $attribs, 'value', 'text', $vars->state->get('filter_orderstatus'))
+                                    ?>
+                                </joomla-field-fancy-select>
+                                <?php
+                                $attribs2 = [
+                                    'name' => 'filter_datetype',
+                                    'id' => 'filter_datetype',
+                                    'onchange' => "jQuery('.csvdiv').html('');this.form.submit();"
+                                ];
+                                ?>
+                                <joomla-field-fancy-select search-placeholder="<?= Text::_('J2STORE_FILTER_DURATION_SEARCH_PLACEHOLDER') ?>">
+                                    <?=
+                                    HTMLHelper::_('select.genericlist', $vars->orderDateType, 'filter_datetype', $attribs2 , 'value', 'text', $vars->state->get('filter_datetype'))
+                                    ?>
+                                </joomla-field-fancy-select>
+                                <?php echo $vars->pagination->getLimitBox(); ?>
+                            </div>
+
+                    </div>
                 </div>
-                <div align="right" style="margin-bottom: 20px;">
-                    <button class="btn btn-warning btn-large"
-                            onclick="jQuery('.csvdiv').html('<input type=\'hidden\' name=\'format\' value=\'csv\'>');this.form.submit();"
-                            style="margin-right: 50px;"><?php echo JText::_('J2STORE_EXPORT'); ?>
-                    </button>
-                    <button class="btn btn-success btn-large"
-                            onclick="jQuery('.csvdiv').html('');this.form.submit();"
-                            style="margin-right: 50px;"><?php echo JText::_('J2STORE_FILTER'); ?>
+            </div>
+            <div class="px-2 pt-2 pb-0 mb-5">
+                <div class="<?php echo $row_class;?> collapse"  id="advanced-search-controls">
+                    <div class="col-lg-2 col-md-4 mb-2">
+                        <?php echo HTMLHelper::calendar($vars->state->get('filter_order_from_date'), 'filter_order_from_date', 'filter_order_from_date', '%Y-%m-%d', array('class' => 'form-control','placeholder' => Text::_('J2STORE_ORDERS_EXPORT_FROM_DATE'))); ?>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-2">
+                        <?php echo HTMLHelper::calendar($vars->state->get('filter_order_to_date'), 'filter_order_to_date', 'filter_order_to_date', '%Y-%m-%d', array('class' => 'form-control','placeholder' => Text::_('J2STORE_ORDERS_EXPORT_TO_DATE'))); ?>
+                </div>
+                    <div class="col-lg-2 col-md-4 mb-2">
+                        <button class="btn btn-primary" onclick="document.getElementById('filter_order_from_date').value='',document.getElementById('filter_order_to_date').value='';this.form.submit();">
+                            <i class="icon icon-remove me-2"></i>
+                            <?php echo Text::_( 'J2STORE_FILTER_RESET' ); ?>
                     </button>
                 </div>
             </div>
-            <div class="<?php echo $col_class; ?>6">
-
-                <div class="example-chart">
-                    <div id="bar-chart-example"></div>
+            </div>
+            <?php if (count($vars->products)): ?>
+                <div class="card mb-4">
+                    <div class="card-body chart-body">
+                        <canvas id="barChart"></canvas>
                 </div>
 
             </div>
-            <div class="<?php echo $col_class; ?>12"><span class="pull-right"><?php echo $vars->pagination->getLimitBox(); ?></span></div>
-            <div class="<?php echo $col_class; ?>12">
-                <table class="table table-striped table-bordered">
+            <?php endif; ?>
+
+            <div class="table-responsive">
+                <table class="table itemList align-middle">
                     <thead>
                     <tr>
-                        <th>
-                            <?php
-                            echo JHtml::_('grid.sort', 'PLG_J2STORE_PRODUCT_NAME', 'orderitem.orderitem_name', $vars->state->get('filter_order_Dir'), $vars->state->get('filter_order')); ?>
+                            <th scope="col">
+                                <?php echo HTMLHelper::_('grid.sort', 'PLG_J2STORE_PRODUCT_NAME', 'orderitem.orderitem_name', $vars->state->get('filter_order_Dir'), $vars->state->get('filter_order')); ?>
                         </th>
-                        <th>
-                            <?php
-                            echo JHtml::_('grid.sort', 'J2STORE_REPORT_TOTAL_QUANTITY', 'orderitem.orderitem_quantity', $vars->state->get('filter_order_Dir'), $vars->state->get('filter_order'));// echo JText::_('PLG_J2STORE_PRODUCT_NAME'); ?>
+                            <th scope="col">
+                                <?php echo HTMLHelper::_('grid.sort', 'J2STORE_REPORT_TOTAL_QUANTITY', 'orderitem.orderitem_quantity', $vars->state->get('filter_order_Dir'), $vars->state->get('filter_order'));?>
                         </th>
-                        <th>
-                            <?php echo JText::_('J2STORE_REPORT_PRODUCT_DISCOUNT'); ?>
+                            <th scope="col">
+                                <?php echo Text::_('J2STORE_REPORT_PRODUCT_DISCOUNT'); ?>
                         </th>
-                        <th>
-                            <?php echo JText::_('J2STORE_REPORT_PRODUCT_TAX'); ?>
+                            <th scope="col">
+                                <?php echo Text::_('J2STORE_REPORT_PRODUCT_TAX'); ?>
                         </th>
-                        <th>
-                            <?php echo JText::_('J2STORE_REPORT_PRODUCT_WITHOUT_TAX'); ?>
+                            <th scope="col">
+                                <?php echo Text::_('J2STORE_REPORT_PRODUCT_WITHOUT_TAX'); ?>
                         </th>
-                        <th>
-                            <?php echo JText::_('J2STORE_REPORT_PRODUCT_WITH_TAX'); ?>
+                            <th scope="col">
+                                <?php echo Text::_('J2STORE_REPORT_PRODUCT_WITH_TAX'); ?>
                         </th>
                     </tr>
                     </thead>
-                    <tfoot>
-                    <tr>
-                        <td colspan="8"><?php echo $vars->pagination->getListFooter(); ?>
-                        </td>
-                    </tr>
-                    </tfoot>
                     <?php if (count($vars->products)): ?>
                         <?php
                         $qty_total = 0;
@@ -176,33 +180,34 @@ $currency = J2Store::currency();
                             ?>
                             <tbody>
                             <tr>
-                                <td><?php echo $product->orderitem_name; ?>
-                                    <br>
-                                    <?php echo JText::_('J2STORE_SKU'); ?>: <?php echo $product->orderitem_sku; ?></td>
-                                <td><?php echo $product->total_qty; ?></td>
-                                <td><?php echo $currency->format($product->total_item_discount + $product->total_item_discount_tax); ?></td>
-                                <td><?php echo $currency->format($product->total_item_tax); ?></td>
-                                <td><?php echo $currency->format($product->total_final_price_without_tax); ?></td>
-                                <td><?php echo $currency->format($product->total_final_price_with_tax); ?></td>
+                                <td class="small">
+                                    <strong class="d-block"><?php echo $product->orderitem_name; ?></strong>
+                                    <strong><?php echo Text::_('J2STORE_SKU'); ?>:</strong> <?php echo $product->orderitem_sku; ?></td>
+                                <td class="small"><?php echo $product->total_qty; ?></td>
+                                <td class="small"><?php echo $currency->format($product->total_item_discount + $product->total_item_discount_tax); ?></td>
+                                <td class="small"><?php echo $currency->format($product->total_item_tax); ?></td>
+                                <td class="small"><?php echo $currency->format($product->total_final_price_without_tax); ?></td>
+                                <td class="small"><?php echo $currency->format($product->total_final_price_with_tax); ?></td>
                             </tr>
                             </tbody>
                         <?php endforeach; ?>
                         <tr>
-                            <td><strong><?php echo JText::_('J2STORE_TOTAL'); ?></strong></td>
-                            <td><?php echo $qty_total; ?></td>
-                            <td><?php echo $currency->format($discount_total); ?></td>
-                            <td><?php echo $currency->format($total_tax); ?></td>
-                            <td><?php echo $currency->format($total_without_tax); ?></td>
-                            <td><?php echo $currency->format($total_with_tax); ?></td>
+                            <td class="py-4 border-top"><strong><?php echo Text::_('J2STORE_TOTAL'); ?></strong></td>
+                            <td class="py-4 border-top"><strong><?php echo $qty_total; ?></strong></td>
+                            <td class="py-4 border-top"><strong><?php echo $currency->format($discount_total); ?></strong></td>
+                            <td class="py-4 border-top"><strong><?php echo $currency->format($total_tax); ?></strong></td>
+                            <td class="py-4 border-top"><strong><?php echo $currency->format($total_without_tax); ?></strong></td>
+                            <td class="py-4 border-top"><strong><?php echo $currency->format($total_with_tax); ?></strong></td>
                         </tr>
                     <?php else: ?>
                         <tbody>
                         <tr>
-                            <td colspan="5"><?php echo JText::_('J2STORE_NO_ITEMS_FOUND'); ?></td>
+                            <td colspan="6"><?php echo Text::_('J2STORE_NO_ITEMS_FOUND'); ?></td>
                         </tr>
                         </tbody>
                     <?php endif; ?>
                 </table>
+                <?php echo $vars->pagination->getListFooter(); ?>
             </div>
             <input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"/>
             <input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"/>
@@ -214,25 +219,107 @@ $currency = J2Store::currency();
             <div class="csvdiv">
 
             </div>
-            <?php echo JHtml::_('form.token'); ?>
+            <?php echo HTMLHelper::_('form.token'); ?>
         </form>
     </div>
 <?php if (!empty($vars->product_amount)): ?>
     <script>
-        var exampleBarChartData = {
-            "datasets": {
-                "values": <?php echo json_encode($vars->product_amount);?>,//[5, 10, 30, 50, 20],
-                "labels": <?php echo json_encode($vars->product_name);?>,
-                "color": "blue"
+        const ctx = document.getElementById('barChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode($vars->product_name);?>,
+                datasets: [{
+                    label: '<?php echo Text::_("J2STORE_REPORT_PRODUCT_CHART_PRODUCTS_REVENUE");?>',
+                    data: <?php echo json_encode($vars->product_amount);?>,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1,
+                    yAxisID: 'y-left'
+                },
+                {
+                    label: '<?php echo Text::_("J2STORE_REPORT_PRODUCT_CHART_PRODUCTS_SOLD");?>',
+                    data: <?php echo json_encode($vars->product_qty); ?>,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 205, 86, 0.2)',
+                        'rgba(201, 203, 207, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(201, 203, 207, 1)'
+                    ],
+                    borderWidth: 1,
+                    type: 'line',
+                    yAxisID: 'y-right'
+                }]
             },
-            "title": "Product Report",
-            "height": "300px",
-            "width": "500px",
-            "background": "#FFFFFF",
-            "shadowDepth": "1",
-
-        };
-
-        MaterialCharts.bar("#bar-chart-example", exampleBarChartData)
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    'y-left': {
+                        beginAtZero: true,
+                        position: 'left',
+                        ticks: {
+                            callback: function(value) {
+                                return '<?php echo $currency_symbol; ?>' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    'y-right': {
+                        beginAtZero: true,
+                        position: 'right',
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.raw || 0;
+                                if (context.datasetIndex === 0) {
+                                    return `<?php echo $currency_symbol; ?>${value.toLocaleString()}`; // Dollar amounts
+                                } else {
+                                    return value.toLocaleString() + ' <?php echo Text::_("J2STORE_REPORT_PRODUCT_CHART_PRODUCTS_SOLD");?>'; // Quantity amounts
+                                }
+                            }
+                        }
+                    },
+                    subtitle: {
+                        display: true,
+                        text: '<?php echo Text::_("J2STORE_J2C_REPORT_PRODUCTS");?>',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    }
+                }
+            }
+        });
     </script>
 <?php endif; ?>

@@ -1,29 +1,33 @@
 <?php
 /**
- * --------------------------------------------------------------------------------
- * Report Plugin - Products
- * --------------------------------------------------------------------------------
- * @package     Joomla 3.x
- * @subpackage  J2 Store
- * @author      Alagesan, J2Store <support@j2store.org>
- * @copyright   Copyright (c) 2015 J2Store . All rights reserved.
- * @license     GNU/GPL license: http://www.gnu.org/licenses/gpl-2.0.html
- * @link        http://j2store.org
- * --------------------------------------------------------------------------------
+ * @package     Joomla.Plugin
+ * @subpackage  J2Commerce.report_products
  *
- * */
-defined('_JEXEC') or die('Restricted access');
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/library/plugins/report.php');
+
 class plgJ2StoreReport_Products extends J2StoreReportPlugin
 {
-
     /**
      * @var $_element  string  Should always correspond with the plugin's filename,
      *                         forcing it to be unique
      */
-    var $_element   = 'report_products';
+    var $_element = 'report_products';
 
-    function __construct($subject, $config) {
+    function __construct($subject, $config)
+    {
         parent::__construct($subject, $config);
         $this->loadLanguage('plg_j2store_'.$this->_element, JPATH_ADMINISTRATOR);
     }
@@ -42,12 +46,15 @@ class plgJ2StoreReport_Products extends J2StoreReportPlugin
         }
         return $this->viewList();
     }
-    function onJ2StoreIsJ2Store4($element){
+
+    function onJ2StoreIsJ2Store4($element)
+    {
         if (!$this->_isMe($element)) {
             return null;
         }
         return true;
     }
+
     /**
      * Validates the data submitted based on the suffix provided
      * A controller for this plugin, you could say
@@ -59,8 +66,8 @@ class plgJ2StoreReport_Products extends J2StoreReportPlugin
         $platform = J2Store::platform();
         $app = $platform->application();
         $fof_helper = J2Store::fof();
-        JToolBarHelper::title(JText::_('J2STORE_REPORT').'-'.JText::_('PLG_J2STORE_'.strtoupper($this->_element)),'j2store-logo');
-        JToolbarHelper::back('J2STORE_BACK','index.php?option=com_j2store&view=reports');
+        ToolbarHelper::title(Text::_('J2STORE_REPORT').'-'.Text::_('PLG_J2STORE_'.strtoupper($this->_element)),'j2store-logo');
+        ToolbarHelper::back('J2STORE_BACK','index.php?option=com_j2store&view=reports');
 
         $vars = new \stdClass();
         $model = $fof_helper->getModel('ReportProducts','J2StoreModel');
@@ -91,8 +98,9 @@ class plgJ2StoreReport_Products extends J2StoreReportPlugin
         }
         $vars->product_amount = $product_amount;
         $vars->product_name = $product_name;
+        $vars->product_qty = $product_qty;
         $vars->products = $lists;
-        $vars->params = JComponentHelper::getParams('com_j2store');
+        $vars->params = ComponentHelper::getParams('com_j2store');
         $id = $app->input->getInt('id', '0');
 
         $vars->id = $id;
@@ -102,7 +110,8 @@ class plgJ2StoreReport_Products extends J2StoreReportPlugin
         return $this->_getLayout('default', $vars);
     }
 
-    function getProductList($model){
+    function getProductList($model)
+    {
         $app = J2Store::platform()->application();
         $option = 'com_j2store';
         $ns = $option.'.reportproducts';
@@ -141,9 +150,9 @@ class plgJ2StoreReport_Products extends J2StoreReportPlugin
         return $model;
     }
 
-
     //export csv
-    function onJ2StoreGetReportExported($row){
+    function onJ2StoreGetReportExported($row)
+    {
         if (!($this->_isMe($row)))
         {
             return null;
@@ -152,13 +161,13 @@ class plgJ2StoreReport_Products extends J2StoreReportPlugin
         $model = $fof_helper->getModel('ReportProducts','J2StoreModel');
         $model = $this->getProductList ( $model );
         $items = $model->getList();
-        $name = JText::_('PLG_J2STORE_PRODUCT_NAME');
-        $quantity = JText::_('J2STORE_REPORT_TOTAL_QUANTITY');
-        $discount_text = JText::_('J2STORE_REPORT_PRODUCT_DISCOUNT');
-        $total_tax_text = JText::_('J2STORE_REPORT_PRODUCT_TAX');
-        $without_tax = JText::_('J2STORE_REPORT_PRODUCT_WITHOUT_TAX');
-        $with_tax =JText::_('J2STORE_REPORT_PRODUCT_WITH_TAX');
-        $total_text = JText::_('J2STORE_TOTAL');
+        $name = Text::_('PLG_J2STORE_PRODUCT_NAME');
+        $quantity = Text::_('J2STORE_REPORT_TOTAL_QUANTITY');
+        $discount_text = Text::_('J2STORE_REPORT_PRODUCT_DISCOUNT');
+        $total_tax_text = Text::_('J2STORE_REPORT_PRODUCT_TAX');
+        $without_tax = Text::_('J2STORE_REPORT_PRODUCT_WITHOUT_TAX');
+        $with_tax =Text::_('J2STORE_REPORT_PRODUCT_WITH_TAX');
+        $total_text = Text::_('J2STORE_TOTAL');
         $currency = J2Store::currency ();
         $export = array();
         $qty_total = 0;
@@ -173,7 +182,7 @@ class plgJ2StoreReport_Products extends J2StoreReportPlugin
                 $total_with_tax += $item->total_final_price_with_tax;
                 $total_tax += $item->total_item_tax;
                 $sample = new \stdClass();
-                $sample->$name = $item->orderitem_name . ', ' . JText::_('J2STORE_SKU') . ': ' . $item->orderitem_sku;
+                $sample->$name = $item->orderitem_name . ', ' . Text::_('J2STORE_SKU') . ': ' . $item->orderitem_sku;
                 $sample->$quantity = $item->total_qty;
                 $sample->$discount_text = $currency->format($item->total_item_discount + $item->total_item_discount_tax);
                 $sample->$total_tax_text = $currency->format($item->total_item_tax);
@@ -195,8 +204,9 @@ class plgJ2StoreReport_Products extends J2StoreReportPlugin
     /**
      * Method to get order status
      */
-    public function getOrderStatus(){
-        $db = JFactory::getDbo();
+    public function getOrderStatus()
+    {
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select("*")->from("#__j2store_orderstatuses");
         $db->setQuery($query);
@@ -204,34 +214,40 @@ class plgJ2StoreReport_Products extends J2StoreReportPlugin
         $data =array();
         foreach($row as $item){
 
-            $data[$item->j2store_orderstatus_id] = JText::_($item->orderstatus_name);
+            $data[$item->j2store_orderstatus_id] = Text::_($item->orderstatus_name);
         }
         return $data;
     }
+
     //search order by days type
-    public function getOrderDateType(){
+    public function getOrderDateType()
+    {
         return array(
-            'select' =>JText::_('J2STORE_DAY_TYPES'),
-            'today' => JText::_('J2STORE_TODAY'),
-            'this_week' => JText::_('J2STORE_THIS_WEEK'),
-            'this_month' => JText::_('J2STORE_THIS_MONTH'),
-            'this_year' => JText::_('J2STORE_THIS_YEAR'),
-            'last_7day' => JText::_('J2STORE_LAST_7_DAYS'),
-            'last_month' => JText::_('J2STORE_LAST_MONTH'),
-            'last_year' => JText::_('J2STORE_LAST_YEAR'),
-            'custom' => JText::_('J2STORE_CUSTOM')
+            'select' =>Text::_('J2STORE_DAY_TYPES'),
+            'today' => Text::_('J2STORE_TODAY'),
+            'this_week' => Text::_('J2STORE_THIS_WEEK'),
+            'this_month' => Text::_('J2STORE_THIS_MONTH'),
+            'this_year' => Text::_('J2STORE_THIS_YEAR'),
+            'last_7day' => Text::_('J2STORE_LAST_7_DAYS'),
+            'last_month' => Text::_('J2STORE_LAST_MONTH'),
+            'last_year' => Text::_('J2STORE_LAST_YEAR'),
+            'custom' => Text::_('J2STORE_CUSTOM')
         );
     }
+
     //tax type
-    public function getVat(){
+    public function getVat()
+    {
         return array(
-            'select' =>JText::_('J2STORE_TAX_TYPE'),
-            'with_tax' => JText::_('J2STORE_WITH_TAX'),
-            'without_tax' => JText::_('J2STORE_WITHOUT_TAX')
+            'select' =>Text::_('J2STORE_TAX_TYPE'),
+            'with_tax' => Text::_('J2STORE_WITH_TAX'),
+            'without_tax' => Text::_('J2STORE_WITHOUT_TAX')
         );
     }
+
     //search filter type
-    public function getFilterType(){
+    public function getFilterType()
+    {
         return array(
             'order' => 'By Order',
             'category' => 'By Category',

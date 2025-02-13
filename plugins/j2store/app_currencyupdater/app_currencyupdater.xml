@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="3.0" type="plugin" group="j2store" method="upgrade">
+<extension type="plugin" group="j2store" method="upgrade">
 	<name>Currency Exchange Rates - Google Finance API</name>
-	<version>1.0.1</version>
-	<creationDate>NOV 2017</creationDate>
-	<author>Alagesan</author>
-	<authorEmail>supports@j2store.org</authorEmail>
-	<authorUrl>http://www.j2store.org</authorUrl>
-	<copyright>2017 CartRabbit International Pte Ltd</copyright>
-	<license>GNU General Public License v3 or later</license>
-	<description>This app used to update currency value</description>
+    <author>J2Commerce</author>
+    <creationDate>JAN 2025</creationDate>
+    <copyright>(C) 2017 J2Store</copyright>
+    <copyright>(C) 2025 J2Commerce, LLC</copyright>
+    <license>GNU General Public License v3 or later versions</license>
+    <authorEmail>support@j2commerce.com</authorEmail>
+    <authorUrl>https://www.j2commerce.com</authorUrl>
+    <version>4.1.0</version>
+	<description>PLG_J2STORE_APP_CURRENCY_UPDATER_DESC</description>
 	<files>
 		<filename plugin="app_currencyupdater">app_currencyupdater.php</filename>
 		<folder>app_currencyupdater</folder>
 	</files>
-
+    <media folder="media" destination="plg_j2store_app_currencyupdater">
+        <folder>images</folder>
+    </media>
 	<config>
 		<fields name="params">
 			<fieldset name="basic" label="J2STORE_BASIC_SETTINGS"
@@ -25,8 +28,9 @@
 				/>
 				<field
 					type="list"
-					name="CURRENCY_CONVERTER_API_TYPE"
+					name="currency_converter_api_type"
 					default="exchangerate_host"
+                    class="form-select"
 					label="J2STORE_APP_CURRENCY_UPDATER_SOURCE_TYPE"
 					>
 					<option value="exchangerate_host">J2STORE_EXCHANGERATE_HOST</option>

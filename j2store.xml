@@ -51,6 +51,9 @@
 		<folder>images</folder>
 		<folder>js</folder>
 	</media>
+    <media destination="com_j2commerce" folder="media">
+        <folder>js</folder>
+    </media>
 
 	<!-- Administrator back-end section -->
 	<administration>

@@ -1,19 +1,18 @@
 <?php
 /**
- * --------------------------------------------------------------------------------
- * App Plugin - Currency Updater
- * --------------------------------------------------------------------------------
- * @package     Joomla  3.x
- * @subpackage  J2 Store
- * @author      Alagesan, J2Store <support@j2store.org>
- * @copyright   Copyright (c) 2017 J2Store . All rights reserved.
- * @license     GNU/GPL v3 or latest
- * @link        http://j2store.org
- * --------------------------------------------------------------------------------
+ * @package     Joomla.Plugin
+ * @subpackage  J2Store.app_currencyupdater
  *
- * */
-defined('_JEXEC') or die('Restricted access');
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+defined('_JEXEC') or die;
+
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/library/appcontroller.php');
+
 class J2StoreControllerAppCurrencyUpdater extends J2StoreAppController
 {
     var $_element   = 'app_currencyupdater';

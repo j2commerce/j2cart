@@ -1,11 +1,15 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined ( '_JEXEC' ) or die ();
+
+defined('_JEXEC') or die;
 
 // Load FOF
 // Include F0F
@@ -14,7 +18,7 @@ if(!defined('F0F_INCLUDED')) {
 }
 if(!defined('F0F_INCLUDED')) {
 ?>
-   <h2>Incomplete installation detected</h2>
+   <h2>J2STORE_INSTALLATION_MESSAGE_INCOMPLETE</h2>
 <?php
 }
 if(!class_exists('J2StoreStrapper')){

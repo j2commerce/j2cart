@@ -1,24 +1,33 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-use Joomla\Registry\Format\Json;
 
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Multilanguage;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Menu\MenuFactoryInterface;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Uri\Uri;
 
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/productbase.php');
+
 class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 {
 	protected $view = 'producttags';
-	protected $cacheableTasks = array();
-	var $_catids = array();
+	protected $cacheableTasks = [];
+	var $_catids = [];
 
-	public function browse() {
+	public function browse()
+    {
 		//first clear cache
 		$utility = J2Store::utilities();
 		$utility->nocache();
@@ -38,22 +47,17 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		$productfilter_ids = $app->input->get('productfilter_ids', array(), 'ARRAY');
 
 		$ns = 'com_j2store.'.$this->getName();
-		$params = F0FModel::getTmpInstance('Producttags', 'J2StoreModel')->getMergedParams();
+		$params = J2Store::fof()->getModel('Producttags', 'J2StoreModel')->getMergedParams();
 		if($params->get('list_show_vote', 0)) {
 			$params->set('show_vote', 1);
 		}
 		$view = $this->getThisView();
 
-		//$model = F0FModel::getTmpInstance('Products', 'J2StoreModel');
 		$model = $this->getModel('Producttags');
 
-		//$model->clearState();
 		$view->setModel($model);
 
-
-		//$states = $this->getFilterStates();
 		$states = $this->getSFFilterStates();
-
 
 		if(!empty($manufacturer_ids)){
 			$session->set('manufacturer_ids', $manufacturer_ids, 'j2store');
@@ -65,7 +69,6 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		if(!empty($vendor_ids)){
 			$session->set('vendor_ids', $vendor_ids, 'j2store');
 			$states['vendor_id']= implode(',',$utility->cleanIntArray($vendor_ids, $db));
-			//$model->setState('vendor_id' ,implode(',',$vendor_ids));
 		}else{
 			$session->clear('vendor_ids', 'j2store');
 			$states['vendor_id']= '';
@@ -76,7 +79,6 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 			$session->set('list_product_filter_search_logic_rel', $params->get('list_product_filter_search_logic_rel', 'OR'), 'j2store');
 			$states['productfilter_id'] = implode(',',$utility->cleanIntArray($productfilter_ids, $db));
 
-			//$model->setState('productfilter_id' ,implode(',',$vendor_ids));
 		}else{
 			$session->clear('productfilter_ids', 'j2store');
 			$session->clear('list_product_filter_search_logic_rel', 'j2store');
@@ -92,7 +94,6 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		$limitstart = $app->input->get('limitstart', 0, 'int');
 
 		// In case limit has been changed, adjust limitstart accordingly
-		//		$limitstart = ($limit != 0 ? (floor($limitstart / $limit) * $limit) : 0);
 		$model->setState('list.start', $limitstart);
 
 		$orderCol = $app->getUserStateFromRequest('com_j2store.producttag.list.' . $itemid . '.filter_order', 'filter_order', '', 'string');
@@ -134,7 +135,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 			$model->setState('filter.subtags', true);
 		}
 
-		$model->setState('filter.language', JLanguageMultilang::isEnabled());
+		$model->setState('filter.language', Multilanguage::isEnabled());
 
 		$model->setState('enabled', 1);
 		$model->setState('visible', 1);
@@ -145,8 +146,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		$items = $model->getSFProducts();
 		$filter_items = $model->getSFAllProducts();
 
-		$filters = array();
-		//$filters = $this->getFilters($items);
+		$filters = [];
 		$filters = $this->getFilters($filter_items);
 		if(count($items)) {
 			foreach($items as &$item) {
@@ -164,7 +164,6 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 				foreach($post_data as $key=>$value){
 					if(is_array($value)){
 						foreach($value as $key_i=>$value_i){
-							//print_r($key_i);
 							$pagination->setAdditionalUrlParam($key.'['.$key_i.']',$value_i);
 						}
 					}else{
@@ -173,7 +172,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 				}
 			}
             J2Store::plugin()->event('ViewProductTagPagination', array(&$items, &$pagination, &$params, $model));
-			$view->assign('pagination', $pagination);
+			$view->set('pagination', $pagination);
 		}
 
 		$filters['pricefilters'] = $this->getPriceRanges($items);
@@ -181,7 +180,6 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		//set up document
 		// Check for layout override only if this is not the active menu item
 		// If it is the active menu item, then the view and category id will match
-
 
 		// Because the application sets a default page title,
 		// we need to get it from the menu item itself
@@ -202,7 +200,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 				'tag' => $filter_tag,
 
 			);
-			$menu = J2StoreRouterHelper::findProductTagsMenu( $qoptions );
+			$menu = \J2Commerce\Helper\J2StoreRouterHelper::findProductTagsMenu( $qoptions );
 		}
 
 		if ($menu)
@@ -212,19 +210,18 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 
 		$title = $params->get('page_title', '');
 
-
 		// Check for empty title and add site name if param is set
 		if (empty($title))
 		{
 			$title = $app->get('sitename');
 		}
-		elseif ($app->get('sitename_pagetitles', 0) == 1)
+		elseif ($app->get('sitename_pagetitles', 0) === 1)
 		{
-			$title = JText::sprintf('JPAGETITLE', $app->get('sitename'), $title);
+			$title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $title);
 		}
-		elseif ($app->get('sitename_pagetitles', 0) == 2)
+		elseif ($app->get('sitename_pagetitles', 0) === 2)
 		{
-			$title = JText::sprintf('JPAGETITLE', $title, $app->get('sitename'));
+			$title = Text::sprintf('JPAGETITLE', $title, $app->get('sitename'));
 		}
 		$document->setTitle($title);
 
@@ -239,7 +236,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 
 		// Set Facebook meta data
 
-		$uri = JURI::getInstance();
+		$uri = Uri::getInstance();
 		$document->setMetaData('og:title', $document->getTitle(),'property');
 		$document->setMetaData('og:site_name', $app->get('sitename'),'property');
 		$document->setMetaData('og:description', strip_tags($document->getDescription()),'property');
@@ -275,25 +272,25 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		//allow plugins to modify the data
 		J2Store::plugin()->event('ViewProductList', array(&$items, &$view, &$params, $model));
 
-		$view->assign('products',$items);
-		$view->assign('state', $model->getState());
-		$view->assign('params',$params);
-		$view->assign('filters',$filters);
-		$view->assign('filter_tag',$filter_tag);
-		$view->assign('currency', J2store::currency());
+		$view->set('products',$items);
+		$view->set('state', $model->getState());
+		$view->set('params',$params);
+		$view->set('filters',$filters);
+		$view->set('filter_tag',$filter_tag);
+		$view->set('currency', J2store::currency());
 
-		$view->assign('active_menu', $menu) ;
+		$view->set('active_menu', $menu) ;
 		$content ='var j2store_product_base_link ="'. $menu->link.'&Itemid='.$menu->id .'";';
         $document->addScriptDeclaration($content);
 
         $view_html = '';
         J2Store::plugin()->event('ViewProductListTagHtml', array(&$view_html, &$view, $model));
-        //$this->display(in_array('browse', $this->cacheableTasks));
         echo $view_html;
 		return true;
 	}
 
-	public function getTagId($tag_alias){
+	public function getTagId($tag_alias)
+    {
         $db = Factory::getContainer()->get('DatabaseDriver');
 		$query = $db->getQuery (true);
 		$query->select ( 'id' )->from ( '#__tags' )->where ( 'alias ='.$db->q($tag_alias) );
@@ -301,8 +298,8 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		return $db->loadResult ();
 	}
 
-	public function processProducts(&$items) {
-
+	public function processProducts(&$items)
+    {
 		foreach ($items as &$item) {
 
 			$item->product_short_desc = $item->introtext;
@@ -310,47 +307,45 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
             $need_to_run_behaviour = true;
             J2Store::plugin()->event('ProcessProductBehaviour',array(&$need_to_run_behaviour,$item));
             if($need_to_run_behaviour){
-                F0FModel::getTmpInstance('Products', 'J2StoreModel')->runMyBehaviorFlag(true)->getProduct($item);
+                J2Store::fof()->getModel('Products', 'J2StoreModel')->runMyBehaviorFlag(true)->getProduct($item);
             }
 			$item->product_name = $item->title;
 		}
-
 	}
 
 	/**
 	 * Method to get Filters and to assign in the browse view
 	 */
-	public function getFilters($items){
-
+	public function getFilters($items)
+    {
 		//filters
-		$filters =array();
-		$filter_tag =array();
-		$params = F0FModel::getTmpInstance('Producttags', 'J2StoreModel')->getMergedParams();
+		$filters = [];
+		$filter_tag = [];
+		$params = J2Store::fof()->getModel('Producttags', 'J2StoreModel')->getMergedParams();
 		//now set the categories
-		$filters['filter_tag'] =array();
+		$filters['filter_tag'] = [];
 
 		if($params->get('list_filter_selected_tags')){
 			$filter_tag = $params->get('list_filter_selected_tags');
-			$filters['filter_tag'] = F0FModel::getTmpInstance('Producttags', 'J2StoreModel')->getTags($filter_tag);
+			$filters['filter_tag'] = J2Store::fof()->getModel('Producttags', 'J2StoreModel')->getTags($filter_tag);
 		}
 
 		//to show the product filter for the existing products in the product layout view
 		//should not fetch all product filters
-		$product_ids = array();
+		$product_ids = [];
 		foreach($items as $item){
 			$product_ids[] =$item->j2store_product_id;
 		}
-		$filters['sorting'] = F0FModel::getTmpInstance('Producttags', 'J2StoreModel')->getSortFields();
-		//$filters['productfilters'] = F0FModel::getTmpInstance('Products', 'J2StoreModel')->getProductFilters($product_ids);
+		$filters['sorting'] = J2Store::fof()->getModel('Producttags', 'J2StoreModel')->getSortFields();
 
-		$filters['productfilters'] = array();
-		$product_model = F0FModel::getTmpInstance('Producttags', 'J2StoreModel');
+		$filters['productfilters'] = [];
+		$product_model = J2Store::fof()->getModel('Producttags', 'J2StoreModel');
 		//fetch the pfilters when show product filter is enabled
 		if($params->get('list_show_product_filter',1)){
 			//this option will list all the productfilter added
-			if($params->get('list_product_filter_list_type','selected') == 'all'){
-				$filters['productfilters'] = F0FTable::getAnInstance('ProductFilter', 'J2StoreTable')->getFilters();
-			}elseif($params->get('list_product_filter_list_type','selected') == 'selected'){
+			if($params->get('list_product_filter_list_type','selected') === 'all'){
+				$filters['productfilters'] = J2Store::fof()->loadTable('ProductFilter', 'J2StoreTable')->getFilters();
+			}elseif($params->get('list_product_filter_list_type','selected') === 'selected'){
 				// this option will list productfilter related to the products selected
 				$filters['productfilters'] = $product_model->getProductFilters($product_ids);
 			}
@@ -358,7 +353,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 
 		//fetch the Manufacturers when Show manufacturer filter is enabled
 		if($params->get('list_show_manfacturer_filter',1)){
-			if($params->get('list_manufacturer_filter_list_type','selected') == 'all'){
+			if($params->get('list_manufacturer_filter_list_type','selected') === 'all'){
 				$filters['manufacturers'] =$product_model->getManufacturers();
 			}else{
 				$filters['manufacturers'] = $product_model->getManfucaturersByProduct($product_ids);
@@ -366,7 +361,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		}
 		//fetch the Vendors when Show vendor filter is enabled
 		if($params->get('list_show_vendor_filter',1)){
-			if($params->get('list_vendor_filter_list_type','selected') == 'all'){
+			if($params->get('list_vendor_filter_list_type','selected') === 'all'){
 				$filters['vendors'] = $product_model->getVendors();
 			}else{
 				$filters['vendors'] =$product_model->getVendorsByProduct($product_ids);
@@ -375,13 +370,11 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		return $filters;
 	}
 
-
-
-	public function getPriceRanges($items){
-
+	public function getPriceRanges($items)
+    {
 		//get the active menu details
-		$params = F0FModel::getTmpInstance('Producttags', 'J2StoreModel')->getMergedParams();
-		$ranges = array();
+		$params = J2Store::fof()->getModel('Producttags', 'J2StoreModel')->getMergedParams();
+		$ranges = [];
 		//get the highest price
 		$priceHigh = abs($params->get('list_price_filter_upper_limit', '1000'));
 
@@ -393,14 +386,13 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		return $ranges;
 	}
 
-
-	public function view() {
-
+	public function view()
+    {
 		$app = Factory::getApplication();
 		$product_id = $app->input->getInt('id');
 
 		if(!$product_id) {
-			$app->redirect(JRoute::_('index.php'), 301);
+			$app->redirect(Route::_('index.php'), 301);
 			return;
 		}
 
@@ -417,12 +409,11 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		}
 		$ns = 'com_j2store.'.$this->getName();
 
-		$params = F0FModel::getTmpInstance('Producttags', 'J2StoreModel')->getMergedParams();
+		$params = J2Store::fof()->getModel('Producttags', 'J2StoreModel')->getMergedParams();
 		if($params->get('item_show_vote', 0)) {
 			$params->set('show_vote', 1);
 		}
 		$product_helper = J2Store::product();
-
 
 		//get product
 		$product = $product_helper->setId($product_id)->getProduct();
@@ -430,13 +421,13 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
         //access
         $access_groups = $user->getAuthorisedViewLevels();
         if(!isset($product->source->access) || empty($product->source->access) || !in_array($product->source->access,$access_groups) ){
-            $app->redirect(JRoute::_('index.php'), 301);
+            $app->redirect(Route::_('index.php'), 301);
             return;
         }
-		F0FModel::getTmpInstance('Products', 'J2StoreModel')->runMyBehaviorFlag(true)->getProduct($product);
+		J2Store::fof()->getModel('Products', 'J2StoreModel')->runMyBehaviorFlag(true)->getProduct($product);
 
-		if((isset($product->exists) && $product->exists == 0) || ($product->visibility !=1) || ($product->enabled !=1) ){
-            J2Store::platform()->redirect('index.php',JText::_('J2STORE_PRODUCT_NOT_ENABLED_CONTACT_SITE_ADMIN_FOR_MORE_DETAILS'),'warning');
+		if((isset($product->exists) && $product->exists === 0) || ($product->visibility !==1) || ($product->enabled !==1) ){
+            J2Store::platform()->redirect('index.php',Text::_('J2STORE_PRODUCT_NOT_ENABLED_CONTACT_SITE_ADMIN_FOR_MORE_DETAILS'),'warning');
 			return;
 		}
 
@@ -444,7 +435,6 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		$model->executePlugins($product->source, $params, 'com_content.article.productlist');
 		$text = $product->product_short_desc .":j2storesplite:".$product->product_long_desc;
 		$text = $model->runPrepareEventOnDescription($text, $product->product_source_id, $params, 'com_content.article.productlist');
-		//$product->product_long_desc = $model->runPrepareEventOnDescription($product->product_long_desc, $product->product_source_id, $params, 'com_content.article.productlist');
 		$desc_array = explode ( ':j2storesplite:', $text );
 		if(isset( $desc_array[0] )){
 			$product->product_short_desc = $desc_array[0];
@@ -453,16 +443,16 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 			$product->product_long_desc = $desc_array[1];
 		}
 		//get filters / specs by product
-		$filters = F0FModel::getTmpInstance('Producttags', 'J2StoreModel')->getProductFilters($product->j2store_product_id);
+		$filters = J2Store::fof()->getModel('Producttags', 'J2StoreModel')->getProductFilters($product->j2store_product_id);
 
 		//upsells
-		$up_sells = array();
+		$up_sells = [];
 		if($params->get('item_show_product_upsells', 0) && !empty($product->up_sells)) {
 			$up_sells = $product_helper->getUpsells($product);
 		}
 
 		//cross sells
-		$cross_sells = array();
+		$cross_sells = [];
 		if($params->get('item_show_product_cross_sells', 0) && !empty($product->cross_sells)) {
 			$cross_sells = $product_helper->getCrossSells($product);
 		}
@@ -515,7 +505,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 				'task' => 'view',
 				'tag' => $filter_tag,
 			);
-			$menu = J2StoreRouterHelper::findProductTagsMenu( $qoptions );
+			$menu = \J2Commerce\Helper\J2StoreRouterHelper::findProductTagsMenu( $qoptions );
 		}
 		$params->def('page_heading', $product->product_name);
 		$params->set('page_title', $product->product_name);
@@ -527,13 +517,13 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		{
 			$title = $app->get('sitename');
 		}
-		elseif ($app->get('sitename_pagetitles', 0) == 1)
+		elseif ($app->get('sitename_pagetitles', 0) === 1)
 		{
-			$title = JText::sprintf('JPAGETITLE', $app->get('sitename'), $title);
+			$title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $title);
 		}
-		elseif ($app->get('sitename_pagetitles', 0) == 2)
+		elseif ($app->get('sitename_pagetitles', 0) === 2)
 		{
-			$title = JText::sprintf('JPAGETITLE', $title, $app->get('sitename'));
+			$title = Text::sprintf('JPAGETITLE', $title, $app->get('sitename'));
 		}
 
 		$document->setTitle($title);
@@ -569,7 +559,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 
 		// Set Facebook meta data
 
-		$uri = JURI::getInstance();
+		$uri = Uri::getInstance();
 		$document->setMetaData('og:title', $document->getTitle(),'property');
 		$document->setMetaData('og:site_name', $app->get('sitename'),'property');
 		$document->setMetaData('og:description', strip_tags($document->getDescription()),'property');
@@ -583,43 +573,37 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		}
 		if (!empty($facebookImage))
 		{
-			if (JFile::exists(JPATH_SITE.'/'.$facebookImage))
+			if (file_exists(JPATH_SITE.'/'.$facebookImage))
 			{
-				$image = substr(JURI::root(), 0, -1).'/'.str_replace(JURI::root(true), '', $facebookImage);
+				$image = substr(Uri::root(), 0, -1).'/'.str_replace(Uri::root(true), '', $facebookImage);
 				$document->setMetaData('og:image', $image,'property');
 				$document->setMetaData('image', $image);
 			}
 		}
 
-
-
-
-
         // 1. Find product canonical url
         if(isset($product->main_tag) && !empty($product->main_tag)){
 
-            $tag_menus =JMenu::getInstance('site');
-            $lang = $app->getLanguage();
-
+            $tag_menus = Factory::getContainer()->get(MenuFactoryInterface::class)->createMenu('site');
+            $lang = Factory::getApplication()->getLanguage();
 
             $tag_menu_id = '';
             foreach ($tag_menus->getMenu() as $tag_menu){
 
                 if(isset($tag_menu->type) && isset($tag_menu->component) && isset($tag_menu->query['view']) && isset($tag_menu->query['tag'])
-                    && $tag_menu->type == 'component' && $tag_menu->component == 'com_j2store' && $tag_menu->query['view'] == 'producttags'
+                    && $tag_menu->type === 'component' && $tag_menu->component === 'com_j2store' && $tag_menu->query['view'] === 'producttags'
                     && $tag_menu->query['tag'] == $product->main_tag) {
 
                     if ($lang->getTag() == $tag_menu->language) {
                         $tag_menu_id = $tag_menu->id;
                         break;
                     }
-                    if ($tag_menu->language == '*') {
+                    if ($tag_menu->language === '*') {
                         $tag_menu_id = $tag_menu->id;
                         break;
                     }
                 }
             }
-
 
             if(isset($tag_menu_id) && $tag_menu_id > 0){
                 // 2. remove all other canonical url
@@ -629,7 +613,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
                     {
                         if(array_key_exists('relation', $value))
                         {
-                            if($value['relation'] == 'canonical')
+                            if($value['relation'] === 'canonical')
                             {
                                 // we found the document link that contains the canonical url
                                 // remove it
@@ -641,13 +625,10 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
                 }
                 // 3. set product canonical url
                 $doc = $app->getDocument();
-                $canonical = trim(JUri::root(),'/').'/'.ltrim(J2Store::platform()->getProductUrl(array('task' => 'view','id' => $product->j2store_product_id,'Itemid' => $tag_menu_id),true),'/');
+                $canonical = trim(Uri::root(),'/').'/'.ltrim(J2Store::platform()->getProductUrl(array('task' => 'view','id' => $product->j2store_product_id,'Itemid' => $tag_menu_id),true),'/');
                 $doc->addHeadLink(htmlspecialchars($canonical), 'canonical');
             }
         }
-
-
-
 
 		$back_link = "";
 		$back_link_title = "";
@@ -662,8 +643,8 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		}
 
 		if(isset($back_link) && !empty($back_link_title)){
-			$view->assign('back_link' , JRoute::_($back_link));
-			$view->assign('back_link_title' ,$back_link_title);
+			$view->set('back_link' , Route::_($back_link));
+			$view->set('back_link_title' ,$back_link_title);
 		}
 
 		//add a pathway
@@ -689,29 +670,31 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 
 		//add class to the module for better styling control.
 		$script = '
-		if (typeof(jQuery) !== \'undefined\') {
-		   jQuery(document).ready(function() {
-		      jQuery("body").addClass("j2store-single-product-view view-product-'.$product->j2store_product_id.'  '.$product->source->alias.'");
+            document.addEventListener("DOMContentLoaded", function() {
+                if (typeof window.jQuery !== "undefined") {
+                    document.body.classList.add(
+                        "j2store-single-product-view",
+                        "view-product-' . $product->j2store_product_id . '",
+                        "' . $product->source->alias . '"
+                    );
+                }
 		  });
-		}
 		';
 		$document->addScriptDeclaration($script);
 
 		//add custom styles
 		$custom_css = $params->get('custom_css', '');
 		$document->addStyleDeclaration(strip_tags($custom_css));
-		$view->assign('params', $params);
-		$view->assign('filters', $filters);
-		$view->assign('up_sells', $up_sells);
-		$view->assign('cross_sells', $cross_sells);
-		$view->assign('product_helper', $product_helper);
-		$view->assign('currency', J2store::currency());
+		$view->set('params', $params);
+		$view->set('filters', $filters);
+		$view->set('up_sells', $up_sells);
+		$view->set('cross_sells', $cross_sells);
+		$view->set('product_helper', $product_helper);
+		$view->set('currency', J2store::currency());
 		//allow plugins to modify the data
 		J2Store::plugin()->event('ViewProduct', array(&$product, &$view));
 
-		$view->assign('product', $product);
-		//$view->setLayout('view');
-		//$view->display();
+		$view->set('product', $product);
         $view_html = '';
         J2Store::plugin()->event('ViewProductTagHtml', array(&$view_html, &$view, $model));
         echo $view_html;
@@ -722,7 +705,8 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 	 * Method to direct to compare layout when
 	 * product added to compare
 	 */
-	function compare(){
+	function compare()
+    {
 		$model = $this->getModel('Products');
 		$view = $this->getThisView();
 		if ($model = $this->getThisModel())
@@ -734,12 +718,12 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		$view->display();
 	}
 
-
 	/**
 	 * Method to direct to compare layout when
 	 * product added to compare
 	 */
-	function wishlist(){
+	function wishlist()
+    {
 		$model = $this->getModel('Products');
 		$view = $this->getThisView();
 		if ($model = $this->getThisModel())

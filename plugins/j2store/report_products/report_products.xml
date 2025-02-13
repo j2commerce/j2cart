@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="3.0" type="plugin" group="j2store" method="upgrade">
+<extension type="plugin" group="j2store" method="upgrade">
 	<name>J2STORE_REPORT_PRODUCTS</name>
-	<version>1.2</version>
-	<creationDate>AUG 2016</creationDate>
-	<author>Alagesan</author>
-	<authorEmail>supports@j2store.org</authorEmail>
-	<authorUrl>http://www.j2store.org</authorUrl>
-	<copyright>2016 Weblogicx India Limited</copyright>
-	<license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later</license>
+    <author>J2Commerce</author>
+    <creationDate>JAN 2025</creationDate>
+    <copyright>(C) 2015 J2Store</copyright>
+    <copyright>(C) 2025 J2Commerce, LLC</copyright>
+    <license>GNU General Public License v3 or later versions</license>
+    <authorEmail>support@j2commerce.com</authorEmail>
+    <authorUrl>https://www.j2commerce.com</authorUrl>
+    <version>4.1.0</version>
 	<description>J2STORE_REPORT_PRODUCTS_DESC</description>
 	<files>
 		<filename plugin="report_products">report_products.php</filename>
@@ -16,5 +17,4 @@
 	<languages folder="languages">
 		<language tag="en-GB">en-GB.plg_j2store_report_products.ini</language>
 	</languages>
-	<config></config>
 </extension>

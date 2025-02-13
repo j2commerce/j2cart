@@ -1,11 +1,21 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Plugin
+ * @subpackage  J2Commerce.app_schemaproducts
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Uri\Uri;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/app.php');
 
 class plgJ2StoreApp_schemaproducts extends J2StoreAppPlugin
@@ -28,12 +38,14 @@ class plgJ2StoreApp_schemaproducts extends J2StoreAppPlugin
         }
         return $this->viewList();
     }
+
     function onJ2StoreIsJ2Store4($element){
         if (!$this->_isMe($element)) {
             return null;
         }
         return true;
     }
+
     /**
      * @return string
      * @throws Exception
@@ -41,7 +53,7 @@ class plgJ2StoreApp_schemaproducts extends J2StoreAppPlugin
     function viewList()
     {
         $app = J2Store::platform()->application();
-        JToolBarHelper::title(JText::_('J2STORE_APP') . '-' . JText::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
+        ToolbarHelper::title(Text::_('J2STORE_APP') . '-' . Text::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
         $vars = new \stdClass();
         $vars->id = $app->input->getInt('id', 0);
         $form = array();
@@ -59,34 +71,33 @@ class plgJ2StoreApp_schemaproducts extends J2StoreAppPlugin
         $i = 1;
         $currency = J2store::currency();
         foreach ($items as $item) {
-            $product_url = rtrim(JUri::base(), '/') . '/' . ltrim($item->product_link, '/');
-            $item_list = array(
+            $product_url = rtrim(Uri::base(), '/') . '/' . ltrim($item->product_link, '/');
+
+            $item_list = [
                 "@type" => "ListItem",
-                //"position" => $i,
-                "item" => array(
+                "item" => [
                     '@type' => "Product",
-                    'name' => $item->product_name,
-                    'sku' => $item->sku,
-                    'url' => $product_url
-                )
-            );
-            if (isset($item->variant->j2store_variant_id) && !empty($item->variant->j2store_variant_id)) {
-                $item_list['item']['offers'] = array(
+                    'name' => $item->product_name ?? '',
+                    'sku' => $item->sku ?? '',
+                    'url' => $product_url,
+                ]
+            ];
+
+            if (!empty($item->variant->j2store_variant_id ?? '')) {
+                $item_list['item']['offers'] = [
                     '@type' => 'Offer',
                     'price' => isset($item->pricing->price) ? round($item->pricing->price, 2) : 0,
-                    'priceCurrency' => $currency->getCode(),
-                    'url' => $product_url
-                );
-                $item_list['offers']['availability'] = 'https://schema.org/' . ($item->variant->availability ? 'InStock' : 'OutOfStock');
-
+                    'priceCurrency' => $currency->getCode() ?? 'USD',
+                    'url' => $product_url,
+                    'availability' => 'https://schema.org/' . ($item->variant->availability ? 'InStock' : 'OutOfStock'),
+                ];
             }
 
             if (isset($item->main_image) && !empty($item->main_image)) {
-                $main_image = rtrim(JUri::base(), '/') . '/' . ltrim($item->main_image, '/');
-                $item_list['item']['image'] = $main_image;
+                $item_list['item']['image'] = rtrim(Uri::base(), '/') . '/' . ltrim($item->main_image, '/');
             } elseif (isset($item->thumb_image) && !empty($item->thumb_image)) {
-                $thumb_image = rtrim(JUri::base(), '/') . '/' . ltrim($item->thumb_image, '/');
-                $item_list['item']['image'] = $thumb_image;
+                $item_list['item']['image'] = rtrim(Uri::base(), '/') . '/' . ltrim($item->thumb_image, '/');
+
             }
             if (isset($item->brand_name) && !empty($item->brand_name)) {
                 $item_list['item']['brand'] = $item->brand_name;
@@ -99,13 +110,19 @@ class plgJ2StoreApp_schemaproducts extends J2StoreAppPlugin
             $schema['itemListElement'][] = $item_list;
             $i++;
         }
-        $doc = J2Store::platform()->application()->getDocument();
-        $doc->addScriptDeclaration(json_encode($schema), 'application/ld+json');
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $prettyPrint = JDEBUG ? JSON_PRETTY_PRINT : 0;
+        $wa->addInline(
+            'script',
+            json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | $prettyPrint),
+            ['name' => 'inline.category-products-schemaorg'],
+            ['type' => 'application/ld+json']
+        );
     }
 
     function onJ2StoreViewProduct(&$item, &$view)
     {
-        $product_url = rtrim(JUri::base(), '/') . '/' . ltrim($item->product_link, '/');
+        $product_url = rtrim(Uri::base(), '/') . '/' . ltrim($item->product_link, '/');
         $currency = J2store::currency();
         $item_list = array(
             '@context' => 'https://schema.org/',
@@ -127,10 +144,10 @@ class plgJ2StoreApp_schemaproducts extends J2StoreAppPlugin
         }
 
         if (isset($item->main_image) && !empty($item->main_image)) {
-            $main_image = rtrim(JUri::base(), '/') . '/' . ltrim($item->main_image, '/');
+            $main_image = rtrim(Uri::base(), '/') . '/' . ltrim($item->main_image, '/');
             $item_list['image'] = $main_image;
         } elseif (isset($item->thumb_image) && !empty($item->thumb_image)) {
-            $thumb_image = rtrim(JUri::base(), '/') . '/' . ltrim($item->thumb_image, '/');
+            $thumb_image = rtrim(Uri::base(), '/') . '/' . ltrim($item->thumb_image, '/');
             $item_list['image'] = $thumb_image;
         }
         if (isset($item->brand_name) && !empty($item->brand_name)) {
@@ -139,7 +156,13 @@ class plgJ2StoreApp_schemaproducts extends J2StoreAppPlugin
         if (isset($item->introtext) && !empty($item->introtext)) {
             $item_list['description'] = substr($item->introtext, 0, 200);
         }
-        $doc = J2Store::platform()->application()->getDocument();
-        $doc->addScriptDeclaration(json_encode($item_list), 'application/ld+json');
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $prettyPrint = JDEBUG ? JSON_PRETTY_PRINT : 0;
+        $wa->addInline(
+            'script',
+            json_encode($item_list, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | $prettyPrint),
+            ['name' => 'inline.product-detail-schemaorg'],
+            ['type' => 'application/ld+json']
+        );
     }
 }

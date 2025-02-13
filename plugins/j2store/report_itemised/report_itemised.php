@@ -1,11 +1,16 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Plugin
+ * @subpackage  J2Commerce.report_itemized
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/report.php');
 
 class plgJ2StoreReport_itemised extends J2StoreReportPlugin
@@ -30,12 +35,15 @@ class plgJ2StoreReport_itemised extends J2StoreReportPlugin
         }
         return $this->viewList();
     }
-    function onJ2StoreIsJ2Store4($element){
+
+    function onJ2StoreIsJ2Store4($element)
+    {
         if (!$this->_isMe($element)) {
             return null;
         }
         return true;
     }
+
     /**
      * Validates the data submitted based on the suffix provided
      * A controller for this plugin, you could say
@@ -46,7 +54,7 @@ class plgJ2StoreReport_itemised extends J2StoreReportPlugin
     function viewList()
     {
         $app = self::$platform->application();
-        JToolBarHelper::title(JText::_('J2STORE_REPORT') . '-' . JText::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
+        ToolbarHelper::title(Text::_('J2STORE_REPORT') . '-' . Text::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
         $vars = new \stdClass();
         $model = self::$fof_helper->getModel('ReportItemised', 'J2StoreModel');
         $model->setState('limit', $app->input->getInt('limit', 0));
@@ -80,14 +88,14 @@ class plgJ2StoreReport_itemised extends J2StoreReportPlugin
     public function getOrderDateType()
     {
         return array(
-            'select' => JText::_('J2STORE_DAY_TYPES'),
-            'today' => JText::_('J2STORE_TODAY'),
-            'this_week' => JText::_('J2STORE_THIS_WEEK'),
-            'this_month' => JText::_('J2STORE_THIS_MONTH'),
-            'this_year' => JText::_('J2STORE_THIS_YEAR'),
-            'last_7day' => JText::_('J2STORE_LAST_7_DAYS'),
-            'last_month' => JText::_('J2STORE_LAST_MONTH'),
-            'last_year' => JText::_('J2STORE_LAST_YEAR')
+            'select' => Text::_('J2STORE_DAY_TYPES'),
+            'today' => Text::_('J2STORE_TODAY'),
+            'this_week' => Text::_('J2STORE_THIS_WEEK'),
+            'this_month' => Text::_('J2STORE_THIS_MONTH'),
+            'this_year' => Text::_('J2STORE_THIS_YEAR'),
+            'last_7day' => Text::_('J2STORE_LAST_7_DAYS'),
+            'last_month' => Text::_('J2STORE_LAST_MONTH'),
+            'last_year' => Text::_('J2STORE_LAST_YEAR')
         );
     }
 
@@ -116,7 +124,4 @@ class plgJ2StoreReport_itemised extends J2StoreReportPlugin
         }
         return $items;
     }
-
-
 }
-

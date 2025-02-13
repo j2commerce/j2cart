@@ -1,29 +1,29 @@
 <?php
 /**
- * --------------------------------------------------------------------------------
- * Report Plugin - Products
- * --------------------------------------------------------------------------------
- * @package     Joomla 3.x
- * @subpackage  J2 Store
- * @author      Alagesan, J2Store <support@j2store.org>
- * @copyright   Copyright (c) 2015 J2Store . All rights reserved.
- * @license     GNU/GPL license: http://www.gnu.org/licenses/gpl-2.0.html
- * @link        http://j2store.org
- * --------------------------------------------------------------------------------
+ * @package     Joomla.Plugin
+ * @subpackage  J2Commerce.report_products
  *
- * */
-defined('_JEXEC') or die( 'Restricted access' );
-class J2storeModelReportProducts extends F0FModel{
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+
+class J2storeModelReportProducts extends F0FModel
+{
     public $cache_enabled = false;
 
     public $filter_search;
     var $filter_orderstatus;
 
-
     function __construct()
     {
         parent::__construct();
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         $option = 'com_j2store';
         $ns = $option.'.reportsales';
         $data = $app->input->getArray($_REQUEST);
@@ -40,7 +40,7 @@ class J2storeModelReportProducts extends F0FModel{
         $filter_date      = $app->getUserStateFromRequest($ns.'modified_date', 'filter_date', '', '');
         $filter_order_id  = $app->getUserStateFromRequest($ns.'order_id', 'filter_order_id', '', '');
 
-        $limit		= $app->getUserStateFromRequest( 'global.list.limit', 'limit', $app->getCfg('list_limit'), 'int' );
+        $limit		= $app->getUserStateFromRequest( 'global.list.limit', 'limit', Factory::getApplication()->get('list_limit'), 'int' );
         $limitstart	= $app->getUserStateFromRequest( $ns.'.limitstart', 'limitstart', 0, 'int' );
 
         // In case limit has been changed, adjust limitstart accordingly
@@ -91,11 +91,12 @@ class J2storeModelReportProducts extends F0FModel{
         $this->setState('filter_order_to_qty',$this->filter_order_to_qty);
         $this->setState('filter_vat',$this->filter_vat);
     }
+
     public function buildQuery($overrideLimits = false)
     {
         // Get the WHERE and ORDER BY clauses for the query //order_id,tbl.user_email,tbl.order_total,tbl.order_subtotal,tbl.order_tax
-        $query = JFactory::getDbo()->getQuery(true);
-        $query->select('orderitem.orderitem_name,orderitem.orderitem_sku,sum(orderitem.orderitem_quantity) as total_qty,sum(orderitem.orderitem_finalprice_without_tax) as total_final_price_without_tax, 
+        $query = Factory::getContainer()->get('DatabaseDriver')->getQuery(true);
+        $query->select('orderitem.orderitem_name,orderitem.orderitem_sku,sum(orderitem.orderitem_quantity) as total_qty,sum(orderitem.orderitem_finalprice_without_tax) as total_final_price_without_tax,
 		sum(orderitem.orderitem_tax) as total_item_tax,sum(orderitem.orderitem_discount) as total_item_discount,sum(orderitem.orderitem_discount_tax) as total_item_discount_tax,
 		sum(orderitem.orderitem_finalprice_with_tax ) as total_final_price_with_tax');
         $query->from('#__j2store_orderitems as orderitem')->group('orderitem.variant_id');
@@ -104,6 +105,7 @@ class J2storeModelReportProducts extends F0FModel{
         $this->_buildQueryOrder($query);
         return $query;
     }
+
     protected function _buildQueryWhere($query)
     {
         // To load only the Normal order items
@@ -129,48 +131,43 @@ class J2storeModelReportProducts extends F0FModel{
             $query->where('tbl.order_state_id IN ('.$status.')');
         }
         if($filter_datetype == 'today'){
-            $query->where('tbl.created_on LIKE '.$this->_db->q(date("Y-m-d").'%'));
+            $query->where('tbl.created_on LIKE '.$this->_db->quote(date("Y-m-d").'%'));
         }
         if($filter_datetype == 'this_week' ){
             $weekdate=$this->getWeekdate();
-            $query->where('tbl.created_on BETWEEN'.$this->_db->q($weekdate['start'].'%').' AND '.$this->_db->q($weekdate['end'].'%'));
+            $query->where('tbl.created_on BETWEEN'.$this->_db->quote($weekdate['start'].'%').' AND '.$this->_db->quote($weekdate['end'].'%'));
         }
         if($filter_datetype == 'this_month'){
             $start = date('Y-m-01',strtotime('this month'));
             $end = date('Y-m-t',strtotime('this month'));
-            $query->where('tbl.created_on BETWEEN'.$this->_db->q($start.'%').' AND '.$this->_db->q($end.'%'));
+            $query->where('tbl.created_on BETWEEN'.$this->_db->quote($start.'%').' AND '.$this->_db->quote($end.'%'));
         }
         if($filter_datetype == 'this_year'){
             $start = date('Y');
-            $query->where('tbl.created_on LIKE '.$this->_db->q($start.'%'));
+            $query->where('tbl.created_on LIKE '.$this->_db->quote($start.'%'));
         }
         if($filter_datetype == 'last_7day'){
             $start = date('Y-m-d', strtotime('-7 days'));
             $end = date("Y-m-d");
-            $query->where('tbl.created_on BETWEEN'.$this->_db->q($start.'%').' AND '.$this->_db->q($end.'%'));
+            $query->where('tbl.created_on BETWEEN'.$this->_db->quote($start.'%').' AND '.$this->_db->quote($end.'%'));
         }
         if($filter_datetype == 'last_month'){
             $start = date('Y-m-d', strtotime('first day of last month'));
             $end = date('Y-m-d', strtotime('last day of last month'));
-            $query->where('tbl.created_on BETWEEN'.$this->_db->q($start.'%').' AND '.$this->_db->q($end.'%'));
+            $query->where('tbl.created_on BETWEEN'.$this->_db->quote($start.'%').' AND '.$this->_db->quote($end.'%'));
         }
         if($filter_datetype == 'last_year'){
             $start = date('Y')-1;
-            $query->where('tbl.created_on LIKE '.$this->_db->q($start.'%'));
+            $query->where('tbl.created_on LIKE '.$this->_db->quote($start.'%'));
         }
         if(!empty($filter_order_from_date) && !empty($filter_order_to_date)){
 
-            $query->where('tbl.created_on BETWEEN'.$this->_db->q($filter_order_from_date.'%').' AND '.$this->_db->q($filter_order_to_date.'%'));
+            $query->where('tbl.created_on BETWEEN'.$this->_db->quote($filter_order_from_date.'%').' AND '.$this->_db->quote($filter_order_to_date.'%'));
         }
-
-        /*if($filter_manufacture){
-            $query->where('product.manufacturer_id ='.$filter_manufacture);
-        }
-        if($filter_vendor){
-            $query->where('orderitem.vendor_id ='.$filter_vendor);
-        }*/
     }
-    function getWeekdate(){
+
+    function getWeekdate()
+    {
         $ddate = date('Y-m-d'); // Change to whatever date you need
         $year=date('Y');
         $date = new DateTime($ddate);
@@ -185,6 +182,7 @@ class J2storeModelReportProducts extends F0FModel{
         $ret['end'] = date('Y-n-j', $time);
         return $ret;
     }
+
     protected function _buildQueryJoins($query)
     {
         $query->join('INNER', '#__j2store_orders AS tbl ON tbl.order_id = orderitem.order_id');

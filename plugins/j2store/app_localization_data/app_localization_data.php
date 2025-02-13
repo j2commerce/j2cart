@@ -1,11 +1,19 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Plugin
+ * @subpackage  J2Commerce.app_localization_data
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/app.php');
 
 class plgJ2StoreApp_localization_data extends J2StoreAppPlugin
@@ -29,12 +37,14 @@ class plgJ2StoreApp_localization_data extends J2StoreAppPlugin
         }
         return $this->viewList();
     }
+
     function onJ2StoreIsJ2Store4($element){
         if (!$this->_isMe($element)) {
             return null;
         }
         return true;
     }
+
     /**
      * Validates the data submitted based on the suffix provided
      * A controller for this plugin, you could say
@@ -45,7 +55,7 @@ class plgJ2StoreApp_localization_data extends J2StoreAppPlugin
     function viewList()
     {
         $app = J2Store::platform()->application();
-        JToolBarHelper::title(JText::_('J2STORE_APP') . '-' . JText::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
+        ToolBarHelper::title(Text::_('J2STORE_APP') . '-' . Text::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
         $vars = new \stdClass();
         $id = $app->input->getInt('id', 0);
         $vars->id = $id;
@@ -54,6 +64,4 @@ class plgJ2StoreApp_localization_data extends J2StoreAppPlugin
         $vars->form = $form;
         return $this->_getLayout('default', $vars);
     }
-
 }
-

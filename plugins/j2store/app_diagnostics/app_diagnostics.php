@@ -1,11 +1,22 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Plugin
+ * @subpackage  J2Store.app_diagnostics
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-/** ensure this file is being included by a parent file */
-defined('_JEXEC') or die('Restricted access');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Version;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/app.php');
 
 class plgJ2StoreApp_diagnostics extends J2StoreAppPlugin
@@ -45,8 +56,8 @@ class plgJ2StoreApp_diagnostics extends J2StoreAppPlugin
     function viewList()
     {
         $app = J2Store::platform()->application();
-        JToolBarHelper::title(JText::_('J2STORE_APP') . '-' . JText::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
-        JToolBarHelper::back('J2STORE_BACK_TO_DASHBOARD', 'index.php?option=com_j2store');
+        ToolbarHelper::title(Text::_('J2STORE_APP') . '-' . Text::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
+        ToolbarHelper::back('J2STORE_BACK_TO_DASHBOARD', 'index.php?option=com_j2store');
         $vars = new \stdClass();
         $vars->info = $this->getInfo();
         $id = $app->input->getInt('id', '0');
@@ -60,8 +71,8 @@ class plgJ2StoreApp_diagnostics extends J2StoreAppPlugin
     public function getInfo()
     {
         $info = array();
-        $version = new JVersion;
-        $db = JFactory::getDbo();
+        $version = new Version;
+        $db = Factory::getContainer()->get('DatabaseDriver');
         if (isset($_SERVER['SERVER_SOFTWARE'])) {
             $sf = $_SERVER['SERVER_SOFTWARE'];
         } else {
@@ -79,11 +90,11 @@ class plgJ2StoreApp_diagnostics extends J2StoreAppPlugin
         $info['is_pro'] = J2Store::isPro();
         $info['curl'] = $this->_isCurl();
         $info['json'] = $this->_isJson();
-        $config = JFactory::getConfig();
+        $config = Factory::getApplication()->getConfig();
         $info['error_reporting'] = $config->get('error_reporting');
         $caching = $config->get('caching');
-        $info['caching'] = ($caching) ? JText::_('J2STORE_ENABLED') : JText::_('J2STORE_DISABLED');
-        $cache_plugin = JPluginHelper::isEnabled('system', 'cache');
+        $info['caching'] = ($caching) ? Text::_('J2STORE_ENABLED') : Text::_('J2STORE_DISABLED');
+        $cache_plugin = PluginHelper::isEnabled('system', 'cache');
         $info['plg_cache_enabled'] = $cache_plugin;
         $info['memory_limit'] = ini_get('memory_limit');
         return $info;
@@ -91,18 +102,18 @@ class plgJ2StoreApp_diagnostics extends J2StoreAppPlugin
 
     function _isCurl()
     {
-        return (function_exists('curl_version')) ? JText::_('J2STORE_ENABLED') : JText::_('J2STORE_DISABLED');
+        return (function_exists('curl_version')) ? Text::_('J2STORE_ENABLED') : Text::_('J2STORE_DISABLED');
     }
 
     function _isJson()
     {
-        return (function_exists('json_encode')) ? JText::_('J2STORE_ENABLED') : JText::_('J2STORE_DISABLED');
+        return (function_exists('json_encode')) ? Text::_('J2STORE_ENABLED') : Text::_('J2STORE_DISABLED');
     }
 
     public function getJ2storeVersion()
     {
         $version = '';
-        $db = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select($db->quoteName('manifest_cache'))->from($db->quoteName('#__extensions'))->where($db->quoteName('element') . ' = ' . $db->quote('com_j2store'));
         $db->setQuery($query);
@@ -116,7 +127,7 @@ class plgJ2StoreApp_diagnostics extends J2StoreAppPlugin
 
     public function onJ2StoreProcessCron($command)
     {
-        if ($command == 'clear_cart') {
+        if ($command === 'clear_cart') {
             $this->clear_outdated_cart_data();
         }
     }
@@ -135,13 +146,13 @@ class plgJ2StoreApp_diagnostics extends J2StoreAppPlugin
             $clear_time = ($no_of_days_old * 1440);
         }
 
-        $tz = JFactory::getConfig()->get('offset');
-        $formattedDate = JFactory::getDate('now -' . $clear_time . ' minutes', $tz)->toSql(true);
-        $db = JFactory::getDbo();
+        $tz = Factory::getApplication()->getConfig()->get('offset');
+        $formattedDate = Factory::getDate('now -' . $clear_time . ' minutes', $tz)->toSql(true);
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true);
         $query->select('ab.j2store_cart_id')->from('#__j2store_carts as ab');
-        $query->where('ab.cart_type = ' . $db->q('cart'));
-        $query->where('ab.created_on <= ' . $db->q($formattedDate));
+        $query->where('ab.cart_type = ' . $db->quote('cart'));
+        $query->where('ab.created_on <= ' . $db->quote($formattedDate));
         $db->setQuery($query);
         $old_cart_items_exists = $db->loadObjectList();
         if (count($old_cart_items_exists) > 0) {
@@ -157,8 +168,8 @@ class plgJ2StoreApp_diagnostics extends J2StoreAppPlugin
             } catch (Exception $e) {
             }
 
-            $delete_carts_qry = "delete from #__j2store_carts where #__j2store_carts.cart_type=" . $db->q('cart')
-                . " AND created_on <= " . $db->q($formattedDate) . ";";
+            $delete_carts_qry = "delete from #__j2store_carts where #__j2store_carts.cart_type=" . $db->quote('cart')
+                . " AND created_on <= " . $db->quote($formattedDate) . ";";
             $db->setQuery($delete_carts_qry);
             try {
                 $db->execute();
@@ -167,4 +178,3 @@ class plgJ2StoreApp_diagnostics extends J2StoreAppPlugin
         }
     }
 }
-

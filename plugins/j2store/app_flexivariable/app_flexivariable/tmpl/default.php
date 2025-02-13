@@ -3,18 +3,17 @@
  * @package     Joomla.Plugin
  * @subpackage  J2Store.app_flexivariable
  *
- * @copyright Copyright (C) 2018 J2Store. All rights reserved.
- * @copyright Copyright (C) 2024 J2Commerce, LLC. All rights reserved.
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
 
-// No direct access
 defined('_JEXEC') or die;
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-
 
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.framework');
@@ -22,7 +21,8 @@ $platform->loadExtra('behavior.modal');
 $platform->loadExtra('behavior.tooltip');
 $platform->loadExtra('behavior.multiselect');
 $platform->loadExtra('dropdown.init');
-$platform->addScript('j2store-script','/media/j2store/js/j2store.js');
+
+$platform->loadExtra('script', 'media/j2store/js/j2store.js', false, false);
 
 $wa  = Factory::getApplication()->getDocument()->getWebAssetManager();
 $script = "Joomla.submitbutton = function(pressbutton) {
@@ -33,7 +33,7 @@ $script = "Joomla.submitbutton = function(pressbutton) {
 	  if(pressbutton == 'cancel') {
 		  Joomla.submitform('cancel');
 	  }
-		var atask = jQuery('#appTask').val();
+		var atask = document.querySelector('#appTask').value;
 		Joomla.submitform('view');
   }";
 $wa->addInlineScript($script, [], []);

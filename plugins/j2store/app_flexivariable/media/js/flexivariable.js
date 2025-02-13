@@ -1,146 +1,131 @@
-/**
- * Setup (required for Joomla! 3)
- */
-if(typeof(j2store) == 'undefined') {
-    var j2store = {};
-}
-if(typeof(j2store.jQuery) == 'undefined') {
-    j2store.jQuery = jQuery.noConflict();
-}
-
 function doFlexiAjaxPrice(product_id, id) {
-    (function($) {
-        /* Get input values from form */
-        var form = $(id).closest('form');
-        //sanity check
-        if(form.data('product_id') != product_id) return;
+    // Get the form element closest to the specified ID
+    var form = document.querySelector(id).closest('form');
+    if (!form || form.dataset.product_id != product_id) return;
 
-        var values = form.serializeArray();
-        //pop these params from values-> task : add & view : mycart
-        values.pop({
-            name : "task",
-            value : 'addItem'
-        });
+    // Serialize the form data into an array
+    var formData = new FormData(form);
+    var values = Array.from(formData.entries()).map(([name, value]) => ({ name, value }));
 
-        values.pop({
-            name : "view",
-            value : 'carts'
-        });
+    // Remove task and view params from the values
+    values = values.filter(item => item.name !== 'task' && item.name !== 'view');
 
-        values.push({
-            name : "product_id",
-            value :product_id
-        });
+    // Add custom params
+    values.push({ name: "product_id", value: product_id });
 
-        var arrayClean = function(thisArray) {
-            "use strict";
-            $.each(thisArray, function(index, item) {
-                if (item.name == 'task' || item.name == 'view') {
-                    delete values[index];
+    // Trigger a custom event before making the AJAX request
+    document.body.dispatchEvent(new CustomEvent('before_doAjaxPrice', { detail: { form, values } }));
+
+    // Remove any existing error messages
+    document.querySelectorAll('.j2error').forEach(el => el.remove());
+
+    // Convert the values array into a query string
+    var queryString = values.map(item => encodeURIComponent(item.name) + '=' + encodeURIComponent(item.value)).join('&');
+
+    // Make the AJAX request
+    fetch(j2storeURL + 'index.php?option=com_j2store&view=product&task=update&' + queryString, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+        .then(response => response.json())
+        .then(data => {
+            var product = document.querySelector('.product-' + product_id);
+
+            if (product && typeof data.error === 'undefined') {
+                // Update SKU
+                if (data.sku) {
+                    var skuElement = product.querySelector('.sku');
+                    if (skuElement) skuElement.innerHTML = data.sku;
                 }
-            });
-        };
-        arrayClean(values);
 
-        values = values.filter(function( element ) {
-            return element !== undefined;
-        });
-        $( 'body' ).trigger( 'before_doAjaxPrice', [ form, values ] );
-        $('.j2error').remove();
-        $.ajax({
-            url : j2storeURL+ 'index.php?option=com_j2store&view=product&task=update',
-            type : 'get',
-            data : values,
-            dataType : 'json',
-            success : function(response) {
-
-                var $product = $('.product-'+ product_id);
-
-                if ($product.length
-                    && typeof response.error == 'undefined' ) {
-                    //SKU
-                    if (response.sku) {
-                        $product.find('.sku').html(response.sku);
-                    }
-
-                    if(response.pricing){
-                        //base price
-                        if (response.pricing.base_price) {
-                            $product.find('.base-price').html(response.pricing.base_price);
-                            if(response.pricing.class){
-                                if(response.pricing.class == 'show'){
-                                    $product.find('.base-price').show();
-                                    $product.find('.base-price').addClass('strike')
-                                }else{
-                                    $product.find('.base-price').hide()
-                                }
+                // Update pricing
+                if (data.pricing) {
+                    if (data.pricing.base_price) {
+                        var basePrice = product.querySelector('.base-price');
+                        if (basePrice) {
+                            basePrice.innerHTML = data.pricing.base_price;
+                            if (data.pricing.class === 'show') {
+                                basePrice.style.display = 'block';
+                                basePrice.classList.add('strike');
+                            } else {
+                                basePrice.style.display = 'none';
                             }
                         }
-                        //price
-                        if (response.pricing.price) {
-                            $product.find('.sale-price').html(response.pricing.price);
-                        }
-
-                        // discount text
-                        $product.find('.discount-percentage').html(response.pricing.discount_text);
                     }
 
-                    //afterDisplayPrice
-                    if (response.afterDisplayPrice) {
-                        $product.find('.afterDisplayPrice').html(response.afterDisplayPrice);
-                    }
-                    //qty
-                    if (response.quantity) {
-                        $product.find('input[name="product_qty"]').val(response.quantity);
-                        if(form.data('product_type') == 'variable' || form.data('product_type') == 'advancedvariable' || form.data('product_type') == 'variablesubscriptionproduct') {
-                            $product.find('input[name="product_qty"]').attr({
-                                value: response.quantity
-                            });
-                        }
-                    }
-                    if (response.main_image) {
-                        // Check if thumb_image exists before updating attributes
-                        if (response.thumb_image) {
-                            $product.find('.j2store-product-thumb-image-' + product_id).attr("src", response.thumb_image);
-                            j2store.jQuery('.j2store-product-thumb-image-' + product_id).attr("src", response.thumb_image);
-                        }
-
-                        j2store.jQuery('.j2store-product-main-image-' + product_id).attr("src", response.main_image);
-                        $product.find('.j2store-mainimage .j2store-img-responsive').attr("src", response.main_image);
-                        $product.find('.j2store-product-additional-images .additional-mainimage').attr("src", response.main_image);
-                    }
-                    //stock status
-
-                    if (typeof response.stock_status != 'undefined') {
-                        if (response.availability == 1) {
-                            $product.find('.product-stock-container').html('<span class="instock">' + response.stock_status + '</span>');
-                        }else {
-                            $product.find('.product-stock-container').html('<span class="outofstock">' + response.stock_status + '</span>');
-                        }
+                    if (data.pricing.price) {
+                        var salePrice = product.querySelector('.sale-price');
+                        if (salePrice) salePrice.innerHTML = data.pricing.price;
                     }
 
-                    //dimensions
-                    if (response.dimensions) {
-                        $product.find('.product-dimensions').html(response.dimensions);
-                    }
-
-                    //weight
-                    if (response.weight) {
-                        $product.find('.product-weight').html(response.weight);
-                    }
-
-
-                    // Trigger event
-                    $( 'body' ).trigger( 'after_doAjaxFilter', [ $product, response ] );
-                    $( 'body' ).trigger( 'after_doAjaxPrice', [ $product, response ] );
-                }else {
-                    $product.find('#variable-options-'+product_id).after('<div class="j2error">'+response.error+'</div>');
+                    var discountText = product.querySelector('.discount-percentage');
+                    if (discountText) discountText.innerHTML = data.pricing.discount_text;
                 }
-            },
-            error : function(xhr, ajaxOptions, thrownError) {
-                console.log(thrownError + "\r\n" + xhr.statusText + "\r\n"
-                    + xhr.responseText);
+
+                // Update additional details
+                if (data.afterDisplayPrice) {
+                    var afterDisplayPrice = product.querySelector('.afterDisplayPrice');
+                    if (afterDisplayPrice) afterDisplayPrice.innerHTML = data.afterDisplayPrice;
+                }
+
+                if (data.quantity) {
+                    var qtyInput = product.querySelector('input[name="product_qty"]');
+                    if (qtyInput) {
+                        qtyInput.value = data.quantity;
+                        if (['variable', 'advancedvariable', 'variablesubscriptionproduct'].includes(form.dataset.product_type)) {
+                            qtyInput.setAttribute('value', data.quantity);
+                        }
+                    }
+                }
+
+                if (data.main_image) {
+                    if (data.thumb_image) {
+                        var thumbImage = document.querySelector('.j2store-product-thumb-image-' + product_id);
+                        if (thumbImage) thumbImage.setAttribute('src', data.thumb_image);
+                    }
+
+                    var mainImage = document.querySelector('.j2store-product-main-image-' + product_id);
+                    if (mainImage) mainImage.setAttribute('src', data.main_image);
+
+                    var additionalImages = product.querySelectorAll('.j2store-product-additional-images .additional-mainimage');
+                    additionalImages.forEach(img => img.setAttribute('src', data.main_image));
+                }
+
+                // Update stock status
+                if (typeof data.stock_status !== 'undefined') {
+                    var stockContainer = product.querySelector('.product-stock-container');
+                    if (stockContainer) {
+                        if (data.availability == 1) {
+                            stockContainer.innerHTML = '<span class="instock">' + data.stock_status + '</span>';
+                        } else {
+                            stockContainer.innerHTML = '<span class="outofstock">' + data.stock_status + '</span>';
+                        }
+                    }
+                }
+
+                // Update dimensions
+                if (data.dimensions) {
+                    var dimensions = product.querySelector('.product-dimensions');
+                    if (dimensions) dimensions.innerHTML = data.dimensions;
+                }
+
+                // Update weight
+                if (data.weight) {
+                    var weight = product.querySelector('.product-weight');
+                    if (weight) weight.innerHTML = data.weight;
+                }
+
+                // Trigger custom events after the AJAX call
+                document.body.dispatchEvent(new CustomEvent('after_doAjaxFilter', { detail: { product, data } }));
+                document.body.dispatchEvent(new CustomEvent('after_doAjaxPrice', { detail: { product, data } }));
+            } else {
+                var variableOptions = product.querySelector('#variable-options-' + product_id);
+                if (variableOptions) {
+                    variableOptions.insertAdjacentHTML('afterend', '<div class="j2error">' + data.error + '</div>');
+                }
             }
+        })
+        .catch(error => {
+            console.error(error);
         });
-    })(j2store.jQuery);
 }

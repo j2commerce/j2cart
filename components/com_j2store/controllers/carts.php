@@ -1,20 +1,26 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
 class J2StoreControllerCarts extends F0FController
 {
-
 	protected $cacheableTasks = array();
 
-	public function execute($task) {
+	public function execute($task)
+    {
 		if(in_array($task, array('add', 'edit', 'read'))) {
 			$task = 'browse';
 		}
@@ -32,8 +38,8 @@ class J2StoreControllerCarts extends F0FController
 		return parent::onBeforeGenericTask($task);
 	}
 
-	protected function onBeforeBrowse() {
-
+	protected function onBeforeBrowse()
+    {
 		$format = Factory::getApplication()->input->getString('format', '');
 		$forbidden = array('json', 'csv', 'pdf');
 		if(in_array(strtolower($format), $forbidden)) {
@@ -43,7 +49,8 @@ class J2StoreControllerCarts extends F0FController
 		return parent::onBeforeBrowse();
 	}
 
-	public function addItem() {
+	public function addItem()
+    {
         $platform = J2Store::platform();
 		$app = $platform->application();
 		$model = $this->getModel('Carts', 'J2StoreModel');
@@ -71,7 +78,7 @@ class J2StoreControllerCarts extends F0FController
 			}
             $platform = J2Store::platform();
 			$json['product_redirect'] = $platform->getProductUrl(array('task' => 'view','id' => $this->input->getInt('product_id')));
-            //JRoute::_('index.php?option=com_j2store&view=product&id='.$this->input->getInt('product_id'));
+            //Route::_('index.php?option=com_j2store&view=product&id='.$this->input->getInt('product_id'));
 			echo json_encode($json);
 			$app->close();
 		} else {
@@ -83,7 +90,7 @@ class J2StoreControllerCarts extends F0FController
 			}
 
 			if($json['success']) {
-				$this->setRedirect($cart_url, JText::_('J2STORE_ITEM_ADDED_TO_CART'), 'success');
+				$this->setRedirect($cart_url, Text::_('J2STORE_ITEM_ADDED_TO_CART'), 'success');
 			} elseif($json['error']) {
 				$error = J2Store::utilities()->errors_to_string($json['error']);
 				$this->setRedirect($return_url , $error, 'error');
@@ -92,57 +99,63 @@ class J2StoreControllerCarts extends F0FController
 			}
 		}
 	}
+
 	/**
 	 * force shipping
 	 *   */
-	function forceshipping(){
+	function forceshipping()
+    {
 		$json = array();
 		$app = Factory::getApplication();
 		$json = J2Store::plugin()->eventWithArray('ValidateShipping');
 		echo json_encode($json);
 		$app->close();
 	}
-	function update() {
 
+	function update()
+    {
 		//first clear cache
 		J2Store::utilities()->clear_cache();
 		J2Store::utilities()->nocache();
-		
+
 		$model = $this->getModel('Carts');
 		$result = $model->update();
 		if(isset($result['error'])) {
 			$msg = $result['error'];
 		} else {
-			$msg = JText::_('J2STORE_CART_UPDATED_SUCCESSFULLY');
+			$msg = Text::_('J2STORE_CART_UPDATED_SUCCESSFULLY');
 		}
 		$url = $model->getCartUrl();
 		$this->setRedirect($url, $msg, 'notice');
 	}
 
-	function clearCart(){
+	function clearCart()
+    {
 		J2Store::utilities()->clear_cache();
 		J2Store::utilities()->nocache();
 		$model = $this->getModel('Carts' ,'J2StoreModel');
 		$items = $model->getItems();
 		foreach ($items as $item){
-			$cartitem = F0FTable::getInstance ( 'Cartitem', 'J2StoreTable' )->getClone();
+			$cartitem = J2Store::fof()->loadTable( 'Cartitem', 'J2StoreTable' )->getClone();
             if ($cartitem->delete ( $item->j2store_cartitem_id )) {
                 J2Store::plugin()->event('RemoveFromCart', array(
                     $item
                 ));
             }
 		}
-		$msg = JText::_('J2STORE_CART_CLEAR_SUCCESSFULLY');
+		$msg = Text::_('J2STORE_CART_CLEAR_SUCCESSFULLY');
 		$url = $model->getCartUrl();
 		$this->setRedirect($url, $msg, 'notice');
 	}
-	function remove() {
+
+	function remove()
+    {
 		J2Store::utilities()->clear_cache();
-		J2Store::utilities()->nocache();		
-		
+		J2Store::utilities()->nocache();
+
 		$model = $this->getModel('Carts' ,'J2StoreModel');
 		if($model->deleteItem()) {
-			$msg = JText::_('J2STORE_CART_UPDATED_SUCCESSFULLY');
+			$msg = Text::_('J2STORE_CART_UPDATED_SUCCESSFULLY');
 		}else {
 			$msg = $model->getError();
 		}
@@ -150,14 +163,14 @@ class J2StoreControllerCarts extends F0FController
 		$this->setRedirect($url, $msg, 'notice');
 	}
 
-	function ajaxmini() {
+	function ajaxmini()
+    {
 		J2Store::utilities()->nocache();
 		//initialise system objects
 		$app = Factory::getApplication();
-		$document = $app->getDocument();
-
+		$document = Factory::getApplication()->getDocument();
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $language = $app->getLanguage()->getTag();
+		$language = Factory::getApplication()->getLanguage()->getTag();
 		$query = $db->getQuery(true);
 		$query->select('*')->from('#__modules')->where('module='.$db->q('mod_j2store_cart'))->where('published=1')
             ->where('(language="*" OR language='.$db->q($language).')');
@@ -188,12 +201,12 @@ class J2StoreControllerCarts extends F0FController
 		$app->close();
 	}
 
-	function setcurrency() {
-
+	function setcurrency()
+    {
 		//no cache
 		J2Store::utilities()->clear_cache();
 		J2Store::utilities()->nocache();
-		
+
 		$app = Factory::getApplication();
 		$currency = J2Store::currency();
 		$post = $app->input->getArray($_POST);
@@ -211,24 +224,24 @@ class J2StoreControllerCarts extends F0FController
 		$app->redirect($url);
 	}
 
-	function applyCoupon() {
-
+	function applyCoupon()
+    {
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
-		
-		$model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
+
+		$model = J2Store::fof()->getModel('Carts', 'J2StoreModel');
 		//coupon
 		$post_coupon = $this->input->getString('coupon', '');
 		//first time applying? then set coupon to session
 		if (isset($post_coupon) && !empty($post_coupon)) {
-			F0FModel::getTmpInstance ( 'Coupons', 'J2StoreModel' )->set_coupon($post_coupon);
+			J2Store::fof()->getModel('Coupons', 'J2StoreModel')->set_coupon($post_coupon);
 		}
 
 		//check if we have a redirect
 		$redirect = Factory::getApplication()->input->getBase64('redirect', '');
 		if(!empty($redirect)) {
-			$url = JRoute::_(base64_decode($redirect));
+			$url = Route::_(base64_decode($redirect));
 		}else {
 			$url = $model->getCartUrl();
 		}
@@ -236,121 +249,117 @@ class J2StoreControllerCarts extends F0FController
 		$this->setRedirect($url);
 	}
 
-	function removeCoupon() {
-		
+	function removeCoupon()
+    {
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
 		$model = $this->getModel('Carts' ,'J2StoreModel');
 		//coupon
-		$coupon_model = F0FModel::getTmpInstance ( 'Coupons', 'J2StoreModel' );
+		$coupon_model = J2Store::fof()->getModel ( 'Coupons', 'J2StoreModel' );
 		if($coupon_model->has_coupon()) {
 			$coupon_model->remove_coupon();
-			$msg = JText::_('J2STORE_COUPON_REMOVED_SUCCESSFULLY');
+			$msg = Text::_('J2STORE_COUPON_REMOVED_SUCCESSFULLY');
 			$msgType = 'success';
 		}else {
-			$msg = JText::_('J2STORE_PROBLEM_REMOVING_COUPON');
+			$msg = Text::_('J2STORE_PROBLEM_REMOVING_COUPON');
 			$msgType = 'notice';
 		}
 		$url = $model->getCartUrl();
 		$this->setRedirect($url, $msg, $msgType);
 	}
 
-	function applyVoucher() {
-
+	function applyVoucher()
+    {
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
-		
 
-		$model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
+		$model = J2Store::fof()->getModel('Carts', 'J2StoreModel');
 		//coupon
 		$voucher = $this->input->getString('voucher', '');
 
 		//first time applying? then set coupon to session
 		if (isset($voucher) && !empty($voucher)) {
-			F0FModel::getTmpInstance ( 'Vouchers', 'J2StoreModel' )->set_voucher($voucher);
+			J2Store::fof()->getModel ( 'Vouchers', 'J2StoreModel' )->set_voucher($voucher);
 		}
 
         //check if we have a redirect
         $redirect = Factory::getApplication()->input->getBase64('redirect', '');
         if(!empty($redirect)) {
-            $url = JRoute::_(base64_decode($redirect));
+            $url = Route::_(base64_decode($redirect));
         }else {
             $url = $model->getCartUrl();
         }
 		$this->setRedirect($url);
 	}
 
-	function removeVoucher() {
-	
-		$app = Factory::getApplication();
-		
+	function removeVoucher()
+    {
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
 		J2Store::plugin()->event('BeforeRemoveVoucher');
 		$model = $this->getModel('Carts' ,'J2StoreModel');
 		//coupon
-		$session = $app::getSession();
-		$voucher_model = F0FModel::getTmpInstance ( 'Vouchers', 'J2StoreModel' );
+		$session = Factory::getApplication()->getSession();
+		$voucher_model = J2Store::fof()->getModel ( 'Vouchers', 'J2StoreModel' );
 		if($voucher_model->has_voucher()) {
 			$voucher_model->remove_voucher();
-			$msg = JText::_('J2STORE_VOUCHER_REMOVED_SUCCESSFULLY');
+			$msg = Text::_('J2STORE_VOUCHER_REMOVED_SUCCESSFULLY');
 			$msgType = 'success';
 		}else {
-			$msg = JText::_('J2STORE_PROBLEM_REMOVING_VOUCHER');
+			$msg = Text::_('J2STORE_PROBLEM_REMOVING_VOUCHER');
 			$msgType = 'notice';
 		}
 		$url = $model->getCartUrl();
 		$this->setRedirect($url, $msg, $msgType);
 	}
 
-	function estimate() {
-		
+	function estimate()
+    {
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
-		
+
 		$model = $this->getModel('Carts' ,'J2StoreModel');
 		$app = Factory::getApplication();
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$country_id = $this->input->getInt('country_id', 0);
 		$zone_id = $this->input->getInt('zone_id', 0);
 		$postcode  = $this->input->getString('postcode', 0);
 		$country_required = $this->input->getString('country_required', 1);
 		$zone_required = $this->input->getString('zone_required', 1);
 		$postal_required = $this->input->getString('postal_required', 0);
-		
+
 		$json = array();
-		if(!$country_id && $country_required) $json['error']['country_id'] = JText::_('J2STORE_ESTIMATE_COUNTRY_REQUIRED');
-		if(!$zone_id && $zone_required) $json['error']['zone_id'] = JText::_('J2STORE_ESTIMATE_ZONE_REQUIRED');
-		
+		if(!$country_id && $country_required) $json['error']['country_id'] = Text::_('J2STORE_ESTIMATE_COUNTRY_REQUIRED');
+		if(!$zone_id && $zone_required) $json['error']['zone_id'] = Text::_('J2STORE_ESTIMATE_ZONE_REQUIRED');
+
 		$params = J2Store::config();
 		if(	($postal_required ==1 || $params->get('postalcode_required', 0) ) && empty($postcode)){
-			$json['error']['postcode'] = JText::_('J2STORE_ESTIMATE_POSTALCODE_REQUIRED');
+			$json['error']['postcode'] = Text::_('J2STORE_ESTIMATE_POSTALCODE_REQUIRED');
 		}
-		
+
 		//run a validation plugin event.
 		J2Store::plugin()->event('BeforeShippingEstimate', array(&$json));
-			
-		
+
 		if(!$json) {
-		
+
 			if($country_id || $zone_id) {
 				if($country_id) {
 					$session->set('billing_country_id', $country_id, 'j2store');
 					$session->set('shipping_country_id', $country_id, 'j2store');
 				}
-	
+
 				if($zone_id) {
 					$session->set('billing_zone_id', $zone_id, 'j2store');
 					$session->set('shipping_zone_id', $zone_id, 'j2store');
 				}
-	
+
 				$session->set('force_calculate_shipping', 1, 'j2store');
 			}
-	
+
 			if($postcode) {
 				$session->set('shipping_postcode', $postcode, 'j2store');
 				$session->set('billing_postcode', $postcode, 'j2store');
@@ -358,23 +367,23 @@ class J2StoreControllerCarts extends F0FController
 			$url = $model->getCartUrl();
 			$json['redirect'] = $url;
 		}
-		
+
 		//run after validation plugin event.
 		J2Store::plugin()->event('AfterShippingEstimate', array(&$json));
-		
+
 		echo json_encode($json);
 		$app->close();
 
 	}
 
-	function shippingUpdate() {
-		
+	function shippingUpdate()
+    {
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
-		
+
 		$json = array();
-		
+
 		$model = $this->getModel('Carts' ,'J2StoreModel');
 		$app = Factory::getApplication();
 		$session = $app->getSession();
@@ -390,10 +399,10 @@ class J2StoreControllerCarts extends F0FController
 
 		$redirect = $model->getCartUrl();
 		$json['redirect'] = $redirect;
-		
+
 		//allow plugins to modify the output
 		J2Store::plugin()->event('AfterShippingUpdate', array(&$json));
-		
+
 		echo json_encode($json);
 		$app->close();
 	}
@@ -406,7 +415,7 @@ class J2StoreControllerCarts extends F0FController
         $country_id = $app->input->getInt('country_id');
         if (!isset($set[$country_id])) {
 
-            $country_info = F0FModel::getTmpInstance('Countries', 'J2StoreModel')->getItem($country_id);
+            $country_info = J2Store::fof()->getModel('Countries', 'J2StoreModel')->getItem($country_id);
             $json = array();
             if ($country_info) {
 
@@ -425,7 +434,7 @@ class J2StoreControllerCarts extends F0FController
             }
 
             foreach ($zones as &$zone) {
-                $zone->zone_name = JText::_($zone->zone_name);
+                $zone->zone_name = Text::_($zone->zone_name);
             }
             if (isset($zones) && is_array($zones)) {
                 $json = array(
@@ -449,8 +458,8 @@ class J2StoreControllerCarts extends F0FController
 	 * Method to check file upload
 	 *
 	 */
-	public function upload(){
-
+	public function upload()
+    {
 		$files = $this->input->files->get('file');
 		$json = array();
 		if($files) {
@@ -460,9 +469,9 @@ class J2StoreControllerCarts extends F0FController
 		echo json_encode($json);
 		Factory::getApplication()->close();
 	}
-	
-	public function addtowishlist() {
-		
+
+	public function addtowishlist()
+    {
 		$app = Factory::getApplication();
 		$model = $this->getModel('Carts', 'J2StoreModel');
 		$model->setCartType('wishlist');
@@ -471,5 +480,4 @@ class J2StoreControllerCarts extends F0FController
 		echo json_encode($json);
 		$app->close();
 	}
-
 }

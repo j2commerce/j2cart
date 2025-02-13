@@ -1,19 +1,22 @@
 <?php
 /**
- * --------------------------------------------------------------------------------
- * App Plugin - Currency Updater
- * --------------------------------------------------------------------------------
- * @package     Joomla  3.x
- * @subpackage  J2 Store
- * @author      Alagesan, J2Store <support@j2store.org>
- * @copyright   Copyright (c) 2017 J2Store . All rights reserved.
- * @license     GNU/GPL v3 or latest
- * @link        http://j2store.org
- * --------------------------------------------------------------------------------
+ * @package     Joomla.Plugin
+ * @subpackage  J2Store.app_currencyupdater
  *
- * */
-defined('_JEXEC') or die('Restricted access');
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
+ */
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/library/plugins/app.php');
+
 class plgJ2StoreApp_currencyupdater extends J2StoreAppPlugin
 {
     /**
@@ -26,12 +29,14 @@ class plgJ2StoreApp_currencyupdater extends J2StoreAppPlugin
     {
         parent::__construct( $subject, $config );
     }
+
     function onJ2StoreIsJ2Store4($element){
         if (!$this->_isMe($element)) {
             return null;
         }
         return true;
     }
+
     /**
      * Overriding
      *
@@ -57,10 +62,10 @@ class plgJ2StoreApp_currencyupdater extends J2StoreAppPlugin
     function viewList()
     {
         $app = J2Store::platform()->application();
-        JToolBarHelper::title(JText::_('J2STORE_APP').'-'.JText::_('PLG_J2STORE_'.strtoupper($this->_element)),'j2store-logo');
-        JToolBarHelper::apply ( 'apply' );
-        JToolBarHelper::save ();
-        JToolBarHelper::back('J2STORE_BACK_TO_DASHBOARD', 'index.php?option=com_j2store');
+        ToolbarHelper::title(Text::_('J2STORE_APP').'-'.Text::_('PLG_J2STORE_'.strtoupper($this->_element)),'j2store-logo');
+        ToolbarHelper::apply ( 'apply' );
+        ToolbarHelper::save ();
+        ToolbarHelper::back('J2STORE_BACK_TO_DASHBOARD', 'index.php?option=com_j2store');
         $vars = new \stdClass();
         $fof_helper = J2Store::fof();
         $model = $fof_helper->getModel('AppCurrencyUpdaters', 'J2StoreModel');
@@ -80,11 +85,12 @@ class plgJ2StoreApp_currencyupdater extends J2StoreAppPlugin
      * @param $rows - available currency list
      *
     */
-    public function onJ2StoreUpdateCurrencies($rows, $force){
+    public function onJ2StoreUpdateCurrencies($rows, $force)
+    {
         if(count($rows)){
             $store = J2Store::config();
             $store_currency = $store->get('config_currency');
-            $db = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
             foreach ($rows as $result) {
                 $currency_value = $this->calculateCurrency($store_currency,$result['currency_code'],1);
                 if((float)$currency_value){
@@ -106,23 +112,21 @@ class plgJ2StoreApp_currencyupdater extends J2StoreAppPlugin
      * @param $amount - amount to convert
      * @return float - currency value
     */
-    function calculateCurrency($fromCurrency, $toCurrency, $amount) {
-        //$amount = urlencode($amount);
+    function calculateCurrency($fromCurrency, $toCurrency, $amount)
+    {
         $fromCurrency = urlencode($fromCurrency);
         $toCurrency = urlencode($toCurrency);
-        //$amount = urlencode($amount);
         $from_Currency = urlencode($fromCurrency);
         $to_Currency = urlencode($toCurrency);
         $api_type = $this->params->get('currency_converter_api_type', 'exchangerate_host');
         $converted_amount = 0;
         $url = '';
-        if ($api_type == 'exchangerate_host') {
+        if ($api_type === 'exchangerate_host') {
             $url = "https://api.exchangerate.host/convert?from=$from_Currency&to=".$to_Currency;
-        }elseif ($api_type == 'exchangerate_api') {
+        }elseif ($api_type === 'exchangerate_api') {
             $exchangerate_api = $this->params->get('exchangerate_api_key', '');
             $url = "https://v6.exchangerate-api.com/v6/" . $exchangerate_api . "/pair/" . $from_Currency . "/" . $to_Currency;
-            //$url = "https://free.currencyconverterapi.com/api/v6/convert?q=".$from_Currency."_".$to_Currency;
-        }elseif ($api_type == 'currencyapi') {
+        }elseif ($api_type === 'currencyapi') {
             $currencyapi_api = $this->params->get('currencyapi_key', '');
             $header_request = array('apikey:'.$currencyapi_api);
             $url = "https://api.currencyapi.com/v3/latest?base_currency=$from_Currency&currencies=$to_Currency";
@@ -134,13 +138,13 @@ class plgJ2StoreApp_currencyupdater extends J2StoreAppPlugin
         $get = curl_exec($curl);
         // Close request to clear up some resources
         curl_close($curl);
-        if ($api_type == 'exchangerate_host' && !empty($get)){
+        if ($api_type === 'exchangerate_host' && !empty($get)){
             $currency_data = json_decode($get);
             $converted_amount = isset( $currency_data->info->rate) && !empty( $currency_data->info->rate) ?  $currency_data->info->rate:'';
-        }elseif ($api_type == 'exchangerate_api' && !empty($get)){
+        }elseif ($api_type === 'exchangerate_api' && !empty($get)){
             $currency_data = json_decode($get);
             $converted_amount = isset($currency_data->conversion_rate) && !empty($currency_data->conversion_rate) ? $currency_data->conversion_rate: '';
-        }elseif ($api_type == 'currencyapi' && !empty($get)){
+        }elseif ($api_type === 'currencyapi' && !empty($get)){
             $currency_data = json_decode($get);
             $converted_amount = isset( $currency_data->data->$to_Currency->value ) && !empty( $currency_data->data->$to_Currency->value) ?  $currency_data->data->$to_Currency->value:'';
         }
@@ -154,15 +158,14 @@ class plgJ2StoreApp_currencyupdater extends J2StoreAppPlugin
      * @param $amount - amount to convert
      * @return float - currency value
      */
-    function calculateCurrency1($fromCurrency, $toCurrency, $amount) {
+    function calculateCurrency1($fromCurrency, $toCurrency, $amount)
+    {
         $amount = urlencode($amount);
         $fromCurrency = urlencode($fromCurrency);
         $toCurrency = urlencode($toCurrency);
         $amount = urlencode($amount);
         $from_Currency = urlencode($fromCurrency);
         $to_Currency = urlencode($toCurrency);
-        //$base_url = 'https://finance.google.com/bctzjpnsun/converter';
-        // $url = $base_url."?a=$amount&from=$from_Currency&to=$to_Currency";
         $url = "https://www.msn.com/en-us/money/currencydetails/fi-$from_Currency$to_Currency";
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -182,10 +185,10 @@ class plgJ2StoreApp_currencyupdater extends J2StoreAppPlugin
                 $p_attr = $item->getElementsByTagName("p");
                 $title = $p_attr[0]->getAttribute('title');
                 $first_count = $count;
-                if(strtolower($title) == 'open'){
+                if(strtolower($title) === 'open'){
                     $count = 1;
                 }
-                if(!empty($first_count) && $first_count == $count ){//&& $class == 'right-align  cc-details-value unchanged'
+                if(!empty($first_count) && ($first_count === $count)){
                     $converted_amount = $title;
                     break;
                 }
