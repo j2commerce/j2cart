@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension
+	type="module"
+	method="upgrade"
+	position ="j2store-module-position-3"
+	client="administrator">
+	<name>MOD_J2COMMERCE_CHART</name>
+    <creationDate>JAN 2025</creationDate>
+    <copyright>(C) 2025 J2Commerce, LLC</copyright>
+    <license>GNU General Public License v3 or later versions</license>
+    <authorEmail>support@j2commerce.com</authorEmail>
+    <authorUrl>https://www.j2commerce.com</authorUrl>
+    <version>4.1.0</version>
+	<description>MOD_J2COMMERCE_CHART_DESC</description>
+    <namespace path="src">J2Commerce\Module\Chart</namespace>
+    <files>
+        <folder module="mod_j2commerce_chart">services</folder>
+        <folder>src</folder>
+        <folder>tmpl</folder>
+    </files>
+    <languages>
+        <language tag="en-GB">language/en-GB/mod_j2commerce_chart.ini</language>
+        <language tag="en-GB">language/en-GB/mod_j2commerce_chart.sys.ini</language>
+    </languages>
+    <config>
+        <fields name="params">
+            <fieldset name="basic" addfieldpath="administrator/components/com_j2store/models/fields">
+                <field
+                    name="chart_type"
+                    type="list"
+                    default="daily,monthly,yearly"
+                    multiple="true"
+                    layout="joomla.form.field.list-fancy-select"
+                    label="MOD_J2STORE_CHART_TYPE"
+                    description="MOD_J2STORE_CHART_TYPE_DESC"
+                    >
+                    <option value="daily">MOD_J2STORE_CHART_DAILY</option>
+                    <option value="monthly">MOD_J2STORE_CHART_MONTHLY</option>
+                    <option value="yearly">MOD_J2STORE_CHART_YEARLY</option>
+                </field>
+                <field
+                    name="order_status"
+                    type="orderstatuslist"
+                    multiple="true"
+                    layout="joomla.form.field.list-fancy-select"
+                    label="J2STORE_ORDER_STATUS"
+                />
+            </fieldset>
+            <fieldset name="advanced">
+                <field
+                    name="layout"
+                    class="form-select"
+                    type="modulelayout"
+                    label="JFIELD_ALT_LAYOUT_LABEL"
+                    description="JFIELD_ALT_MODULE_LAYOUT_DESC"
+                />
+                <field
+                    name="moduleclass_sfx"
+                    type="textarea"
+                    label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL"
+                    description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC"
+                    rows="3"
+                />
+                <field
+                    name="owncache"
+                    type="list"
+                    label="COM_MODULES_FIELD_CACHING_LABEL"
+                    description="COM_MODULES_FIELD_CACHING_DESC"
+                    default="1"
+                    filter="integer"
+                >
+                    <option value="1">JGLOBAL_USE_GLOBAL</option>
+                    <option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
+                </field>
+                <field
+                    name="cache_time"
+                    type="number"
+                    label="COM_MODULES_FIELD_CACHE_TIME_LABEL"
+                    description="COM_MODULES_FIELD_CACHE_TIME_DESC"
+                    default="900"
+                    filter="integer"
+                />
+            </fieldset>
+        </fields>
+    </config>
+</extension>

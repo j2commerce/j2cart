@@ -67,7 +67,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
    *
    * @var string
    */
-  protected $componentTitle = 'J2Store Joomla Shopping cart';
+  protected $componentTitle = 'J2Commerce Joomla Shopping Cart';
 
   protected $minimumJoomlaVersion = '4.0.0';
   protected $maximumJoomlaVersion = '5.99.99';
@@ -104,7 +104,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
   protected $installation_queue = array(        // modules => { (folder) => { (module) => { (position), (published) } }* }*
     'modules' => array(
       'admin' => array(
-        'j2store_chart' => array('j2store-module-position-3', 1),
+        'mod_j2commerce_chart' => array('j2store-module-position-3', 1),
         'j2store_stats_mini' => array('j2store-module-position-1', 1),
         'j2store_orders' => array('j2store-module-position-4', 1),
         'j2store_stats' => array('j2store-module-position-5', 1),
@@ -211,11 +211,6 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         $manifest = json_decode($result);
         $version = $manifest->version;
         if (!empty($version)) {
-          // abort if the current J2Store release is older
-          /*if( version_compare( $version, '3.9.99', 'lt' ) ) {
-              $parent->getParent()->abort('You cannot install J2Store Version 4 over the old versions directly. A migration tool should be used first to migrate your previous store data.');
-              return false;
-          }*/
           if (version_compare($version, '3.9.99', 'lt')) {
             if (!ComponentHelper::isEnabled('com_j2migrationchecker')) {
               $parent->getParent()->abort('The J2Store v4 Migration component com_j2migrationchecker was not found. Please install it before updating to J2Store 4.');
