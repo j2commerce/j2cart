@@ -871,6 +871,14 @@ class J2StoreControllerConfigurations extends F0FController
                     'value' => isset($vars->item->backend_voucher_to_shipping) && !is_null($vars->item->backend_voucher_to_shipping) ? $vars->item->backend_voucher_to_shipping : 1,
                     'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES')))
                 ),
+                'export_column_per_product_option' => array(
+                    'label' => 'J2STORE_CONF_EXPORT_PRODUCT_OPTIONS_PER_COLUMN_LABEL',
+                    'type' => 'radiolist',
+                    'name' => 'export_column_per_product_option',
+                    'value' => isset($vars->item->export_column_per_product_option) && !is_null($vars->item->export_column_per_product_option) ? $vars->item->export_column_per_product_option : 0,
+                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'desc' => 'J2STORE_CONF_EXPORT_PRODUCT_OPTIONS_PER_COLUMN_DESC'
+                ),
             )
         );
 
