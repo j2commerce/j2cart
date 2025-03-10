@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS `#__j2store_countries` (
   `country_name` varchar(255) NOT NULL,
   `country_isocode_2` varchar(5) NOT NULL,
   `country_isocode_3` varchar(5) NOT NULL,
+  `country_isocode_num` int(4) NOT NULL DEFAULT '0',
   `enabled` int(11) NOT NULL,
   `ordering` int(11) NOT NULL,
  PRIMARY KEY (`j2store_country_id`)

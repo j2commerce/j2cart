@@ -18,6 +18,7 @@ defined('_JEXEC') or die('Restricted access');
 				<th><?php echo JText::_('J2STORE_COUNTRY_NAME');?></th>
 				<th><?php echo JText::_('J2STORE_COUNTRY_CODE2');?></th>
 				<th><?php echo JText::_('J2STORE_COUNTRY_CODE3');?></th>
+                <th><?php echo JText::_('J2STORE_COUNTRY_CODENUM');?></th>
 			</tr>
 		</thead>
 		<tfoot>
@@ -36,12 +37,13 @@ defined('_JEXEC') or die('Restricted access');
 				<td><?php echo $item->country_name;?></td>
 				<td><?php echo $item->country_isocode_2;?></td>
 				<td><?php echo $item->country_isocode_3;?></td>
+                <td><?php echo $item->country_isocode_num;?></td>
 			</tr>
 			<?php endforeach;?>
 
 			<?php else:?>
 			<tr>
-				<td colspan="4">
+				<td colspan="5">
 					<?php echo JText::_('J2STORE_NO_ITEMS_FOUND');?>
 				</td>
 			</tr>
