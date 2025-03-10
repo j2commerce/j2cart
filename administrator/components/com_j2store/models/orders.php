@@ -1,22 +1,31 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined ( '_JEXEC' ) or die ();
 
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Date\Date;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\Utilities\ArrayHelper;
 
-class J2StoreModelOrders extends F0FModel {
-
+class J2StoreModelOrders extends F0FModel
+{
 	protected $_order = null;
 
-	protected $_orders = array();
+	protected $_orders = [];
 
-	protected function onAfterGetItem(&$record) {
-		$status = F0FModel::getTmpInstance('Orderstatuses', 'J2StoreModel')->getItem($record->order_state_id);
+	protected function onAfterGetItem(&$record)
+    {
+		$status = J2Store::fof()->getModel('Orderstatuses', 'J2StoreModel')->getItem($record->order_state_id);
 		$record->orderstatus_name = $status->orderstatus_name;
 		$record->orderstatus_cssclass = $status->orderstatus_cssclass;
 	}
@@ -32,60 +41,62 @@ class J2StoreModelOrders extends F0FModel {
 		J2Store::plugin()->event('ProcessOrderList', array(&$order_list));
 	}
 
-	public function populateOrder($cartitems = array(), $order_id = null) {
-
-		$orderTable = F0FTable::getAnInstance('Order', 'J2StoreTable')->getClone();
+	public function populateOrder($cartitems = array(), $order_id = null)
+    {
+		$orderTable = J2Store::fof()->loadTable('Order', 'J2StoreTable')->getClone();
 
 		if ( $order_id > 0 && ( $orderTable->load(array('order_id'=>$order_id))) && $orderTable->has_status( array( 5 ) ) ) {
 			$order = $orderTable;
 			//Customer is resuming an order. So delete the children. We have to re-initialise the order object
 			$order->updateOrder();
 		}else{
-			$order = F0FTable::getAnInstance('Order', 'J2StoreTable')->getClone();
+			$order = J2Store::fof()->loadTable('Order', 'J2StoreTable')->getClone();
 			$order->is_update = 0;
 		}
 
 		//get the cart items
 		if(is_null($this->_order)) {
 			if(!$cartitems) {
-				$cart_model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
+				$cart_model = J2Store::fof()->getModel('Carts', 'J2StoreModel');
 				$cart_model->setCartType('cart');
 				$cartitems = $cart_model->getItems();
-				//$cartitems = F0FModel::getTmpInstance('Carts', 'J2StoreModel')->getItems();
 			}
-			$items = F0FModel::getTmpInstance('OrderItems', 'J2StoreModel')->setItems($cartitems)->getItems();
+			$items = J2Store::fof()->getModel('OrderItems', 'J2StoreModel')->setItems($cartitems)->getItems();
 
 			$order->setItems($items);
 			$order->getTotals();
 			$this->_order = $order;
 		}
+
 		return $this;
 	}
 
-	function getOrder() {
+	function getOrder()
+    {
 		return $this->_order;
 	}
 
-	function initOrder($order_id = null) {
-		$cart_model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
+	function initOrder($order_id = null)
+    {
+		$cart_model = J2Store::fof()->getModel('Carts', 'J2StoreModel');
 		$cart_model->setCartType('cart');
 		$items = $cart_model->getItems();
-		//$items = F0FModel::getTmpInstance('Carts', 'J2StoreModel')->getItems();
 		$this->populateOrder($items, $order_id);
+
 		return $this;
 	}
 
-	function validateOrder(&$order) {
+	function validateOrder(&$order)
+    {
+		$app = Factory::getApplication();
+		$user = $app->getIdentity();
+		$session = $app->getSession();
 
-		$app = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$session = JFactory::getSession();
-
-		$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
+		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 
 		//check if items are in cart
 		if($order->getItemCount() < 1) {
-			throw new Exception(JText::_('J2STORE_CART_NO_ITEMS'));
+			throw new \Exception(Text::_('J2STORE_CART_NO_ITEMS'));
 			return false;
 		}
 
@@ -107,7 +118,7 @@ class J2StoreModelOrders extends F0FModel {
 		if ($isShippingEnabled = $order->isShippingEnabled())
 		{
 			if (empty($shipping_address)) {
-				throw new Exception(JText::_('J2STORE_CHECKOUT_NO_SHIPPING_ADDRESS_FOUND'));
+				throw new \Exception(Text::_('J2STORE_CHECKOUT_NO_SHIPPING_ADDRESS_FOUND'));
 				return false;
 			}
 		}else {
@@ -125,15 +136,15 @@ class J2StoreModelOrders extends F0FModel {
 		}
 
 		if (empty($billing_address)) {
-			throw new Exception(JText::_('J2STORE_CHECKOUT_NO_BILLING_ADDRESS_FOUND'));
+			throw new \Exception(Text::_('J2STORE_CHECKOUT_NO_BILLING_ADDRESS_FOUND'));
 			return false;
 		}
 
 		return true;
 	}
 
-	function loadItemsTemplate($order,$receiver_type = '*') {
-
+	function loadItemsTemplate($order,$receiver_type = '*')
+    {
 		static $sets;
 		if ( !is_array( $sets ) )
 		{
@@ -142,11 +153,11 @@ class J2StoreModelOrders extends F0FModel {
 		if ( !isset( $sets[$order->order_id] ) )
 		{
 
-			$app = JFactory::getApplication();
+			$app = Factory::getApplication();
 			$html = ' ';
 
 			if(!empty($order->customer_language)) {
-				$lang = JFactory::getLanguage();
+				$lang = $app->getLanguage();
 				$lang->load('com_j2store', JPATH_ADMINISTRATOR, $order->customer_language);
 				$lang->load('com_j2store', JPATH_SITE, $order->customer_language);
 			}
@@ -164,14 +175,16 @@ class J2StoreModelOrders extends F0FModel {
 			$html = $view->getOutput('orderitems');
 			$sets[$order->order_id] = $html;
 		}
+
 		return $sets[$order->order_id];
 	}
 
-	public function buildQuery($overrideLimites = false) {
-        $db = Factory::getContainer()->get('DatabaseDriver');
+	public function buildQuery($overrideLimites = false)
+    {
+        $db = $this->_db;
 		$query = parent::buildQuery($overrideLimites);
-		$query->select($this->_db->qn('#__j2store_orderstatuses.orderstatus_name'));
-		$query->select($this->_db->qn('#__j2store_orderstatuses.orderstatus_cssclass'));
+		$query->select($db->quoteName('#__j2store_orderstatuses.orderstatus_name'));
+		$query->select($db->quoteName('#__j2store_orderstatuses.orderstatus_cssclass'));
 		$query->select("CASE WHEN #__j2store_orders.invoice_prefix IS NULL or #__j2store_orders.invoice_number = 0 THEN
 						#__j2store_orders.j2store_order_id
   					ELSE
@@ -179,10 +192,9 @@ class J2StoreModelOrders extends F0FModel {
 					END
 				 	AS invoice");
 		$query->join('LEFT OUTER', '#__j2store_orderstatuses ON #__j2store_orders.order_state_id = #__j2store_orderstatuses.j2store_orderstatus_id');
-		$query->select($this->_db->qn('#__j2store_orderinfos.billing_first_name'));
-		$query->select($this->_db->qn('#__j2store_orderinfos.billing_last_name'));
+		$query->select($db->quoteName('#__j2store_orderinfos.billing_first_name'));
+		$query->select($db->quoteName('#__j2store_orderinfos.billing_last_name'));
 		$query->join('LEFT OUTER', '#__j2store_orderinfos ON #__j2store_orders.order_id = #__j2store_orderinfos.order_id');
-
 
 		$limit_orderstatuses = $this->getState('orderstatuses', '*');
 		$limit_orderstatuses = explode(',', $limit_orderstatuses);
@@ -194,10 +206,8 @@ class J2StoreModelOrders extends F0FModel {
 		return $query;
 	}
 
-
-
-	function getOrderList($overrideLimits = false, $group = '') {
-
+	function getOrderList($overrideLimits = false, $group = '')
+    {
 		if (empty($this->_orders))
 		{
 			$query = $this->getOrderListQuery($overrideLimits);
@@ -208,7 +218,7 @@ class J2StoreModelOrders extends F0FModel {
 				$limit = $this->getState('limit');
                 try {
                     $this->_orders = $this->_getList((string) $query, $limitstart, $limit, $group);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
 
                 }
 			}
@@ -216,7 +226,7 @@ class J2StoreModelOrders extends F0FModel {
 			{
                 try {
                     $this->_orders = $this->_getList((string) $query, 0, 0, $group);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
 
                 }
 			}
@@ -225,14 +235,15 @@ class J2StoreModelOrders extends F0FModel {
 		return $this->_orders;
 	}
 
-	function getOrderListQuery($overrideLimits = false, $group = '') {
+	function getOrderListQuery($overrideLimits = false, $group = '')
+    {
 		$db = $this->_db;
 
 		$query = $db->getQuery(true)->select('#__j2store_orders.*')->from('#__j2store_orders');
 
-		$query->select($this->_db->qn('#__j2store_orderstatuses.orderstatus_name'));
+		$query->select($this->_db->quoteName('#__j2store_orderstatuses.orderstatus_name'));
 
-		$query->select($this->_db->qn('#__j2store_orderstatuses.orderstatus_cssclass'));
+		$query->select($this->_db->quoteName('#__j2store_orderstatuses.orderstatus_cssclass'));
 
 		$query->select("CASE WHEN #__j2store_orders.invoice_prefix IS NULL or #__j2store_orders.invoice_number = 0 THEN
 				#__j2store_orders.j2store_order_id
@@ -257,33 +268,35 @@ class J2StoreModelOrders extends F0FModel {
 		$query->select(' ( SELECT #__j2store_zones.zone_name FROM #__j2store_zones WHERE #__j2store_zones.j2store_zone_id = #__j2store_orderinfos.billing_zone_id ) as billingzone_name');
 		$query->select(' ( SELECT #__j2store_zones.zone_name FROM #__j2store_zones WHERE #__j2store_zones.j2store_zone_id = #__j2store_orderinfos.shipping_zone_id ) as shippingzone_name');
 
-		$query->select($this->_db->qn('#__j2store_orderdiscounts.discount_code'));
-		$query->join('LEFT OUTER', '#__j2store_orderdiscounts ON #__j2store_orders.order_id = #__j2store_orderdiscounts.order_id AND #__j2store_orderdiscounts.discount_type = '.$db->q('coupon'));
+		$query->select($this->_db->quoteName('#__j2store_orderdiscounts.discount_code'));
+		$query->join('LEFT OUTER', '#__j2store_orderdiscounts ON #__j2store_orders.order_id = #__j2store_orderdiscounts.order_id AND #__j2store_orderdiscounts.discount_type = '.$db->quote('coupon'));
 
-		$query->select($this->_db->qn('#__j2store_ordershippings.ordershipping_name'));
-		$query->select($this->_db->qn('#__j2store_ordershippings.ordershipping_tracking_id'));
+		$query->select($this->_db->quoteName('#__j2store_ordershippings.ordershipping_name'));
+		$query->select($this->_db->quoteName('#__j2store_ordershippings.ordershipping_tracking_id'));
 		$query->join('LEFT OUTER', '#__j2store_ordershippings ON #__j2store_orders.order_id = #__j2store_ordershippings.order_id');
 
 		$this->_buildTotalQueryWhere($query);
 		$this->_buildQueryOrderBy($query);
         J2Store::plugin()->event('AfterOrderListQuery',array(&$query));
-		//echo $query;
+
 		return $query;
 	}
 
-	function buildCountQuery() {
+	function buildCountQuery()
+    {
 		$subquery = $this->getOrderListQuery();
 		$subquery->clear('order');
 		$query = $this->_db->getQuery(true)
 		->select('COUNT(*)')
 		->from("(" . (string) $subquery . ") AS a");
+
 		return $query;
 	}
 
-	function getOrdersTotal() {
-
+	function getOrdersTotal()
+    {
 		//run some basic ACL checks
-		$user = JFactory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		if(!$user->authorise('j2store.vieworder', 'com_j2store')) {
 			return '';
 		}
@@ -301,16 +314,18 @@ class J2StoreModelOrders extends F0FModel {
 		$this->_buildTotalQueryWhere($query);
 		//echo $query;
 		$db->setQuery($query);
+
 		return $db->loadResult();
 	}
 
-	protected function _buildQueryOrderBy(&$query){
-		$db =$this->_db;
+	protected function _buildQueryOrderBy(&$query)
+    {
+		$db = $this->_db;
 		if(!empty($this->state->filter_order) && in_array($this->state->filter_order,array('invoice','order_id','created_on','order_total','orderpayment_type'))) {
             if(!in_array(strtolower($this->state->filter_order_Dir),array('asc','desc'))){
                 $this->state->filter_order_Dir = 'desc';
             }
-            $query->order($db->qn($this->state->filter_order).' '.$this->state->filter_order_Dir);
+            $query->order($db->quoteName($this->state->filter_order).' '.$this->state->filter_order_Dir);
 			//$query->order($this->state->filter_order.' '.$this->state->filter_order_Dir);
 		}
 		$query->order('#__j2store_orders.created_on DESC');
@@ -323,7 +338,7 @@ class J2StoreModelOrders extends F0FModel {
 				'title'			=> $this->getState('title','','string'),
 				'user_id'		=> $this->getState('user_id',0,'int'),
 				'order_id'		=> $this->getState('order_id',0,'int'),
-				'orderstate'		=> $this->getState('orderstate',0,'int'),
+				'orderstate'	=> $this->getState('orderstate',0,'int'),
 				'processor'		=> $this->getState('processor','','string'),
 				'paykey'		=> $this->getState('paykey','','string'),
 				'since'			=> $this->getState('since',0,'string'),
@@ -332,38 +347,36 @@ class J2StoreModelOrders extends F0FModel {
 				'groupbylevel'	=> $this->getState('groupbylevel',0,'int'),
 				'moneysum'		=> $this->getState('moneysum',0,'float'),
 				'coupon_id'		=> $this->getState('coupon_id',0,'int'),
-				'coupon_code'		=> $this->getState('coupon_code',0,'string'),
+				'coupon_code'	=> $this->getState('coupon_code',0,'string'),
 				'nozero'		=> $this->getState('nozero',0,'int'),
-				'frominvoice'		=> $this->getState('frominvoice',0,'int'),
+				'frominvoice'	=> $this->getState('frominvoice',0,'int'),
 				'toinvoice'		=> $this->getState('toinvoice',0,'int'),
-				'orderstatus'		=> $this->getState('orderstatus',array()),
-                'token'		=> $this->getState('token',''),
-                'user_email'		=> $this->getState('user_email',''),
+				'orderstatus'	=> $this->getState('orderstatus',array()),
+                'token'		    => $this->getState('token',''),
+                'user_email'	=> $this->getState('user_email',''),
 		);
 	}
 
-	function _buildTotalQueryWhere(&$query){
-		$app = JFactory::getApplication();
-		$db =$this->_db;
-		jimport('joomla.utilities.date');
+	function _buildTotalQueryWhere(&$query)
+    {
+		$app = Factory::getApplication();
+		$db = $this->_db;
 		$state = $this->getFilterValues();
 
 		$loadChildOrders = $app->input->getInt('parent');
 		if($loadChildOrders){
 			$query->where(
-				$db->qn('#__j2store_orders').'.'.$db->qn('parent_id').'='.$db->q($loadChildOrders)
+				$db->quoteName('#__j2store_orders').'.'.$db->quoteName('parent_id').'='.$db->quote($loadChildOrders)
 			);
 		} else {
 			$query->where(
-				$db->qn('#__j2store_orders').'.'.$db->qn('order_type').'='.$db->q('normal')
+				$db->quoteName('#__j2store_orders').'.'.$db->quoteName('order_type').'='.$db->quote('normal')
 			);
 		}
 
-
-
 		if(isset($state->orderstatus) && !empty($state->orderstatus) && is_array($state->orderstatus)) {
 			if(!in_array('*' ,$state->orderstatus)){
-				$query->where($db->qn('#__j2store_orders').'.'.$db->qn('order_state_id').' IN ('.
+				$query->where($db->quoteName('#__j2store_orders').'.'.$db->quoteName('order_state_id').' IN ('.
 					implode(',',$state->orderstatus).')');
 			}
 		}
@@ -377,43 +390,41 @@ class J2StoreModelOrders extends F0FModel {
 				$s = strtoupper($s);
 				//5=incomplete, 4=pending, 3=failed, 1=confirmed
 			//	if(!in_array($s, array(1,3,4,5))) continue;
-				$states[] = $db->q($s);
+				$states[] = $db->quote($s);
 			}
 
 			if(!empty($states)) {
 
 				$query->where(
-						$db->qn('#__j2store_orders').'.'.$db->qn('order_state_id').' IN ('.
+						$db->quoteName('#__j2store_orders').'.'.$db->quoteName('order_state_id').' IN ('.
 						implode(',',$states).')'
 				);
 			}
 		}
 
-
 		if($state->paykey) {
 			$query->where(
-					$db->qn('#__j2store_orders').'.'.$db->qn('orderpayment_type').' LIKE '.
-					$db->q('%'.$state->paykey.'%')
+					$db->quoteName('#__j2store_orders').'.'.$db->quoteName('orderpayment_type').' LIKE '.
+					$db->quote('%'.$state->paykey.'%')
 			);
 		}
 
-
 		if($state->user_id) {
 			$query->where(
-					$db->qn('#__j2store_orders').'.'.$db->qn('user_id').'='.$db->q($state->user_id)
+					$db->quoteName('#__j2store_orders').'.'.$db->quoteName('user_id').'='.$db->quote($state->user_id)
 			);
 		}
 		if($state->token){
             $query->where(
-                $db->qn('#__j2store_orders').'.'.$db->qn('token').'='.$db->q($state->token)
+                $db->quoteName('#__j2store_orders').'.'.$db->quoteName('token').'='.$db->quote($state->token)
             );
         }
 		if($state->user_email){
             $query->where(
-                $db->qn('#__j2store_orders').'.'.$db->qn('user_email').'='.$db->q($state->user_email)
+                $db->quoteName('#__j2store_orders').'.'.$db->quoteName('user_email').'='.$db->quote($state->user_email)
             );
         }
-        $tz = JFactory::getConfig()->get('offset');
+        $tz = Factory::getConfig()->get('offset');
 		//since
         $since = trim($state->since);
 
@@ -427,8 +438,8 @@ class J2StoreModelOrders extends F0FModel {
             $since = $this->convert_time_to_utc($since);
 			// Filter from-to dates
 			$query->where(
-					$db->qn('#__j2store_orders').'.'.$db->qn('created_on').' >= '.
-					$db->q($since)
+					$db->quoteName('#__j2store_orders').'.'.$db->quoteName('created_on').' >= '.
+					$db->quote($since)
 			);
 		}
 
@@ -444,22 +455,22 @@ class J2StoreModelOrders extends F0FModel {
 			}
             $until = $this->convert_time_to_utc($until);
 			$query->where(
-					$db->qn('#__j2store_orders').'.'.$db->qn('created_on').' <= '.
-					$db->q($until)
+					$db->quoteName('#__j2store_orders').'.'.$db->quoteName('created_on').' <= '.
+					$db->quote($until)
 			);
 		}
 		// No-zero toggle
 		if(!empty($state->nozero)) {
 			$query->where(
-					$db->qn('#__j2store_orders').'.'.$db->qn('order_total').' > '.
-					$db->q('0')
+					$db->quoteName('#__j2store_orders').'.'.$db->quoteName('order_total').' > '.
+					$db->quote('0')
 			);
 		}
 
 	/* 	if(!empty($state->moneysum)) {
 			$query->where(
-					$db->qn('#__j2store_orders').'.'.$db->qn('order_total').' = '.
-					$db->q($state->moneysum)
+					$db->quoteName('#__j2store_orders').'.'.$db->quoteName('order_total').' = '.
+					$db->quote($state->moneysum)
 			);
 		} */
 
@@ -470,66 +481,68 @@ class J2StoreModelOrders extends F0FModel {
          // ELSE 1=1
       //END
 			$query->where('CASE WHEN '.
-					$db->qn('#__j2store_orders').'.'.$db->qn('invoice_number').' = 0 THEN '.$db->qn('#__j2store_orders').'.'.$db->qn('j2store_order_id').' >= '.$db->q($state->frominvoice).
-					' ELSE ' .$db->qn('#__j2store_orders').'.'.$db->qn('invoice_number').' >= '.$db->q($state->frominvoice) .' END '
+					$db->quoteName('#__j2store_orders').'.'.$db->quoteName('invoice_number').' = 0 THEN '.$db->quoteName('#__j2store_orders').'.'.$db->quoteName('j2store_order_id').' >= '.$db->quote($state->frominvoice).
+					' ELSE ' .$db->quoteName('#__j2store_orders').'.'.$db->quoteName('invoice_number').' >= '.$db->quote($state->frominvoice) .' END '
 			);
 		}
 
 		//to invoice number
 		if($state->toinvoice) {
 			$query->where('CASE WHEN '.
-				$db->qn('#__j2store_orders').'.'.$db->qn('invoice_number').' = 0 THEN '.$db->qn('#__j2store_orders').'.'.$db->qn('j2store_order_id').' <= '.$db->q($state->toinvoice).
-				' ELSE ' .$db->qn('#__j2store_orders').'.'.$db->qn('invoice_number').' <= '.$db->q($state->toinvoice) .' END '
+				$db->quoteName('#__j2store_orders').'.'.$db->quoteName('invoice_number').' = 0 THEN '.$db->quoteName('#__j2store_orders').'.'.$db->quoteName('j2store_order_id').' <= '.$db->quote($state->toinvoice).
+				' ELSE ' .$db->quoteName('#__j2store_orders').'.'.$db->quoteName('invoice_number').' <= '.$db->quote($state->toinvoice) .' END '
 			);
 
 			/*$query->where(
-					$db->qn('#__j2store_orders').'.'.$db->qn('invoice_number').' <= '.$db->q($state->toinvoice)
+					$db->quoteName('#__j2store_orders').'.'.$db->quoteName('invoice_number').' <= '.$db->quote($state->toinvoice)
 			);*/
 		}
 
 		if($state->search){
 			$search = '%'.trim($state->search).'%';
-			$subquery = '( select order_id from #__j2store_orderitems where #__j2store_orderitems.orderitem_sku LIKE '.$db->q($search).' AND #__j2store_orderitems.order_id = '.$db->qn('#__j2store_orders').'.'.$db->qn('order_id').' Group by #__j2store_orderitems.order_id )';
+			$subquery = '( select order_id from #__j2store_orderitems where #__j2store_orderitems.orderitem_sku LIKE '.$db->quote($search).' AND #__j2store_orderitems.order_id = '.$db->quoteName('#__j2store_orders').'.'.$db->quoteName('order_id').' Group by #__j2store_orderitems.order_id )';
 			$query->where('('.
-			 				$db->qn('#__j2store_orders').'.'.$db->qn('order_id').' LIKE '.$db->q($search).' OR '.
-							$db->qn('#__j2store_orders').'.'.$db->qn('order_id').' = '.$subquery.' OR '.
-			 				$db->qn('#__j2store_orders').'.'.$db->qn('j2store_order_id').' LIKE '.$db->q($search).'OR '.
-			 				$db->qn('#__j2store_orders').'.'.$db->qn('user_email').' LIKE '.$db->q($search).'OR '.
-			 				$db->qn('#__j2store_orders').'.'.$db->qn('order_state').' LIKE '.$db->q($search).'OR '.
-	 		 				$db->qn('#__j2store_orders').'.'.$db->qn('orderpayment_type').' LIKE '.$db->q($search).'OR'.
-			 				' CONCAT ('.$db->qn('#__j2store_orderinfos').'.'.$db->qn('billing_first_name').', " ", '.$db->qn('#__j2store_orderinfos').'.'.$db->qn('billing_last_name').') LIKE '.$db->q($search).'OR '.
-			 				$db->qn('#__j2store_orderinfos').'.'.$db->qn('billing_first_name').' LIKE '.$db->q($search).'OR'.
-			 				$db->qn('#__j2store_orderinfos').'.'.$db->qn('billing_last_name').' LIKE '.$db->q($search)
-				.')'
-			 		) ;
+                    $db->quoteName('#__j2store_orders').'.'.$db->quoteName('order_id').' LIKE '.$db->quote($search).' OR '.
+                    $db->quoteName('#__j2store_orders').'.'.$db->quoteName('order_id').' = '.$subquery.' OR '.
+                    $db->quoteName('#__j2store_orders').'.'.$db->quoteName('j2store_order_id').' LIKE '.$db->quote($search).'OR '.
+                    $db->quoteName('#__j2store_orders').'.'.$db->quoteName('user_email').' LIKE '.$db->quote($search).'OR '.
+                    $db->quoteName('#__j2store_orders').'.'.$db->quoteName('order_state').' LIKE '.$db->quote($search).'OR '.
+                    $db->quoteName('#__j2store_orders').'.'.$db->quoteName('orderpayment_type').' LIKE '.$db->quote($search).'OR'.
+                    ' CONCAT ('.$db->quoteName('#__j2store_orderinfos').'.'.$db->quoteName('billing_first_name').', " ", '.$db->quoteName('#__j2store_orderinfos').'.'.$db->quoteName('billing_last_name').') LIKE '.$db->quote($search).'OR '.
+                    $db->quoteName('#__j2store_orderinfos').'.'.$db->quoteName('billing_first_name').' LIKE '.$db->quote($search).'OR'.
+                    $db->quoteName('#__j2store_orderinfos').'.'.$db->quoteName('billing_last_name').' LIKE '.$db->quote($search)
+                .')'
+            ) ;
 		}
 
 		if($state->coupon_code){
 			$query->where(
-					$db->qn('#__j2store_orderdiscounts').'.'.$db->qn('discount_code').' LIKE '.
-					$db->q('%'.$state->coupon_code.'%')
+					$db->quoteName('#__j2store_orderdiscounts').'.'.$db->quoteName('discount_code').' LIKE '.
+					$db->quote('%'.$state->coupon_code.'%')
 			);
 			//set the type to coupon
-			$query->where($db->qn('#__j2store_orderdiscounts').'.'.$db->qn('discount_type').' = '.$db->q('coupon'));
+			$query->where($db->quoteName('#__j2store_orderdiscounts').'.'.$db->quoteName('discount_type').' = '.$db->quote('coupon'));
 		}
 	}
 
     function convert_time_to_utc($datetime, $format = 'Y-m-d H:i:s', $modify = '')
     {
-        $tz = JFactory::getConfig()->get('offset');
-        $from_date = JFactory::getDate($datetime,$tz);
+        $tz = Factory::getConfig()->get('offset');
+        $from_date = Factory::getDate($datetime,$tz);
         $from_date->format($format);
         $timezone = new DateTimeZone('UTC');
         $from_date->setTimezone($timezone);
+
         return $from_date->format($format);
     }
 
-	public function export($data=array(), $auto=false) {
-		$app = JFactory::getApplication();
-		//$dispatcher = JDispatcher::getInstance();
-		JPluginHelper::importPlugin ('j2store');
+	public function export($data=array(), $auto=false)
+    {
+		$app = Factory::getApplication();
+		PluginHelper::importPlugin ('j2store');
 		$currency = J2Store::currency();
 
+        $j2params = J2Store::config();
 
 		if($auto) {
 			//trigger the plugin event
@@ -539,9 +552,7 @@ class J2StoreModelOrders extends F0FModel {
 			{
 				$data = array_merge($data, $results[0]);
 			}
-
 		}
-
 
 		$paystate = '';
 		//order status filter
@@ -563,8 +574,31 @@ class J2StoreModelOrders extends F0FModel {
 			$max = 1;
             $platform = J2Store::platform();
 			$new_orders =array();
+
+            // Create product option columns when requested
+            // Needs a first pass to get options for all products
+            // May significantly slow down the export on a large amount of orders
+            if ($j2params->get('export_column_per_product_option', 0))
+            {
+                $option_columns = [];
+
+                foreach ($rows as $key => $order)
+                {
+                    $orderTable = J2Store::fof()->loadTable('Order', 'J2StoreTable')->getClone();
+                    $orderTable->load($order->j2store_order_id);
+                    $orderitems = $orderTable->getItems();
+
+                    foreach ($orderitems as $item)
+                    {
+                        $columns_from_options_item = $this->gatherColumnsFromProductOptions($item);
+                        $option_columns            = array_merge($option_columns, $columns_from_options_item);
+                    }
+                    $option_columns = array_unique($option_columns);
+                }
+            }
+
 			foreach ($rows as $key => $order) {
-				$orderTable = F0FTable::getAnInstance('Order','J2StoreTable')->getClone();
+				$orderTable = J2Store::fof()->loadTable('Order','J2StoreTable')->getClone();
 				$orderTable->load($order->j2store_order_id);
 				$orderitems = $orderTable->getItems();
 				$new_order = array();
@@ -608,8 +642,8 @@ class J2StoreModelOrders extends F0FModel {
 
 				//$new_order = array_merge($new_order, $new_order);
 
-				$new_order['orderstatus_name'] = JText::_($order->orderstatus_name);
-				$new_order['orderpayment_type'] = JText::_($order->orderpayment_type);
+				$new_order['orderstatus_name'] = Text::_($order->orderstatus_name);
+				$new_order['orderpayment_type'] = Text::_($order->orderpayment_type);
 
 				//now process order items
 				$i = 1;
@@ -621,7 +655,21 @@ class J2StoreModelOrders extends F0FModel {
 					//$new_order['product_type_'.$i] =$item->product_type;
 					$new_order['product_sku_'.$i] =$item->orderitem_sku;
 					$new_order['product_name_'.$i] =$item->orderitem_name;
-					$new_order['product_options_'.$i] =$this->getItemDescription($item);
+
+                    if (!$j2params->get('export_column_per_product_option', 0)) {
+                        // product options in the same column
+                        $new_order['product_options_' . $i] = $this->getItemDescription($item);
+                    } else {
+                        // product options each have their own column
+                        if (!empty($option_columns)) {
+                            foreach ($option_columns as $column) {
+                                $new_order['product_options_' . $i . ' ' . $column] = $this->getValuesForProductOptionsColumns($item, $column);
+                            }
+                        } else {
+                            $new_order['product_options_'.$i] = '';
+                        }
+                    }
+
 					$new_order['product_quantity_'.$i] =$item->orderitem_quantity;
 					$new_order['product_tax_'.$i] =$currency->format($item->orderitem_tax, $order->currency_code,$order->currency_value, false);
 					$new_order['product_total_with_tax_'.$i] =$currency->format($item->orderitem_finalprice_with_tax, $order->currency_code,$order->currency_value, false);
@@ -657,13 +705,41 @@ class J2StoreModelOrders extends F0FModel {
 			}
 			return $new_orders;
 		}
+
 		return true;
 	}
 
+    function gatherColumnsFromProductOptions($item)
+    {
+        $columns = [];
 
-	function formatCustomFields($type, $data_field, &$order) {
+        if (!empty($item->orderitemattributes) && count($item->orderitemattributes) > 0) {
+            foreach ($item->orderitemattributes as $option) {
+                if (!in_array($option->orderitemattribute_name, $columns)) {
+                    $columns[] = $option->orderitemattribute_name;
+                }
+            }
+        }
 
-		$address = F0FTable::getAnInstance('Address', 'J2StoreTable');
+        return $columns;
+    }
+
+    function getValuesForProductOptionsColumns($item, $column)
+    {
+        if (!empty($item->orderitemattributes) && count($item->orderitemattributes) > 0) {
+            foreach ($item->orderitemattributes as $option) {
+                if ($option->orderitemattribute_name === $column) {
+                    return $option->orderitemattribute_value;
+                }
+            }
+        }
+
+        return '';
+    }
+
+	function formatCustomFields($type, $data_field, &$order)
+    {
+		$address = J2Store::fof()->loadTable('Address', 'J2StoreTable');
 		$fields = J2Store::getSelectableBase()->getFields($type, $address, 'address', '', true);
 		foreach($fields as $field) {
 			$order[$type.'_'.strtolower($field->field_namekey)] = '';
@@ -672,12 +748,11 @@ class J2StoreModelOrders extends F0FModel {
 		try{
             $registry = J2Store::platform()->getRegistry(stripslashes($data_field));
             $custom_fields = $registry->toObject();
-        }catch (Exception $e){
-            //do nothings
+        }catch (\Exception $e){
+            // do nothing
         }
 
-
-		$row = F0FTable::getAnInstance('Orderinfo','J2StoreTable');
+		$row = J2Store::fof()->loadTable('Orderinfo','J2StoreTable');
 		if(isset($custom_fields) && $custom_fields) {
 			foreach($custom_fields as $namekey=>$field) {
 				if(!property_exists($row, $type.'_'.strtolower($namekey)) && !property_exists($row, 'user_'.$namekey) && $namekey !='country_id' && $namekey != 'zone_id' && $namekey != 'option' && $namekey !='task' && $namekey != 'view' && $namekey !='email' ) {
@@ -686,7 +761,7 @@ class J2StoreModelOrders extends F0FModel {
 						if(is_array($field->value)) {
 							$k = count($field->value); $i = 1;
 							foreach($field->value as $value) {
-								$string .=JText::_($value);
+								$string .=Text::_($value);
 								if($i != $k) {
 									$string .='|';
 								}
@@ -695,10 +770,10 @@ class J2StoreModelOrders extends F0FModel {
 
 						}elseif(is_object($field->value)) {
                             //convert the object into an array
-                            $obj_array = JArrayHelper::fromObject($field->value);
+                            $obj_array = ArrayHelper::fromObject($field->value);
                             $k = count($obj_array); $i = 1;
                             foreach($obj_array as $value) {
-                                $string .=JText::_($value);
+                                $string .=Text::_($value);
                                 if($i != $k) {
                                     $string .='|';
                                 }
@@ -709,7 +784,7 @@ class J2StoreModelOrders extends F0FModel {
                             $json_values = array();
                             try{
                                 $json_values = json_decode(stripslashes($field->value));
-                            }catch (Exception $e){
+                            }catch (\Exception $e){
                                 // do nothing
                             }
 
@@ -717,19 +792,18 @@ class J2StoreModelOrders extends F0FModel {
 							if(is_array($json_values)) {
 								$k = count($json_values ); $i = 1;
 								foreach($json_values as $value){
-									$string .= JText::_($value);
+									$string .= Text::_($value);
 									if($i != $k) {
 										$string .='|';
 									}
 									$i++;
 								}
 							} else {
-								$string .= JText::_($field->value);
+								$string .= Text::_($field->value);
 							}
 
 						} else {
-
-							$string = JText::_($field->value);
+							$string = Text::_($field->value);
 						}
 						if(!empty($string)) {
 							$order[$type.'_'.strtolower($namekey)] = $string;
@@ -740,8 +814,8 @@ class J2StoreModelOrders extends F0FModel {
 		}
 	}
 
-
-	function getItemDescription($item) {
+	function getItemDescription($item)
+    {
 		$desc = '';
 
 		//productoptions
@@ -765,21 +839,20 @@ class J2StoreModelOrders extends F0FModel {
 					$first = false;
 				}
 			}
-
 		}
+
 		return $desc;
 	}
 
 	/**
 	 * Method to cancel unpaid orders
 	 */
-	public function cancel_unpaid_orders() {
-
+	public function cancel_unpaid_orders()
+    {
 		$config = J2Store::config();
 
 		// Get today's date
-		JLoader::import('joomla.utilities.date');
-		$jNow	 = new JDate();
+		$jNow	 = new Date();
 		$now	 = $jNow->toUnix();
 
 		$held_duration = $config->get('hold_stock');
@@ -789,15 +862,15 @@ class J2StoreModelOrders extends F0FModel {
 		$date = date( "Y-m-d H:i:s", strtotime( '-' . abs( intval( $held_duration )) . ' MINUTES', $now) );
 
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true)->select('order_id')->from('#__j2store_orders')->where('modified_on <'.$db->q($date))
-            ->where('order_type ='.$db->q('normal'))
+        $query = $db->getQuery(true)->select('order_id')->from('#__j2store_orders')->where('modified_on <'.$db->quote($date))
+            ->where('order_type ='.$db->quote('normal'))
             ->where('order_state_id IN (4,5)');
 		$db->setQuery($query);
 		$unpaid_orders = $db->loadObjectList();
 		if ( $unpaid_orders ) {
 			foreach ( $unpaid_orders as $unpaid_order ) {
 
-				$order = F0FTable::getInstance('Order', 'J2StoreTable')->getClone();
+				$order = J2Store::fof()->loadTable('Order', 'J2StoreTable')->getClone();
 				if($order->load(array('order_id'=>$unpaid_order->order_id)) ) {
 
 					if ( !empty($order->order_id) ) {
@@ -813,18 +886,18 @@ class J2StoreModelOrders extends F0FModel {
 						if($old_status == 4) {
 							$order->restore_order_stock();
 						}
-						$order->add_history(JText::_('J2STORE_ORDER_CANCELLED_TIME_LIMIT_EXPIRED'));
+						$order->add_history(Text::_('J2STORE_ORDER_CANCELLED_TIME_LIMIT_EXPIRED'));
 					}
 				}
-
 			}
 		}
 	}
 
-	public function getCountryById($country_id) {
-		$country = F0FTable::getInstance('Country', 'J2StoreTable')->getClone();
+	public function getCountryById($country_id)
+    {
+		$country = J2Store::fof()->loadTable('Country', 'J2StoreTable')->getClone();
 		$country->load($country_id);
+
 		return $country;
 	}
-
 }
