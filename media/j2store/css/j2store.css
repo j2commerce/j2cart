@@ -547,9 +547,6 @@ line-height: 1px;
 .fancybox-slide--iframe .fancybox-content {
 	height : 80% !important;
 }
-.com_j2store .j2store-product-list	.row > * {
-		width:auto;
-	}
 .j2store .checkout-content label{
 	display:block;
 }
