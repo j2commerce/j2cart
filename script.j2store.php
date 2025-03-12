@@ -143,8 +143,6 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         'app_currencyupdater' => 1,
         'app_flexivariable' => 1,
         'app_schemaproducts' => 1,
-        'app_bootstrap3' => 0,
-        'app_bootstrap4' => 0,
         'app_bootstrap5' => 1
       )
     )
