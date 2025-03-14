@@ -20,7 +20,8 @@ class J2StoreStrapper
 {
     public static $instance = null;
 
-    public function __construct($properties=null) {
+    public function __construct($properties=null)
+    {
 
     }
 
@@ -218,7 +219,6 @@ class J2StoreStrapper
 
     public static function getTimePickerScript($date_format='', $time_format='', $prefix='j2store', $isAdmin=false)
     {
-
         //initialise the date/time picker
         if($isAdmin) {
             $platform = J2Store::platform();
@@ -233,6 +233,7 @@ class J2StoreStrapper
         if(empty($time_format)) {
             $time_format = 'HH:mm';
         }
+
         $localisation = self::getDateLocalisation();
 
         $element_date = $prefix.'_date';
@@ -247,8 +248,8 @@ class J2StoreStrapper
             if (dateElements.length) {
                 dateElements.forEach(function(el) {
                     new flatpickr(el, { dateFormat: '".$date_format."' });
-					});
-				}
+                });
+            }
 
             // Initialize datetime picker
             var datetimeElements = document.querySelectorAll('".$element_datetime."');
@@ -258,10 +259,12 @@ class J2StoreStrapper
                         enableTime: true,
                         dateFormat: '".$date_format."',
                         timeFormat: '".$time_format."',
-                        locale: ".$localisation."
+                        locale: {
+                            ".$localisation."
+                        }
                     });
                 });
-				}
+            }
 
             // Initialize time picker
             var timeElements = document.querySelectorAll('".$element_time."');
@@ -271,12 +274,14 @@ class J2StoreStrapper
                         enableTime: true,
                         noCalendar: true,
                         dateFormat: '".$time_format."',
-                        locale: ".$localisation."
+                        locale: {
+                            ".$localisation."
+                        }
                     });
-			          });
-	          }
-        });
-	";
+                });
+            }
+        });";
+
         return $timepicker_script;
     }
 
