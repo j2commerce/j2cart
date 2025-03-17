@@ -13,6 +13,9 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Log\Log;
+use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
+
 // use Joomla\Database\DatabaseDriver; // not in Joomla 3
 
 defined('_JEXEC') or die;
@@ -185,7 +188,136 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
               Factory::getApplication()->enqueueMessage('Could not move J2Commerce media files');
           }
       }
+
+      $dashboard_positions = [];
+
+      $dashboard_positions[] = 'j2store-module-position-1';
+      $dashboard_positions[] = 'j2store-module-position-2';
+      $dashboard_positions[] = 'j2store-module-position-3';
+      $dashboard_positions[] = 'j2store-module-position-4';
+      $dashboard_positions[] = 'j2store-module-position-5';
+
+      // New charts
+      if (!$this->isModuleInAnyPositions('mod_j2commerce_chart', $dashboard_positions)) {
+          $this->addModuleToPosition('mod_j2commerce_chart', 'j2store-module-position-3', ['chart_type' => 'daily,monthly,yearly']);
+          // Remove the old chart module
+          if ($this->isModuleInAnyPositions('mod_j2store_chart', $dashboard_positions)) {
+              $this->removeModuleFromAnyPositions('mod_j2store_chart', $dashboard_positions);
+          }
+      }
+
+      // Quick Start Checklist
+      if (!$this->isModuleInAnyPositions('mod_j2commerce_checklist', $dashboard_positions)) {
+          $this->addModuleToPosition('mod_j2commerce_checklist', 'j2store-module-position-1');
+      }
+
+      // New admin menu
+      if (!$this->isModuleInAnyPositions('mod_j2commerce_adminmenu', ['menu'])) {
+          $this->addModuleToPosition('mod_j2commerce_adminmenu', 'menu');
+      }
   }
+
+    /**
+     * Add modules to the dashboard.
+     *
+     * @param   string  $position   The name of the position to add the module to
+     * @param   string  $module     The name of the admin module
+     * @param   array   $params     The list of parameters to set to the module
+     *
+     * @return  void
+     *
+     * @throws  Exception
+     */
+    private function addModuleToPosition(string $module_name, string $position, array $module_params = [])
+    {
+        $model  = Factory::getApplication()->bootComponent('com_modules')->getMVCFactory()->createModel('Module', 'Administrator', ['ignore_request' => true]);
+        $module = [
+            'id'         => 0,
+            'asset_id'   => 0,
+            'language'   => '*',
+            'note'       => '',
+            'published'  => 1,
+            'assignment' => 0,
+            'client_id'  => 1,
+            'showtitle'  => 0,
+            'content'    => '',
+            'module'     => $module_name,
+            'position'   => $position,
+        ];
+
+        $module['title']  = Text::_(strtoupper($module_name));
+        $module['access'] = (int) Factory::getApplication()->get('access', 1);
+        $module['params'] = array_merge([
+            'menutype' => '*',
+            'style'    => 'System-none',
+        ], $module_params);
+
+        if (!$model->save($module)) {
+            Factory::getApplication()->enqueueMessage(Text::sprintf('JLIB_INSTALLER_ERROR_COMP_INSTALL_FAILED_TO_CREATE_DASHBOARD', $model->getError()));
+        }
+    }
+
+    /**
+     * Does at least one instance of a given module exist in the dashboard
+     *
+     * @param   string  $position   The position to check. If no position is mentionned, all positions are checked
+     * @param   string  $module     The module to check
+     *
+     * @return  bool
+     */
+    private function isModuleInAnyPositions(string $module, array $positions = []): bool
+    {
+        if (empty($positions)) {
+            return 0;
+        }
+
+        $db    = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__modules'))
+            ->where([
+                $db->quoteName('module') . ' = :module',
+                $db->quoteName('client_id') . ' = ' . $db->quote(1),
+                $db->quoteName('published') . ' = ' . $db->quote(1)
+            ])
+            ->whereIn($db->quoteName('position'), $positions, ParameterType::STRING)
+            ->bind(':module', $module, ParameterType::STRING);
+
+        $modules = $db->setQuery($query)->loadResult() ?: 0;
+
+        return $modules > 0;
+    }
+
+    /**
+     * Remove a module from the dashboard
+     *
+     * @param   string  $module_name   The name of the module to remove
+     *
+     * @return  void
+     */
+    private function removeModuleFromAnyPositions(string $module_name, array $positions = [])
+    {
+        if (empty($positions)) {
+            return;
+        }
+
+        $db    = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true)
+            ->delete($db->quoteName('#__modules'))
+            ->where([
+                $db->quoteName('module') . ' = :module',
+                $db->quoteName('client_id') . ' = ' . $db->quote(1),
+                $db->quoteName('published') . ' = ' . $db->quote(1)
+            ])
+            ->whereIn($db->quoteName('position'), $positions, ParameterType::STRING)
+            ->bind(':module', $module_name, ParameterType::STRING);
+
+        try {
+            $db->setQuery($query)->execute();
+        } catch (\Exception $e) {
+            Factory::getApplication()->enqueueMessage('Could not uninstall ' . $module_name);
+        }
+    }
 
   public function preflight($type, $parent)
   {
