@@ -105,7 +105,7 @@ $wa->addInlineStyle($style, [], []);
                                                       data-bs-trigger="click focus"
                                                       data-bs-customClass="additional-popup-image"
                                                       data-bs-title=""
-                                                      data-bs-content="<img src='/<?php echo htmlspecialchars($img, ENT_QUOTES, 'UTF-8'); ?>'>">
+                                                      data-bs-content="<img src='<?php echo Uri::root().htmlspecialchars($img, ENT_QUOTES, 'UTF-8'); ?>'>">
 
                                                 </span>
                                             <?php } else { ?>
