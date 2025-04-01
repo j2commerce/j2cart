@@ -205,6 +205,19 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
       if (!$this->isModuleInAnyPositions('mod_j2commerce_chart', $dashboard_positions)) {
           $this->addModuleToPosition('mod_j2commerce_chart', 'j2store-module-position-3', ['chart_type' => 'daily,monthly,yearly']);
       }
+
+      // New admin menu
+      if (!$this->isModuleInAnyPositions('mod_j2commerce_adminmenu', ['menu'])) {
+          $this->addModuleToPosition('mod_j2commerce_adminmenu', 'menu');
+      }
+
+      if ($type === 'install') {    
+          // New admin menu Quick Icons
+          $this->addModuleToPosition('mod_j2commerce_adminmenu', 'icon');
+    
+          // New admin menu Quick Icons for the J2Commerce dashboard (position 'cpanel-j2commerce' is added by core Joomla dashboard
+          $this->addModuleToPosition('mod_j2commerce_adminmenu', 'cpanel-j2commerce');
+      }
   }
 
     /**

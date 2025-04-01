@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" method="upgrade" client="administrator">
+	<name>MOD_J2COMMERCE_ADMINMENU</name>
+    <creationDate>FEB 2025</creationDate>
+    <copyright>(C) 2025 J2Commerce, LLC</copyright>
+    <license>GNU General Public License v3 or later versions</license>
+    <authorEmail>support@j2commerce.com</authorEmail>
+    <authorUrl>https://www.j2commerce.com</authorUrl>
+    <version>4.1.0</version>
+	<description>MOD_J2COMMERCE_ADMINMENU_DESC</description>
+    <namespace path="src">J2Commerce\Module\AdminMenu</namespace>
+    <files>
+        <folder module="mod_j2commerce_adminmenu">services</folder>
+        <folder>presets</folder>
+        <folder>src</folder>
+        <folder>tmpl</folder>
+    </files>
+    <languages>
+        <language tag="en-GB">language/en-GB/mod_j2commerce_adminmenu.ini</language>
+        <language tag="en-GB">language/en-GB/mod_j2commerce_adminmenu.sys.ini</language>
+    </languages>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+                <field
+					name="buttons"
+					type="subform"
+					label="MOD_J2COMMERCE_ADMINMENU_FIELD_BUTTONS_LABEL"
+					description="MOD_J2COMMERCE_ADMINMENU_FIELD_BUTTONS_DESC"
+					default='[{"button":"dashboard"}]'
+					multiple="true"
+					layout="joomla.form.field.subform.repeatable"
+					>
+					<form>
+						<field
+			                name="button"
+			                type="list"
+			                label="MOD_J2COMMERCE_ADMINMENU_FIELD_BUTTON_LABEL">
+			                <option value="dashboard">COM_J2STORE_MAINMENU_DASHBOARD</option>
+			                <option value="products">COM_J2STORE_TITLE_PRODUCTS</option>
+			                <option value="options">COM_J2STORE_TITLE_OPTIONS</option>
+			                <option value="inventories">COM_J2STORE_TITLE_INVENTORIES</option>
+			                <option value="orders">COM_J2STORE_TITLE_ORDERS</option>
+			                <option value="reports">COM_J2STORE_TITLE_REPORTS</option>
+			            </field>
+					</form>
+				</field>
+				<field type="hidden" name="header_icon" default="fa fa-cart-shopping fa-shopping-cart" />
+            </fieldset>
+	        <fieldset name="advanced">
+	            <field
+	                name="layout"
+	                type="modulelayout"
+	                label="JFIELD_ALT_LAYOUT_LABEL"
+	                class="form-select"
+	            />
+	        </fieldset>
+		</fields>
+	</config>
+</extension>
