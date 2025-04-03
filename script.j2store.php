@@ -166,6 +166,18 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
   {
       parent::postflight($type, $parent);
 
+      // Remove extra column from the variants table
+
+      $db = Factory::getDbo();
+
+      try {
+          $alterQuery = "ALTER TABLE `#__j2store_variants` DROP `campaign_variant_id`";
+          $db->setQuery($alterQuery);
+          $db->execute();
+      } catch (\Exception $e) {
+          // Can fail if the column does not exist
+      }
+
       // TODO remove once we are done moving files from j2store to com_j2commerce
       $source = JPATH_SITE . '/media/j2store/j2commerce';
       $destination = JPATH_SITE . '/media/com_j2commerce';
