@@ -85,6 +85,10 @@
 		</languages>
 	</administration>
 
+	<dashboards>
+		<dashboard title="COM_J2STORE_DASHBOARD_J2COMMERCE_TITLE" icon="none fa fa-cart-shopping fa-shopping-cart">j2commerce</dashboard>
+	</dashboards>
+
 	<!-- Installation / uninstallation PHP scripts -->
 	<scriptfile>script.j2store.php</scriptfile>
 

@@ -106,6 +106,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
   protected $installation_queue = array(
     'modules' => array(
       'admin' => array(
+        'mod_j2commerce_adminmenu' => array('menu', 1),
         'mod_j2commerce_chart' => array('', 0), // we just want to install the module
         'j2store_stats_mini' => array('j2store-module-position-1', 1),
         'j2store_orders' => array('j2store-module-position-4', 1),
@@ -215,6 +216,14 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
       // New charts
       if (!$this->isModuleInAnyPositions('mod_j2commerce_chart', $dashboard_positions)) {
           $this->addModuleToPosition('mod_j2commerce_chart', 'j2store-module-position-3', ['chart_type' => ['daily', 'monthly', 'yearly']]);
+      }
+
+      if ($type === 'install') {    
+          // New admin menu Quick Icons
+          $this->addModuleToPosition('mod_j2commerce_adminmenu', 'icon');
+    
+          // New admin menu Quick Icons for the J2Commerce dashboard (position 'cpanel-j2commerce' is added by core Joomla dashboard
+          $this->addModuleToPosition('mod_j2commerce_adminmenu', 'cpanel-j2commerce');
       }
   }
 
