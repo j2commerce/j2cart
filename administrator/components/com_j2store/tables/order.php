@@ -1113,6 +1113,26 @@ class J2StoreTableOrder extends F0FTable
 		J2Store::plugin ()->event ( "PrepareOrderInformation", array( $this ) );
 	}
 
+    /**
+     * Method to add tax.
+     *
+     * @param string $name
+     * @param float $rate
+     * @param float $amount
+     * @param int $order_id
+     */
+    public function add_tax($name, $rate, $amount, $order_id = null)
+    {
+        $ordertax = F0FTable::getAnInstance('Ordertax', 'J2StoreTable')->getClone();
+        $ordertax->ordertax_title = $name;
+        $ordertax->ordertax_percent = $rate;
+        $ordertax->ordertax_amount = $amount;
+        if (!empty($order_id)) {
+            $ordertax->order_id = $order_id;
+        }
+        $this->_ordertaxes[] = $ordertax;
+    }
+
 	/**
 	 * Method to add fee.
 	 *
