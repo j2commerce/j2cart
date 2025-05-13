@@ -32,10 +32,6 @@ class J2StoreControllerCustomers extends F0FController
     public function browse()
     {
         $app = Factory::getApplication();
-        $option = $app->input->getCmd('option', '');
-        $msg = Text::_($option . '_CONFIRM_DELETE');
-        ToolBarHelper::deleteList(strtoupper($msg));
-        $this->exportButton('customers');
         $model = $this->getThisModel();
         $state = [];
         $state['customer_name'] = $app->input->getstring('customer_name','');
@@ -114,6 +110,10 @@ class J2StoreControllerCustomers extends F0FController
         if($format === 'csv'){
             $this->display();
         }else{
+			$option = $app->input->getCmd('option', '');
+			$msg = Text::_($option . '_CONFIRM_DELETE');
+			ToolBarHelper::deleteList(strtoupper($msg));
+			$this->exportButton('customers');
             echo $this->_getLayout('default',$vars);
         }
     }
