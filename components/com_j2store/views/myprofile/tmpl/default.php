@@ -173,9 +173,9 @@ $page_heading_text = $page_heading->get('page_heading','');
         <?php else: ?>
             <ul class="nav nav-tabs" id="myProfileTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="orders-tab-tab" data-bs-toggle="tab" data-bs-target="#orders-tab" type="button" role="tab" aria-controls="orders-tab" aria-selected="true">
+                    <a class="nav-link active" id="orders-tab-tab" data-bs-toggle="tab" data-bs-target="#orders-tab" type="button" role="tab" aria-controls="orders-tab" aria-selected="true">
                         <i class="fa fa-th-large"></i><?php echo JText::_('J2STORE_MYPROFILE_ORDERS'); ?>
-                    </button>
+                    </a>
                 </li>
                 <?php if($this->params->get('download_area', 1)): ?>
                     <li class="nav-item" role="presentation">
