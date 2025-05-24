@@ -1,18 +1,28 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
-jimport('joomla.mail.helper');
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Mail\MailHelper;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Uri\Uri;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/controllers/traits/list_view.php';
 class J2StoreControllerCustomers extends F0FController
 {
     use list_view;
 
-	public function __construct($config =array())
+    public function __construct($config = [])
 	{
 
 		parent::__construct($config);
@@ -21,13 +31,9 @@ class J2StoreControllerCustomers extends F0FController
 
     public function browse()
     {
-        $app = JFactory::getApplication();
-        $option = $app->input->getCmd('option', '');
-        $msg = JText::_($option . '_CONFIRM_DELETE');
-        JToolBarHelper::deleteList(strtoupper($msg));
-        $this->exportButton('customers');
+        $app = Factory::getApplication();
         $model = $this->getThisModel();
-        $state = array();
+        $state = [];
         $state['customer_name'] = $app->input->getstring('customer_name','');
         $state['email'] = $app->input->getString('email','');
         $state['address_1'] = $app->input->getString('address_1','');
@@ -101,9 +107,13 @@ class J2StoreControllerCustomers extends F0FController
         $this->setHeader($header,$vars);
         $vars->pagination = $model->getPagination();
         $format = $app->input->get('format','html');
-        if($format == 'csv'){
+        if($format === 'csv'){
             $this->display();
         }else{
+            $option = $app->input->getCmd('option', '');
+            $msg = Text::_($option . '_CONFIRM_DELETE');
+            ToolbarHelper::deleteList(strtoupper($msg));
+            $this->exportButton('customers');
             echo $this->_getLayout('default',$vars);
         }
     }
