@@ -67,7 +67,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
             <?php echo \Joomla\CMS\HTML\HTMLHelper::_('uitab.addTab', 'j2storetab', 'generalTab', JText::_('J2STORE_PRODUCT_TAB_GENERAL')); ?>
             <div class="row">
                 <div class="col-lg-12">
-                    <input type="hidden" name="<?php echo $this->form_prefix.'[j2store_variant_id]'; ?>" value="<?php echo isset($this->variant->j2store_variant_id) && !empty($this->variant->j2store_variant_id) ? $this->variant->j2store_variant_id: 0; ?>" />
+                    <input type="hidden" name="<?php echo $this->form_prefix.'[j2store_variant_id]'; ?>" value="<?php echo isset($this->item->variant->j2store_variant_id) && !empty($this->item->variant->j2store_variant_id) ? $this->item->variant->j2store_variant_id: 0; ?>" />
                     <?php echo $this->loadTemplate('variable_general');?>
                 </div>
             </div>
