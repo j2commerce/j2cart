@@ -1,10 +1,14 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Administrator
+ * @subpackage  com_j2store
+ *
+ * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined ( '_JEXEC' ) or die ();
 
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/version.php');
@@ -121,11 +125,11 @@ class J2Store
 	public static function getSelectableFields() {
 		return J2StoreSelectableFields::getInstance();
 	}
-	
+
 	public static function help($config=array()) {
 		return J2Help::getInstance($config);
 	}
-	
+
 	public static function view($config=array()) {
 		return J2ViewHelper::getInstance($config);
 	}
@@ -135,19 +139,33 @@ class J2Store
 		return $isPro;
 	}
 
-	public static function buildHelpLink($url, $content='app') {
+    public static function buildHelpLink($url, $content='app')
+    {
+        $source = 'free';
+        if(self::isPro()) {
+            $source = 'pro';
+        }
 
-		$source = 'free';
-		if(self::isPro()) {
-			$source = 'pro';
-		}
-		$utm_query ='?utm_source='.$source.'&utm_medium=component&utm_campaign=inline&utm_content='.$content;
-		$domain = 'https://www.j2commerce.com';
+        $utm_query = '?utm_source=' . $source . '&utm_medium=component&utm_campaign=inline&utm_content=' . $content;
+        $domain = 'https://docs.j2commerce.com/j2commerce';
+        $fullurl = $domain . '/' . $url.$utm_query;
 
-		$fullurl = $domain.'/'.$url.$utm_query;
-		return $fullurl;
+        return $fullurl;
+    }
 
-	}
+    public static function buildSiteLink($url, $content='app')
+    {
+        $source = 'free';
+        if(self::isPro()) {
+            $source = 'pro';
+        }
+
+        $utm_query = '?utm_source=' . $source . '&utm_medium=component&utm_campaign=inline&utm_content=' . $content;
+        $domain = 'https://www.j2commerce.com';
+        $fullurl = $domain . '/' . $url . $utm_query;
+
+        return $fullurl;
+    }
 
 	public static function queue($config=array()) {
 
