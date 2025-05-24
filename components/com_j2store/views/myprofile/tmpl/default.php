@@ -77,7 +77,7 @@ $page_heading_text = $page_heading->get('page_heading','');
 	                  	</a>
                  	</li>
                  	<?php endif;?>
-                 	
+
                  	<?php if($this->user->id) : ?>
                     <li>
                   		<a href="#address-tab" data-toggle="tab">
@@ -93,9 +93,9 @@ $page_heading_text = $page_heading->get('page_heading','');
 						  <?php echo J2Store::modules()->loadposition('j2store-myprofile-order'); ?>
 		                	<div class="table-responsive">
 								<?php echo $this->loadTemplate('orders');?>
-							</div>						
+							</div>
 	                  </div>
-					
+
 					<?php if($this->params->get('download_area', 1)): ?>
 	                  <div class="tab-pane" id="downloads-tab">
 						  <?php echo J2Store::modules()->loadposition('j2store-myprofile-download'); ?>
@@ -106,7 +106,7 @@ $page_heading_text = $page_heading->get('page_heading','');
 							</div>
 	                  </div>
 					<?php endif; ?>
-					
+
 	                  <?php if($this->user->id) : ?>
 	                  	<div class="tab-pane" id="address-tab">
 							<?php echo J2Store::modules()->loadposition('j2store-myprofile-address'); ?>
@@ -170,9 +170,9 @@ $page_heading_text = $page_heading->get('page_heading','');
         <?php else: ?>
             <ul class="nav nav-tabs" id="myProfileTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="orders-tab-tab" data-bs-toggle="tab" data-bs-target="#orders-tab" type="button" role="tab" aria-controls="orders-tab" aria-selected="true">
+                    <a class="nav-link active" id="orders-tab-tab" data-bs-toggle="tab" data-bs-target="#orders-tab" type="button" role="tab" aria-controls="orders-tab" aria-selected="true">
                         <i class="fa fa-th-large"></i><?php echo JText::_('J2STORE_MYPROFILE_ORDERS'); ?>
-                    </button>
+                    </a>
                 </li>
                 <?php if($this->params->get('download_area', 1)): ?>
                     <li class="nav-item" role="presentation">
