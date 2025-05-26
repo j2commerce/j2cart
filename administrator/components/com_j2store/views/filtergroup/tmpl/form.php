@@ -20,11 +20,11 @@ jimport('joomla.filesystem.file');
 $this->loadHelper('select');
 $row_class = 'row';
 $col_class = 'col-md-';
-$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.Text::_('J2STORE_INVALID_INPUT_FIELD').'</div></div></joomla-alert>' ;
+$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.htmlspecialchars(Text::_('J2STORE_INVALID_INPUT_FIELD')).'</div></div></joomla-alert>' ;
 if (version_compare(JVERSION, '3.99.99', 'lt')) {
     $row_class = 'row-fluid';
     $col_class = 'span';
-    $alert_html = '<div class="alert alert-error alert-danger">'.Text::_('J2STORE_INVALID_INPUT_FIELD').'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
+    $alert_html = '<div class="alert alert-error alert-danger">'.htmlspecialchars(Text::_('J2STORE_INVALID_INPUT_FIELD')).'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
 }
 
 
@@ -153,7 +153,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
             $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
             $script = "
                 var filter_value_row = ".json_encode($product_filter_value_row).";
-                
+
                 function j2storeAddFilterToGroup() {
                     var html = '';
                     html += '<tbody id=\"filter-value-row' + filter_value_row + '\">';
@@ -166,12 +166,12 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                     html += '<td class=\"border-bottom text-end\"><a class=\"btn btn-danger btn-sm\" onclick=\"document.getElementById(\'filter-value-row' + filter_value_row + '\').remove();\">".Text::_('J2STORE_REMOVE')."</a></td>';
                     html += '</tr>';
                     html += '</tbody>';
-                
+
                     var pFilerValueTable = document.querySelector('#pFilerValue tfoot');
                     if (pFilerValueTable) {
                         pFilerValueTable.insertAdjacentHTML('beforebegin', html);
                     }
-                
+
                     filter_value_row++;
                 }
                 ";
@@ -182,7 +182,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', 'index.php?option=com_j2store&view=filtergroups&task=deleteproductfiltervalues&productfiltervalue_id=' + productfiltervalue_id, true);
                     xhr.responseType = 'json';
-                
+
                     xhr.onload = function() {
                         var json = xhr.response;
                         var html = '';
@@ -201,14 +201,14 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                             }
                         }
                     };
-                
+
                     xhr.onerror = function() {
                         console.error('An error occurred while processing the request.');
                     };
-                
+
                     // Set 'beforeSend' equivalent
                     document.getElementById('filterValueDeleteBtn-' + productfiltervalue_id).value = '".Text::_('J2STORE_REMOVE_CONTINUE')."';
-                
+
                     xhr.send();
                 }
                 ";

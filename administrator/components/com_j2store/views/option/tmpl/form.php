@@ -21,11 +21,11 @@ jimport('joomla.filesystem.file');
 $this->loadHelper('select');
 $row_class = 'row';
 $col_class = 'col-md-';
-$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.Text::_('J2STORE_INVALID_INPUT_FIELD').'</div></div></joomla-alert>' ;
+$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.htmlspecialchars(Text::_('J2STORE_INVALID_INPUT_FIELD')).'</div></div></joomla-alert>' ;
 if (version_compare(JVERSION, '3.99.99', 'lt')) {
     $row_class = 'row-fluid';
     $col_class = 'span';
-    $alert_html = '<div class="alert alert-error alert-danger">'.Text::_('J2STORE_INVALID_INPUT_FIELD').'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
+    $alert_html = '<div class="alert alert-error alert-danger">'.htmlspecialchars(Text::_('J2STORE_INVALID_INPUT_FIELD')).'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
 }
 $config = Factory::getApplication()->getConfig();
 $asset_id = $config->get('asset_id');
