@@ -1351,7 +1351,7 @@ class J2StoreTableOrder extends F0FTable
 		$ordershipping_table->ordershipping_code = $values[ 'shipping_code' ];
 		$ordershipping_table->ordershipping_name = $values[ 'shipping_name' ];
 		$ordershipping_table->ordershipping_type = $values[ 'shipping_plugin' ];
-		$ordershipping_table->ordershipping_total = $values[ 'shipping_price' ] + $values[ 'shipping_extra' ] + $values[ 'shipping_tax' ];
+		$ordershipping_table->ordershipping_total = (float)$values[ 'shipping_price' ] + (float)$values[ 'shipping_extra' ] + (float)$values[ 'shipping_tax' ];
 		$this->_shipping_totals = $ordershipping_table;
 
 	}
