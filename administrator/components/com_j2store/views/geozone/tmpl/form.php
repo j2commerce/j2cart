@@ -176,6 +176,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 
     function j2storeAddGeoZone() {
         (function ($) {
+            let first_key = <?php echo array_key_first($countries); ?>;
             html = '<tbody id="zone-to-geo-zone-row' + zone_to_geo_zone_row + '">';
             html += '<tr>';
             html += '<td class="left"><select name="zone_to_geo_zone[' + zone_to_geo_zone_row + '][country_id]" id="country' + zone_to_geo_zone_row + '" onchange="getZones(' + zone_to_geo_zone_row + ',this.value )">';
@@ -189,7 +190,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
             html += '</tr>';
             html += '</tbody>';
             $('#geozone_rule_table > tfoot').before(html);
-            $('#zone' + zone_to_geo_zone_row).load('index.php?option=com_j2store&view=geozone&task=getZone&country_id=' + $('#country' + zone_to_geo_zone_row).attr('value') + '&zone_id=0');
+            $('#zone' + zone_to_geo_zone_row).load('index.php?option=com_j2store&view=geozone&task=getZone&country_id=' + first_key + '&zone_id=0');
 
             zone_to_geo_zone_row++;
         })(j2store.jQuery);
