@@ -1,18 +1,20 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Administrator
+ * @subpackage  com_j2store
+ *
+ * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
-// No direct access to this file
 defined('_JEXEC') or die('Restricted access');
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
-
 
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
@@ -48,7 +50,7 @@ $search = htmlspecialchars($this->state->search);
       <?php echo $sidebar ; ?>
    </div>
    <div id="j-main-container" class="<?php echo $col_class; ?>6">
- <?php else : ?> 
+ <?php else : ?>
 	<div class="j2store">
   <?php endif;?>
 		<?php include 'default_steps.php';?>
@@ -279,7 +281,7 @@ $search = htmlspecialchars($this->state->search);
             </div>
             <?php echo $this->pagination->getListFooter(); ?>
 		<?php else:?>
-		<div class="alert alert-message"><?php echo Text::sprintf('J2STORE_SHIPPING_TROUBLESHOOT_NOTE_MESSAGE','index.php?option=com_j2store&view=shippings',J2Store::buildHelpLink('support/user-guide/standard-shipping.html', 'shipping'));?></div>
+		<div class="alert alert-message"><?php echo Text::sprintf('J2STORE_SHIPPING_TROUBLESHOOT_NOTE_MESSAGE','index.php?option=com_j2store&view=shippings',J2Store::buildHelpLink('shipping-methods/standard-shipping-methods', 'shipping'));?></div>
 		<?php endif;?>
   </form>
   </div>
@@ -288,7 +290,7 @@ $search = htmlspecialchars($this->state->search);
                 <span class="fas fa-solid fa-arrow-left me-2"></span><?php echo Text::_('JPREV');?>
             </a>
         </div>
-  
+
             <?php if (!empty($sidebar)): ?>
          </div>
             <?php else: ?>

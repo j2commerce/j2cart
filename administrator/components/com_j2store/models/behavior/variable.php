@@ -590,7 +590,7 @@ class J2StoreModelProductsBehaviorVariable extends F0FModelBehavior {
             $return['pricing']['class'] = 'hide';
         }
         $return['pricing']['discount_text'] = '';
-        if( isset($variant->pricing->is_discount_pricing_available)) {
+        if( isset($variant->pricing->is_discount_pricing_available) && $variant->pricing->base_price > 0) {
             $discount = (1 - ($variant->pricing->price / $variant->pricing->base_price)) * 100;
             if ($discount > 0){
                 $return['pricing']['discount_text'] = JText::sprintf('J2STORE_PRODUCT_OFFER',round($discount).'%');

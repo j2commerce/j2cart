@@ -1,16 +1,18 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
- * @license GNU GPL v3 or later
+ * @package     Joomla.Administrator
+ * @subpackage  com_j2store
+ *
+ * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
-// No direct access to this file
 defined('_JEXEC') or die('Restricted access');
+
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-
 use Joomla\CMS\Router\Route;
 
 $platform = J2Store::platform();
@@ -69,7 +71,7 @@ $this->tab_name = 'com-j2store-wizard';
             <?php endif;?>
         <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
     <?php else: ?>
-        <div class="alert alert-danger"><?php echo Text::sprintf('J2STORE_SHIPPING_TROUBLESHOOT_NOTE_MESSAGE', 'index.php?option=com_j2store&view=shippings', J2Store::buildHelpLink('support/user-guide/standard-shipping', 'shipping')); ?></div>
+        <div class="alert alert-danger"><?php echo Text::sprintf('J2STORE_SHIPPING_TROUBLESHOOT_NOTE_MESSAGE', 'index.php?option=com_j2store&view=shippings', J2Store::buildHelpLink('shipping-methods/standard-shipping-methods', 'shipping')); ?></div>
     <?php endif; ?>
     <div class="text-center mt-3">
         <a class="btn btn-primary" href="<?php echo Route::_('index.php?option=com_j2store&view=shippingtroubles&layout=default_shipping_product'); ?>">

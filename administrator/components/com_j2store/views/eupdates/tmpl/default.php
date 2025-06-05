@@ -16,7 +16,7 @@ $platform->loadExtra('dropdown.init');
 
 $updates = F0FModel::getTmpInstance('EUpdates', 'J2StoreModel')->getUpdates();
 
-$update_link = J2Store::buildHelpLink('my-downloads.html', 'update');
+$update_link = J2Store::buildSiteLink('my-account/my-downloads', 'update');
 
 $sidebar = JHtmlSidebar::render();
 F0FModel::getTmpInstance('Updates', 'J2StoreModel')->refreshUpdateSite();

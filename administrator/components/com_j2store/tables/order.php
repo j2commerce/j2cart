@@ -1126,6 +1126,26 @@ class J2StoreTableOrder extends F0FTable
 
 	}
 
+    /**
+     * Method to add tax.
+     *
+     * @param string $name
+     * @param float $rate
+     * @param float $amount
+     * @param int $order_id
+     */
+    public function add_tax($name, $rate, $amount, $order_id = null)
+    {
+        $ordertax = F0FTable::getAnInstance('Ordertax', 'J2StoreTable')->getClone();
+        $ordertax->ordertax_title = $name;
+        $ordertax->ordertax_percent = $rate;
+        $ordertax->ordertax_amount = $amount;
+        if (!empty($order_id)) {
+            $ordertax->order_id = $order_id;
+        }
+        $this->_ordertaxes[] = $ordertax;
+    }
+
 	/**
 	 * Method to add fee.
 	 *
@@ -1331,7 +1351,7 @@ class J2StoreTableOrder extends F0FTable
 		$ordershipping_table->ordershipping_code = $values[ 'shipping_code' ];
 		$ordershipping_table->ordershipping_name = $values[ 'shipping_name' ];
 		$ordershipping_table->ordershipping_type = $values[ 'shipping_plugin' ];
-		$ordershipping_table->ordershipping_total = $values[ 'shipping_price' ] + $values[ 'shipping_extra' ] + $values[ 'shipping_tax' ];
+		$ordershipping_table->ordershipping_total = (float)$values[ 'shipping_price' ] + (float)$values[ 'shipping_extra' ] + (float)$values[ 'shipping_tax' ];
 		$this->_shipping_totals = $ordershipping_table;
 
 	}
@@ -2546,20 +2566,20 @@ class J2StoreTableOrder extends F0FTable
 
 	}
 
-	
+
 	/**
 	 * --------------------------------------------------
-	 * Formatted totals 
+	 * Formatted totals
 	 * --------------------------------------------------
 	 */
-	
+
 	/**
 	 * Gets line item unit price (excl. or incl. tax). Used only for the cart page
 	 * @param object $item Line item object
 	 * @param string $including_tax
 	 * @return float Unit price
 	 */
-	
+
 	function get_formatted_lineitem_price($item, $including_tax=false) {
 		$product_helper = J2Store::product();
 		if($including_tax) {
@@ -2572,29 +2592,29 @@ class J2StoreTableOrder extends F0FTable
 		J2Store::plugin()->event('LineItemPrice', array(&$price, $item));
 		return $price;
 	}
-	
+
 	/**
 	 * Method to get the line item subtotal (item price * quantity)
 	 * @param object $item
 	 * @param string $including_tax
 	 * @return float Line item subtotal
 	 */
-	
+
 	function get_formatted_lineitem_total($item, $including_tax=false) {
-        
+
         if($including_tax) {
             $total_price_html = $item->orderitem_finalprice_with_tax ;
         } else {
-            $total_price_html = $item->orderitem_finalprice_without_tax ; 
+            $total_price_html = $item->orderitem_finalprice_without_tax ;
         }
         //allow plugins to modify the output
         J2Store::plugin()->event('LineItemTotal', array($this, &$total_price_html, $item ));
 
         return $total_price_html;
     }
-	
+
 	function get_formatted_subtotal($including_tax = false, $items=array()) {
-		
+
 		if($including_tax) {
 			$order_subtotal = $this->order_subtotal;
 		}else {
@@ -2615,15 +2635,15 @@ class J2StoreTableOrder extends F0FTable
 		J2Store::plugin()->event('GetFormattedGrandTotal', array(&$order_obj));
 		return $this->order_total;
 	}
-	
-	
+
+
 	/**
 	 * Method to get formatted fees. Including or excluding tax
 	 * @param object $fee
 	 * @param string $including_tax
 	 * @return float fee amount
 	 */
-	
+
 	function get_formatted_fees($fee, $including_tax = false) {
 		if($including_tax) {
 			return $fee->amount + $fee->tax;
@@ -2631,9 +2651,9 @@ class J2StoreTableOrder extends F0FTable
 			return $fee->amount;
 		}
 	}
-	
-	
-	public function get_formatted_discount($discount, $including_tax=false) {			
+
+
+	public function get_formatted_discount($discount, $including_tax=false) {
 		if($including_tax) {
 			$amount = $discount->discount_amount + $discount->discount_tax;
 		}else {
@@ -2641,8 +2661,8 @@ class J2StoreTableOrder extends F0FTable
 		}
 		return abs($amount) * -1;
 	}
-	
-	
+
+
 	/**
 	 * Returns a formatted price for an order. This is different from the one called by the cart
 	 * Since 3.2
@@ -2650,7 +2670,7 @@ class J2StoreTableOrder extends F0FTable
 	 * @param boolean $including_tax
 	 * @return number
 	 */
-	
+
 	public function get_formatted_order_lineitem_price($item, $including_tax=false) {
 		if($including_tax) {
 			$price = $item->orderitem_finalprice_with_tax / $item->orderitem_quantity;
@@ -2659,69 +2679,69 @@ class J2StoreTableOrder extends F0FTable
 		}
 		//allow plugins to modify
 		J2Store::plugin()->event('GetFormattedOrderLineItemPrice', array(&$price, $item, $this));
-		return $price;										
+		return $price;
 	}
-	
+
 	/**
 	 * Get formatted totals for an order
 	 * Since 3.2
 	 * @return array Totals as an associative array
-	 */	
-	
+	 */
+
 	public function get_formatted_order_totals() {
-		
+
 		$total_rows = array();
 		$currency = J2Store::currency();
 		$params = J2Store::config();
 		$items = $this->getItems();
-		
+
 		$taxes = $this->getOrderTaxrates();
 		$shipping = $this->getOrderShippingRate();
-		
+
 		//subtotal
 		$total_rows['subtotal'] = array(
 			'label' => JText::_('J2STORE_CART_SUBTOTAL'),
 			'value'	=> $currency->format($this->get_formatted_subtotal($params->get('checkout_price_display_options', 1), $items), $this->currency_code, $this->currency_value )
 		);
-		
+
 		//shipping
-		
+
 		if(!empty($shipping->ordershipping_name)) {
-			
+
 			$total_rows['shipping'] = array(
 					'label' => JText::_(stripslashes($shipping->ordershipping_name)),
 					'value'	=> $currency->format($this->order_shipping, $this->currency_code, $this->currency_value)
 			);
 		}
-		
+
 		//shipping tax
 		if($this->order_shipping_tax > 0) {
-				
+
 			$total_rows['shipping_tax'] = array(
 					'label' => JText::_('J2STORE_ORDER_SHIPPING_TAX'),
 					'value'	=> $currency->format($this->order_shipping_tax, $this->currency_code, $this->currency_value)
 			);
 		}
-		
+
 		//fees
 		foreach ( $this->get_fees() as $fee ) {
-			
+
 			$total_rows['fee_'.F0FInflector::underscore($fee->name)] = array(
 					'label' => JText::_($fee->name),
 					'value'	=> $currency->format($this->get_formatted_fees($fee, $params->get('checkout_price_display_options', 1)), $this->currency_code, $this->currency_value)
 			);
 		}
-		
+
 		//surcharge @depreicated.
 
 		if($this->order_surcharge > 0) {
-		
+
 			$total_rows['surcharge'] = array(
 					'label' => JText::_('J2STORE_CART_SURCHARGE'),
 					'value'	=> $currency->format($this->order_surcharge, $this->currency_code, $this->currency_value)
 			);
 		}
-		
+
 		//discount
 		foreach($this->getOrderDiscounts() as $discount) {
 			if($discount->discount_amount > 0 ) {
@@ -2729,28 +2749,28 @@ class J2StoreTableOrder extends F0FTable
 				if($discount->discount_type == 'coupon') {
 					$label = JText::sprintf('J2STORE_COUPON_TITLE', $discount->discount_title);
 					$link = '<a class="j2store-remove remove-icon" href="javascript:void(0)" onClick="jQuery(\'#j2store-cart-form #j2store-cart-task\').val(\'removeCoupon\'); jQuery(\'#j2store-cart-form\').submit();" >X</a>';
-				}elseif($discount->discount_type == 'voucher') {				
+				}elseif($discount->discount_type == 'voucher') {
 					$label = JText::sprintf('J2STORE_VOUCHER_TITLE', $discount->discount_title);
 					$link = '<a class="j2store-remove remove-icon" href="javascript:void(0)" onClick="jQuery(\'#j2store-cart-form #j2store-cart-task\').val(\'removeVoucher\'); jQuery(\'#j2store-cart-form\').submit();" >X</a>';
 				}else {
 					$label = JText::sprintf('J2STORE_DISCOUNT_TITLE', $discount->discount_title);
 				}
 				$label .=J2Store::plugin()->eventWithHtml('AfterDisplayDiscountTitle', array($this, $discount));
-				
-				
+
+
 				$value = $currency->format($this->get_formatted_discount($discount, $params->get('checkout_price_display_options', 1)), $this->currency_code, $this->currency_value);
 				$value .= J2Store::plugin()->eventWithHtml('AfterDisplayDiscountAmount', array($this, $discount));
-				
+
 				$total_rows[$discount->discount_code.F0FInflector::underscore($discount->discount_title)] = array(
 						'label' => $label,
-						'link' => $link,					
+						'link' => $link,
 						'value'	=> $value
 				);
 			}
 		}
-		
+
 		//taxes
-		if(isset($taxes) && count($taxes) ) {			
+		if(isset($taxes) && count($taxes) ) {
 			$label = '';
 			foreach($taxes as $key=> $tax) {
 				$label = '';
@@ -2759,16 +2779,16 @@ class J2StoreTableOrder extends F0FTable
 				}else{
 					$label .= JText::sprintf('J2STORE_CART_TAX_EXCLUDED_TITLE', JText::_($tax->ordertax_title), floatval($tax->ordertax_percent).'%');
 				}
-				
+
 				$value = $currency->format($tax->ordertax_amount, $this->currency_code, $this->currency_value);
 				$total_rows['tax_'.F0FInflector::underscore($tax->ordertax_title).$key] = array(
 						'label' => $label,
 						'value'	=> $value
 				);
-				
+
 			}
 		}
-		
+
 		//refund
 		if($this->order_refund){
 			$total_rows['refund'] = array(
@@ -2776,30 +2796,30 @@ class J2StoreTableOrder extends F0FTable
 					'value' => $currency->format($this->order_refund,$this->currency_code,$this->currency_value)
 			);
 		}
-		
+
 		$total_rows['grandtotal'] = array(
 				'label' => JText::_('J2STORE_CART_GRANDTOTAL'),
 				'value'	=> $currency->format($this->get_formatted_grandtotal(), $this->currency_code, $this->currency_value)
 		);
-		
+
 		//allow plugins to modify
 		J2Store::plugin()->event('GetFormattedOrderTotals', array($this, &$total_rows));
 		return $total_rows;
-	}	
-	
+	}
+
 	/**
 	 * Method to validate stock in an order. Called only before placing the order.
 	 * @return boolean True if successful | False if a condition does not match
 	 */
-	
+
 	public function validate_order_stock() {
-	
+
 		$product_helper = J2Store::product ();
 		$utilities = J2Store::utilities();
-	
+
 		$items = $this->getItems();
 		if(count($items) < 1) return true;
-	
+
 		$quantity_in_cart = $this->get_orderitem_stock($items);
 		foreach ( $items as $item) {
 			$result = J2Store::plugin ()->event ( 'ValidateOrderStock', array($item,$this) );
@@ -2815,11 +2835,11 @@ class J2StoreTableOrder extends F0FTable
 			if ($item->cartitem->quantity_restriction && J2Store::isPro()) {
 				// get quantity restriction
 				$product_helper->getQuantityRestriction ( $item->cartitem);
-	
+
 				$quantity = $quantity_in_cart [$item->variant_id];
 				$min = $item->cartitem->min_sale_qty;
 				$max = $item->cartitem->max_sale_qty;
-	
+
 				if ($max && $max > 0) {
 					if ($quantity > $max) {
 						JFactory::getApplication ()->enqueueMessage ( JText::sprintf ( "J2STORE_CART_ITEM_MAXIMUM_QUANTITY_REACHED", $item->orderitem_name, $utilities->stock_qty($max), $utilities->stock_qty($quantity) ) );
@@ -2833,7 +2853,7 @@ class J2StoreTableOrder extends F0FTable
 					}
 				}
 			}
-	
+
 			if ($product_helper->managing_stock ( $item->cartitem ) && $product_helper->backorders_allowed ( $item->cartitem ) == false) {
 				$productQuantity = F0FTable::getInstance ( 'ProductQuantity', 'J2StoreTable' )->getClone ();
 				$productQuantity->load ( array (
@@ -2845,7 +2865,7 @@ class J2StoreTableOrder extends F0FTable
 					JFactory::getApplication ()->enqueueMessage ( JText::sprintf ( "J2STORE_CART_ITEM_STOCK_NOT_AVAILABLE", $item->orderitem_name) );
 					return false;
 				}
-	
+
 				// not enough stock ?
 				if ($qty > 0 && $quantity_in_cart [$item->variant_id] > $qty) {
 					JFactory::getApplication ()->enqueueMessage ( JText::sprintf ( "J2STORE_CART_ITEM_STOCK_NOT_ENOUGH_STOCK", $item->orderitem_name, $utilities->stock_qty($qty) ) );
@@ -2855,7 +2875,7 @@ class J2StoreTableOrder extends F0FTable
 		}
 		return true;
 	}
-	
+
 	public function get_orderitem_stock($items) {
 		//sort by variant
 		$quantities = array();
@@ -2867,7 +2887,7 @@ class J2StoreTableOrder extends F0FTable
 		}
 		return $quantities;
 	}
-	
+
 	/**
 	 * Gets cross sells based on the items in the cart.
 	 *
@@ -2890,8 +2910,8 @@ class J2StoreTableOrder extends F0FTable
 		$cross_sells = array_diff( $cross_sells, $in_cart );
 		return $cross_sells;
 	}
-	
-	
+
+
 	//** Gateway utility methods
 
 	public function prepare_line_items($tax_display_option='') {
@@ -2900,22 +2920,22 @@ class J2StoreTableOrder extends F0FTable
 		if(empty($tax_display_option)) {
 			$params = J2Store::config();
 			$tax_display_option = $params->get('checkout_price_display_options', 1);
-		}	
+		}
 		$items = $this->getItems();
-		
+
 		foreach($items as $item) {
 			$line_item = $this->add_line_item(
-					$item->orderitem_name, 
-					$item->orderitem_quantity, 
+					$item->orderitem_name,
+					$item->orderitem_quantity,
 					$this->get_line_item_subtotal($item, $tax_display_option),
 					$this->get_line_item_tax($item),
 					$this->get_line_item_sku($item),
 					$this->get_line_item_options($item),
 					$item
 			);
-			
+
 			$calculated_total += $this->get_line_item_subtotal($item, $tax_display_option) * $item->orderitem_quantity;
-			
+
 			if ( ! $line_item ) {
 				return false;
 			}
@@ -2924,19 +2944,19 @@ class J2StoreTableOrder extends F0FTable
 		foreach($this->get_fees() as $fee) {
 			$this->add_line_item(JText::_($fee->name), 1, $this->get_formatted_fees($fee, $tax_display_option) );
 		}
-		
+
 		//add shipping as a line item too
 		$handling_cost = $this->order_shipping + $this->order_shipping_tax + $this->order_surcharge;
 		if($handling_cost) $this->add_line_item(JText::_('J2STORE_SHIPPING_AND_HANDLING'), 1, $handling_cost, 0, 'shipping');
-		 
+
 	}
-	
+
 	protected function add_line_item( $item_name, $quantity = 1, $amount = 0, $tax=0, $item_number = '', $options=array(), $item = array()) {
-	
+
 		if ( ! $item_name) {
 			return false;
 		}
-		
+
 		$line_item = array();
 		$line_item['name'] = html_entity_decode( substr( $item_name, 0, 127 ), ENT_NOQUOTES, 'UTF-8' );
 		$line_item['quantity'] = $quantity;
@@ -2950,26 +2970,26 @@ class J2StoreTableOrder extends F0FTable
 		array_push($this->line_items, $line_item);
 		return true;
 	}
-	
+
 	public function get_line_items($tax_display_option='') {
 		$this->prepare_line_items($tax_display_option);
 		//allow plugins to modify
 		J2Store::plugin()->event('GetGatewayLineItems', array($this));
 		return $this->line_items;
 	}
-	
+
 	public function reset_line_items() {
 		$this->line_items = array();
 	}
-	
+
 	public function get_line_item_sku($item) {
-		
+
 		if(empty($item->orderitem_sku)) {
 			return $item->product_id;
 		}
 		return $item->orderitem_sku;
 	}
-	
+
 	public function get_line_item_tax($item) {
 		$tax = 0;
 		if($item->orderitem_per_item_tax > 0) {
@@ -2977,8 +2997,8 @@ class J2StoreTableOrder extends F0FTable
 		}
 		return $tax;
 	}
-	
-	public function get_line_item_options($item) {		
+
+	public function get_line_item_options($item) {
 		$options=array();
 		if (isset($item->orderitemattributes) && count($item->orderitemattributes)) {
 			foreach ($item->orderitemattributes as $attribute) {
@@ -2986,12 +3006,12 @@ class J2StoreTableOrder extends F0FTable
 						'name' => JText::_($attribute->orderitemattribute_name),
 						'value'=> JText::_($attribute->orderitemattribute_value)
 				);
-		
+
 			}
 		}
 		return $options;
 	}
-	
+
 	public function get_line_item_subtotal( $item, $inc_tax = false) {
 
 		if ( $inc_tax ) {
@@ -3001,17 +3021,17 @@ class J2StoreTableOrder extends F0FTable
 		}
 		return $price;
 	}
-	
+
 	public function get_total_discount($including_tax = false) {
 		if($including_tax) {
-			return $this->order_discount + $this->order_discount_tax; 
+			return $this->order_discount + $this->order_discount_tax;
 		}else {
 			return $this->order_discount;
-		}		
+		}
 	}
-	
+
 	//admin
-	
+
 	public function saveAdminOrderBasic($data){
 		$app = JFactory::getApplication();
 		$lang = JFactory::getLanguage();
@@ -3034,7 +3054,7 @@ class J2StoreTableOrder extends F0FTable
 				$user =  JFactory::getUser($this->user_id);
 				$this->user_email =$user->email;
 				$this->customer_group = implode(',', JAccess::getAuthorisedViewLevels($user->id, false));
-					
+
 				$this->currency_id = $currency->getId();
 				$this->currency_code = $currency->getCode();
 				$this->currency_value = $currency->getValue($currency->getCode());
@@ -3083,7 +3103,7 @@ class J2StoreTableOrder extends F0FTable
 		$orderinfo->load(array('order_id'=> $this->order_id));
 		// check already exists
 		$orderinfo->order_id = $this->order_id;
-		
+
 		if($app->input->getString('address','') == 'existing'){
 			$address_id = $app->input->getInt('address_id');
 			// get the address id
@@ -3122,14 +3142,14 @@ class J2StoreTableOrder extends F0FTable
 		}else{
 			$data['email'] = $this->user_email;
 			$data['user_id'] = $this->user_id;
-			
+
 			$address   = F0FModel::getTmpInstance('Addresses','J2StoreModel');
 			$address_id = $address->addAddress($address_type,$data);
-			
+
 			if($address_id){
 				$address   = F0FTable::getAnInstance('Address','J2StoreTable');
 				$address->load($address_id);
-				
+
 				$address->country_name = F0FModel::getTmpInstance('Countries','J2StoreModel')->getItem($address->country_id)->country_name;
 				$address->zone_name = F0FModel::getTmpInstance('Zones','J2StoreModel')->getItem($address->zone_id)->zone_name;
 				$input = J2Store::platform()->fromObject($address);
@@ -3142,31 +3162,31 @@ class J2StoreTableOrder extends F0FTable
 						$k = $address_type.'_'.$k;
 					}
 					$values[$k] = $value;
-				}				
+				}
 				$orderinfo->bind($values);
 				if(!$orderinfo->store()){
 					$result =array('msg' => JText::_('J2STORE_ORDERINFO_ERROR_IN_SAVING') ,'msgType'=>'warning');
 				}
 			}
-			
+
 		}
-	
+
 		return $result;
 	}
-	
+
 	public function getAdminTotals($taxes=FALSE) {
-	
+
 		//$this->reset();
-	
-		$this->order_discount = 0;		
+
+		$this->order_discount = 0;
 		//set the order information
 		//$this->setOrderInformation();
-		
+
 		$this->getAdminOrderProductTotals($taxes);
-	
+
 		// then calculate shipping total
 		$this->getAdminOrderShippingTotals($taxes);
-	
+
 
 		// Trigger the fees API where developers can add fees or additional cost to order
 		$this->getAdminOrderFeeTotals();
@@ -3199,16 +3219,16 @@ class J2StoreTableOrder extends F0FTable
 		//$this->order_subtotal_ex_tax = 0;
 		// set object properties
 		$this->order_total      = $total;
-		
+
 		$this->store();
-		
+
 		// We fire just a single plugin event here and pass the entire order object
 		// so the plugins can override whatever they need to
         $order_obj = $this->get_order_obj();
 		J2Store::plugin()->event("CalculateOrderTotals", array( &$order_obj ) );
-	
+
 	}
-	
+
 	/**
 	 * Calculates the product total (aka subtotal)
 	 * using the array of items in the order object
@@ -3229,26 +3249,26 @@ class J2StoreTableOrder extends F0FTable
 		 * Calculate subtotals for items.
 		 * This is done first so that discount logic can use the values.
 		*/
-	
+
 		foreach ( $this->getItems () as $item ) {
-			
+
 			// Prices
 			$base_price = $item->orderitem_price + $item->orderitem_option_price;
 			J2Store::plugin ()->event ( 'AfterCalculateBasePriceInProductTotal', array( &$item, $this, &$base_price) );
 			$line_price = $base_price * $item->orderitem_quantity;
-	
+
 			$line_subtotal = 0;
 			$line_subtotal_tax = 0;
-	
+
 			/**
 			 * No tax to calculate
 			 */
 			if (! isset ( $item->orderitem_taxprofile_id ) || $item->orderitem_taxprofile_id < 1) {
-	
+
 				// Subtotal is the undiscounted price
 				$this->subtotal += $line_price;
 				$this->subtotal_ex_tax += $line_price;
-					
+
 				/**
 				 * Prices include tax
 				 *
@@ -3262,67 +3282,67 @@ class J2StoreTableOrder extends F0FTable
 				 * e.g. $100 bike with $10 coupon = customer pays $90 and tax worked backwards from that
 				 */
 			} elseif ($item->orderitem_taxprofile_id && $params->get ( 'config_including_tax', 0 )) {
-	
+
 				// Get base tax rates
-	
+
 				$shop_taxrates = $tax_model->getBaseTaxRates ( $line_price, $item->orderitem_taxprofile_id, 1 );
-	
+
 				// Get item tax rates
 				$item_taxrates = $tax_model->getTaxwithRates ( $line_price, $item->orderitem_taxprofile_id, 1 );
-	
+
 				/**
 				 * ADJUST TAX - Calculations when base tax is not equal to the item tax
 				*/
 				if ($item_taxrates->taxtotal !== $shop_taxrates->taxtotal) {
-	
+
 					// Work out a new base price without the shop's base tax
-	
+
 					// Now we have a new item price (excluding TAX)
 					$line_subtotal = $line_price - $shop_taxrates->taxtotal;
-	
+
 					// Now add modified taxes
 					$modified_taxrates = $tax_model->getTaxwithRates ( $line_subtotal, $item->orderitem_taxprofile_id, 0 );
 					$line_subtotal_tax = $modified_taxrates->taxtotal;
-	
+
 					/**
 					 * Regular tax calculation (customer inside base and the tax class is unmodified
 					 */
 				} else {
-	
+
 					// Calc tax normally
 					$line_subtotal_tax = $item_taxrates->taxtotal;
 					$line_subtotal = $line_price - $item_taxrates->taxtotal;
 				}
-					
+
 			} else {
-	
+
 				/**
 				 * Prices exclude tax
 				 *
 				 * This calculation is simpler - work with the base, untaxed price.
 				 */
-	
+
 				$item_taxrates = $tax_model->getTaxwithRates ( $line_price, $item->orderitem_taxprofile_id, 0 );
 				// Base tax for line before discount - we will store this in the order data
 				$line_subtotal_tax = $item_taxrates->taxtotal;
 				$line_subtotal = $line_price;
 			}
-	
+
 			// Add to main subtotal
 			$this->subtotal += $line_subtotal + $line_subtotal_tax;
 			$this->subtotal_ex_tax += $line_subtotal;
 		}
-	
+
 		/**
 		 * Calculate actual totals for items
 		 */
 		foreach ( $this->getItems () as $hash => $item ) {
-	
+
 			// Prices
 			$base_price = $item->orderitem_price + $item->orderitem_option_price;
 			J2Store::plugin ()->event ( 'AfterCalculateBasePriceInProductTotal', array( &$item, $this, &$base_price) );
 			$line_price = $base_price * $item->orderitem_quantity;
-	
+
 			// Tax data
 			$taxes = array ();
 			$discounted_taxes = array ();
@@ -3330,7 +3350,7 @@ class J2StoreTableOrder extends F0FTable
 			 * No tax to calculate
 			*/
 			if (! isset ( $item->orderitem_taxprofile_id ) || $item->orderitem_taxprofile_id < 1) {
-	
+
 				// Discounted Price (price with any pre-tax discounts applied)
 				$discounted_price = $this->get_discounted_price ( $item, $base_price, true );
 				$discounted_tax_amount = 0;
@@ -3343,47 +3363,47 @@ class J2StoreTableOrder extends F0FTable
 				 * Prices include tax
 				 */
 			} elseif ($item->orderitem_taxprofile_id && $params->get ( 'config_including_tax', 0 )) {
-	
+
 				// Get base tax rates
-	
+
 				$shop_taxrates = $tax_model->getBaseTaxRates ( $line_price, $item->orderitem_taxprofile_id, 1 );
-	
+
 				// Get item tax rates
 				$item_taxrates = $tax_model->getTaxwithRates ( $line_price, $item->orderitem_taxprofile_id, 1 );
-	
+
 				/**
 				 * ADJUST TAX - Calculations when base tax is not equal to the item tax
 				*/
 				if ($item_taxrates->taxtotal !== $shop_taxrates->taxtotal) {
-	
+
 					// Work out a new base price without the shop's base tax
-	
+
 					// Now we have a new item price (excluding TAX)
 					$line_subtotal = $line_price - $shop_taxrates->taxtotal;
-	
+
 					// Now add modified taxes
 					$modified_taxrates = $tax_model->getTaxwithRates ( $line_subtotal, $item->orderitem_taxprofile_id, 0 );
 					$line_subtotal_tax = $modified_taxrates->taxtotal;
-	
+
 					// Adjusted price (this is the price including the new tax rate)
 					$adjusted_price = ($line_subtotal + $line_subtotal_tax) / $item->orderitem_quantity;
-	
+
 					// Apply discounts
 					$discounted_price = $this->get_discounted_price ( $item, $adjusted_price, true );
 					$discounted_taxes = $tax_model->getTaxwithRates ( $discounted_price * $item->orderitem_quantity, $item->orderitem_taxprofile_id, 1 );
 					$line_tax = $discounted_taxes->taxtotal;
 					$line_total = ($discounted_price * $item->orderitem_quantity) - $line_tax;
-	
+
 					/**
 					 * Regular tax calculation (customer inside base and the tax class is unmodified
 					 */
 				} else {
-	
+
 					// Work out a new base price without the item tax
 					// Now we have a new item price (excluding TAX)
 					$line_subtotal = $line_price - $item_taxrates->taxtotal;
 					$line_subtotal_tax = $item_taxrates->taxtotal;
-	
+
 					// Calc prices and tax (discounted)
 					$discounted_price = $this->get_discounted_price ( $item, $base_price, true );
 					$discounted_taxes = $tax_model->getTaxwithRates ( $discounted_price * $item->orderitem_quantity, $item->orderitem_taxprofile_id, 1 );
@@ -3403,23 +3423,23 @@ class J2StoreTableOrder extends F0FTable
 					}
 				}
 				$item->orderitem_per_item_tax = $discounted_taxes->taxtotal / $item->orderitem_quantity;
-					
+
 				/**
 				 * Prices exclude tax
 				 */
 			} else {
-	
-	
+
+
 				// Work out a new base price without the shop's base tax
 				$item_taxrates = $tax_model->getTaxwithRates ( $line_price, $item->orderitem_taxprofile_id, 0 );
-	
+
 				// Now we have the item price (excluding TAX)
 				$line_subtotal = $line_price;
 				$line_subtotal_tax = $item_taxrates->taxtotal;
-	
+
 				// Now calc product rates
 				$discounted_price = $this->get_discounted_price ( $item, $base_price, true );
-	
+
 				$discounted_taxes = $tax_model->getTaxwithRates ( $discounted_price * $item->orderitem_quantity, $item->orderitem_taxprofile_id, 0 );
 				$discounted_tax_amount = $discounted_taxes->taxtotal;
 				$line_tax = $discounted_tax_amount;
@@ -3438,7 +3458,7 @@ class J2StoreTableOrder extends F0FTable
 				}
 				$item->orderitem_per_item_tax = $discounted_taxes->taxtotal / $item->orderitem_quantity;
 			}
-	
+
 			// Cart contents total is based on discounted prices and is used for the final total calculation
 			$this->cart_contents_total += $line_total;
 			/* 	var_dump ( $line_total );
@@ -3450,13 +3470,13 @@ class J2StoreTableOrder extends F0FTable
 			$this->cart_contents [$hash] ['line_tax'] = $line_tax;
 			$this->cart_contents [$hash] ['line_subtotal'] = $line_subtotal;
 			$this->cart_contents [$hash] ['line_subtotal_tax'] = $line_subtotal_tax;
-	
+
 			// Store rates ID and costs - Since 2.2
 			$this->cart_contents [$hash] ['line_tax_data'] = array (
 					'total' => $discounted_taxes,
 					'subtotal' => $taxes
 			);
-	
+
 			$item->orderitem_finalprice = $line_subtotal + $line_subtotal_tax;
 			$item->orderitem_finalprice_with_tax = $line_subtotal + $line_subtotal_tax;
 			$item->orderitem_finalprice_without_tax = $line_subtotal;
@@ -3465,7 +3485,7 @@ class J2StoreTableOrder extends F0FTable
 			if($platform->isClient('administrator') && F0FPlatform::getInstance()->isBackend()) {
 				$item->store();
 			}
-				
+
 		}
 		// vat exempted customer ? remove the taxes
 		$customer = F0FTable::getAnInstance ( 'Customer', 'J2StoreTable' );
@@ -3475,10 +3495,10 @@ class J2StoreTableOrder extends F0FTable
 		// set object properties
 		$this->order_subtotal = !empty($this->subtotal)?$this->subtotal:0;
 		$this->order_subtotal_ex_tax = !empty($this->subtotal_ex_tax) ? $this->subtotal_ex_tax:0;
-	
+
 		if($platform->isClient('administrator') && F0FPlatform::getInstance()->isBackend()) {
 			$ordertaxes = F0FModel::getTmpInstance('OrderTaxes', 'J2StoreModel')->order_id($this->order_id)->getList();
-			
+
 			if(isset($this->_taxrates) && $apply_taxes) {
 				$this->_ordertaxes = array();
 				foreach ($ordertaxes as $order_tax){
@@ -3486,7 +3506,7 @@ class J2StoreTableOrder extends F0FTable
 					$ordertaxeTable->load($order_tax->j2store_ordertax_id);
 					$ordertaxeTable->delete();
 				}
-				
+
 				foreach($this->_taxrates as $tax) {
 					$ordertax = F0FTable::getAnInstance('Ordertax', 'J2StoreTable')->getClone();
 					$ordertax->ordertax_title = $tax['name'];
@@ -3505,14 +3525,14 @@ class J2StoreTableOrder extends F0FTable
 		$this
 		) );
 	}
-	
+
 	public function getAdminOrderShippingTotals($taxes){
-		$session = JFactory::getSession();				
-		$shipping_values = $session->get('shipping_values', array(), 'j2store');		
+		$session = JFactory::getSession();
+		$shipping_values = $session->get('shipping_values', array(), 'j2store');
 		$session->clear('shipping_values', 'j2store');
 		$config = J2Store::config();
         $voucher_apply_to_shipping = $config->get('backend_voucher_to_shipping',1);
-		if(isset($shipping_values['shipping_name'])) {			
+		if(isset($shipping_values['shipping_name'])) {
 			$this->setAdminOrderShippingRate($shipping_values);
 			$this->order_shipping = $this->_shipping_totals->ordershipping_price + $this->_shipping_totals->ordershipping_extra;
             $this->order_shipping_tax  = $this->_shipping_totals->ordershipping_tax;
@@ -3586,7 +3606,7 @@ class J2StoreTableOrder extends F0FTable
 		}
 		return $price;
 	}
-	
+
 	function getAdminOrderTaxTotals() {
 		/*  */
 		$items = $this->getItems();
@@ -3647,7 +3667,7 @@ class J2StoreTableOrder extends F0FTable
 
 	public function setAdminOrderShippingRate( $values)
 	{
-	
+
 		$ordershipping_table = F0FTable::getAnInstance('Ordershipping', 'J2StoreTable');
 		$ordershipping_table->load(array(
 				'order_id'=>$this->order_id
@@ -3667,7 +3687,7 @@ class J2StoreTableOrder extends F0FTable
 		if(isset($this->_orderdiscounts) && count($this->_orderdiscounts)) {
 			foreach ($this->_orderdiscounts as $discount) {
 				//$discount = F0FTable::getAnInstance('Ordershipping', 'J2StoreTable');
-	
+
 				$discount->order_id = $this->order_id;
 				if(!isset($discount->discount_customer_email)) {
 					$discount->discount_customer_email = $this->user_email;
@@ -3682,7 +3702,7 @@ class J2StoreTableOrder extends F0FTable
 					$discount_table->bind($discount);
 					$discount_table->store();
 				}
-	
+
 			}
 		}
 	}
