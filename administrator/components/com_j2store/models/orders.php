@@ -487,20 +487,26 @@ class J2StoreModelOrders extends F0FModel {
 		}
 
 		if($state->search){
-			$search = '%'.trim($state->search).'%';
-			$subquery = '( select order_id from #__j2store_orderitems where #__j2store_orderitems.orderitem_sku LIKE '.$db->q($search).' AND #__j2store_orderitems.order_id = '.$db->qn('#__j2store_orders').'.'.$db->qn('order_id').' Group by #__j2store_orderitems.order_id )';
-			$query->where('('.
-			 				$db->qn('#__j2store_orders').'.'.$db->qn('order_id').' LIKE '.$db->q($search).' OR '.
-							$db->qn('#__j2store_orders').'.'.$db->qn('order_id').' = '.$subquery.' OR '.
-			 				$db->qn('#__j2store_orders').'.'.$db->qn('j2store_order_id').' LIKE '.$db->q($search).'OR '.
-			 				$db->qn('#__j2store_orders').'.'.$db->qn('user_email').' LIKE '.$db->q($search).'OR '.
-			 				$db->qn('#__j2store_orders').'.'.$db->qn('order_state').' LIKE '.$db->q($search).'OR '.
-	 		 				$db->qn('#__j2store_orders').'.'.$db->qn('orderpayment_type').' LIKE '.$db->q($search).'OR'.
-			 				' CONCAT ('.$db->qn('#__j2store_orderinfos').'.'.$db->qn('billing_first_name').', " ", '.$db->qn('#__j2store_orderinfos').'.'.$db->qn('billing_last_name').') LIKE '.$db->q($search).'OR '.
-			 				$db->qn('#__j2store_orderinfos').'.'.$db->qn('billing_first_name').' LIKE '.$db->q($search).'OR'.
-			 				$db->qn('#__j2store_orderinfos').'.'.$db->qn('billing_last_name').' LIKE '.$db->q($search)
-				.')'
-			 		) ;
+            $search = trim($state->search);
+            // Check if it looks like an email address
+            if(filter_var($search, FILTER_VALIDATE_EMAIL) || strpos($search, '@') !== false) {
+                $query->where($db->qn('#__j2store_orders').'.'.$db->qn('user_email').' = '.$db->q($search));
+            } else {
+                $search = '%' . $search . '%';
+                $subquery = '( select order_id from #__j2store_orderitems where #__j2store_orderitems.orderitem_sku LIKE ' . $db->q($search) . ' AND #__j2store_orderitems.order_id = ' . $db->qn('#__j2store_orders') . '.' . $db->qn('order_id') . ' Group by #__j2store_orderitems.order_id )';
+                $query->where('(' .
+                    $db->qn('#__j2store_orders') . '.' . $db->qn('order_id') . ' LIKE ' . $db->q($search) . ' OR ' .
+                    $db->qn('#__j2store_orders') . '.' . $db->qn('order_id') . ' = ' . $subquery . ' OR ' .
+                    $db->qn('#__j2store_orders') . '.' . $db->qn('j2store_order_id') . ' LIKE ' . $db->q($search) . 'OR ' .
+                    $db->qn('#__j2store_orders') . '.' . $db->qn('user_email') . ' LIKE ' . $db->q($search) . 'OR ' .
+                    $db->qn('#__j2store_orders') . '.' . $db->qn('order_state') . ' LIKE ' . $db->q($search) . 'OR ' .
+                    $db->qn('#__j2store_orders') . '.' . $db->qn('orderpayment_type') . ' LIKE ' . $db->q($search) . 'OR' .
+                    ' CONCAT (' . $db->qn('#__j2store_orderinfos') . '.' . $db->qn('billing_first_name') . ', " ", ' . $db->qn('#__j2store_orderinfos') . '.' . $db->qn('billing_last_name') . ') LIKE ' . $db->q($search) . 'OR ' .
+                    $db->qn('#__j2store_orderinfos') . '.' . $db->qn('billing_first_name') . ' LIKE ' . $db->q($search) . 'OR' .
+                    $db->qn('#__j2store_orderinfos') . '.' . $db->qn('billing_last_name') . ' LIKE ' . $db->q($search)
+                    . ')'
+                );
+            }
 		}
 
 		if($state->coupon_code){
