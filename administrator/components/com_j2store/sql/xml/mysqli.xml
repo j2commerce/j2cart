@@ -8,7 +8,7 @@
             <driver>mysqli</driver>
         </drivers>
     </meta>
-    
+
     <!-- SQL commands to run on installation and update -->
     <sql>
         <!-- Create tables if they are missing -->
@@ -605,6 +605,14 @@
                 ALTER TABLE `#__j2store_orders` ADD INDEX idx_token_email( `user_email`, `token` );
             ]]></query>
         </action>
+
+        <action table="#__j2store_orders" canfail="1">
+            <condition type="true"/>
+            <query><![CDATA[
+                ALTER TABLE `#__j2store_orders` ADD INDEX idx_user_email (`user_email`);
+            ]]></query>
+        </action>
+
         <action table="#__j2store_orderitems" canfail="1">
             <condition type="true"/>
             <query><![CDATA[
