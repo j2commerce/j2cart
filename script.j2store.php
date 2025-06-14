@@ -252,6 +252,9 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             'position'   => $position,
         ];
 
+        // Load the module's language file
+        Factory::getLanguage()->load($module_name, JPATH_ADMINISTRATOR);
+
         $module['title']  = Text::_(strtoupper($module_name));
         $module['access'] = (int) Factory::getApplication()->get('access', 1);
         $module['params'] = array_merge([
