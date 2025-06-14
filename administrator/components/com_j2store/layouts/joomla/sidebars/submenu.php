@@ -99,7 +99,7 @@ $menus = [
         'icon' => 'fas fa-solid fa-th',
         'submenu' => [
             'apps' => 'fas fa-th',
-            'appstores' => 'fas fa-solid fa-shop',
+            /*'appstores' => 'fas fa-solid fa-shop',*/
         ],
         'active' => 0
 	],
@@ -193,7 +193,7 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
                     <?php $view = $app->input->getString('view');
                     foreach($menus as $key => $value): ?>
                         <?php if(isset($value['submenu']) && count($value['submenu'])):?>
-                            <li class="nav-item dropdown flex-lg-grow-1 flex-xl-grow-0 me-xl-2" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo $value['name'];?>">
+                            <li data-menu-key="<?php echo $key;?>" class="nav-item dropdown flex-lg-grow-1 flex-xl-grow-0 me-xl-2" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo $value['name'];?>">
                                 <a href="javascript:void(0);" class="nav-link dropdown-toggle submenu-dropdown-toggle text-lg-center" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-fw me-1 me-xxl-2 <?php echo isset($value['icon']) ? $value['icon'] : '';?>" aria-hidden="true"></i>
                                     <span class="submenu-title d-inline d-lg-none d-xl-inline fs-6"><?php echo $value['name'];?></span>
@@ -222,7 +222,7 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
                                                 $sub_menu_span_class = isset( $sub_value ) ? $sub_value:'';
                                             ?>
                                         <?php endif;?>
-                                        <li>
+                                        <li data-menu-key="<?php echo $sub_key;?>">
                                             <a class="dropdown-item <?php echo $class ?>" href="<?php echo $link_url;?>">
                                                 <i class="fa-fw me-1 me-xxl-2 <?php echo $sub_menu_span_class;?>" aria-hidden="true"></i>
                                                 <span class="fs-6"><?php echo Text::_('COM_J2STORE_TITLE_'.strtoupper($sub_key));?></span>
@@ -238,7 +238,7 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
                                 $active_class ='active';
                             }
                             ?>
-                            <li class="nav-item <?php echo $active_class;?> flex-lg-grow-1 flex-xl-grow-0 me-xl-2 position-relative">
+                            <li data-menu-key="<?php echo $key;?>" class="nav-item <?php echo $active_class;?> flex-lg-grow-1 flex-xl-grow-0 me-xl-2 position-relative">
                                 <?php if (isset($value['link']) && $value['link'] != ''): ?>
                                     <a class="nav-link text-lg-center text-nowrap" aria-current="page" href="<?php echo $value['link'];?>">
                                 <?php else : ?>

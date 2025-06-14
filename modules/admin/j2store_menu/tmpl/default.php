@@ -102,7 +102,7 @@ $menus = [
         'active' => 0,
         'submenu' => [
             'apps' => 'fas fa-th',
-            'appstores' => 'fas fa-solid fa-shop',
+            /*'appstores' => 'fas fa-solid fa-shop',*/
         ]
     ],
     'reporting' => [
