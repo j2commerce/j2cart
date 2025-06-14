@@ -8,7 +8,7 @@
             <driver>mysqli</driver>
         </drivers>
     </meta>
-    
+
     <!-- SQL commands to run on installation and update -->
     <sql>
         <!-- Create tables if they are missing -->
@@ -31,7 +31,7 @@
 			CREATE TABLE IF NOT EXISTS `#__j2store_filters` (
 			  `j2store_filter_id` int(11) NOT NULL AUTO_INCREMENT,
 			  `group_id` int(11) NOT NULL,
-			  `filter_name` varchar(255) DEFAULT NULL,
+			  `filter_name` varchar(255) NULL DEFAULT NULL,
 			  `ordering` int(11) NOT NULL,
 			  PRIMARY KEY (`j2store_filter_id`),
 			  KEY `group_id` (`group_id`)
@@ -868,7 +868,7 @@
             <condition type="true"/>
             <query><![CDATA[
                 ALTER TABLE `#__j2store_currencies`
-                MODIFY `currency_position` varchar(12) DEFAULT 'pre',
+                MODIFY `currency_position` varchar(12) NULL DEFAULT 'pre' ,
                 MODIFY `currency_symbol` varchar(255) NULL DEFAULT NULL,
                 MODIFY `currency_decimal` varchar(12) NULL DEFAULT '.' ,
                 MODIFY `currency_thousands` char(1) NULL DEFAULT ',' ,
@@ -1248,18 +1248,6 @@
                 MODIFY `mime_type` varchar(255) NULL DEFAULT NULL,
                 MODIFY `created_by` INT(11) NULL DEFAULT 0,
                 MODIFY `created_on` datetime NULL DEFAULT NULL;
-            ]]></query>
-        </action>
-        <action table="#__j2store_orderfees" canfail="0">
-            <condition type="true"/>
-            <query><![CDATA[
-                ALTER TABLE `#__j2store_orderfees`
-                MODIFY `name` varchar(255) NULL DEFAULT NULL,
-                MODIFY `amount` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `tax_class_id` int(11) NULL DEFAULT NULL,
-                MODIFY `taxable` int(11)  NULL DEFAULT NULL,
-                MODIFY `tax` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `tax_data` text NULL DEFAULT NULL;
             ]]></query>
         </action>
     </sql>
