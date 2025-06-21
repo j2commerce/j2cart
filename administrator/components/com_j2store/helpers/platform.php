@@ -120,17 +120,49 @@ class J2StorePlatform
         return $output;
     }
 
-    public function loadExtra($behaviour,...$methodArgs)
+    /**
+     * Load extra scripts, styles or behaviors
+     *
+     * @param string $behaviour
+     * @param mixed ...$methodArgs
+     */
+    public function loadExtra($behaviour, ...$methodArgs)
     {
-        if(!in_array($behaviour,array('behavior.framework','behavior.modal','bootstrap.tooltip','behavior.tooltip'))){
-            HTMLHelper::_($behaviour,implode(',',$methodArgs));
-        }elseif($behaviour == 'behavior.modal'){
-            HTMLHelper::_('script', 'system/fields/modal-fields.min.js', array('version' => 'auto', 'relative' => true));
+        if ($behaviour === 'script') {
+            if (strpos($methodArgs[0], 'j2store.js') !== false) {
+                $this->loadCoreScript();
+                return;
+            }
+        }
+
+        if (!in_array($behaviour, ['behavior.framework','behavior.modal','bootstrap.tooltip','behavior.tooltip'])) {
+            HTMLHelper::_($behaviour, implode(',', $methodArgs));
+        } elseif ($behaviour === 'behavior.modal') {
+            $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+            // deprecated in Joomla 6 - use the new modal-content-select-field script
+            $wa->useScript('field.modal-fields');
         }
     }
+
+    /**
+     * Load the core J2Store script
+     *
+     * This method is used to load the main J2Store JavaScript file.
+     * It registers the script with the web asset manager and sets it to be used.
+     */
+    public function loadCoreScript()
+    {
+        $this->addScript('j2store-script','j2store/j2store.js', ['version' => 'auto', 'relative' => true]);
+    }
+
+    /**
+     * Add an include path for HTMLHelper
+     *
+     * @param string $path The path to add
+     */
     public function addIncludePath($path)
     {
-        HTMLHelper::addIncludePath($path);
+        HTMLHelper::addIncludePath($path); // Deprecated Joomla 6 ? HTMLHelper::getServiceRegistry()->getService($file);
     }
 
     public function checkAdminMenuModule()
@@ -162,16 +194,16 @@ class J2StorePlatform
 
     public function addScript($asset, $uri ,$options = [], $attributes = [], $dependencies = [])
     {
-        $url = trim(Uri::root(),'/').$uri;
+        $uri = ltrim($uri,'/');
         $wa = $this->application()->getDocument()->getWebAssetManager();
-        $wa->registerAndUseScript($asset,$url,$options,$attributes,$dependencies);
+        $wa->registerAndUseScript($asset, $uri, $options, $attributes, $dependencies);
     }
 
     public function addStyle($asset, $uri ,$options = [], $attributes = [], $dependencies = [])
     {
-        $url = trim(Uri::root(),'/').$uri;
+        $uri = ltrim($uri,'/');
         $wa = $this->application()->getDocument()->getWebAssetManager();
-        $wa->registerAndUseStyle($asset,$url,$options,$attributes,$dependencies);
+        $wa->registerAndUseStyle($asset, $uri, $options, $attributes, $dependencies);
     }
 
     public function addInlineScript( $content, $options = [], $attributes = [], $dependencies = [])
