@@ -22,7 +22,7 @@ $platform->loadExtra('behavior.tooltip');
 $platform->loadExtra('behavior.multiselect');
 $platform->loadExtra('dropdown.init');
 
-$platform->loadExtra('script', 'media/j2store/js/j2store.js', false, false);
+$platform->loadCoreScript();
 
 $wa  = Factory::getApplication()->getDocument()->getWebAssetManager();
 $script = "Joomla.submitbutton = function(pressbutton) {
