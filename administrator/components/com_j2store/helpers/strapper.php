@@ -92,7 +92,7 @@ class J2StoreStrapper
         } else {
             $platform->addScript('j2store-jquery-zoom-script', 'j2store/jquery.zoom.js', [], [], ['jquery']);
             $platform->loadCoreScript();
-            $platform->addScript('j2store-media-script', 'j2store/bootstrap-modal-conflit.js', [], [], ['jquery']);
+            $platform->addScript('j2store-bootstrap-modal-script', 'j2store/bootstrap-modal-conflit.js', [], [], ['jquery']);
             if ($params->get('load_fancybox', 1)) {
                 $platform->addScript('j2store-fancybox-script', 'j2store/jquery.fancybox.min.js', [], [], ['jquery']);
                 $platform->addInlineScript('jQuery(document).off("click.fb-start", "[data-trigger]");');
