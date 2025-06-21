@@ -104,7 +104,7 @@ class J2StoreStrapper {
         }
         else {
 	        $wa->registerAndUseScript('j2store-jquery-zoom-script',Uri::root().'media/j2store/js/jquery.zoom.js');
-	        $wa->registerAndUseScript('j2store-script',Uri::root().'media/j2store/js/j2store.js');
+            $platform->loadCoreScript();
 	        $wa->registerAndUseScript('j2store-media-script',Uri::root().'media/j2store/js/bootstrap-modal-conflit.js');
             if($load_fancybox) {
 	            $wa->registerAndUseScript('j2store-fancybox-script',Uri::root().'media/j2store/js/jquery.fancybox.min.js');
