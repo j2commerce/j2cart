@@ -104,7 +104,7 @@ class JFormFieldJ2storeitem extends FormField
 		$css = '#j2store-product-item-list{ list-style:none; margin:5px; }';
 
         $platform->addInlineScript($js);
-        $platform->addStyle($js);
+        $platform->addInlineStyle($css);
 		$html .= J2Store::platform()->loadExtra('behavior.modal','a.modal');
 		$html .= '<div id="'.$fieldId.'">';
 		$html .= '<label class="control-label"></label>';
