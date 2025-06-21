@@ -152,7 +152,7 @@ class J2StorePlatform
      */
     public function loadCoreScript()
     {
-        $this->addScript('j2store-script','j2store/j2store.js', ['version' => 'auto', 'relative' => true]);
+        $this->addScript('j2store-script','j2store/j2store.js', ['version' => 'auto', 'relative' => true], [], ['jquery']);
     }
 
     /**
