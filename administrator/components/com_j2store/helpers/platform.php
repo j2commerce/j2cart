@@ -128,6 +128,7 @@ class J2StorePlatform
      */
     public function loadExtra($behaviour, ...$methodArgs)
     {
+        // Deal will add-on calls, redirect to the right way to call j2store.js
         if ($behaviour === 'script') {
             if (strpos($methodArgs[0], 'j2store.js') !== false) {
                 $this->loadCoreScript();
