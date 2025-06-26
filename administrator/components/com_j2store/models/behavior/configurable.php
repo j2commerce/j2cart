@@ -9,6 +9,9 @@ defined('_JEXEC') or die;
 class J2StoreModelProductsBehaviorConfigurable extends F0FModelBehavior {
 	private $_rawData = array();
 	public function onAfterGetItem(&$model, &$record) {
+
+        if($record->product_type != 'configurable') return;
+
         $platform = J2Store::platform();
 		//we just have the products. Get the variants
 		$variantModel = F0FModel::getTmpInstance('Variants', 'J2StoreModel');
@@ -300,6 +303,7 @@ class J2StoreModelProductsBehaviorConfigurable extends F0FModelBehavior {
 	}
 
 	public function onUpdateProduct(&$model, &$product) {
+        if($product->product_type != 'configurable') return;
 		$app = JFactory::getApplication ();
 		$params = J2Store::config ();
 		$product_helper = J2Store::product ();
