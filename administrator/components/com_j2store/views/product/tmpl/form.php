@@ -31,11 +31,11 @@ $style = '.j2store-product-edit-form .input-group .form-check.form-switch .form-
 $wa->addInlineStyle($style, [], []);
 ?>
 <script type="text/javascript">
+    var J2StoreSubmitbuttonOverride = Joomla.submitbutton || function(){}
     Joomla.submitbutton = function(pressbutton) {
         var form = document.adminForm;
         if(pressbutton == 'article.cancel') {
-            document.adminForm.task.value = pressbutton;
-            form.submit();
+            J2StoreSubmitbuttonOverride(pressbutton);
         }else if(pressbutton == 'article.apply') {
             if (document.formvalidator.isValid(form)) {
                 document.adminForm.task.value = pressbutton;
@@ -44,22 +44,22 @@ $wa->addInlineStyle($style, [], []);
                         this.disabled = true;
                     }
                 }
-                form.submit();
+                J2StoreSubmitbuttonOverride(pressbutton);
             }
             else {
                 let msg = [];
-                msg.push('<?php echo $alert_html; ?>');
-                document.getElementById('system-message-container').innerHTML =  msg.join('\n') ;
+                msg.push('');
+                document.getElementById('system-message-container').innerHTML = "msg.join('\n') ;"
             }
         }else{
             if (document.formvalidator.isValid(form)) {
                 document.adminForm.task.value = pressbutton;
-                form.submit();
+                J2StoreSubmitbuttonOverride(pressbutton);
             }
             else {
                 let msg = [];
-                msg.push('<?php echo $alert_html; ?>');
-                document.getElementById('system-message-container').innerHTML =  msg.join('\n') ;
+                msg.push('');
+                document.getElementById('system-message-container').innerHTML = msg.join('\n') ;
             }
         }
     }
@@ -77,48 +77,48 @@ $wa->addInlineStyle($style, [], []);
                         <div class="form-grid">
                             <div class="control-group" id="j2store-product-enable">
                                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_TREAT_AS_PRODUCT'), 'enabled',array());?></div>
-		                        <?php echo J2Html::radioBooleanList($this->form_prefix.'[enabled]', $this->item->enabled, array('id'=>'j2store-product-enabled-radio-group', 'class'=>'form-check form-check-inline','hide_label'=>true));?>
+								<?php echo J2Html::radioBooleanList($this->form_prefix.'[enabled]', $this->item->enabled, array('id'=>'j2store-product-enabled-radio-group', 'class'=>'form-check form-check-inline','hide_label'=>true));?>
                             </div>
                             <div class="control-group" id="j2store-product-type">
-		                        <?php if(!empty($this->item->product_type)): ?>
+								<?php if(!empty($this->item->product_type)): ?>
                                     <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TYPE'), 'product_type',array()); ?></div>
                                     <div class="controls">
                                         <span class="<?php echo $product_type_class;?>"><?php echo Text::_('J2STORE_PRODUCT_TYPE_'.strtoupper($this->item->product_type)) ?></span>
                                     </div>
-			                        <?php echo J2Html::hidden($this->form_prefix.'[product_type]', $this->item->product_type); ?>
-		                        <?php else: ?>
+									<?php echo J2Html::hidden($this->form_prefix.'[product_type]', $this->item->product_type); ?>
+								<?php else: ?>
                                     <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TYPE'), 'product_type',array()); ?></div>
                                     <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', $this->product_types); ?></div>
-		                        <?php endif; ?>
+								<?php endif; ?>
                             </div>
-	                        <?php if(!$this->item->enabled): ?>
+							<?php if(!$this->item->enabled): ?>
                                 <!-- Show this only when this was not a product -->
-		                        <?php if($option == 'com_content' && J2Store::platform()->isClient('administrator')): ?>
+								<?php if($option == 'com_content' && J2Store::platform()->isClient('administrator')): ?>
                                     <div class="control-group">
                                         <div class="controls">
                                             <input type="button" id="submit_button" onclick="Joomla.submitbutton('article.apply')" class="btn btn-primary" value="<?php echo Text::_('J2STORE_SAVE_AND_CONTINUE'); ?>" />
                                         </div>
                                     </div>
-		                        <?php endif; ?>
-	                        <?php endif; ?>
+								<?php endif; ?>
+							<?php endif; ?>
 
-	                        <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
+							<?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
                                 <div class="control-group">
                                     <div class="control-label"></div>
                                     <div class="controls">
                                         <div class="j2store-confirm-cont">
                                             <a data-fancybox data-src="#j2storeConfirmChange" type="button" class="btn btn-sm btn-outline-danger" ><?php echo  Text::_('J2STORE_CHANGE_PRODUCT_TYPE');?></a>
-                                            <?php echo $this->loadTemplate('confirm_change'); ?>
+											<?php echo $this->loadTemplate('confirm_change'); ?>
                                         </div>
                                     </div>
                                 </div>
-                            <?php endif; ?>
+							<?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
+			<?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
                 <div class="<?php echo $col_class;?>8 mb-4">
                     <div class="card j2store-product-shortcodes text-bg-primary text-white">
                         <div class="card-header justify-content-between fs-3">
@@ -131,36 +131,36 @@ $wa->addInlineStyle($style, [], []);
                                 {j2store}<?php echo $this->item->j2store_product_id; ?>|cart{/j2store}
                             </p>
                             <small>
-		                        <?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_HELP_TEXT');?>
+								<?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_HELP_TEXT');?>
                             </small>
                             <div class="collapse additional-short-code" id="collapseShortcodes">
                                 <h4 class="mb-2 text-white fs-5 mt-4"><?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_ADDITIONAL')?></h4>
                                 <p class="small">
-		                            <?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_HELP_TEXT_ADDITIONAL');?> <b> {j2store}<?php echo $this->item->j2store_product_id; ?>|upsells|crosssells{/j2store}</b>
+									<?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_HELP_TEXT_ADDITIONAL');?> <b> {j2store}<?php echo $this->item->j2store_product_id; ?>|upsells|crosssells{/j2store}</b>
                                 </p>
                                 <p class="shortcode small">price|thumbnail|mainimage|mainadditional|upsells|crosssells</p>
                                 <p class="small">
-		                            <?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_FOOTER_WARNING');?>
+									<?php echo Text::_('J2STORE_PLUGIN_SHORTCODE_FOOTER_WARNING');?>
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
-            <?php endif;?>
+			<?php endif;?>
         </div>
         <input type="hidden" name="<?php echo $this->form_prefix.'[j2store_product_id]'?>" value="<?php echo $this->item->j2store_product_id; ?>" />
 
-        <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
+		<?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
             <div class="card j2store-product-shortcodes">
                 <div class="card-header justify-content-between">
                     <h3 class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_TYPE_'.strtoupper($this->item->product_type)); ?></h3>
                 </div>
                 <div class="card-body">
-                    <?php echo $this->loadTemplate($this->item->product_type); ?>
+					<?php echo $this->loadTemplate($this->item->product_type); ?>
                     <input type="hidden" name="<?php echo $this->form_prefix.'[product_type]'?>" value="<?php echo $this->item->product_type; ?>" />
                 </div>
             </div>
-        <?php endif; ?>
+		<?php endif; ?>
     </div>
 </div>
 <?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
