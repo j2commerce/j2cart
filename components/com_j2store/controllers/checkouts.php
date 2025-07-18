@@ -1,28 +1,28 @@
 <?php
 /**
- * @package     Joomla.Component
- * @subpackage  J2Store
+ * @package J2Commerce
  *
- * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @copyright Copyright (C) 2024-2025 J2Commerce, LLC. All rights reserved.
  * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
 
+// No direct access to this file
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Document\Document;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\PluginHelper;
-use Joomla\CMS\User\UserHelper;
+use Joomla\CMS\User\UserFactory;
+
 
 class J2StoreControllerCheckouts extends F0FController
 {
+
 	protected $cacheableTasks = array();
 
-	function execute($task)
-    {
+	function execute($task) {
 		if(in_array($task, array('add', 'edit', 'read', 'browse'))) {
 			$task='browse';
 		}
@@ -40,8 +40,8 @@ class J2StoreControllerCheckouts extends F0FController
 		return parent::onBeforeGenericTask($task);
 	}
 
-	protected function onBeforeBrowse()
-    {
+	protected function onBeforeBrowse() {
+
 		$format = Factory::getApplication()->input->getString('format', '');
 		$forbidden = array('json', 'csv', 'pdf');
 		if(in_array(strtolower($format), $forbidden)) {
@@ -51,11 +51,11 @@ class J2StoreControllerCheckouts extends F0FController
 		return parent::onBeforeBrowse();
 	}
 
-	public function display($cachable = false, $urlparams = array(), $tpl=null)
-    {
+	public function display($cachable = false, $urlparams = array(), $tpl=null) {
+
 		$document = F0FPlatform::getInstance()->getDocument();
 		$app = Factory::getApplication();
-        $user = $app->getIdentity();
+		$user = Factory::getApplication()->getIdentity();
 
 		if ($document instanceof Document)
 		{
@@ -87,13 +87,13 @@ class J2StoreControllerCheckouts extends F0FController
 
 		$order = J2Store::fof()->getModel('Orders', 'J2StoreModel')->initOrder()->getOrder();
 		$items = $order->getItems();
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$is_mobile = $session->get('is_mobile','','j2store');
         $cart_params = array();
         if ($is_mobile){
             $cart_params['mobile'] = 'mobile';
         }
-		$link = J2Store::platform()->getCartUrl($cart_params);//Route::_('index.php?option=com_j2store&view=carts'.$mobile);
+		$link = J2Store::platform()->getCartUrl($cart_params);//JRoute::_('index.php?option=com_j2store&view=carts'.$mobile);
 
 		if(count($items) < 1) {
 			$app->enqueueMessage(Text::_('J2STORE_CART_NO_ITEMS'), 'notice');
@@ -125,12 +125,13 @@ class J2StoreControllerCheckouts extends F0FController
 
 		// Display without caching
 		$view->display();
+
 	}
 
-	function login()
-    {
+
+	function login() {
 		$app = Factory::getApplication();
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$view = $this->getThisView();
 
 		if ($model = $this->getThisModel())
@@ -159,11 +160,12 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 
-	function login_validate()
-    {
+
+	function login_validate() {
+
 		$app = Factory::getApplication();
-        $user = $app->getIdentity();
-		$session = $app->getSession();
+		$user = Factory::getApplication()->getIdentity();
+		$session = Factory::getApplication()->getSession();
 		$params = J2Store::config();
 		$session->set('uaccount', 'login', 'j2store');
 
@@ -199,18 +201,18 @@ class J2StoreControllerCheckouts extends F0FController
 
 		if (!$json) {
 			$session->clear('guest', 'j2store');
-            $user = $app->getIdentity();
+            $user = Factory::getApplication()->getIdentity();
 			// Default Addresses
 			$address_info = J2Store::fof()->getModel('Addresses', 'J2StoreModel')->user_id($user->id)->getFirstItem();
 
 			if ($address_info) {
-				if ($params->get('config_tax_default') === 'shipping') {
+				if ($params->get('config_tax_default') == 'shipping') {
 					$session->set('shipping_country_id', $address_info->country_id, 'j2store');
 					$session->set('shipping_zone_id',$address_info->zone_id, 'j2store');
 					$session->set('shipping_postcode',$address_info->zip, 'j2store');
 				}
 
-				if ($params->get('config_tax_default') === 'billing') {
+				if ($params->get('config_tax_default') == 'billing') {
 					$session->set('billing_country_id', $address_info->country_id, 'j2store');
 					$session->set('billing_zone_id',$address_info->zone_id, 'j2store');
 					$session->set('billing_postcode',$address_info->zip, 'j2store');
@@ -233,10 +235,9 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 
-	function register()
-    {
+	function register() {
 		$app = Factory::getApplication();
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$params = J2Store::config();
 
 		$view = $this->getThisView();
@@ -246,12 +247,13 @@ class J2StoreControllerCheckouts extends F0FController
 			$view->setModel($model, true);
 		}
 		$order = J2Store::fof()->getModel('Orders', 'J2StoreModel')->initOrder()->getOrder();
+		//$link = JRoute::_('index.php?option=com_j2store&view=carts');
 
 		$session->set('uaccount', 'register', 'j2store');
 
 		$selectableBase = J2Store::getSelectableBase();
 		$view->set('fieldsClass', $selectableBase);
-		$address = J2Store::fof()->loadTable('address', 'J2StoreTable');
+		$address = F0FTable::getAnInstance('address', 'J2StoreTable');
 		$fields = $selectableBase->getFields('billing',$address,'address');
 		J2Store::plugin ()->event ( 'BeforeCheckoutRegister', array(&$address,$order) );
 		$view->set('fields', $fields);
@@ -259,6 +261,8 @@ class J2StoreControllerCheckouts extends F0FController
 
 		//get layout settings
 		$view->set('storeProfile', J2Store::storeProfile());
+
+
 
 		$showShipping = false;
 		if($params->get('show_shipping_address', 0)) {
@@ -273,7 +277,7 @@ class J2StoreControllerCheckouts extends F0FController
 		$this->showShipping = $showShipping;
 
 		$view->set( 'showShipping', $showShipping );
-        $view->set( 'privacyconsent_enabled', PluginHelper::isEnabled('system', 'privacyconsent'));
+        $view->set( 'privacyconsent_enabled',PluginHelper::isEnabled('system', 'privacyconsent'));
 		$view->setLayout( 'default_register');
 		$html = '';
 
@@ -285,10 +289,10 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 
-	function register_validate()
-    {
-		$app = Factory::getApplication();
-        $user = $app->getIdentity();
+	function register_validate() {
+        $platform = J2Store::platform();
+		$app = $platform->application();
+		$user = Factory::getApplication()->getIdentity();
 		$session = $app->getSession();
 		$view = $this->getThisView();
 		if ($model = $this->getThisModel())
@@ -297,7 +301,7 @@ class J2StoreControllerCheckouts extends F0FController
 			$view->setModel($model, true);
 		}
 
-        $redirect_url = J2Store::platform()->getCheckoutUrl();
+        $redirect_url = $platform->getCheckoutUrl();
 		$data = $app->input->getArray($_POST);
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 		$store_address = J2Store::storeProfile();
@@ -331,7 +335,7 @@ class J2StoreControllerCheckouts extends F0FController
 
 			if($privacy_plugin_enabled && !$privacy_plugin){
                 $privacy_plugin = PluginHelper::getPlugin('system', 'privacyconsent');
-                $privacy_params = J2Store::platform()->getRegistry($privacy_plugin->params);
+                $privacy_params = $platform->getRegistry($privacy_plugin->params);//Joomla 1.6 Onward
                 $json['error']['privacyconsent'] = Text::_($privacy_params->get('messageOnRedirect','PLG_SYSTEM_PRIVACYCONSENT_REDIRECT_MESSAGE_DEFAULT'));
             }
 		}
@@ -366,6 +370,7 @@ class J2StoreControllerCheckouts extends F0FController
                 }
 				//$billing_address_id = $userHelper->addCustomer($post);
 				$billing_address_id = $address_model->addAddress('billing');
+
 
 				//check if we have a country and zone id's. If not use the store address
 				$country_id = $app->input->post->getInt('country_id', '');
@@ -414,10 +419,9 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 
-	function guest()
-    {
+	function guest() {
 		$app = Factory::getApplication();
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$cart_model = J2Store::fof()->getModel('Carts', 'J2StoreModel');
 		$view = $this->getThisView();
 		if ($model = $this->getThisModel())
@@ -432,7 +436,7 @@ class J2StoreControllerCheckouts extends F0FController
         if ($is_mobile){
             $cart_params['mobile'] = 'mobile';
         }
-        $link = J2Store::platform()->getCartUrl($cart_params);
+        $link = J2Store::platform()->getCartUrl($cart_params);//$link = JRoute::_('index.php?option=com_j2store&view=carts'.$mobile);
 
 		$session->set('uaccount', 'guest', 'j2store');
 
@@ -459,7 +463,7 @@ class J2StoreControllerCheckouts extends F0FController
 		$selectableBase = J2Store::getSelectableBase();
 		$view->set('fieldsClass', $selectableBase);
 
-		$address = J2Store::fof()->loadTable('address', 'J2StoreTable');
+		$address = F0FTable::getAnInstance('address', 'J2StoreTable');
 
 		if (empty($guest['billing']['zip']) && $session->has('billing_postcode', 'j2store') ) {
 			$guest['billing']['zip'] = $session->get('billing_postcode', '', 'j2store');
@@ -517,12 +521,13 @@ class J2StoreControllerCheckouts extends F0FController
 		ob_end_clean();
 		echo $html;
 		$app->close();
+
 	}
 
-	function guest_validate()
-    {
+	function guest_validate() {
+
 		$app = Factory::getApplication();
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 		$view = $this->getThisView();
 		if ($model = $this->getThisModel())
@@ -541,7 +546,7 @@ class J2StoreControllerCheckouts extends F0FController
 		$json = array();
 
 		// Validate if customer is logged in.
-		if ($app->getIdentity()->id) {
+		if (Factory::getApplication()->getIdentity()->id) {
 			$json['redirect'] = $redirect_url;
 		}
 
@@ -558,6 +563,7 @@ class J2StoreControllerCheckouts extends F0FController
 		}
 
 		if (!$json) {
+
 			$selectableBase =J2Store::getSelectableBase();
 			$json = $selectableBase->validate($data, 'billing', 'address');
 
@@ -565,6 +571,7 @@ class J2StoreControllerCheckouts extends F0FController
 			if ((strlen($app->input->post->get('email')) < 4)) {
 				$json['error']['email'] = Text::_('J2STORE_EMAIL_REQUIRED');
 			}
+
 		}
 
 		J2Store::plugin()->event('CheckoutValidateGuest',array(&$json,&$data));
@@ -669,12 +676,13 @@ class J2StoreControllerCheckouts extends F0FController
 		}
 		echo json_encode($json);
 		$app->close();
+
 	}
 
-	function guest_shipping()
-    {
+	function guest_shipping() {
+
 		$app = Factory::getApplication();
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$view = $this->getThisView();
 		if ($model = $this->getThisModel())
 		{
@@ -689,7 +697,7 @@ class J2StoreControllerCheckouts extends F0FController
 		$selectableBase = J2Store::getSelectableBase();
 		$view->set('fieldsClass', $selectableBase);
 
-		$address = J2Store::fof()->loadTable('address', 'J2StoreTable');
+		$address = F0FTable::getAnInstance('address', 'J2StoreTable');
 
 		if (empty($guest['shipping']['zip']) && $session->has('shipping_postcode', 'j2store') ) {
 			$guest['shipping']['zip'] = $session->get('shipping_postcode', '', 'j2store');
@@ -733,7 +741,7 @@ class J2StoreControllerCheckouts extends F0FController
 
 	function guest_shipping_validate() {
 		$app = Factory::getApplication();
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 		$params = J2Store::config();
 		$view = $this->getThisView();
@@ -751,7 +759,7 @@ class J2StoreControllerCheckouts extends F0FController
 		$json = array();
 
 		// Validate if customer is logged in.
-		if ($app->getIdentity()->id) {
+		if (Factory::getApplication()->getIdentity()->id) {
 			$json['redirect'] = $redirect_url;
 		}
 
@@ -766,7 +774,9 @@ class J2StoreControllerCheckouts extends F0FController
 			$json = $selectableBase->validate($data, 'shipping', 'address');
 		}
 
+
 		J2Store::plugin()->event('CheckoutValidateGuestShipping',array(&$json,&$data));
+
 
 		if(!$json) {
 
@@ -833,10 +843,10 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 
-	function billing_address()
-    {
+	function billing_address() {
+
 		$app = Factory::getApplication();
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 		$view = $this->getThisView();
 		if ($model = $this->getThisModel())
@@ -844,12 +854,14 @@ class J2StoreControllerCheckouts extends F0FController
 			// Push the model into the view (as default)
 			$view->setModel($model, true);
 		}
-		$user = $app->getIdentity();
-		$address = J2Store::fof()->loadTable('Address', 'J2StoreTable');
+		$user = Factory::getApplication()->getIdentity();
+		$address = F0FTable::getAnInstance('Address', 'J2StoreTable');
 		if($user->id) {
 			//$address = $address_model->user_id($user->id)->getFirstItem();
 			if(isset( $address->j2store_address_id ) && empty($address->j2store_address_id)){
-				$userProfile = UserHelper::getProfile( $user->id );
+                $userFactory = Factory::getContainer()->get(UserFactory::class);
+                $userProfile = $userFactory->loadUserById($user->id);
+
 				$address->address_1 = isset($userProfile->profile['address1']) ? $userProfile->profile['address1']:'';
 				$address->address_2 = isset($userProfile->profile['address2']) ? $userProfile->profile['address2']:'';
 				$address->city = isset($userProfile->profile['city']) ? $userProfile->profile['city']:'';
@@ -870,7 +882,7 @@ class J2StoreControllerCheckouts extends F0FController
         }
         $link = J2Store::platform()->getCartUrl($cart_params);
 		/*$mobile = ($is_mobile) ? '&mobile=mobile' : '';
-		$link = Route::_('index.php?option=com_j2store&view=carts'.$mobile);*/
+		$link = JRoute::_('index.php?option=com_j2store&view=carts'.$mobile);*/
 
 		$order = J2Store::fof()->getModel('Orders', 'J2StoreModel')->initOrder()->getOrder();
 		if(count($order->getItems()) < 1 ) {
@@ -916,7 +928,7 @@ class J2StoreControllerCheckouts extends F0FController
 		$view->set('fieldsClass', $selectableBase);
 		$fields = $selectableBase->getFields('billing',$address,'address');
         // if any custom field, need to add address object
-        $default_address = J2Store::fof()->loadTable('Address', 'J2StoreTable')->getClone();
+        $default_address = F0FTable::getAnInstance('Address', 'J2StoreTable')->getClone();
         $selectableBase->getFields('billing',$default_address,'address');
 
 		$view->set('fields', $fields);
@@ -938,11 +950,11 @@ class J2StoreControllerCheckouts extends F0FController
 
 	//validate billing address
 
-	function billing_address_validate()
-    {
+	function billing_address_validate() {
+
 		$app = Factory::getApplication();
-		$session = $app->getSession();
-		$user = $app->getIdentity();
+		$session = Factory::getApplication()->getSession();
+		$user = Factory::getApplication()->getIdentity();
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 
 		$view = $this->getThisView();
@@ -966,11 +978,11 @@ class J2StoreControllerCheckouts extends F0FController
 		J2Store::plugin()->event('BeforeCheckoutValidateBilling',array(&$json));
 		//Has the customer selected an existing address?
 		$selected_billing_address = $app->input->getString('billing_address');
-		if (isset($selected_billing_address ) && $app->input->getString('billing_address') === 'existing') {
+		if (isset($selected_billing_address ) && $app->input->getString('billing_address') == 'existing') {
 			$selected_address_id =	$app->input->getInt('address_id');
 			if (empty($selected_address_id)) {
 				$json['error']['warning'] = Text::_('J2STORE_ADDRESS_SELECTION_ERROR');
-			} elseif (!array_key_exists($app->input->getInt('address_id'), $address_model->getAddresses('j2store_address_id'))) {
+			} elseif (!in_array($app->input->getInt('address_id'), array_keys($address_model->getAddresses('j2store_address_id')))) {
 				$json['error']['warning'] = Text::_('J2STORE_ADDRESS_SELECTION_ERROR');
 			} else {
 				// Default Payment Address
@@ -1035,20 +1047,23 @@ class J2StoreControllerCheckouts extends F0FController
 					$session->clear('payment_method', 'j2store');
 					$session->clear('payment_methods', 'j2store');
 				}
+
 			}
+
 		}
 		J2Store::plugin()->event('CheckoutValidateBilling',array(&$json));
 		echo json_encode($json);
 		$app->close();
+
 	}
 
 	//shipping address
 
-	function shipping_address()
-    {
+	function shipping_address() {
+
 		$app = Factory::getApplication();
-		$user = $app->getIdentity();
-		$session = $app->getSession();
+		$user = Factory::getApplication()->getIdentity();
+		$session = Factory::getApplication()->getSession();
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 
 		$view = $this->getThisView();
@@ -1058,11 +1073,13 @@ class J2StoreControllerCheckouts extends F0FController
 			$view->setModel($model, true);
 		}
 		//address variable only for new user, only prefile data to prefile
-		$address = J2Store::fof()->loadTable('Address', 'J2StoreTable');
+		$address = F0FTable::getAnInstance('Address', 'J2StoreTable');
 		if($user->id) {
 			//$address = $address_model->user_id($user->id)->getFirstItem();
 			if(isset( $address->j2store_address_id ) && empty($address->j2store_address_id)){
-				$userProfile = UserHelper::getProfile( $user->id );
+                $userFactory = Factory::getContainer()->get(UserFactory::class);
+                $userProfile = $userFactory->loadUserById($user->id);
+
 				$address->address_1 = isset($userProfile->profile['address1']) ? $userProfile->profile['address1']:'';
 				$address->address_2 = isset($userProfile->profile['address2']) ? $userProfile->profile['address2']:'';
 				$address->city = isset($userProfile->profile['city']) ? $userProfile->profile['city']:'';
@@ -1120,13 +1137,14 @@ class J2StoreControllerCheckouts extends F0FController
 
 		$fields = $selectableBase->getFields('shipping',$address,'address');
 		// if any custom field, need to add address object
-        $default_address = J2Store::fof()->loadTable('Address', 'J2StoreTable')->getClone();
+        $default_address = F0FTable::getAnInstance('Address', 'J2StoreTable')->getClone();
         $selectableBase->getFields('shipping',$default_address,'address');
 		$view->set('fields', $fields);
 		$view->set('address', empty($addresses) ? $address :$default_address);
 
 		//get layout settings
 		$view->set('storeProfile', J2Store::storeProfile());
+
 
 		$view->setLayout( 'default_shipping');
 
@@ -1140,11 +1158,11 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 
-	function shipping_address_validate()
-    {
+	function shipping_address_validate() {
+
 		$app = Factory::getApplication();
-		$user = $app->getIdentity();
-		$session = $app->getSession();
+		$user = Factory::getApplication()->getIdentity();
+		$session = Factory::getApplication()->getSession();
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 		$params = J2Store::config();
 		$view = $this->getThisView();
@@ -1191,11 +1209,11 @@ class J2StoreControllerCheckouts extends F0FController
 		J2Store::plugin()->event('BeforeCheckoutValidateShipping',array(&$json));
 		//Has the customer selected an existing address?
 		$selected_shipping_address =$app->input->getString('shipping_address');
-		if (isset($selected_shipping_address ) && $app->input->getString('shipping_address') === 'existing') {
+		if (isset($selected_shipping_address ) && $app->input->getString('shipping_address') == 'existing') {
 			$selected_address_id =	$app->input->getInt('address_id');
 			if (empty($selected_address_id)) {
 				$json['error']['warning'] = Text::_('J2STORE_ADDRESS_SELECTION_ERROR');
-			} elseif (!array_key_exists($app->input->getInt('address_id'), $address_model->getAddresses('j2store_address_id'))) {
+			} elseif (!in_array($app->input->getInt('address_id'), array_keys($address_model->getAddresses('j2store_address_id')))) {
 				$json['error']['warning'] = Text::_('J2STORE_ADDRESS_SELECTION_ERROR');
 			} else {
 				// Default shipping Address. returns associative list of single record
@@ -1260,7 +1278,9 @@ class J2StoreControllerCheckouts extends F0FController
 					$session->clear('shipping_method', 'j2store');
 					$session->clear('shipping_methods', 'j2store');
 				}
+
 			}
+
 		}
 		J2Store::plugin()->event('CheckoutValidateShipping',array(&$json));
 		echo json_encode($json);
@@ -1269,11 +1289,10 @@ class J2StoreControllerCheckouts extends F0FController
 
 	//shipping and payment method
 
-	function shipping_payment_method()
-    {
+	function shipping_payment_method() {
 		$app = Factory::getApplication();
-		$session = $app->getSession();
-		$user = $app->getIdentity();
+		$session = Factory::getApplication()->getSession();
+		$user = Factory::getApplication()->getIdentity();
 		$params = J2Store::config();
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 
@@ -1303,7 +1322,7 @@ class J2StoreControllerCheckouts extends F0FController
 		//custom fields
 		$selectableBase = J2Store::getSelectableBase();
 		$view->set('fieldsClass', $selectableBase);
-		$address_table = J2Store::fof()->loadTable('Address', 'J2StoreTable');
+		$address_table = F0FTable::getAnInstance('Address', 'J2StoreTable');
 		$fields = $selectableBase->getFields('payment',$address_table,'address');
 		$view->set('fields', $fields);
 		$view->set('address', $address_table);
@@ -1389,11 +1408,11 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 
-	function shipping_payment_method_validate()
-    {
+	function shipping_payment_method_validate() {
+
 		$app = Factory::getApplication();
-		$session = $app->getSession();
-		$user = $app->getIdentity();
+		$session = Factory::getApplication()->getSession();
+		$user = Factory::getApplication()->getIdentity();
 		$params = J2Store::config();
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
 
@@ -1466,6 +1485,7 @@ class J2StoreControllerCheckouts extends F0FController
 
 					if(!$json) {
 
+
 						$shipping_values = array();
 						$shipping_values['shipping_price']    = isset($values['shipping_price']) ? $values['shipping_price'] : 0;
 						$shipping_values['shipping_extra']   = isset($values['shipping_extra']) ? $values['shipping_extra'] : 0;
@@ -1476,22 +1496,44 @@ class J2StoreControllerCheckouts extends F0FController
 						//set the shipping method to session
 						$session->set('shipping_method',$shipping_values['shipping_plugin'], 'j2store');
 						$session->set('shipping_values',$shipping_values, 'j2store');
+
+
 					}
+
 				}
+
 			}
 
 			if (!$json) {
 				// is shipping mandatory
-				if($params->get('shipping_mandatory', 0)) {
-					//yes it is. Check if session has shipping values
-					$shipping_values = $session->get('shipping_values', array(), 'j2store');
-					$shipping_method = $session->get('shipping_method', null, 'j2store');
-					if(count($shipping_values) < 1 || empty($shipping_method)) {
-						//now value selected
-						$json['error']['shipping'] = Text::_('J2STORE_CHECKOUT_SHIPPING_METHOD_SELECTION_MANDATORY');
-					}
-				}
+                if($params->get('shipping_mandatory', 0))
+                {
+                    $profile_order_id = $session->get('profile_order_id',null,'j2store');
+                    $current_order = J2Store::fof()->getModel('Orders', 'J2StoreModel')->initOrder($profile_order_id)->getOrder();
+                    $items = $current_order->getItems();
+
+                    $hasShippableItems = false;
+                    foreach($items as $item) {
+                        $platform = J2Store::platform();
+                        $registry = $platform->getRegistry($item->orderitem_params);
+                        if($registry->get('shipping', 0) == 1) {
+                            $hasShippableItems = true;
+                            break; // Found at least one item that requires shipping
+                        }
+                    }
+                    if($hasShippableItems) {
+                        //yes it is. Check if session has shipping values
+                        $shipping_values = $session->get('shipping_values', array(), 'j2store');
+                        $shipping_method = $session->get('shipping_method', null, 'j2store');
+                        if (count($shipping_values) < 1 || empty($shipping_method))
+                        {
+                            //no value selected
+                            $json['error']['shipping'] = Text::_('J2STORE_CHECKOUT_SHIPPING_METHOD_SELECTION_MANDATORY');
+                        }
+                    }
+                }
 			}
+
 
 			//validate selection of payment methods
 			if (!$json) {
@@ -1522,7 +1564,7 @@ class J2StoreControllerCheckouts extends F0FController
 
 				}
 
-				if($params->get('show_terms', 0) && $params->get('terms_display_type', 'link') ==='checkbox' ) {
+				if($params->get('show_terms', 0) && $params->get('terms_display_type', 'link') =='checkbox' ) {
 					$tos_check = $app->input->get('tos_check');
 					if (!isset($tos_check)) {
 						$json['error']['tos_check'] = Text::_('J2STORE_CHECKOUT_ERROR_AGREE_TERMS');
@@ -1542,15 +1584,13 @@ class J2StoreControllerCheckouts extends F0FController
 		echo json_encode($json);
 		$app->close();
 	}
-
 	/**
 	 * display expressconfirm layout
 	 *   */
-	function expressconfirm()
-    {
+	function expressconfirm(){
 		$app = Factory::getApplication();
 		$data = $app->input->getArray($_REQUEST);
-		$session = $app->getSession();
+		$session = Factory::getApplication()->getSession();
 		$view = $this->getThisView();
 		$order = '';
 		if ($model = $this->getThisModel())
@@ -1562,7 +1602,7 @@ class J2StoreControllerCheckouts extends F0FController
 			$data['order_id'] = $session->get('order_id','','j2store');
 		}
 		if(isset($data['order_id']) ){
-			$order = J2Store::fof()->loadTable('Order', 'J2StoreTable')->getClone();
+			$order = F0FTable::getInstance('Order', 'J2StoreTable')->getClone();
 			$order->load(array('order_id'=>$data['order_id']));
 
 		}else{
@@ -1579,17 +1619,17 @@ class J2StoreControllerCheckouts extends F0FController
 		$view->display();
 	}
 
-	function confirm()
-    {
+	function confirm() {
+
 		//no cache
 		J2Store::utilities()->nocache();
 
 		$app = Factory::getApplication();
-		$session = $app->getSession();
-		$user = $app->getIdentity();
+		$session = Factory::getApplication()->getSession();
+		$user = Factory::getApplication()->getIdentity();
 		$params = J2Store::config();
 		$address_model = J2Store::fof()->getModel('Addresses', 'J2StoreModel');
-		PluginHelper::importPlugin('j2store');
+		PluginHelper::importPlugin ('j2store');
 
 		$errors = array();
 
@@ -1623,6 +1663,7 @@ class J2StoreControllerCheckouts extends F0FController
 			$errors[]= $e->getMessage();
 		}
 
+
 		//Extra watch fix
 		if(!$session->has('payment_method', 'j2store')) {
 			$payment_values = $session->get('payment_values', array(), 'j2store');
@@ -1647,6 +1688,7 @@ class J2StoreControllerCheckouts extends F0FController
 		}
 		$view->set( 'showPayment', $showPayment );
 
+
 		// Validate if payment method has been set.
 		$orderpayment_type = trim($orderpayment_type);
 		if (($showPayment == true && !$session->has('payment_method', 'j2store')) || empty($orderpayment_type)) {
@@ -1662,6 +1704,13 @@ class J2StoreControllerCheckouts extends F0FController
 			//	$results = $app->triggerEvent( "onJ2StoreBeforePayment", array($orderpayment_type, $order) );
 			}
 
+			// in the case of orders with a value of 0.00, use custom values
+//			if ( (float) $order->order_total == (float)'0.00' )
+//			{
+//				$orderpayment_type = 'free';
+//				$transaction_status = Text::_( "J2STORE_COMPLETE" );
+//			}
+
 			$order->orderpayment_type = $orderpayment_type;
 
 			try {
@@ -1672,6 +1721,12 @@ class J2StoreControllerCheckouts extends F0FController
 				$app->setUserState( 'j2store.order_id', $order->order_id );
 				$app->setUserState( 'j2store.orderpayment_id', $order->j2store_order_id );
 				$app->setUserState( 'j2store.order_token', $order->token);
+				// in the case of orders with a value of 0.00, we redirect to the confirmPayment page
+//				if ( (float) $order->order_total == (float)'0.00' )
+//				{
+//					$free_redirect = JRoute::_( 'index.php?option=com_j2store&view=checkout&task=confirmPayment' );
+//					$view->set('free_redirect', $free_redirect);
+//				}
 
 				$values = array();
 				$values['order_id'] = $order->order_id;
@@ -1683,7 +1738,7 @@ class J2StoreControllerCheckouts extends F0FController
 
 				// Display whatever comes back from Payment Plugin for the onPrePayment
 				$html = "";
-				for ($i=0, $iMax = count($results); $i< $iMax; $i++)
+				for ($i=0; $i<count($results); $i++)
 				{
 				$html .= $results[$i];
 				}
@@ -1693,6 +1748,7 @@ class J2StoreControllerCheckouts extends F0FController
 			} catch (Exception $e) {
 				$errors[] = $e->getMessage();
 			}
+
 		}
 
 		if(count($errors)) {
@@ -1701,6 +1757,7 @@ class J2StoreControllerCheckouts extends F0FController
 
 		// Set display
 		$view->setLayout('default_confirm');
+
 
 		$html = '';
 
@@ -1712,8 +1769,7 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 
-	function getShippingHtml(&$order)
-    {
+	function getShippingHtml(&$order) {
         $layout = 'shipping_yes';
 		$html = '';
 		$view = $this->getThisView ();
@@ -1723,7 +1779,7 @@ class J2StoreControllerCheckouts extends F0FController
 		}
 
 		$view->setLayout ( $layout );
-		$rates = [];
+		$rates = array ();
 
 		switch (strtolower ( $layout )) {
 			case "shipping_calculate" :
@@ -1732,10 +1788,10 @@ class J2StoreControllerCheckouts extends F0FController
 				break;
 			case "shipping_yes" :
 			default :
-				$rates = J2Store::fof()->getModel('Shippings', 'J2StoreModel')->getShippingRates($order);
-				$default_rate = [];
+				$rates = J2Store::fof()->getModel ( 'Shippings', 'J2StoreModel' )->getShippingRates ( $order );
+				$default_rate = array ();
 				$session = Factory::getApplication()->getSession();
-				$shipping_values = $session->get ( 'shipping_values', [], 'j2store' );
+				$shipping_values = $session->get('shipping_values', array (), 'j2store' );
 				if(count($rates)){
 					$order->show_payment_method = 1;
 				}else{
@@ -1756,8 +1812,8 @@ class J2StoreControllerCheckouts extends F0FController
 						}
 					}
 				}
-				$view->set ( 'rates', $rates );
-				$view->set ( 'default_rate', $default_rate );
+				$view->set('rates', $rates );
+				$view->set('default_rate', $default_rate );
 				break;
 		}
 		ob_start ();
@@ -1767,25 +1823,24 @@ class J2StoreControllerCheckouts extends F0FController
 		return $html;
 	}
 
-	function getPaymentForm($element = '', $plain_format = false)
-    {
-		$app = Factory::getApplication();
+	function getPaymentForm($element = '', $plain_format = false) {
+		$app = Factory::getApplication ();
 		$values = $app->input->getArray ( $_REQUEST );
 		$html = '';
 		$text = "";
-		$user = $app->getIdentity();
+		$user = Factory::getApplication()->getIdentity();
 		if (empty ( $element )) {
 			$element = $app->input->getString ( 'payment_element' );
 		}
-		$results = [];
+		$results = array ();
 
-		PluginHelper::importPlugin('j2store');
+		PluginHelper::importPlugin ( 'j2store' );
 
 		$results = $app->triggerEvent ( "onJ2StoreGetPaymentForm", array (
 				$element,
 				$values
 		) );
-		for($i = 0, $iMax = count($results); $i < $iMax; $i ++) {
+		for($i = 0; $i < count ( $results ); $i ++) {
 			$result = $results [$i];
 			$text .= $result;
 		}
@@ -1796,33 +1851,32 @@ class J2StoreControllerCheckouts extends F0FController
 		} else {
 
 			// set response array
-			$response = [];
+			$response = array ();
 			$response ['msg'] = $html;
 
 			// encode and echo (need to echo to send back to browser)
-			echo json_encode($response);
+			echo json_encode ( $response );
 			$app->close ();
 		}
 		// return;
 	}
 
-	function validateSelectPayment($payment_plugin, $values)
-    {
-		$response = [];
+	function validateSelectPayment($payment_plugin, $values) {
+		$response = array ();
 		$response ['msg'] = '';
 		$response ['error'] = '';
 
-		$app = Factory::getApplication();
-		PluginHelper::importPlugin('j2store');
+		$app = Factory::getApplication ();
+		PluginHelper::importPlugin ( 'j2store' );
 
 		// verify the form data
-		$results = [];
+		$results = array ();
 		$results = $app->triggerEvent ( "onJ2StoreGetPaymentFormVerify", array (
 				$payment_plugin,
 				$values
 		) );
 
-		for($i = 0, $iMax = count($results); $i < $iMax; $i ++) {
+		for($i = 0; $i < count ( $results ); $i ++) {
 			$result = $results [$i];
 			if (! empty ( $result->error )) {
 				$response ['msg'] = $result->message;
@@ -1838,37 +1892,36 @@ class J2StoreControllerCheckouts extends F0FController
 		return false;
 	}
 
-	function validateSelectShipping($values, $order)
-    {
+	function validateSelectShipping($values, $order) {
 		$error = 0;
 
-		if (isset ( $values ['shippingrequired'] )) {
-			if ($values ['shippingrequired'] === 1 && empty ( $values ['shipping_plugin'] )) {
-				throw new Exception (Text::_('J2STORE_CHECKOUT_SELECT_A_SHIPPING_METHOD'));
+		if (isset($values ['shippingrequired'] )) {
+			if ($values ['shippingrequired'] == 1 && empty ( $values ['shipping_plugin'] )) {
+				throw new Exception(Text::_( 'J2STORE_CHECKOUT_SELECT_A_SHIPPING_METHOD' ) );
 				return false;
 			}
 		}
 
-		if ((float) $order->order_total == (float)'0.00') {
+		if (( float ) $order->order_total == ( float ) '0.00') {
 			return true;
 		}
 
 		// trigger the plugin's validation function
 		// no matter what, fire this validation plugin event for plugins that extend the checkout workflow
-		$results = [];
-		$results = Factory::getApplication()->triggerEvent ( "onValidateSelectShipping", array (
+		$results = array ();
+		$results = Factory::getApplication ()->triggerEvent ( "onValidateSelectShipping", array (
 				$values
 		) );
 
-		for($i = 0, $iMax = count($results); $i < $iMax; $i ++) {
+		for($i = 0; $i < count ( $results ); $i ++) {
 			$result = $results [$i];
 			if (! empty ( $result->error )) {
-				throw new Exception ($result->message);
+				throw new Exception ( $result->message );
 				return false;
 			}
 		}
 
-		if ($error === '1') {
+		if ($error == '1') {
 			return false;
 		}
 
@@ -1881,13 +1934,13 @@ class J2StoreControllerCheckouts extends F0FController
 	 *
 	 * @return unknown_type
 	 */
-	function confirmPayment()
-    {
+	function confirmPayment() {
+
 		J2Store::utilities()->nocache();
 
-		$app = Factory::getApplication();
-		$user = $app->getIdentity();
-		$session = $app->getSession();
+		$app = Factory::getApplication ();
+		$user = Factory::getApplication()->getIdentity();
+		$session = Factory::getApplication()->getSession();
 		$params = J2Store::config();
 		$order_model = J2Store::fof()->getModel('Orders', 'J2StoreModel');
 		$orderpayment_type = $app->input->getString ( 'orderpayment_type' );
@@ -1902,12 +1955,13 @@ class J2StoreControllerCheckouts extends F0FController
 		$values = $app->input->getArray ( $_POST );
 		// backward compatibility for payment plugins
 		foreach ( $values as $name => $value ) {
-			$app->input->set ( $name, $value );
+			$app->input->set($name, $value );
 		}
+
 
 		// set the guest mail to null if it is present
 		// check if it was a guest checkout
-		$account = $session->get ( 'account', 'register', 'j2store' );
+		$account = $session->get('account', 'register', 'j2store' );
 
 		// get the order_id from the session set by the prePayment
 		$orderpayment_id = ( int ) $app->getUserState ( 'j2store.orderpayment_id' );
@@ -1915,24 +1969,24 @@ class J2StoreControllerCheckouts extends F0FController
 		$order_id = $app->getUserState ( 'j2store.order_id' );
 
 
-		$order = J2Store::fof()->loadTable('Order', 'J2StoreTable')->getClone();
+		$order = F0FTable::getAnInstance('Order', 'J2StoreTable')->getClone();
 		$order->load ( array (
 				'order_id' => $order_id
 		) );
 
 		$clear_cart = $params->get('clear_cart', 'order_placed');
-		if($clear_cart === 'order_placed') {
+		if($clear_cart == 'order_placed') {
 			$order->empty_cart();
 		}
 
-		$order_link = J2Store::platform()->getMyprofileUrl();//Route::_('index.php?option=com_j2store&view=myprofile');
+		$order_link = J2Store::platform()->getMyprofileUrl();//JRoute::_('index.php?option=com_j2store&view=myprofile');
 		if ($session->has ( 'guest', 'j2store' ) && !$user->id) {
-			$guest = $session->get ( 'guest', [], 'j2store' );
-			$session->set ( 'guest_order_email', $guest ['billing'] ['email'], 'j2store' );
-			$session->set ( 'guest_order_token', $order->token, 'j2store');
+			$guest = $session->get('guest', array (), 'j2store' );
+			$session->set('guest_order_email', $guest ['billing'] ['email'], 'j2store' );
+			$session->set('guest_order_token', $order->token, 'j2store');
 		}
 
-		PluginHelper::importPlugin('j2store');
+		PluginHelper::importPlugin ( 'j2store' );
 		$html = "";
 
         $showPayment = false;
@@ -1945,8 +1999,8 @@ class J2StoreControllerCheckouts extends F0FController
 			// After confirm free product
 			J2Store::plugin()->event( "AfterConfirmFreeProduct", array ($order) );
 
-			//Free product so clear cart.
-			if($clear_cart === 'order_confirmed') {
+			//free product. So clear cart.
+			if($clear_cart == 'order_confirmed') {
 				$order->empty_cart();
 			}
 		} else {
@@ -1961,8 +2015,8 @@ class J2StoreControllerCheckouts extends F0FController
 					$values
 			) );
 
-			// Display whatever comes back from the payment plugin for the onPrePayment
-			for($i = 0, $iMax = count($results); $i < $iMax; $i ++) {
+			// Display whatever comes back from Payment Plugin for the onPrePayment
+			for($i = 0; $i < count ( $results ); $i ++) {
 				$html .= $results [$i];
 			}
 
@@ -1973,25 +2027,25 @@ class J2StoreControllerCheckouts extends F0FController
 		}
 
 		// $order_id would be empty on posts back from Paypal, for example
-		if (isset ( $order->order_id) && !empty($order->order_id)) {
+		if (isset($order->order_id) && !empty($order->order_id)) {
 
 			//fail-safe
-			if($clear_cart === 'order_placed') {
+			if($clear_cart == 'order_placed') {
 				$order->empty_cart();
 			}
 			// unset a few things from the session.
-			$session->clear ( 'shipping_method', 'j2store' );
-			$session->clear ( 'shipping_methods', 'j2store' );
-			$session->clear ( 'payment_method', 'j2store' );
-			$session->clear ( 'payment_methods', 'j2store' );
-			$session->clear ( 'payment_values', 'j2store' );
-			$session->clear ( 'guest', 'j2store' );
-			$session->clear ( 'customer_note', 'j2store' );
-			$session->clear ( 'profile_order_id', 'j2store' );
+			$session->clear('shipping_method', 'j2store' );
+			$session->clear('shipping_methods', 'j2store' );
+			$session->clear('payment_method', 'j2store' );
+			$session->clear('payment_methods', 'j2store' );
+			$session->clear('payment_values', 'j2store' );
+			$session->clear('guest', 'j2store' );
+			$session->clear('customer_note', 'j2store' );
+			$session->clear('profile_order_id', 'j2store' );
 
 			// clear coupon and voucher
-			J2Store::fof()->getModel('Coupons', 'J2StoreModel')->remove_coupon();
-			J2Store::fof()->getModel('Vouchers', 'J2StoreModel')->remove_voucher();
+			J2Store::fof()->getModel ( 'Coupons', 'J2StoreModel' )->remove_coupon();
+			J2Store::fof()->getModel ( 'Vouchers', 'J2StoreModel' )->remove_voucher();
 
 			// trigger onAfterOrder plugin event
 			$results = $app->triggerEvent ( "onJ2StoreAfterPayment", array (
@@ -2003,8 +2057,8 @@ class J2StoreControllerCheckouts extends F0FController
 			}
 		}
 
-		$app->setUserState ( 'j2store.order_id', null);
-		$app->setUserState ( 'j2store.orderpayment_id', null);
+		$app->setUserState('j2store.order_id', null);
+		$app->setUserState('j2store.orderpayment_id', null);
 
 		$is_mobile = $session->get('is_mobile','','j2store');
 		if($is_mobile){
@@ -2012,17 +2066,17 @@ class J2StoreControllerCheckouts extends F0FController
 		}
 
 		$params = J2Store::config();
-		if ($params->get ( 'show_postpayment_orderlink', 1 )) {
-			$view->set ( 'order_link', $order_link );
+		if ($params->get('show_postpayment_orderlink', 1 )) {
+			$view->set('order_link', $order_link );
 		} else {
-			$view->set ( 'order_link', '' );
+			$view->set('order_link', '' );
 		}
 		if(isset($order)) {
-			$view->set ( 'order', $order);
+			$view->set('order', $order);
 		}
-		$view->set ( 'plugin_html', $html );
-		$view->setLayout ( 'postpayment' );
-		$view->display ();
+		$view->set('plugin_html', $html );
+		$view->setLayout('postpayment' );
+		$view->display();
 		return;
 	}
 }
