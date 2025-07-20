@@ -35,11 +35,12 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 }
 ?>
 <script  type="text/javascript">
+    var J2StoreSubmitbuttonOverride = Joomla.submitbutton || function(){}
     Joomla.submitbutton = function(pressbutton) {
         var form = document.adminForm;
         if(pressbutton == 'article.cancel') {
             document.adminForm.task.value = pressbutton;
-            form.submit();
+            J2StoreSubmitbuttonOverride(pressbutton);
         }else if(pressbutton == 'article.apply') {
             if (document.formvalidator.isValid(form)) {
                 document.adminForm.task.value = pressbutton;
@@ -48,22 +49,22 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                         this.disabled = true;
                     }
                 }
-                form.submit();
+                J2StoreSubmitbuttonOverride(pressbutton);
             }
             else {
                 let msg = [];
-                msg.push('<?php echo $alert_html; ?>');
-                document.getElementById('system-message-container').innerHTML =  msg.join('\n') ;
+                msg.push('');
+                document.getElementById('system-message-container').innerHTML = msg.join('\n');
             }
         }else{
             if (document.formvalidator.isValid(form)) {
                 document.adminForm.task.value = pressbutton;
-                form.submit();
+                J2StoreSubmitbuttonOverride(pressbutton);
             }
             else {
                 let msg = [];
-                msg.push('<?php echo $alert_html; ?>');
-                document.getElementById('system-message-container').innerHTML =  msg.join('\n') ;
+                msg.push('');
+                document.getElementById('system-message-container').innerHTML = msg.join('\n');
             }
         }
     }
