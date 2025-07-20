@@ -651,9 +651,10 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         if($is_main_as_thum){
             $thumb_image = isset( $main_image ) && !empty( $main_image )  ? $main_image: '';
         }
-        $image_path = Uri::root();
-        $return['thumb_image'] = isset( $thumb_image) && !empty( $thumb_image) ? $image_path.$thumb_image : $image_path.$product->thumb_image ;
-        $return['main_image'] = isset( $main_image ) && !empty( $main_image ) ? $image_path.$main_image : $image_path.$product->main_image ;
+
+        $return['thumb_image'] = isset( $thumb_image) && !empty( $thumb_image) ? $thumb_image : $product->thumb_image ;
+        $return['main_image'] = isset( $main_image ) && !empty( $main_image ) ? $main_image : $product->main_image ;
+
         $return['sku'] = $variant->sku;
         $return['quantity'] = (float)$quantity;
         $return['price'] = $variant->price;
