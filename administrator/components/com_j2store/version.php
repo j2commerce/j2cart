@@ -13,7 +13,7 @@
 defined('_JEXEC') or die('Restricted Access');
 
 define('J2STORE_PRO', '1');
-define('J2STORE_VERSION', '4.0.16');
-define('J2STORE_DATE', '2025-06-05');
+define('J2STORE_VERSION', '4.0.17');
+define('J2STORE_DATE', '2025-07-22');
 
 
