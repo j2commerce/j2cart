@@ -4,8 +4,12 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
+
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Language\Text;
+
 class J2StoreControllerCheckouts extends F0FController
 {
 
@@ -1491,15 +1495,32 @@ class J2StoreControllerCheckouts extends F0FController
 
 			if (!$json) {
 				// is shipping mandatory
-				if($params->get('shipping_mandatory', 0)) {
-					//yes it is. Check if session has shipping values
-					$shipping_values = $session->get('shipping_values', array(), 'j2store');
-					$shipping_method = $session->get('shipping_method', null, 'j2store');
-					if(count($shipping_values) < 1 || empty($shipping_method)) {
-						//now value selected
-						$json['error']['shipping'] = JText::_('J2STORE_CHECKOUT_SHIPPING_METHOD_SELECTION_MANDATORY');
-					}
-				}
+                if($params->get('shipping_mandatory', 0))
+                {
+                    $profile_order_id = $session->get('profile_order_id',null,'j2store');
+                    $current_order = J2Store::fof()->getModel('Orders', 'J2StoreModel')->initOrder($profile_order_id)->getOrder();
+                    $items = $current_order->getItems();
+
+                    $hasShippableItems = false;
+                    foreach($items as $item) {
+                        $platform = J2Store::platform();
+                        $registry = $platform->getRegistry($item->orderitem_params);
+                        if($registry->get('shipping', 0) == 1) {
+                            $hasShippableItems = true;
+                            break; // Found at least one item that requires shipping
+                        }
+                    }
+                    if($hasShippableItems) {
+                        //yes it is. Check if session has shipping values
+                        $shipping_values = $session->get('shipping_values', array(), 'j2store');
+                        $shipping_method = $session->get('shipping_method', null, 'j2store');
+                        if (count($shipping_values) < 1 || empty($shipping_method))
+                        {
+                            //no value selected
+                            $json['error']['shipping'] = Text::_('J2STORE_CHECKOUT_SHIPPING_METHOD_SELECTION_MANDATORY');
+                        }
+                    }
+                }
 			}
 
 			//validate selection of payment methods
