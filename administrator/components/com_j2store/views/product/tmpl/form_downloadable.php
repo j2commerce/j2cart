@@ -103,7 +103,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                 <!-- / Tab content starts -->
                 <div class="tab-content">
                     <div class="tab-pane active" id="generalTab">
-                        <input type="hidden" name="<?php echo $this->form_prefix.'[j2store_variant_id]'; ?>" value="<?php echo $this->variant->j2store_variant_id; ?>" />
+                        <input type="hidden" name="<?php echo $this->form_prefix.'[j2store_variant_id]'; ?>" value="<?php echo isset($this->variant->j2store_variant_id) && !empty($this->variant->j2store_variant_id) ? $this->variant->j2store_variant_id: 0; ?>" />
                         <?php echo $this->loadTemplate('general');?>
                     </div>
                     <div class="tab-pane" id="pricingTab">
