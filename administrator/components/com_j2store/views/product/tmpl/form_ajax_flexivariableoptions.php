@@ -20,8 +20,7 @@ require_once JPATH_ADMINISTRATOR.'/components/com_j2store/library/popup.php';
 
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
-$row_class = 'row';
-$col_class = 'col-md-';
+
 $product_type_class = 'badge bg-success';
 $btn_class = 'btn-sm';
 $star_icon = 'far fa-regular fa-star';
@@ -125,7 +124,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
 					                            ?>
                                             </div>
                                         </div>
-			                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariableProductForm',array(&$this->variant,$prefix));?>
+                                        <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantGeneral', array($this, $this->variant,$prefix)); ?>
                                     </fieldset>
                                 </div>
                                 <div class="col-lg-6 j2commerce-variant-shipping">
@@ -189,6 +188,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
 					                            ?>
                                             </div>
                                         </div>
+                                        <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantShipping', array($this, $this->variant,$prefix)); ?>
                                     </fieldset>
                                 </div>
                                 <div class="col-lg-6 j2commerce-variant-main-image">
@@ -207,6 +207,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                 </div>
                                             </div>
                                         </div>
+                                        <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantImage', array($this, $this->variant,$prefix)); ?>
                                     </fieldset>
                                 </div>
                             </div>
@@ -391,7 +392,11 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
 	                            <?php else:?>
 		                            <?php echo J2Html::pro(); ?>
 	                            <?php endif;?>
+                                <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantInventory', array($this, $this->variant,$prefix)); ?>
                             </fieldset>
+                        </div>
+                        <div class="col-12">
+                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantForm', array($this, $this->variant,$prefix)); ?>
                         </div>
                     </div>
                 </div>
