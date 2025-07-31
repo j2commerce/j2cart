@@ -31,41 +31,45 @@ $wa->addInlineStyle($style, [], []);
         <legend><?php echo Text::_('J2STORE_PRODUCT_VARIANTS');?></legend>
         <div id="variant_add_block" class="mb-3">
             <input type="hidden" name="flexi_product_id" value="<?php echo $this->item->j2store_product_id;?>"/>
-            <div class="input-group">
-                <?php foreach ($this->item->product_options as $product_option): ?>
-                    <select name="variant_combin[<?php echo $product_option->j2store_productoption_id;?>]" class="form-select me-2">
-                        <option value="0"><?php echo substr(Text::_('J2STORE_ANY').' '.$this->escape($product_option->option_name),0,10).'...';?></option>
-                        <?php foreach ($product_option->option_values as $option_value): ?>
-                            <option value="<?php echo $option_value->j2store_optionvalue_id;?>"><?php echo $this->escape($option_value->optionvalue_name);?></option>
-                        <?php endforeach; ?>
-                    </select>
-                <?php endforeach; ?>
-                <button type="button" onclick="addFlexiVariant()" class="btn btn-primary">
-                    <span class="fas fa-solid fa-plus me-1"></span><?php echo Text::_('J2STORE_ADD_VARIANT');?>
-                </button>
-            </div>
+            <?php if(isset($this->item->product_options) && !empty($this->item->product_options)):?>
+                <div class="input-group">
+                    <?php foreach ($this->item->product_options as $product_option): ?>
+                        <select name="variant_combin[<?php echo $product_option->j2store_productoption_id;?>]" class="form-select me-2">
+                            <option value="0"><?php echo substr(Text::_('J2STORE_ANY').' '.$this->escape($product_option->option_name),0,10).'...';?></option>
+                            <?php foreach ($product_option->option_values as $option_value): ?>
+                                <option value="<?php echo $option_value->j2store_optionvalue_id;?>"><?php echo $this->escape($option_value->optionvalue_name);?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php endforeach; ?>
+                    <button type="button" onclick="addFlexiVariant()" class="btn btn-primary">
+                        <span class="fas fa-solid fa-plus me-1"></span><?php echo Text::_('J2STORE_ADD_VARIANT');?>
+                    </button>
+                </div>
+            <?php endif;?>
         </div>
         <div id="variant_display_block">
-            <div class="d-flex justify-content-start align-items-center mb-3">
-                <div class="form-check pt-0 me-2">
-                    <input class="form-check-input" type="checkbox" value="" id="toggleAllCheckboxes">
+            <?php if(isset($this->item->variants) && count($this->item->variants)):?>
+                <div class="d-flex justify-content-start align-items-center mb-3">
+                    <div class="form-check pt-0 me-2">
+                        <input class="form-check-input" type="checkbox" value="" id="toggleAllCheckboxes">
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm me-2" id="deleteCheckedVariants" data-bs-toggle="tooltip" title="<?php echo Text::_('J2STORE_PRODUCT_VARIANTS_DELETE_CHECKED');?>" disabled>
+                    <span class="fa-stack small">
+                      <span class="fas fa-solid fa-trash fa-stack-2x"></span>
+                      <span class="fas fa-solid fa-check fa-stack-1x text-danger small"></span>
+                    </span>
+                    </button>
+                    <button type="button" onclick="removeFlexiAllVariant()" class="btn btn-sm btn-danger">
+                        <span class="fas fa-solid fa-trash me-2"></span><?php echo Text::_('J2STORE_DELETE_ALL_VARIANTS');?>
+                    </button>
+                    <button type="button" id="openAll-panel" class="btn btn-outline-primary btn-sm ms-auto" onclick="setExpandAll();" data-bs-toggle="tooltip" title="<?php echo Text::_('J2STORE_OPEN_ALL');?>">
+                        <span class="fas fa-solid fa-chevron-down"></span>
+                    </button>
+                    <button type="button" id="closeAll-panel" class="btn btn-outline-primary btn-sm ms-2" onclick="setCloseAll();" data-bs-toggle="tooltip" title="<?php echo Text::_('J2STORE_CLOSE_ALL');?>">
+                        <span class="fas fa-solid fa-chevron-up"></span>
+                    </button>
                 </div>
-                <button type="button" class="btn btn-outline-danger btn-sm me-2" id="deleteCheckedVariants" data-bs-toggle="tooltip" title="<?php echo Text::_('J2STORE_PRODUCT_VARIANTS_DELETE_CHECKED');?>" disabled>
-                <span class="fa-stack small">
-                  <span class="fas fa-solid fa-trash fa-stack-2x"></span>
-                  <span class="fas fa-solid fa-check fa-stack-1x text-danger small"></span>
-                </span>
-                </button>
-                <button type="button" onclick="removeFlexiAllVariant()" class="btn btn-sm btn-danger">
-                    <span class="fas fa-solid fa-trash me-2"></span><?php echo Text::_('J2STORE_DELETE_ALL_VARIANTS');?>
-                </button>
-                <button type="button" id="openAll-panel" class="btn btn-outline-primary btn-sm ms-auto" onclick="setExpandAll();" data-bs-toggle="tooltip" title="<?php echo Text::_('J2STORE_OPEN_ALL');?>">
-                    <span class="fas fa-solid fa-chevron-down"></span>
-                </button>
-                <button type="button" id="closeAll-panel" class="btn btn-outline-primary btn-sm ms-2" onclick="setCloseAll();" data-bs-toggle="tooltip" title="<?php echo Text::_('J2STORE_CLOSE_ALL');?>">
-                    <span class="fas fa-solid fa-chevron-up"></span>
-                </button>
-            </div>
+            <?php endif;?>
             <div class="j2store-advancedvariants-settings">
                 <div class="accordion" id="accordion">
                     <?php
