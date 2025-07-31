@@ -1,39 +1,63 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
-// No direct access
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Language\Text;
 ?>
 
 <div class="j2store-product-general">
-	<div class="control-group form-inline">
-		<?php echo J2Html::label(JText::_('J2STORE_PRODUCT_VISIBILITY'), 'visibility',array('class'=>'control-label')); ?>
-		<?php echo J2Html::radio($this->form_prefix.'[visibility]', $this->item->visibility); ?>
-	</div>
-
-	<div class="control-group">
-		<?php echo J2Html::label(JText::_('J2STORE_PRODUCT_MANUFACTURER'), 'manufacturer',array('class'=>'control-label')); ?>
-		<?php echo $this->manufacturers;?>
-	</div>
-	<?php if(J2Store::isPro()): ?>
-	<div class="control-group">
-		<?php echo J2Html::label(JText::_('J2STORE_PRODUCT_VENDOR'), 'vendor',array('class'=>'control-label')); ?>
-			<?php echo $this->vendors;?>
-		</div>
-	<?php endif;?>
-
-	<div class="control-group">
-		<?php echo J2Html::label(JText::_('J2STORE_PRODUCT_TAX_PROFILE'), 'tax_profile',array('class'=>'control-label')); ?>
-		<?php echo $this->taxprofiles;?>
-	</div>
-
-	<div class="control-group">
-			<?php echo J2Html::label(JText::_('J2STORE_PRODUCT_CART_TEXT'), 'addtocart_text',array('class'=>'control-label')); ?>
-			<?php echo J2Html::text($this->form_prefix.'[addtocart_text]', JText::_($this->item->addtocart_text), array('class'=>'input-large ')); ?>
-		</div>
-
+    <fieldset class="options-form">
+        <legend><?php echo Text::_('J2STORE_PRODUCT_TAB_GENERAL');?></legend>
+        <div class="form-grid">
+            <div class="control-group">
+                <div class="control-label">
+                    <?php echo J2Html::label(Text::_('J2STORE_PRODUCT_VISIBILITY'), 'visibility'); ?>
+                </div>
+                <?php echo J2Html::radioBooleanList($this->form_prefix.'[visibility]', $this->item->visibility); ?>
+            </div>
+            <div class="control-group">
+                <div class="control-label">
+                    <?php echo J2Html::label(Text::_('J2STORE_PRODUCT_MANUFACTURER'), 'manufacturer'); ?>
+                </div>
+                <div class="controls">
+                    <?php echo str_replace('<select', '<select class="form-select"', $this->manufacturers); ?>
+                </div>
+            </div>
+            <?php if(J2Store::isPro()): ?>
+                <div class="control-group">
+                    <div class="control-label">
+                        <?php echo J2Html::label(Text::_('J2STORE_PRODUCT_VENDOR'), 'vendor'); ?>
+                    </div>
+                    <div class="controls">
+                        <?php echo str_replace('<select', '<select class="form-select"', $this->vendors); ?>
+                    </div>
+                </div>
+            <?php endif;?>
+            <div class="control-group">
+                <div class="control-label">
+                    <?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TAX_PROFILE'), 'tax_profile'); ?>
+                </div>
+                <div class="controls">
+                    <?php echo str_replace('<select', '<select class="form-select"', $this->taxprofiles); ?>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">
+                    <?php echo J2Html::label(Text::_('J2STORE_PRODUCT_CART_TEXT'), 'addtocart_text'); ?>
+                </div>
+                <div class="controls">
+                    <?php echo J2Html::text($this->form_prefix.'[addtocart_text]', Text::_($this->item->addtocart_text), array('class'=>'form-control')); ?>
+                </div>
+            </div>
+        </div>
+    </fieldset>
 </div>
