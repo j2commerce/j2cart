@@ -36,10 +36,10 @@ use Joomla\CMS\Language\Text;
                             <?php foreach($this->item->product_options as $poption ):?>
                                 <tr id="pao_current_option_<?php echo $poption->j2store_productoption_id;?>">
                                     <td>
-                                        <?php echo $poption->option_name;?>
+                                        <?php echo $this->escape($poption->option_name);?>
                                         <?php echo J2Html::hidden($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][j2store_productoption_id]', $poption->j2store_productoption_id);?>
                                         <?php echo J2Html::hidden($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][option_id]', $poption->option_id);?>
-                                        <small>(<?php  echo $poption->option_unique_name;?>)</small>
+                                        <small>(<?php  echo $this->escape($poption->option_unique_name);?>)</small>
                                         <small><?php Text::_('J2STORE_OPTION_TYPE');?> <?php echo Text::_('J2STORE_'.strtoupper($poption->type))?></small>
                                         <?php if(isset($poption->type) && ($poption->type =='select' || $poption->type =='radio' || $poption->type =='checkbox')):?>
                                             <small class="d-block">
@@ -48,9 +48,9 @@ use Joomla\CMS\Language\Text;
                                         <?php endif;?>
                                     </td>
                                     <td>
-                                        <?php echo J2Html::text($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][ordering]',$poption->ordering,array('id'=>'ordering' ,'class'=>'form-control'));?>
+                                        <?php echo J2Html::text($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][ordering]',$poption->ordering,array('id'=>'ordering' ,'class'=>'form-control form-control-sm'));?>
                                     </td>
-                                    <td class="text-end">
+                                    <td>
                                         <span class="optionRemove" onClick="removePAOption(<?php echo $poption->j2store_productoption_id;?>)">
                                             <span class="icon icon-trash text-danger"></span>
                                         </span>
@@ -104,9 +104,7 @@ use Joomla\CMS\Language\Text;
         (function ($) {
             var option_value = $('#option_select_id').val();
             var option_name = $('#option_select_id option[value='+option_value+']').html();
-            console.log(option_value);
-            console.log(option_name);
-            $('<tr><td class=\"addedOption\">' + option_name+ '</td><td><input class=\"input-small\" name=\"<?php echo $this->form_prefix.'[item_options]' ;?>['+ option_value+'][ordering]\" value=\"0\"></td><td><span class=\"optionRemove\" onclick=\"j2store.jQuery(this).parent().parent().remove();\">x</span><input type=\"hidden\" value=\"' + option_value+ '\" name=\"<?php echo $this->form_prefix; ?>[item_options]['+ option_value+'][option_id]\" /><input type=\"hidden\" value="" name=\"<?php echo $this->form_prefix; ?>[item_options]['+ option_value+'][j2store_productoption_id]\" /></td></tr>').insertBefore('.j2store_a_options');
+            $('<tr><td class=\"addedOption\">' + option_name+ '</td><td><input class=\"form-control form-control-sm\" name=\"<?php echo $this->form_prefix.'[item_options]' ;?>['+ option_value+'][ordering]\" value=\"0\"></td><td><span class=\"optionRemove\" onclick=\"j2store.jQuery(this).parent().parent().remove();\"><span class=\"icon icon-trash text-danger\"></span></span><input type=\"hidden\" value=\"' + option_value+ '\" name=\"<?php echo $this->form_prefix; ?>[item_options]['+ option_value+'][option_id]\" /><input type=\"hidden\" value="" name=\"<?php echo $this->form_prefix; ?>[item_options]['+ option_value+'][j2store_productoption_id]\" /></td></tr>').insertBefore('.j2store_a_options');
         })(j2store.jQuery);
 
     }
