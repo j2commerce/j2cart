@@ -41,6 +41,7 @@ class J2StoreModelShippings extends F0FModel {
 	{
 		$query->where("shipping.type='plugin'");
 		$query->where("shipping.element LIKE 'shipping_%'");
+        $query->where("shipping.folder='j2store'");
 	}
 
     public function buildOrderbyQuery(&$query){
