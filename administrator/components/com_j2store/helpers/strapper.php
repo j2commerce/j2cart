@@ -414,16 +414,16 @@ class J2StoreStrapper {
         }
     }
 
-    public function addFontAwesome(){
+    public function addFontAwesome()
+    {
         $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
-        $waState = $wa->getManagerState();
         $config = J2Store::config();
-        $font_awesome_ui = $config->get('load_fontawesome_ui',1);
-        if($font_awesome_ui){
-            if($waState['activeAssets']['style']['fontawesome']){
+
+        if ($config->get('load_fontawesome_ui', 1)) {
+            if ($wa->assetExists('style', 'fontawesome')) {
                 $wa->useStyle('fontawesome');
             } else {
-                $wa->registerAndUseStyle('fontawesome',Uri::root() .'media/j2store/css/font-awesome.min.css');
+                $wa->registerAndUseStyle('fontawesome', 'j2store/font-awesome.min.css');
             }
         }
     }
