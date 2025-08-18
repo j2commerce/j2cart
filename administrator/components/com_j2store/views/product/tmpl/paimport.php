@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 // No direct access
@@ -24,18 +24,18 @@ nav, header, div.subhead {
 				<div class="span2">
 					<?php echo JText::_('J2STORE_SKU'); ?> <br>
 					<input type="text" name="filter_sku" value="<?php  echo $app->input->getString ( 'filter_sku', '' ); ?>" class="span12">
-					
+
 				</div>
 				<div class="span1">
 				<br>
 				<?php echo JText::_('J2STORE_OR'); ?></div>
 				<div class="span2">
-					
+
 					<?php echo JText::_('J2STORE_PRODUCT_ID'); ?> <br>
 					<input type="text" name="filter_pid" value="<?php  echo $app->input->getString ( 'filter_pid', '' ); ?>" class="span8">
-				</div>	
+				</div>
 				<!--<input type="text" name="filter_search" value="<?php  echo $app->input->getString ( 'filter_search', '' ); ?>" > -->
-				
+
 				<div class="span3">
 					<br>
 					<input type="submit" name="search_button" class="btn btn-success" value="<?php echo JText::_('J2STORE_PAIMPORT_FIND_PRODUCTS_TO_IMPORT')?>">
@@ -48,17 +48,17 @@ nav, header, div.subhead {
 			<input type="hidden" name="product_id" value="<?php echo $this->row->j2store_product_id; ?>" />
 			<input type="hidden" name="product_type" value="<?php  echo $app->input->getString ( 'product_type', 'simple' ); ?>" />
 			<input type="hidden" name="tmpl" value="component" />
-		</form>	
+		</form>
 	</div>
 <?php if(isset($this->products) && count($this->products)):?>
 	<form action="index.php" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
-		
+
 		<div class="row-fluid">
 			<div>
 				<button class="btn btn-info btn-large pull-right"
 					onclick="document.getElementById('task').value='importattributes'; document.adminForm.submit(); ">
 					<?php echo JText::_('J2STORE_PAI_IMPORT_PRODUCT_OPTIONS'); ?>
-				</button> 
+				</button>
 				<br><br>
 			</div>
 			<br>

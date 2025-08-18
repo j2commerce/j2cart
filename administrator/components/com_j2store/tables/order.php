@@ -2664,19 +2664,22 @@ class J2StoreTableOrder extends F0FTable
 
 
 	/**
-	 * Returns a formatted price for an order. This is different from the one called by the cart
+	 * Returns a formatted price for an order with additional check to prevent division by zero error. This is different from the one called by the cart
 	 * Since 3.2
 	 * @param object $item
 	 * @param boolean $including_tax
 	 * @return number
 	 */
-
 	public function get_formatted_order_lineitem_price($item, $including_tax=false) {
-		if($including_tax) {
-			$price = $item->orderitem_finalprice_with_tax / $item->orderitem_quantity;
-		}else {
-			$price = $item->orderitem_finalprice_without_tax / $item->orderitem_quantity;
-		}
+        if($item->orderitem_quantity == 0) {
+            $price = 0; // Return zero if quantity is zero
+        } else {
+            if ($including_tax) {
+                $price = $item->orderitem_finalprice_with_tax / $item->orderitem_quantity;
+            } else {
+                $price = $item->orderitem_finalprice_without_tax / $item->orderitem_quantity;
+            }
+        }
 		//allow plugins to modify
 		J2Store::plugin()->event('GetFormattedOrderLineItemPrice', array(&$price, $item, $this));
 		return $price;

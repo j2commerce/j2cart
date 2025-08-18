@@ -1,7 +1,7 @@
 <?php
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -33,7 +33,7 @@ defined('_JEXEC') or die;
 			<?php echo J2Html::label(JText::_('J2STORE_PRODUCT_WEIGHT_CLASS'), 'weight_class'); ?>
 			<?php echo $this->weights; ?>
 		</div>
-<!-- 
+<!--
 		<div class="control-group">
 		<?php echo J2Html::label(JText::_('J2STORE_PRODUCT_SHIPPING'), 'shipping',array('class'=>'control-label')); ?>
 		<?php
