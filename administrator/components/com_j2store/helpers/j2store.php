@@ -33,6 +33,7 @@ require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/queue.php');
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/strapper.php');
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/platform.php');
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/fof.php');
+require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/image.php');
 
 /**
  * J2Store helper.
@@ -190,5 +191,10 @@ class J2Store
     public static function fof($config = [])
     {
         return J2F0F::getInstance($config);
+    }
+
+    public static function image($config = [])
+    {
+        return J2Image::getInstance($config);
     }
 }
