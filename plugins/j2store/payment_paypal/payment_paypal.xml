@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="2.5" type="plugin" group="j2store" method="upgrade">
 	<name>Paypal Standard for J2Store</name>
-	<version>4.0.0</version>
+	<version>4.0.1</version>
 	<creationDate>DEC 2021</creationDate>
 	<author>J2Store</author>
 	<authorEmail>support@j2store.org</authorEmail>
