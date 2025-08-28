@@ -180,43 +180,64 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
         for($i=0; $i < count($line_items); $i++) {
             $postFieldsItems['L_PAYMENTREQUEST_0_NAME'.$i] = $line_items[$i]['name'];
 //			$postFieldsItems['L_PAYMENTREQUEST_0_NUMBER'.$i] = urlencode($i);
-            $postFieldsItems['L_PAYMENTREQUEST_0_AMT'.$i] = ($card_update === true)? urlencode(0): urlencode($line_items[$i]['amount']);
+
+            // Fix: Ensure amounts are properly formatted and validated
+            $item_amount = ($card_update === true) ? 0 : round(floatval($line_items[$i]['amount']), 2);
+            if ($item_amount < 0) {
+                $item_amount = 0; // PayPal doesn't accept negative item amounts
+            }
+
+            $postFieldsItems['L_PAYMENTREQUEST_0_AMT'.$i] = urlencode($item_amount);
             $postFieldsItems['L_PAYMENTREQUEST_0_QTY'.$i] = urlencode($line_items[$i]['quantity']);
 
-            $itemTotalValue += $line_items[$i]['amount'] * $line_items[$i]['quantity'];
-            $taxTotalValue += $line_items[$i]['tax'] * $line_items[$i]['quantity'];
+            $itemTotalValue += $item_amount * $line_items[$i]['quantity'];
+            $taxTotalValue += floatval($line_items[$i]['tax']) * $line_items[$i]['quantity'];
         }
 
         if ($params->get ( 'checkout_price_display_options', 1 ) == 0) {
             if ($order->order_tax > 0) {
                 $tax = round ( $currency->format ( $order->order_tax, $currency_values ['currency_code'], $currency_values ['currency_value'], false ), 2 );
+
+                // Fix: Ensure tax amount is valid
+                $tax = max(0, floatval($tax)); // Ensure non-negative
+                $tax_amount = ($card_update === true) ? 0 : $tax;
+
                 $postFieldsItems['L_PAYMENTREQUEST_0_NAME'.$i] = JText::_ ( 'J2STORE_CART_TAX' );
 //			$postFields['L_PAYMENTREQUEST_0_NUMBER'.$i] = urlencode($i);
-                $postFieldsItems['L_PAYMENTREQUEST_0_AMT'.$i] = ($card_update === true)? urlencode(0): urlencode($tax);
+                $postFieldsItems['L_PAYMENTREQUEST_0_AMT'.$i] = urlencode($tax_amount);
                 $postFieldsItems['L_PAYMENTREQUEST_0_QTY'.$i] = urlencode(1);
                 $i++;
-                $itemTotalValue += $tax;
+                $itemTotalValue += $tax_amount;
             }
         }
 
         $discount = round ( $currency->format ( $order->get_total_discount ( $params->get ( 'checkout_price_display_options', 1 ) ), $currency_values ['currency_code'], $currency_values ['currency_value'], false ), 2 );
         if ($discount > 0) {
+            // Fix: Ensure discount amount is properly handled
+            $discount = max(0, floatval($discount)); // Ensure non-negative
+            $discount_amount = ($card_update === true) ? 0 : (-1 * $discount); // PayPal expects negative for discounts
+
             $postFieldsItems['L_PAYMENTREQUEST_0_NAME'.$i] = JText::_ ( 'J2STORE_CART_DISCOUNT' );
 //			$postFieldsItems['L_PAYMENTREQUEST_0_NUMBER'.$i] = urlencode($i);
-            $postFieldsItems['L_PAYMENTREQUEST_0_AMT'.$i] = ($card_update === true)? urlencode(0): urlencode(- $discount);
+            $postFieldsItems['L_PAYMENTREQUEST_0_AMT'.$i] = urlencode($discount_amount);
             $postFieldsItems['L_PAYMENTREQUEST_0_QTY'.$i] = urlencode(1);
             $i++;
-            $itemTotalValue -= $discount;
+            $itemTotalValue += $discount_amount; // Already negative, so += is correct
         }
 
         $orderTotalValue = round($itemTotalValue, 2);
 
         $amount = round ( $currency->format ( $order->order_total, $currency_values ['currency_code'], $currency_values ['currency_value'], false ), 2 );
-        if($orderTotalValue != $amount){
+
+        // Fix: Improve amount validation with proper tolerance
+        $amount_difference = abs($orderTotalValue - $amount);
+        if($amount_difference > 0.01){  // Use 0.01 tolerance instead of exact match
             $description = JText::_ ( "J2STORE_PAYMENT_PAYPALSUBSCRIPTION_ORDER_DESCRIPTION" ) . ": " . $order->order_id;
             //get invoice number
             $invoice_number = $order->getInvoiceNumber ();
 
+            // Clear existing line items and use single item
+            $postFieldsItems = array();
             $postFields['L_PAYMENTREQUEST_0_NAME0'] = $description;
             $postFields['L_PAYMENTREQUEST_0_NUMBER0'] = urlencode($invoice_number);
             $postFields['L_PAYMENTREQUEST_0_AMT0'] = ($card_update === true)? urlencode(0): urlencode($amount);
@@ -228,6 +249,10 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
         if($card_update === true){
             $orderTotalValue = 0;
         }
+
+        // Fix: Ensure all amounts are properly validated before sending
+        $orderTotalValue = max(0, round($orderTotalValue, 2)); // Ensure non-negative and properly rounded
+
         $postFields['PAYMENTREQUEST_0_ITEMAMT'] = urlencode($orderTotalValue);
         $postFields['PAYMENTREQUEST_0_TAXAMT'] = urlencode(0);
         $postFields['PAYMENTREQUEST_0_AMT'] = urlencode($orderTotalValue);
@@ -241,6 +266,18 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
             $postFields['HDRBACKCOLOR'] = urlencode(substr($cpp_headerborder_color, 0,6));
         if($cpp_headerback_color = $this->_getParam('cpp_headerborder_color',''))
             $postFields['HDRBORDERCOLOR'] = urlencode(substr($cpp_headerback_color, 0,6));
+
+        // Debug logging for subscription payment amounts
+        if (defined('JDEBUG') && JDEBUG) {
+            $debug_info = array(
+                'orderTotalValue' => $orderTotalValue,
+                'originalAmount' => $amount,
+                'itemTotalValue' => $itemTotalValue,
+                'cardUpdate' => $card_update,
+                'lineItemsCount' => count($line_items)
+            );
+            $this->_log($debug_info, 'Subscription Payment Debug Info');
+        }
 
         J2Store::plugin()->event('AfterPrepaymentForSubscriptionProduct', array(&$postFields, $this->_element));
 
