@@ -1041,8 +1041,10 @@ class J2StoreTableOrder extends F0FTable
 			$shipping = $session->get ( 'shipping_values', array(), 'j2store' );
 			if ( count ( $shipping ) && isset( $shipping[ 'shipping_name' ] ) ) {
 				$this->setOrderShippingRate ( $shipping );
-				$order_shipping = $this->_shipping_totals->ordershipping_price + $this->_shipping_totals->ordershipping_extra;
-				$order_shipping_tax = $this->_shipping_totals->ordershipping_tax;
+                $shipping_price = is_numeric($this->_shipping_totals->ordershipping_price) ? (float)$this->_shipping_totals->ordershipping_price : 0;
+                $shipping_extra = is_numeric($this->_shipping_totals->ordershipping_extra) ? (float)$this->_shipping_totals->ordershipping_extra : 0;
+                $order_shipping = $shipping_price + $shipping_extra;
+                $order_shipping_tax = is_numeric($this->_shipping_totals->ordershipping_tax)? (float)$this->_shipping_totals->ordershipping_tax : 0;
 			}
 		}
 		$this->order_shipping = $order_shipping;
