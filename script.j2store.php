@@ -72,6 +72,13 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
   protected $minimumJoomlaVersion = '4.0.0';
   protected $maximumJoomlaVersion = '5.99.99';
 
+    /**
+     * Store original error reporting level
+     *
+     * @var int
+     */
+    protected $originalErrorReporting;
+
   protected $removeFilesAllVersions = array(
     'files' => array(
       // Use pathnames relative to your site's root, e.g.
@@ -154,6 +161,12 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
     {
         parent::postflight($type, $parent);
 
+        // Restore original error reporting level
+        if (isset($this->originalErrorReporting)) {
+            error_reporting($this->originalErrorReporting);
+            ini_set('display_errors', $this->originalErrorReporting > 0 ? 1 : 0);
+        }
+
         // Remove extra column from the variants table
 
         $db = Factory::getDbo();
@@ -169,6 +182,11 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
 
   public function preflight($type, $parent)
   {
+      // Store current error reporting level and set to exclude warnings/deprecations
+      $this->originalErrorReporting = error_reporting();
+      error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING & ~E_NOTICE);
+      ini_set('display_errors', 1);
+
     if (parent::preflight($type, $parent)) {
       $app = Factory::getApplication();
       $db = Factory::getDbo();
