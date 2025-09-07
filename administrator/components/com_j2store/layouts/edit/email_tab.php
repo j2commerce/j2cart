@@ -35,6 +35,18 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
         var form = document.adminForm;
         if (pressbutton == 'cancel') {
             document.adminForm.task.value = pressbutton;
+
+            // Ensure the content from the Joomla CodeMirror editor instance is saved to the textarea
+            if (Joomla.editors && Joomla.editors.instances && Joomla.editors.instances['source']) {
+                if (typeof Joomla.editors.instances['source'].getValue === 'function') {
+                    var value = Joomla.editors.instances['source'].getValue();
+                    var textarea = document.getElementById('source');
+                    if (textarea) {
+                        textarea.value = value;
+                    }
+                }
+            }
+
             form.submit();
         }else{
             if (document.formvalidator.isValid(form)) {
