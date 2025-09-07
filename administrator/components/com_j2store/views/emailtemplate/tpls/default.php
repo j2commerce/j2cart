@@ -48,7 +48,7 @@ $params = J2Store::config();
 			<tbody>
 				<tr valign="top">
 				<td rowspan="1" colspan="12">
-					Thank you for your order! Your unique Order ID is:<strong>[ORDERID]</strong>, please keep this for your records.</p>
+					<p>Thank you for your order! Your unique Order ID is:<strong>[ORDERID]</strong>, please keep this for your records.</p>
 					</td>
 				</tr>
 			</tbody>
