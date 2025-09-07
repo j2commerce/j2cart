@@ -44,6 +44,18 @@ $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" rol
         }else{
             if (document.formvalidator.isValid(form)) {
                 document.adminForm.task.value = pressbutton;
+
+				// Ensure the content from the Joomla CodeMirror editor instance is saved to the textarea
+                if (Joomla.editors && Joomla.editors.instances && Joomla.editors.instances['source']) {
+                    if (typeof Joomla.editors.instances['source'].getValue === 'function') {
+                        var value = Joomla.editors.instances['source'].getValue();
+                        var textarea = document.getElementById('source');
+                        if (textarea) {
+                            textarea.value = value;
+                        }
+                    }
+                }
+
                 form.submit();
             }
             else {
