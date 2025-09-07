@@ -48,7 +48,7 @@ $params = J2Store::config();
 			<tbody>
 				<tr valign="top">
 				<td rowspan="1" colspan="12">
-					Thank you for your order! Your unique Order ID is:<strong>[ORDERID]</strong>, please keep this for your records.</p>
+					<p>Thank you for your order! Your unique Order ID is:<strong>[ORDERID]</strong>, please keep this for your records.</p>
 					</td>
 				</tr>
 			</tbody>
@@ -138,7 +138,7 @@ $params = J2Store::config();
 					<td>
 						<?php if($params->get('show_thumb_cart', 1) && !empty($thumb_image)): ?>
 							<span class="cart-thumb-image">
-								<?php if(JFile::exists(JPATH_SITE.'/'.$thumb_image)): ?>
+								<?php if(file_exists(JPATH_SITE.'/'.$thumb_image)): ?>
 								<img style="float: left;" width="120" src="<?php echo JUri::root(true).'/'.$thumb_image; ?>" >
 								<?php endif;?>
 							</span>

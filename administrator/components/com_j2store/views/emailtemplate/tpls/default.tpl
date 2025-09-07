@@ -13,33 +13,33 @@ $params = J2Store::config();
 ?>
 <style>
 
- .emailtemplate-table td {    
-   font-style: normal; 
-   font-variant: normal; 
-   font-weight: normal; 
-   font-size: 11px; 
-   line-height: 1.35em;  
-   padding: 7px 9px 9px; 
-   border-width: 0px 1px 1px; 
-   border-right: 1px solid rgb(190, 188, 183); 
-   border-bottom: 1px solid rgb(190, 188, 183); 
+ .emailtemplate-table td {
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 11px;
+   line-height: 1.35em;
+   padding: 7px 9px 9px;
+   border-width: 0px 1px 1px;
+   border-right: 1px solid rgb(190, 188, 183);
+   border-bottom: 1px solid rgb(190, 188, 183);
    border-left: 1px solid rgb(190, 188, 183);
-   
-   
+
+
  }
-  
+
  .emailtemplate-table th {
-    
-   padding: 5px 9px 6px; 
-   border-top: 1px solid rgb(190, 188, 183); 
-   border-right: 1px solid rgb(190, 188, 183); 
-   border-left: 1px solid rgb(190, 188, 183); 
-   border-style: solid solid none; 
+
+   padding: 5px 9px 6px;
+   border-top: 1px solid rgb(190, 188, 183);
+   border-right: 1px solid rgb(190, 188, 183);
+   border-left: 1px solid rgb(190, 188, 183);
+   border-style: solid solid none;
    line-height: 1em;
  }
-  
+
   .emailtemplate-table-footer td {
-    text-align: right;    
+    text-align: right;
   }
 
 </style>
@@ -48,7 +48,7 @@ $params = J2Store::config();
 			<tbody>
 				<tr valign="top">
 				<td rowspan="1" colspan="12">
-					Thank you for your order! Your unique Order ID is:<strong>[ORDERID]</strong>, please keep this for your records.</p>
+					<p>Thank you for your order! Your unique Order ID is:<strong>[ORDERID]</strong>, please keep this for your records.</p>
 					</td>
 				</tr>
 			</tbody>
@@ -97,7 +97,7 @@ $params = J2Store::config();
 			<tbody>
 				<tr valign="top">
 					<td style="color: rgb(47, 47, 47); font-style: normal; font-variant: normal; font-weight: normal; font-size: 11px; line-height: 1.35em;  padding: 7px 9px 9px; border-width: 0px 1px 1px; border-right: 1px solid rgb(190, 188, 183); border-bottom: 1px solid rgb(190, 188, 183); border-left: 1px solid rgb(190, 188, 183); background-color: rgb(248, 247, 245);">
-						<p><strong>Payment Type: </strong>[PAYMENT_TYPE]</p>						
+						<p><strong>Payment Type: </strong>[PAYMENT_TYPE]</p>
 						<p>&nbsp;</p>
 					</td>
 					<td style="color: rgb(47, 47, 47); font-style: normal; font-variant: normal; font-weight: normal; font-size: 11px; line-height: 1.35em; "> </td>
@@ -138,7 +138,7 @@ $params = J2Store::config();
 					<td>
 						<?php if($params->get('show_thumb_cart', 1) && !empty($thumb_image)): ?>
 							<span class="cart-thumb-image">
-								<?php if(JFile::exists(JPATH_SITE.'/'.$thumb_image)): ?>
+								<?php if(file_exists(JPATH_SITE.'/'.$thumb_image)): ?>
 								<img style="float: left;" width="120" src="<?php echo JUri::root(true).'/'.$thumb_image; ?>" >
 								<?php endif;?>
 							</span>
@@ -162,7 +162,7 @@ $params = J2Store::config();
 						<?php if($params->get('show_price_field', 1)): ?>
 
 							<span class="cart-product-unit-price">
-								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>								
+								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>
 								<span class="cart-item-value">
 									<?php echo $currency->format($order->get_formatted_order_lineitem_price($item, $params->get('checkout_price_display_options', 1)), $order->currency_code, $order->currency_value);?>
 								</span>
@@ -179,7 +179,7 @@ $params = J2Store::config();
 						<?php endif; ?>
 					</td>
                   	<td><?php echo $item->orderitem_quantity; ?></td>
-				   <td>	<?php echo $currency->format($order->get_formatted_lineitem_total($item, $params->get('checkout_price_display_options', 1)), $order->currency_code, $order->currency_value ); ?>					
+				   <td>	<?php echo $currency->format($order->get_formatted_lineitem_total($item, $params->get('checkout_price_display_options', 1)), $order->currency_code, $order->currency_value ); ?>
 					</td>
 				</tr>
 				<?php endforeach; ?>

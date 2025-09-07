@@ -39,6 +39,7 @@ class J2StoreModelShippings extends F0FModel {
 	{
 		$query->where("shipping.type='plugin'");
 		$query->where("shipping.element LIKE 'shipping_%'");
+        $query->where("shipping.folder='j2store'");
 	}
 
     public function buildOrderbyQuery(&$query){
@@ -73,7 +74,7 @@ class J2StoreModelShippings extends F0FModel {
 	public function getShippingRates(&$order)
 	{
 		static $rates;
-		
+
 		if (empty($rates) || !is_array($rates))
 		{
 			$rates = array();
@@ -99,7 +100,7 @@ class J2StoreModelShippings extends F0FModel {
 				$shippingOptions = $app->triggerEvent( "onJ2StoreGetShippingOptions", array( $plugin->element, $order  ) );
 				if (in_array(true, $shippingOptions, true))
 				{
-					$results = $app->triggerEvent( "onJ2StoreGetShippingRates", array( $plugin->element, $order  ) );					
+					$results = $app->triggerEvent( "onJ2StoreGetShippingRates", array( $plugin->element, $order  ) );
 					foreach ($results as $result)
 					{
 						if(is_array($result))
