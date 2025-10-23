@@ -239,13 +239,13 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		$uri = Uri::getInstance();
 		$document->setMetaData('og:title', $document->getTitle(),'property');
 		$document->setMetaData('og:site_name', $app->get('sitename'),'property');
-		$document->setMetaData('og:description', strip_tags($document->getDescription()),'property');
+		$document->setMetaData('og:description', strip_tags($document->getDescription() ?? ''),'property');
 		$document->setMetaData('og:url', $uri->toString(),'property');
 		$document->setMetaData('og:type', 'product.group','property');
 
 		//add custom styles
 		$custom_css = $params->get('custom_css', '');
-		$document->addStyleDeclaration(strip_tags($custom_css));
+		$document->addStyleDeclaration(strip_tags($custom_css ?? ''));
 
 		if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
 
@@ -535,7 +535,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		else
 		{
 			$metaDescItem = preg_replace("#{(.*?)}(.*?){/(.*?)}#s", '', $product->source->introtext.' '.$product->source->fulltext);
-			$metaDescItem = strip_tags($metaDescItem);
+			$metaDescItem = strip_tags($metaDescItem ?? '');
 			$metaDescItem = J2Store::utilities()->characterLimit($metaDescItem, 150);
 			$document->setDescription(html_entity_decode($metaDescItem));
 		}
@@ -562,7 +562,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 		$uri = Uri::getInstance();
 		$document->setMetaData('og:title', $document->getTitle(),'property');
 		$document->setMetaData('og:site_name', $app->get('sitename'),'property');
-		$document->setMetaData('og:description', strip_tags($document->getDescription()),'property');
+		$document->setMetaData('og:description', strip_tags($document->getDescription() ?? ''),'property');
 		$document->setMetaData('og:url', $uri->toString(),'property');
 		$document->setMetaData('og:type', 'product','property');
 
@@ -684,7 +684,7 @@ class J2StoreControllerProducttags extends J2StoreControllerProductsBase
 
 		//add custom styles
 		$custom_css = $params->get('custom_css', '');
-		$document->addStyleDeclaration(strip_tags($custom_css));
+		$document->addStyleDeclaration(strip_tags($custom_css ?? ''));
 		$view->set('params', $params);
 		$view->set('filters', $filters);
 		$view->set('up_sells', $up_sells);
