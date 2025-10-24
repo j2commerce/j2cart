@@ -75,8 +75,8 @@
 					name="max_subtotal"
 					type="text"
 					default="-1.00"
-					label="J2STORE_COD_MINIMUM_SUBTOTAL"
-					description="J2STORE_COD_MINIMUM_SUBTOTAL_DESC"
+					label="J2STORE_COD_MAXIMUM_SUBTOTAL"
+					description="J2STORE_COD_MAXIMUM_SUBTOTAL_DESC"
 				/>
 				<field
 					name="payment_status"
