@@ -17,4 +17,7 @@
     <languages folder="languages">
         <language tag="en-GB">en-GB.plg_j2store_app_schemaproducts.ini</language>
     </languages>
+    <media folder="media" destination="plg_j2store_app_schemaproducts">
+        <folder>images</folder>
+    </media>
 </extension>
