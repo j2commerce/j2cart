@@ -1,7 +1,7 @@
 ALTER TABLE `#__j2store_countries` ADD `country_isocode_num` INT(4) NOT NULL DEFAULT '0' AFTER `country_isocode_3`;
 
 UPDATE `#__j2store_countries` SET `country_isocode_num` = 626 WHERE `country_isocode_2` = 'TP';
-UPDATE `#__j2store_countries` SET `country_name` = 'Timor-Leste', `country_isocode_2` = 'TL', `country_isocode_3` = 'TLS' WHERE `country_isocode_num` = 626
+UPDATE `#__j2store_countries` SET `country_name` = 'Timor-Leste', `country_isocode_2` = 'TL', `country_isocode_3` = 'TLS' WHERE `country_isocode_num` = 626;
 
 UPDATE `#__j2store_countries` SET `country_isocode_num` = 180 WHERE `country_isocode_2` = 'ZR';
 UPDATE `#__j2store_countries` SET `country_isocode_num` = 249 WHERE `country_isocode_2` = 'FX';
