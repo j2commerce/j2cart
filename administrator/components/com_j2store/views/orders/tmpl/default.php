@@ -2,7 +2,7 @@
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license GNU GPL v3 or later
  */
 
@@ -53,7 +53,7 @@ $shouldExpand = $this->state->since || $this->state->until || $this->state->payk
                         <div class="js-stools-container-filters clearfix bg-white collapse<?php echo $shouldExpand ? ' show' : ''; ?>" id="collapseFilters">
 			                <?php echo $this->loadTemplate('advancedfilters'); ?>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
                 <div class="j2store-order-list">
                     <?php echo $this->loadTemplate('items'); ?>
