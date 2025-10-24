@@ -31,7 +31,7 @@
 			CREATE TABLE IF NOT EXISTS `#__j2store_filters` (
 			  `j2store_filter_id` int(11) NOT NULL AUTO_INCREMENT,
 			  `group_id` int(11) NOT NULL,
-			  `filter_name` varchar(255) DEFAULT NULL,
+			  `filter_name` varchar(255) NULL DEFAULT NULL,
 			  `ordering` int(11) NOT NULL,
 			  PRIMARY KEY (`j2store_filter_id`),
 			  KEY `group_id` (`group_id`)
@@ -868,7 +868,7 @@
             <condition type="true"/>
             <query><![CDATA[
                 ALTER TABLE `#__j2store_currencies`
-                MODIFY `currency_position` varchar(12) DEFAULT 'pre',
+                MODIFY `currency_position` varchar(12) NULL DEFAULT 'pre' ,
                 MODIFY `currency_symbol` varchar(255) NULL DEFAULT NULL,
                 MODIFY `currency_decimal` varchar(12) NULL DEFAULT '.' ,
                 MODIFY `currency_thousands` char(1) NULL DEFAULT ',' ,
