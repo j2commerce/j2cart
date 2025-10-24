@@ -69,12 +69,10 @@ $alert_html = '<joomla-alert type="danger" close-text="' . Text::_('J2STORE_CLOS
                                             <?php foreach ($field_set['fields'] as $field_name => $field):?>
                                                 <?php $is_required = isset($field['options']['required']) && !empty($field['options']['required']) ? true:false;?>
                                                 <div class="control-group">
-                                                    <?php if($field['options']['hiddenLabel'] != true):?>
+                                                    <?php if (!$field['options']['hiddenLabel'] && isset($field['label']) && !empty($field['label'])) : ?>
                                                         <div class="control-label">
                                                             <label>
-                                                                <?php if(isset($field['label']) && !empty($field['label'])):?>
-                                                                    <?php echo Text::_($field['label']);?><?php echo $is_required ? "<span>*</span>": '';?>
-                                                                <?php endif; ?>
+                                                                <?php echo Text::_($field['label']);?><?php echo $is_required ? "<span>*</span>": '';?>
                                                             </label>
                                                         </div>
                                                     <?php endif;?>
