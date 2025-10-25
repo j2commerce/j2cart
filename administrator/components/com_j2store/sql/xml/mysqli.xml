@@ -247,10 +247,10 @@
 				  `j2store_orderfee_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				  `order_id` varchar(255) NOT NULL,
 				  `name` varchar(255) NOT NULL,
-				  `amount` decimal(12,4) NOT NULL,
+				  `amount` decimal(15,5) NOT NULL,
 				  `tax_class_id` int(11) unsigned NOT NULL,
 				  `taxable` int(11) NOT NULL,
-				  `tax` decimal(12,4) NOT NULL,
+				  `tax` decimal(15,5) NOT NULL,
 				  `tax_data` text NOT NULL,
 				  PRIMARY KEY (`j2store_orderfee_id`)
 				) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -260,7 +260,7 @@
         <action table="#__j2store_orders" canfail="0">
             <condition type="missing" value="order_fees"/>
             <query><![CDATA[
-            	ALTER TABLE `#__j2store_orders` ADD `order_fees` decimal(12,4) AFTER `order_surcharge`;
+            	ALTER TABLE `#__j2store_orders` ADD `order_fees` decimal(15,5) AFTER `order_surcharge`;
             ]]></query>
         </action>
 
@@ -278,8 +278,8 @@
 				  `discount_value_type` varchar(255) NOT NULL,
 				  `discount_customer_email` varchar(255) NOT NULL,
 				  `user_id` int(11) unsigned NOT NULL,
-				  `discount_amount` decimal(12,4) NOT NULL,
-				  `discount_tax` decimal(12,4) NOT NULL,
+				  `discount_amount` decimal(15,5) NOT NULL,
+				  `discount_tax` decimal(15,5) NOT NULL,
 				  `discount_params` text NOT NULL,
 				  PRIMARY KEY (`j2store_orderdiscount_id`),
 				  KEY `order_id` (`order_id`)
@@ -304,21 +304,21 @@
         <action table="#__j2store_orders" canfail="0">
             <condition type="missing" value="order_subtotal_ex_tax"/>
             <query><![CDATA[
-            	ALTER TABLE `#__j2store_orders` ADD `order_subtotal_ex_tax` decimal(12,4) AFTER `order_subtotal`;
+            	ALTER TABLE `#__j2store_orders` ADD `order_subtotal_ex_tax` decimal(15,5) AFTER `order_subtotal`;
             ]]></query>
         </action>
 
         <action table="#__j2store_orders" canfail="0">
             <condition type="missing" value="order_discount_tax"/>
             <query><![CDATA[
-            	ALTER TABLE `#__j2store_orders` ADD `order_discount_tax` decimal(12,4) AFTER `order_discount`;
+            	ALTER TABLE `#__j2store_orders` ADD `order_discount_tax` decimal(15,5) AFTER `order_discount`;
             ]]></query>
         </action>
 
         <action table="#__j2store_orderdiscounts" canfail="0">
             <condition type="missing" value="discount_tax"/>
             <query><![CDATA[
-            	ALTER TABLE `#__j2store_orderdiscounts` ADD `discount_tax` decimal(12,4) AFTER `discount_amount`;
+            	ALTER TABLE `#__j2store_orderdiscounts` ADD `discount_tax` decimal(15,5) AFTER `discount_amount`;
             ]]></query>
         </action>
 
@@ -386,7 +386,7 @@
         <action table="#__j2store_orders" canfail="0">
             <condition type="true" value="order_refund" />
             <query><![CDATA[
-                ALTER TABLE `#__j2store_orders` MODIFY COLUMN `order_refund` decimal(12,4);
+                ALTER TABLE `#__j2store_orders` MODIFY COLUMN `order_refund` decimal(15,5);
             ]]></query>
         </action>
 
@@ -504,7 +504,7 @@
         <action table="#__j2store_orders" canfail="1">
             <condition type="true" value="currency_value" />
             <query><![CDATA[
-                ALTER TABLE `#__j2store_orders` MODIFY COLUMN `currency_value` decimal(15,8);
+                ALTER TABLE `#__j2store_orders` MODIFY COLUMN `currency_value` decimal(15,5);
                 ]]></query>
         </action>
 
@@ -893,15 +893,15 @@
                 MODIFY `token` varchar(255) NULL DEFAULT NULL,
                 MODIFY `user_id` INT(11) NULL DEFAULT NULL,
                 MODIFY `user_email` varchar(255) NULL DEFAULT NULL,
-                MODIFY `order_total` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `order_subtotal` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `order_tax` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `order_shipping` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `order_shipping_tax` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `order_discount` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `order_credit` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `order_refund` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `order_surcharge` decimal(12,4) NULL DEFAULT NULL,
+                MODIFY `order_total` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `order_subtotal` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `order_tax` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `order_shipping` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `order_shipping_tax` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `order_discount` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `order_credit` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `order_refund` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `order_surcharge` decimal(15,5) NULL DEFAULT NULL,
                 MODIFY `orderpayment_type` varchar(255) NULL DEFAULT NULL,
                 MODIFY `transaction_id` varchar(255) NULL DEFAULT NULL,
                 MODIFY `transaction_status` varchar(255) NULL DEFAULT NULL,
@@ -965,15 +965,15 @@
                 MODIFY `orderitem_attributes` TEXT NULL DEFAULT NULL,
                 MODIFY `orderitem_quantity` varchar(255) NULL DEFAULT NULL,
                 MODIFY `orderitem_taxprofile_id` INT(11) NULL DEFAULT NULL,
-                MODIFY `orderitem_per_item_tax` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `orderitem_tax` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `orderitem_discount` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `orderitem_discount_tax` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `orderitem_price` decimal(12,5) NULL DEFAULT NULL,
-                MODIFY `orderitem_option_price` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `orderitem_finalprice` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `orderitem_finalprice_with_tax` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `orderitem_finalprice_without_tax` decimal(12,4) NULL DEFAULT NULL,
+                MODIFY `orderitem_per_item_tax` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `orderitem_tax` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `orderitem_discount` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `orderitem_discount_tax` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `orderitem_price` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `orderitem_option_price` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `orderitem_finalprice` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `orderitem_finalprice_with_tax` decimal(15,5) NULL DEFAULT NULL,
+                MODIFY `orderitem_finalprice_without_tax` decimal(15,5) NULL DEFAULT NULL,
                 MODIFY `orderitem_params` TEXT NULL DEFAULT NULL,
                 MODIFY `created_on` datetime NULL DEFAULT NULL,
                 MODIFY `created_by` INT(11) NULL DEFAULT NULL,
@@ -1001,10 +1001,10 @@
                 ALTER TABLE `#__j2store_orderfees`
                 MODIFY `order_id` varchar(255) NULL DEFAULT NULL,
                 MODIFY `name` varchar(255) NULL DEFAULT NULL,
-                MODIFY `amount` decimal(12,4) NULL DEFAULT NULL,
+                MODIFY `amount` decimal(15,5) NULL DEFAULT NULL,
                 MODIFY `tax_class_id` INT(11) NULL DEFAULT NULL,
                 MODIFY `taxable` INT(11) NULL DEFAULT NULL,
-                MODIFY `tax` decimal(12,4) NULL DEFAULT NULL,
+                MODIFY `tax` decimal(15,5) NULL DEFAULT NULL,
                 MODIFY `tax_data` TEXT NULL DEFAULT NULL,
                 MODIFY `fee_type` varchar(255) NULL DEFAULT NULL;
             ]]></query>
@@ -1044,7 +1044,7 @@
                 MODIFY `coupon_name` varchar(255) NULL DEFAULT NULL,
                 MODIFY `ordering` INT(11) NULL DEFAULT 0,
                 MODIFY `enabled` INT(11) NULL DEFAULT 1,
-                MODIFY `value` decimal(12,4) NULL DEFAULT NULL,
+                MODIFY `value` decimal(15,5) NULL DEFAULT NULL,
                 MODIFY `max_value` varchar(255) NULL DEFAULT NULL,
                 MODIFY `free_shipping` INT(11) NULL DEFAULT NULL,
                 MODIFY `max_uses` INT(11) NULL DEFAULT 0,
@@ -1125,9 +1125,9 @@
             <condition type="true"/>
             <query><![CDATA[
                 ALTER TABLE `#__j2store_shippingrates`
-                MODIFY `shipping_rate_price` decimal(12,5) NULL DEFAULT 0.0,
+                MODIFY `shipping_rate_price` decimal(15,5) NULL DEFAULT 0.0,
                 MODIFY `shipping_rate_weight_end` decimal(11,3) NULL DEFAULT 0.0,
-                MODIFY `shipping_rate_handling` decimal(11,3) NULL DEFAULT 0.0,
+                MODIFY `shipping_rate_handling` decimal(15,5) NULL DEFAULT 0.0,
                 MODIFY `shipping_rate_weight_start` decimal(11,3) NULL DEFAULT 0.0,
                 MODIFY `created_date` datetime NULL DEFAULT NULL,
                 MODIFY `modified_date` datetime NULL DEFAULT NULL;
@@ -1165,8 +1165,8 @@
                 MODIFY `discount_value` varchar(255) NULL DEFAULT NULL,
                 MODIFY `discount_value_type` varchar(255) NULL DEFAULT NULL,
                 MODIFY `user_id` INT(11) NULL DEFAULT 0,
-                MODIFY `discount_amount` decimal(12,4) NULL DEFAULT 0.0,
-                MODIFY `discount_tax` decimal(12,4) NULL DEFAULT 0.0,
+                MODIFY `discount_amount` decimal(15,5) NULL DEFAULT 0.0,
+                MODIFY `discount_tax` decimal(15,5) NULL DEFAULT 0.0,
                 MODIFY `discount_params` text NULL DEFAULT NULL,
                 MODIFY `discount_customer_email` varchar(255) NULL DEFAULT NULL;
             ]]></query>
@@ -1191,7 +1191,7 @@
                 MODIFY `orderitemattribute_name` varchar(255) NULL DEFAULT NULL,
                 MODIFY `orderitemattribute_value` text NULL DEFAULT NULL,
                 MODIFY `orderitemattribute_prefix` varchar(4) NULL DEFAULT NULL,
-                MODIFY `orderitemattribute_price` decimal(12,5) NULL DEFAULT 0.0,
+                MODIFY `orderitemattribute_price` decimal(15,5) NULL DEFAULT 0.0,
                 MODIFY `orderitemattribute_code` varchar(255) NULL DEFAULT NULL,
                 MODIFY `orderitemattribute_type` varchar(255) NULL DEFAULT NULL;
             ]]></query>
@@ -1220,8 +1220,8 @@
             <query><![CDATA[
                 ALTER TABLE `#__j2store_ordertaxes`
                 MODIFY `ordertax_title` varchar(255) NULL DEFAULT NULL,
-                MODIFY `ordertax_percent` decimal(12,4) NULL DEFAULT 0.0,
-                MODIFY `ordertax_amount` decimal(12,4) NULL DEFAULT 0.0;
+                MODIFY `ordertax_percent` decimal(15,5) NULL DEFAULT 0.0,
+                MODIFY `ordertax_amount` decimal(15,5) NULL DEFAULT 0.0;
             ]]></query>
         </action>
         <action table="#__j2store_queues" canfail="0">
@@ -1248,18 +1248,6 @@
                 MODIFY `mime_type` varchar(255) NULL DEFAULT NULL,
                 MODIFY `created_by` INT(11) NULL DEFAULT 0,
                 MODIFY `created_on` datetime NULL DEFAULT NULL;
-            ]]></query>
-        </action>
-        <action table="#__j2store_orderfees" canfail="0">
-            <condition type="true"/>
-            <query><![CDATA[
-                ALTER TABLE `#__j2store_orderfees`
-                MODIFY `name` varchar(255) NULL DEFAULT NULL,
-                MODIFY `amount` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `tax_class_id` int(11) NULL DEFAULT NULL,
-                MODIFY `taxable` int(11)  NULL DEFAULT NULL,
-                MODIFY `tax` decimal(12,4) NULL DEFAULT NULL,
-                MODIFY `tax_data` text NULL DEFAULT NULL;
             ]]></query>
         </action>
     </sql>
