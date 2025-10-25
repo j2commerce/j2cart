@@ -1,4 +1,4 @@
-ALTER TABLE `#__j2store_countries` ADD `country_isocode_num` INT(4) NOT NULL DEFAULT '0' AFTER `country_isocode_3`;
+ALTER TABLE `#__j2store_countries` ADD COLUMN `country_isocode_num` INT(4) NOT NULL DEFAULT '0' AFTER `country_isocode_3` /** CAN FAIL **/;
 
 UPDATE `#__j2store_countries` SET `country_isocode_num` = 626 WHERE `country_isocode_2` = 'TP';
 UPDATE `#__j2store_countries` SET `country_name` = 'Timor-Leste', `country_isocode_2` = 'TL', `country_isocode_3` = 'TLS' WHERE `country_isocode_num` = 626;
