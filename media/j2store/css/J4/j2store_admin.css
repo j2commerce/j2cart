@@ -800,9 +800,6 @@ cursor:pointer;
 #j2store-navbar .navbar-nav {
     flex-direction: row;
 }
-#j2store-navbar .nav-link {
-    margin-inline-end: 10px;
-}
 #j2store-navbar .navbar-nav .nav-item .nav-link {
     display: inline;
     color: #fff;
