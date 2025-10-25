@@ -403,7 +403,13 @@ class J2StoreModelOrderdownloads extends F0FModel {
 		//$savepath = $path.DS.'products';
 		$file = JPath::clean($path.'/'.$productfile->product_file_save_name);
 
-		if(!JFile::exists($file)) {
+        // For use with ARS, considering the 'releases' folder is in root
+        // Allows a mix and match of file locations between J2Store and ARS
+        if(!is_file($file)){
+            $file = JPATH_ROOT . '/' . JPath::clean('releases/' . ltrim($productfile->product_file_save_name, '/'));
+        }
+
+        if(!JFile::exists($file)) {
             $root = JPATH_ROOT.'/';
             $current = JPath::clean($path.'/'.$productfile->product_file_save_name);
             $file = $root.trim($current,'/');
