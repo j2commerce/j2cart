@@ -36,80 +36,80 @@ HTMLHelper::_('bootstrap.dropdown', '.dropdown-toggle');
 
 $menus = [
     'dashboard' => [
-        'name' => Text::_ ( 'COM_J2STORE_MAINMENU_DASHBOARD' ),
-        'icon' => 'fas fa-tachometer-alt',
-        'active' => 1,
+        'name' => Text::_('COM_J2STORE_MAINMENU_DASHBOARD'),
+        'icon' => 'fas fa-solid fa-tachometer-alt',
+        'active' => 1
     ],
     'catalog' => [
         'name' => Text::_('COM_J2STORE_MAINMENU_CATALOG'),
-        'icon' => 'fas fa-tags',
+        'icon' => 'fas fa-solid fa-tags',
         'submenu' => [
-            'products' => 'fa fa-tags',
-            'inventories' => 'fa fa-database',
-            'options' => 'fa fa-list-ol',
-            'vendors' => 'fa fa-male',
-            'manufacturers' => 'fa fa-user',
-            'filtergroups' => 'fa fa-filter',
+            'products' => 'fas fa-solid fa-tags',
+            'inventories' => 'fas fa-solid fa-database',
+            'options' => 'fas fa-solid fa-list-ol',
+            'vendors' => 'fas fa-solid fa-male',
+            'manufacturers' => 'fas fa-solid fa-user',
+            'filtergroups' => 'fas fa-solid fa-filter'
         ]
     ],
     'sales' => [
         'name' => Text::_('COM_J2STORE_MAINMENU_SALES'),
-        'icon' => 'fas fa-money fa-money-bill',
+        'icon' => 'fas fa-solid fa-money fa-money-bill',
         'submenu' => [
-            'orders' => 'fa fa-list-alt',
-            'customers' => 'fa fa-users',
-            'coupons' => 'fa fa-scissors fa-cut',
-            'vouchers' => 'fa fa-gift',
+            'orders' => 'fas fa-solid fa-list-alt',
+            'customers' => 'fas fa-solid fa-users',
+            'coupons' => 'fas fa-solid fa-scissors fa-cut',
+            'vouchers' => 'fas fa-solid fa-gift'
         ]
     ],
     'localisation' => [
         'name' => Text::_('COM_J2STORE_MAINMENU_LOCALISATION'),
         'icon' => 'fas fa-globe',
         'submenu' => [
-            'countries' => 'fas fa-globe',
-            'zones' => 'fa fa-flag',
-            'geozones' => 'fa fa-pie-chart fa-chart-pie',
-            'taxrates' => 'fa fa-calculator',
-            'taxprofiles' => 'fa fa-sitemap',
-            'lengths' => 'fas fa-arrows-alt-v fa-up-down',
-            'weights' => 'fas fa-arrows-alt-h fa-left-right',
-            'orderstatuses' => 'fa fa-check-square',
+            'countries' => 'fas fa-solid fa-globe',
+            'zones' => 'fas fa-solid fa-flag',
+            'geozones' => 'fas fa-solid fa-pie-chart fa-chart-pie',
+            'taxrates' => 'fas fa-solid fa-calculator',
+            'taxprofiles' => 'fas fa-solid fa-sitemap',
+            'lengths' => 'fas fa-solid fa-arrows-alt-v fa-up-down',
+            'weights' => 'fas fa-solid fa-arrows-alt-h fa-left-right',
+            'orderstatuses' => 'fas fa-solid fa-check-square'
         ]
     ],
     'design' => [
         'name' => Text::_('COM_J2STORE_MAINMENU_DESIGN'),
-        'icon' => 'fa fa-paint-brush',
+        'icon' => 'fas fa-solid fa-paint-brush',
         'submenu' => [
-            'emailtemplates' => 'fa fa-envelope',
-            'invoicetemplates' => 'fa fa-print',
+            'emailtemplates' => 'fas fa-solid fa-envelope',
+            'invoicetemplates' => 'fas fa-solid fa-print'
         ]
     ],
     'setup' => [
         'name' => Text::_('COM_J2STORE_MAINMENU_SETUP'),
-        'icon' => 'fa fa-cogs',
+        'icon' => 'fas fa-solid fa-cogs',
         'submenu' => [
-            'configuration' => 'fa fa-cogs',
-            'currencies' => 'fa fa-dollar fa-dollar-sign',
-            'payments' => 'fa fa-credit-card',
-            'shippings' => 'fa fa-truck',
-            'shippingtroubles' => 'fa fa-bug',
-            'customfields' => 'fa fa-th-list',
+            'configuration' => 'fas fa-solid fa-cogs',
+            'currencies' => 'fas fa-solid fa-dollar fa-dollar-sign',
+            'payments' => 'fas fa-solid fa-credit-card',
+            'shippings' => 'fas fa-solid fa-truck',
+            'shippingtroubles' => 'fas fa-solid fa-bug',
+            'customfields' => 'fas fa-solid fa-th-list',
         ]
     ],
     'apps' => [
-        'name' => Text::_ ( 'COM_J2STORE_MAINMENU_APPS' ),
-        'icon' => 'fas fa-th',
-        'active' => 0,
+        'name' => Text::_('COM_J2STORE_MAINMENU_APPS'),
+        'icon' => 'fas fa-solid fa-th',
         'submenu' => [
             'apps' => 'fas fa-th',
-            'appstores' => 'fas fa-solid fa-shop',
-        ]
+            /*'appstores' => 'fas fa-solid fa-shop',*/
+        ],
+        'active' => 0
     ],
     'reporting' => [
         'name' => Text::_ ( 'COM_J2STORE_MAINMENU_REPORTING' ),
-        'icon' => 'fas fa-pie-chart fa-chart-pie',
+        'icon' => 'fas fa-solid fa-pie-chart fa-chart-pie',
         'submenu' => [
-            'Reports' => 'fas fa-chart-bar',
+            'Reports' => 'fas fa-solid fa-chart-bar'
         ]
     ]
 ];
@@ -130,35 +130,43 @@ $j2StorePlugin->event('AddDashboardMenuInJ2Store', array(&$menus));
         <span class="icon-angle-down" aria-hidden="true"></span>
     </button>
     <div id="j2menu" class="dropdown-menu dropdown-menu-end">
-        <?php foreach($menus as $key => $value): ?>
+        <?php foreach($menus as $key => $value) : ?>
             <?php if(isset($value['submenu']) && count($value['submenu'])):?>
-                <a class="dropdown-item j2submenu" href="#">
-                    <span class="fa-fw me-1 me-xxl-2 <?php echo isset($value['icon']) ? $value['icon'] : '';?>" aria-hidden="true"></span>
-                    <?php echo $value['name'];?>
+                <a class="dropdown-item j2submenu align-items-center" aria-haspopup="true" href="#">
+                    <i class="fa-fw me-1 me-xxl-2 <?php echo isset($value['icon']) ? $value['icon'] : '';?>" aria-hidden="true"></i>
+                    <span><?php echo $value['name'];?></span>
+                    <i class="fas fa-chevron-right ms-auto"></i>
                 </a>
                 <div class="j2submenu-list dropdown-menu dropdown-menu-end">
-                    <?php foreach($value['submenu'] as $sub_key => $sub_value): ?>
-                        <?php if (is_array ( $sub_value )): ?>
+                    <?php foreach($value['submenu'] as $sub_key => $sub_value) : ?>
+                        <?php if (is_array ( $sub_value )) : ?>
                             <?php
                             $link_url = isset($sub_value['link']) ? $sub_value['link'] : 'index.php?option=com_j2store&view=' . strtolower($sub_key);
-                            $sub_menu_icon_class = isset( $sub_value['icon'] ) ? ' ' . $sub_value['icon'] : '';
+                            $sub_menu_icon_class = isset( $sub_value['icon'] ) ? $sub_value['icon'] : '';
                             ?>
                         <?php else: ?>
                             <?php
                             $link_url = 'index.php?option=com_j2store&view=' . strtolower($sub_key);
-                            $sub_menu_icon_class = isset($sub_value) ? ' ' . $sub_value : '';
+                            $sub_menu_icon_class = $sub_value ?? '';
                             ?>
                         <?php endif;?>
-                        <a class="dropdown-item" href="<?php echo Route::_($link_url);?>">
-                            <span class="fa-fw me-1 me-xxl-2<?php echo $sub_menu_icon_class;?>" aria-hidden="true"></span>
-                            <?php echo Text::_('COM_J2STORE_TITLE_'.strtoupper($sub_key));?>
+                        <?php
+                            $title = 'COM_J2STORE_TITLE_' . strtoupper($sub_key);
+                            $translatedTitle = Text::_($title);
+                            if ($translatedTitle === $title) {
+                                $translatedTitle = Text::_('COM_J2STORE_MAINMENU_' . strtoupper($sub_key));
+                            }
+                        ?>
+                        <a class="dropdown-item align-items-center" href="<?php echo Route::_($link_url);?>">
+                            <i class="fa-fw me-1 me-xxl-2 <?php echo $sub_menu_icon_class;?>" aria-hidden="true"></i>
+                            <span><?php echo $translatedTitle; ?></span>
                         </a>
                     <?php endforeach;?>
                 </div>
-            <?php else:?>
+            <?php else : ?>
                 <?php
                 $url = 'javascript:void(0);';
-                if ($key == 'dashboard') {
+                if ($key === 'dashboard') {
                     $url = Route::_('index.php?option=com_j2store&view=cpanels');
                 }
                 ?>
