@@ -16,6 +16,9 @@
 	<languages folder="languages">
 		<language tag="en-GB">en-GB.plg_j2store_app_flexivariable.ini</language>
 	</languages>
+    <media folder="media" destination="plg_j2store_app_flexivariable">
+        <folder>images</folder>
+    </media>
 	<!--<config>
 		<fields name="params">
 			<fieldset name="basic">

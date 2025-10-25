@@ -16,6 +16,9 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
     private $_rawData = array();
 
     public function onAfterGetItem(&$model, &$record) {
+
+        if($record->product_type != 'flexivariable') return;
+
         $platform = J2Store::platform();
         //we just have the products. Get the variants
         $variantModel = F0FModel::getTmpInstance('Variants', 'J2StoreModel');
@@ -174,6 +177,8 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         if($this->_rawData) {
 
             $table = $model->getTable();
+
+            if($table->product_type != 'flexivariable') return;
 
             //save variant
             //since post has too much of information, this could do the job
@@ -558,6 +563,9 @@ class J2StoreModelProductsBehaviorFlexiVariable extends F0FModelBehavior {
         return $product_variant->product_optionvalue_ids;
     }
     public function onUpdateProduct(&$model, &$product) {
+
+        if($product->product_type != 'flexivariable') return;
+
         $platform = J2Store::platform();
         $app = $platform->application();
         $product_helper = J2Store::product();

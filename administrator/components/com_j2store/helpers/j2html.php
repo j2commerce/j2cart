@@ -1,7 +1,10 @@
 <?php
 /**
- * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
- * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
@@ -721,7 +724,7 @@ class J2Html
         }
 
         $html = '';
-        $html .= '<div class="alert alert-block alert-info"><strong id="j2store_queue_key">'.$queue_key.'</strong><a onclick="regenerateQueueKey()" class="btn btn-primary btn-sm text-white ms-3"><i class="fas fa-solid fa-redo me-2"></i>'.Text::_ ( 'J2STORE_STORE_REGENERATE' ).'</a>
+        $html .= '<div class="alert alert-block alert-info"><strong id="j2store_queue_key">'.$queue_key.'</strong><a onclick="regenerateQueueKey()" class="btn btn-primary btn-sm text-white ms-3"><span class="fas fa-solid fa-redo me-2" aria-hidden="true"></span>'.Text::_ ( 'J2STORE_STORE_REGENERATE' ).'</a>
 		<script>
 		function regenerateQueueKey(){
 			(function($){

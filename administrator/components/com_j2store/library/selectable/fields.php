@@ -1,52 +1,63 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
- * based on Hikashop field class
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
-defined('_JEXEC') or die;
-require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/selectable/base.php');
-class J2StoreSelectableFields {
 
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Plugin\PluginHelper;
+
+require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/selectable/base.php');
+
+class J2StoreSelectableFields
+{
 	protected static $instance;
 	var $allValues;
 	var $externalValues;
 
-	function __construct($args=array()) {
+	function __construct($args=array())
+    {
 		$this->externalValues = null;
 	}
 
 	public static function getInstance()
 	{
-		if (!is_object(self::$instance))
-		{
+		if (!is_object(self::$instance)) {
 			self::$instance = new self();
 		}
 
 		return self::$instance;
 	}
 
-	function load($type=''){
+	function load($type='')
+    {
 		$this->allValues = array();
-		$this->allValues["text"] = JText::_('J2STORE_TEXT');
-		$this->allValues["email"] = JText::_('J2STORE_EMAIL');
-		$this->allValues["textarea"] = JText::_('J2STORE_TEXTAREA');
-		$this->allValues["wysiwyg"] = JText::_('J2STORE_WYSIWYG');
-		$this->allValues["radio"] = JText::_('J2STORE_RADIO');
-		$this->allValues["checkbox"] = JText::_('J2STORE_CHECKBOX');
-		$this->allValues["singledropdown"] = JText::_('J2STORE_SINGLEDROPDOWN');
-		$this->allValues["zone"] = JText::_('J2STORE_ZONELIST');
-		$this->allValues["date"] = JText::_('J2STORE_DATE');
-		$this->allValues["time"] = JText::_('J2STORE_TIME');
-		$this->allValues["datetime"] = JText::_('J2STORE_DATETIME');
-		$this->allValues["customtext"] = JText::_('J2STORE_CUSTOM_TEXT');
+        $this->allValues["text"] = Text::_('J2STORE_TEXT');
+        $this->allValues["email"] = Text::_('J2STORE_EMAIL');
+        $this->allValues["textarea"] = Text::_('J2STORE_TEXTAREA');
+        $this->allValues["wysiwyg"] = Text::_('J2STORE_WYSIWYG');
+        $this->allValues["radio"] = Text::_('J2STORE_RADIO');
+        $this->allValues["checkbox"] = Text::_('J2STORE_CHECKBOX');
+        $this->allValues["singledropdown"] = Text::_('J2STORE_SINGLEDROPDOWN');
+        $this->allValues["zone"] = Text::_('J2STORE_ZONELIST');
+        $this->allValues["date"] = Text::_('J2STORE_DATE');
+        $this->allValues["time"] = Text::_('J2STORE_TIME');
+        $this->allValues["datetime"] = Text::_('J2STORE_DATETIME');
+        $this->allValues["customtext"] = Text::_('J2STORE_CUSTOM_TEXT');
 
 		if($this->externalValues == null) {
-            $app = JFactory::getApplication();
+            $app = Factory::getApplication();
             $this->externalValues = array();
-			JPluginHelper::importPlugin('j2store');
+			PluginHelper::importPlugin('j2store');
             $app->triggerEvent('onJ2StoreFieldsLoad', array(&$this->externalValues));
 			if(!empty($this->externalValues)) {
 				foreach($this->externalValues as $value) {
@@ -58,7 +69,8 @@ class J2StoreSelectableFields {
 		}
 	}
 
-	function addJS(){
+	function addJS()
+    {
 		$externalJS = '';
 		if(!empty($this->externalValues)){
 			foreach($this->externalValues as $value) {
@@ -100,7 +112,7 @@ class J2StoreSelectableFields {
 		jQuery(document).ready(function(){
 			updateFieldType();
 		});";
-		$doc = JFactory::getDocument();
+        $doc = Factory::getApplication()->getDocument();
 		$doc->addScriptDeclaration( $js );
 	}
 
@@ -109,32 +121,35 @@ class J2StoreSelectableFields {
 		$this->addJS();
 		$this->values = array();
 		foreach($this->allValues as $oneType => $oneVal){
-			$this->values[] = JHTML::_('select.option', $oneType,$oneVal);
+            $this->values[] = HTMLHelper::_('select.option', $oneType,$oneVal);
 		}
 
-		return JHTML::_('select.genericlist', $this->values, $map , 'size="1" onchange="updateFieldType();"', 'value', 'text', (string) $value,'fieldtype');
+        return HTMLHelper::_('select.genericlist', $this->values, $map , 'size="1" onchange="updateFieldType();"', 'value', 'text', (string) $value,'fieldtype');
     }
 }
 
-class j2storeZoneType {
-	function load($form=false){
+class j2storeZoneType
+{
+	function load($form=false)
+    {
 		$this->values = array();
 		if(!$form){
-			$this->values[] = JHTML::_('select.option', '', JText::_('J2STORE_ALL_ZONES') );
+            $this->values[] = HTMLHelper::_('select.option', '', Text::_('J2STORE_ALL_ZONES') );
 		}
-		$this->values[] = JHTML::_('select.option', 'country',JText::_('J2STORE_COUNTRIES'));
-		$this->values[] = JHTML::_('select.option', 'zone',JText::_('J2STORE_ZONES'));
+        $this->values[] = HTMLHelper::_('select.option', 'country',Text::_('J2STORE_COUNTRIES'));
+        $this->values[] = HTMLHelper::_('select.option', 'zone',Text::_('J2STORE_ZONES'));
 	}
 
-	function display($map,$value,$form=false){
+	function display($map,$value,$form=false)
+    {
 		$this->load($form);
 		$dynamic = ($form ? '' : 'onchange="document.adminForm.submit( );"');
-		return JHTML::_('select.genericlist',   $this->values, $map, 'class="inputbox" size="1"'. $dynamic, 'value', 'text', $value );
+        return HTMLHelper::_('select.genericlist',   $this->values, $map, 'class="form-select" size="1"'. $dynamic, 'value', 'text', $value );
 	}
 }
 
-
-class j2storeCountryType{
+class j2storeCountryType
+{
 	var $type = 'country';
 	var $published = false;
 	var $allName = 'J2STORE_ALL_ZONES';
@@ -142,8 +157,8 @@ class j2storeCountryType{
 	var $country_id = '';
 	protected $country_list = null;
 
-	function load(){
-
+	function load()
+    {
 		if($this->type == 'country') {
 			static $sets;
 			if ( !is_array( $sets) )
@@ -189,32 +204,31 @@ class j2storeCountryType{
 		return $list;
 	}
 
-	function display($map, $value, $form = true, $options = 'class="inputbox" size="1"',$id=false){
+    function display($map, $value, $form = true, $options = 'class="form-select" size="1"',$id=false)
+    {
 		$countries = $this->load();
 		$this->values = array();
 		if($form){
-			$this->values[] = JHTML::_('select.option', '0', JText::_($this->allName) );
+            $this->values[] = HTMLHelper::_('select.option', '0', Text::_($this->allName) );
 			//$options .= ' onchange="document.adminForm.submit( );"';
 		}
 		foreach($countries as $country){
-			$this->values[] = JHTML::_('select.option', $country->j2store_country_id, JText::_($country->country_name));
+            $this->values[] = HTMLHelper::_('select.option', $country->j2store_country_id, Text::_($country->country_name));
 		}
-		return JHTML::_('select.genericlist', $this->values, $map, $options, 'value', 'text', (int)$value, $id );
+        return HTMLHelper::_('select.genericlist', $this->values, $map, $options, 'value', 'text', (int)$value, $id );
 	}
 
-
-	function displayZone($map, $value, $form = true, $options = 'class="inputbox" size="1"',$id=false){
+    function displayZone($map, $value, $form = true, $options = 'class="form-select" size="1"',$id=false)
+    {
 		$zones = $this->load();
 		$this->values = array();
 		if($form){
-			$this->values[] = JHTML::_('select.option', '', JText::_('J2STORE_SELECT_STATE') );
+            $this->values[] = HTMLHelper::_('select.option', '', Text::_('J2STORE_SELECT_STATE') );
 			//$options .= ' onchange="document.adminForm.submit( );"';
 		}
 		foreach($zones as $zone){
-			$this->values[] = JHTML::_('select.option', $zone->j2store_zone_id, JText::_($zone->zone_name));
+            $this->values[] = HTMLHelper::_('select.option', $zone->j2store_zone_id, Text::_($zone->zone_name));
 		}
-		return JHTML::_('select.genericlist', $this->values, $map, $options, 'value', 'text', (int)$value, $id );
-
+        return HTMLHelper::_('select.genericlist', $this->values, $map, $options, 'value', 'text', (int)$value, $id );
 	}
-
 }

@@ -24,7 +24,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
       <table>
         <tr>
           <td><span class="required">*</span> <?php echo JText::_('J2STORE_SELECT_A_COUNTRY'); ?></td>
-          <td><?php 
+          <td><?php
           $countryList = J2Html::select()->clearState()
           ->type('genericlist')
           ->name('country_id')
@@ -41,7 +41,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
           		)
           )
           )->getHtml();
-          echo $countryList; 
+          echo $countryList;
           ?>
           </td>
         </tr>
@@ -59,9 +59,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
           </td>
           <td><input type="text" id="estimate_postcode" name="postcode" value="<?php echo $this->postcode; ?>" /></td>
         </tr>
+          <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayCalculatorField', array($this->order)); ?>
       </table>
       <input type="button" value="<?php echo JText::_('J2STORE_CART_CALCULATE_TAX_SHIPPING'); ?>" id="button-quote" class="btn btn-primary" />
- 
+
  	<input type="hidden" name="option" value="com_j2store" />
  	<input type="hidden" name="view" value="carts" />
  	<input type="hidden" name="task" value="estimate" />
@@ -107,10 +108,10 @@ j2store.jQuery('input[name=\'next\']').bind('click', function() {
 							if (value) {
 								$('#shipping-estimate-form #estimate_'+key).after('<br class="j2error" /><span class="j2error">' + value + '</span>');
 							}
-						
+
 						});
 					}
-					
+
 					if (json['redirect']) {
 						window.location.href = json['redirect'];
 					}
@@ -139,7 +140,7 @@ $('#shipping-estimate-form select[name=\'country_id\']').bind('change', function
 			html = '<option value=""><?php echo JText::_('J2STORE_SELECT_OPTION'); ?></option>';
 
 			if (json['zone'] != '') {
-				for (i = 0; i < json['zone'].length; i++) {					
+				for (i = 0; i < json['zone'].length; i++) {
         			html += '<option value="' + json['zone'][i]['j2store_zone_id'] + '"';
 
 					if (json['zone'][i]['j2store_zone_id'] == '<?php echo $this->zone_id; ?>') {

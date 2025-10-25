@@ -3957,4 +3957,6 @@ INSERT INTO `#__j2store_zones` (`j2store_zone_id`, `country_id`, `zone_code`, `z
 (3992, 118, 'JL', 'Mount Lebanon', 1, 0),
 (3993, 118, 'NA', 'Nabatieh', 1, 0),
 (3994, 118, 'AS', 'North', 1, 0),
-(3995, 118, 'JA', 'South', 1, 0);
+(3995, 118, 'JA', 'South', 1, 0),
+(3996, 21, 'BRU', 'Bruxelles-Capitale', 1, 0),
+(3997, 222, 'CUMB', 'Cumbria', 1, 0);

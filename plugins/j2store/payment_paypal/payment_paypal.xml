@@ -17,6 +17,9 @@
 		<language tag="en-GB">languages/en-GB.plg_j2store_payment_paypal.ini</language>
 		<language tag="en-GB">languages/en-GB.plg_j2store_payment_paypal.sys.ini</language>
 	</languages>
+    <media folder="media" destination="plg_j2store_payment_paypal">
+        <folder>images</folder>
+    </media>
 	<config>
 		<fields name="params">
 			<fieldset name="basic">

@@ -9,6 +9,9 @@ defined('_JEXEC') or die;
 class J2StoreModelProductsBehaviorConfigurable extends F0FModelBehavior {
 	private $_rawData = array();
 	public function onAfterGetItem(&$model, &$record) {
+
+        if($record->product_type != 'configurable') return;
+
         $platform = J2Store::platform();
 		//we just have the products. Get the variants
 		$variantModel = F0FModel::getTmpInstance('Variants', 'J2StoreModel');
@@ -43,7 +46,7 @@ class J2StoreModelProductsBehaviorConfigurable extends F0FModelBehavior {
 		}catch (Exception $e) {
 			$this->setError($e->getMessage());
 		}
-		
+
 		$registry = $platform->getRegistry($record->params);
 		$record->params = $registry;
 
@@ -58,7 +61,7 @@ class J2StoreModelProductsBehaviorConfigurable extends F0FModelBehavior {
 		if(!isset( $data['visibility'] )){
 			$data['visibility'] = 1;
 		}
-		
+
 		if(isset($data['cross_sells'])) {
 			$data['cross_sells'] = $utility_helper->to_csv($data['cross_sells']);
 		}else{
@@ -300,6 +303,9 @@ class J2StoreModelProductsBehaviorConfigurable extends F0FModelBehavior {
 	}
 
 	public function onUpdateProduct(&$model, &$product) {
+
+        if($product->product_type != 'configurable') return;
+
 		$app = JFactory::getApplication ();
 		$params = J2Store::config ();
 		$product_helper = J2Store::product ();

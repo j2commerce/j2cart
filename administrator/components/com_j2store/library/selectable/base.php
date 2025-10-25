@@ -1,17 +1,20 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
- * based on Hikashop field class
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
-//require_once('fields.php');
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/selectable/fields.php');
-class J2StoreSelectableBase {
 
+class J2StoreSelectableBase
+{
 	protected static $instance;
 	var $tables = array('customfield');
 	var $pkeys = array('j2store_customfield_id');
@@ -28,8 +31,8 @@ class J2StoreSelectableBase {
 	var $fielddata = null;
 	var $database = null;
 
-
-	function __construct() {
+	function __construct()
+    {
 		$this->database = JFactory::getDbo();
 	}
 
@@ -43,8 +46,8 @@ class J2StoreSelectableBase {
 		return self::$instance;
 	}
 
-
-	function display($field, $value, $name, $translate=false, $options = '', $test = false, $allFields = null, $allValues = null) {
+	function display($field, $value, $name, $translate=false, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		$field_type = $field->field_type;
 
 		if(substr($field->field_type,0,4) == 'plg.') {
@@ -56,16 +59,14 @@ class J2StoreSelectableBase {
 		if(is_string($value))
 			$value = htmlspecialchars($value, ENT_COMPAT,'UTF-8');
 		$html = '';
-	//	if(!empty($field->field_required)){
-	//		$html .=' <span class="j2store_field_required">*</span>';
-	//	}
 
 		$html .= $class->display($field,$value,$name,$translate, $options,$test,$allFields,$allValues);
 
 		return $html;
 	}
 
-	function show($field,$value){
+	function show($field,$value)
+    {
 		$field_type = $field->field_type;
 		if(substr($field->field_type,0,4) == 'plg.') {
 			$field_type = substr($field->field_type,4);
@@ -76,16 +77,13 @@ class J2StoreSelectableBase {
 		if(is_string($value))
 			$value = htmlspecialchars($value, ENT_COMPAT,'UTF-8');
 		$html = '';
-	//	if(!empty($field->field_required)){
-	//		$html .=' <span class="j2store_field_required">*</span>';
-	//	}
 		$html .= $class->show($field,$value);
 
 		return $html;
 	}
 
-	function getFormatedCustomFields($row, $layout='customfields', $type='billing') {
-
+	function getFormatedCustomFields($row, $layout='customfields', $type='billing')
+    {
 		$app = JFactory::getApplication();
 
 		// get the template and default paths for the layout
@@ -109,19 +107,18 @@ class J2StoreSelectableBase {
 		ob_end_clean();
 
 		return $html;
-
-
 	}
 
-	function getFormatedDisplay($field, $value, $name, $translate=false, $options = '', $test = false, $allFields = null, $allValues = null) {
+	function getFormatedDisplay($field, $value, $name, $translate=false, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		$label = $this->getFieldName($field);
 		$input = $this->display($field, $value, $name, $translate, $options, $test, $allFields, $allValues);
-		$html = $label.$input;
+        $html = '<div class="control-group"><div class="control-label">'.$label.'</div><div class="controls">'.$input.'</div></div>';
 		return $html;
 	}
 
-
-	function validate($formData, $area, $type='address') {
+	function validate($formData, $area, $type='address')
+    {
         if(!in_array($area,array('billing','shipping','payment'))){
             $area = 'billing';
         }
@@ -154,7 +151,8 @@ class J2StoreSelectableBase {
 		return $json;
 	}
 
-	function getField($fieldid,$type='address'){
+	function getField($fieldid,$type='address')
+    {
 		if(is_numeric($fieldid)){
 			$element = F0FModel::getTmpInstance('CustomFields' ,'J2StoreModel')->getItem($fieldid);
 		}else{
@@ -168,8 +166,8 @@ class J2StoreSelectableBase {
 		return $fields[0];
 	}
 
-
-	function prepareFields(&$fields,&$data,$type='user',$url='checkout&task=state',$test=false){
+	function prepareFields(&$fields,&$data,$type='user',$url='checkout&task=state',$test=false)
+    {
 		if(!empty($fields)){
 			if($type == 'address') {
 				$id = 'id';
@@ -206,15 +204,14 @@ class J2StoreSelectableBase {
 					}
 					$fields[$namekey]->field_url = $baseUrl . '&';
 				}
-
 			}
 
 			$this->handleZone($fields,$test,$data);
 		}
 	}
 
-
-	function handleZone(&$fields,$test,$data){
+	function handleZone(&$fields,$test,$data)
+    {
 		$types = array();
 		foreach($fields as $k => $field){
 			if($field->field_type=='zone' && !empty($field->field_options['zone_type'])){
@@ -252,9 +249,7 @@ class J2StoreSelectableBase {
 							$this->setValues($zones,$fields,$k,$field);
 							break;
 						}
-
 					}
-
 				}
 			}
 		}
@@ -271,9 +266,8 @@ class J2StoreSelectableBase {
 		}
 	}
 
-
-	function setValues(&$zones,&$fields,$k,&$field){
-
+	function setValues(&$zones,&$fields,$k,&$field)
+    {
 		if($field->field_type=='zone' && !empty($field->field_options['zone_type']) && $field->field_options['zone_type']=='country'){
 			foreach($zones as $zone){
 				$title = $zone->country_name;
@@ -308,7 +302,8 @@ class J2StoreSelectableBase {
 		}
 	}
 
-	function getCurrentURL($checkInRequest='',$safe=true){
+	function getCurrentURL($checkInRequest='',$safe=true)
+    {
 		$app = JFactory::getApplication();
 		$config = JFactory::getConfig();
 		if(!empty($checkInRequest)){
@@ -346,7 +341,8 @@ class J2StoreSelectableBase {
 		return $result;
 	}
 
-	function getFields($area,&$data,$type='user',$url='checkout&task=state', $notcoreonly=false){
+	function getFields($area,&$data,$type='user',$url='checkout&task=state', $notcoreonly=false)
+    {
 		$fields = $this->getData($area,$type, $notcoreonly);
 		$this->prepareFields($fields,$data,$type,$url);
 		return $fields;
@@ -358,7 +354,8 @@ class J2StoreSelectableBase {
 	 * @notcoreonly boolean true for core fields
 	 */
 
-	function &getData($area,$type,$notcoreonly=false){
+	function &getData($area,$type,$notcoreonly=false)
+    {
 		static $data = array();
 		$key = $area.'_'.$type.'_'.$notcoreonly;
 
@@ -415,20 +412,21 @@ class J2StoreSelectableBase {
 		return $data[$key];
 	}
 
-
-	function getFieldName($field){
+	function getFieldName($field)
+    {
 		$platform = J2Store::platform();
 		$html = '';
 		if(!empty($field->field_required)) {
 			$html .='<span class="j2store_field_required">*</span>';
 		}
 		if(isset($field->display_label) && strtolower($field->display_label) == 'yes'){
-			return $html.'<label for="'.$this->prefix.$field->field_namekey.$this->suffix.'">'.$this->translate($field->field_name).'</label>';
-		}elseif($platform->isClient('administrator')) return $this->translate($field->field_name);
-		return $html.'<label for="'.$this->prefix.$field->field_namekey.$this->suffix.'">'.$this->translate($field->field_name).'</label>';
+            return '<label for="'.$this->prefix.$field->field_namekey.$this->suffix.'">'.$this->translate($field->field_name).'</label>'.$html;
+        }elseif($platform->isClient('administrator')) return '<label for="'.$this->prefix.$field->field_namekey.$this->suffix.'">'.$this->translate($field->field_name).'</label>'.$html;
+        return '<label for="'.$this->prefix.$field->field_namekey.$this->suffix.'">'.$this->translate($field->field_name).'</label>'.$html;
 	}
 
-	function translate($name){
+	function translate($name)
+    {
 		$val = preg_replace('#[^a-z0-9]#i','_',strtoupper($name));
 		$trans = JText::_($val);
 		if($val==$trans){
@@ -437,7 +435,8 @@ class J2StoreSelectableBase {
 		return $trans;
 	}
 
-	function get($field_id,$default=null){
+	function get($field_id,$default=null)
+    {
 		$query = 'SELECT a.* FROM #__j2store_customfields as a WHERE a.`j2store_customfield_id` = '.intval($field_id).' LIMIT 1';
 		$this->database->setQuery($query);
 
@@ -453,7 +452,8 @@ class J2StoreSelectableBase {
 		return $field;
 	}
 
-	function explodeValues($values){
+	function explodeValues($values)
+    {
 		$allValues = explode("\n",$values);
 		$returnedValues = array();
 
@@ -476,7 +476,8 @@ class J2StoreSelectableBase {
 		return $returnedValues;
 	}
 
-	function _loadExternals() {
+	function _loadExternals()
+    {
 		if($this->externalValues == null) {
 			$this->externalValues = array();
 			JPluginHelper::importPlugin('j2store');
@@ -492,8 +493,8 @@ class J2StoreSelectableBase {
 		}
 	}
 
-
-	function _checkOneInput(&$fields,&$formData,&$data,$type,&$oldData){
+	function _checkOneInput(&$fields,&$formData,&$data,$type,&$oldData)
+    {
 		$ok = true;
 		if(!empty($fields)){
 			foreach($fields as $k => $field){
@@ -523,7 +524,8 @@ class J2StoreSelectableBase {
 		return $ok;
 	}
 
-	function checkFields(&$data,&$object,$type,&$fields){
+	function checkFields(&$data,&$object,$type,&$fields)
+    {
         $platform = J2Store::platform();
 		static $safeHtmlFilter= null;
 		if(is_null($object))$object=new stdClass();
@@ -581,7 +583,8 @@ class J2StoreSelectableBase {
 		}
 	}
 
-	function allowed($column,$type='user'){
+	function allowed($column,$type='user')
+    {
 		$restricted = array(
 				'user'=>array('user_partner_price'=>1,'user_partner_paid'=>1,'user_created_ip'=>1,'user_partner_id'=>1,'user_partner_lead_fee'=>1,'user_partner_click_fee'=>1,'user_partner_percent_fee'=>1,'user_partner_flat_fee'=>1),
 				'order'=>array('order_id'=>1,'order_billing_address_id'=>1,'order_shipping_address_id'=>1,'order_user_id'=>1,'order_status'=>1,'order_discount_code'=>1,'order_created'=>1,'order_ip'=>1,'order_currency_id'=>1,'order_status'=>1,'order_shipping_price'=>1,'order_discount_price'=>1,'order_shipping_id'=>1,'order_shipping_method'=>1,'order_payment_id'=>1,'order_payment_method'=>1,'order_full_price'=>1,'order_modified'=>1,'order_partner_id'=>1,'order_partner_price'=>1,'order_partner_paid'=>1,'order_type'=>1,'order_partner_currency_id'=>1)
@@ -599,8 +602,8 @@ class J2StoreSelectableBase {
 		return true;
 	}
 
-	function save() {
-
+	function save()
+    {
 		$app = JFactory::getApplication();
 		$field_id = $app->input->getInt('j2store_customfield_id');
 		$formData = $app->input->get('data', array(), 'ARRAY');
@@ -963,7 +966,8 @@ class J2StoreSelectableBase {
 
 	}
 
-	function fieldTable($table_name) {
+	function fieldTable($table_name)
+    {
 		if(substr($table_name, 0, 4) == 'plg.') {
 			$this->_loadExternals();
 			$table_name = substr($table_name, 4);
@@ -978,22 +982,24 @@ class J2StoreSelectableBase {
 		return $this->j2storeTable($table_name);
 	}
 
-	function j2storeTable($name,$component = true){
+	function j2storeTable($name,$component = true)
+    {
 		$prefix = '#__j2store_';
 		return $prefix.$name;
 	}
 
 }
 
-class j2storeFieldItem {
-
+class j2storeFieldItem
+{
 	var $prefix;
 	var $suffix;
 	var $excludeValue;
 	var $report;
 	var $parent;
 
-	function __construct(&$obj){
+	function __construct(&$obj)
+    {
 		$this->prefix = $obj->prefix;
 		$this->suffix = $obj->suffix;
 		$this->excludeValue =& $obj->excludeValue;
@@ -1001,7 +1007,8 @@ class j2storeFieldItem {
 		$this->parent =& $obj;
 	}
 
-	function translate($name){
+	function translate($name)
+    {
 		$val = preg_replace('#[^a-z0-9]#i','_',strtoupper($name));
 		$trans = JText::_($val);
 		if($val==$trans){
@@ -1010,8 +1017,8 @@ class j2storeFieldItem {
 		return $trans;
 	}
 
-
-	function check(&$field,&$value, $oldvalue){
+	function check(&$field,&$value, $oldvalue)
+    {
 		$error = '';
 		if(!$field->field_required || is_array($value) || strlen($value) || strlen($oldvalue)){
 			return $error;
@@ -1030,20 +1037,24 @@ class j2storeFieldItem {
 		return $error;
 	}
 
-	function display($field, $value, $name, $translate, $options = '', $test = false, $allFields = null, $allValues = null) { return $value; }
+	function display($field, $value, $name, $translate, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
+        return $value;
+    }
 
-	function show(&$field,$value){
+	function show(&$field,$value)
+    {
 		return $this->translate($value);
 	}
 }
 
-class j2storeText extends j2storeFieldItem {
-
+class j2storeText extends j2storeFieldItem
+{
 	var $type = 'text';
-	var $class = 'inputbox';
+    var $class = 'form-control';
 
-	function display($field, $value, $name, $translate, $options = '', $test = false, $allFields = null, $allValues = null) {
-
+	function display($field, $value, $name, $translate, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		$size = empty($field->field_options['size']) ? '' : 'size="'.intval($field->field_options['size']).'"';
 		$size .= empty($field->field_options['maxlength']) ? '' : ' maxlength="'.intval($field->field_options['maxlength']).'"';
 		$size .= empty($field->field_options['readonly']) ? '' : ' readonly="readonly"';
@@ -1052,19 +1063,17 @@ class j2storeText extends j2storeFieldItem {
 			$value = addslashes($this->translate($field->field_name));
 		}
 		return '<input class="'.$this->class.'" id="'.$this->prefix.$field->field_namekey.$this->suffix.'" '.$size.' '.$js.' '.$options.' type="'.$this->type.'" name="'.$name.'" value="'.$value.'" />';
-
 	}
 
-	function show(&$field,$value){
-
+	function show(&$field,$value)
+    {
 		if($field->field_table=='address') return $value;
 		return $this->translate($value);
 	}
-
 }
 
-
-class j2storeEmail extends j2storeText {
+class j2storeEmail extends j2storeText
+{
 	function check(&$field,&$value,$oldvalue){
 		$error = '';
 		if(!$field->field_required || is_array($value)){
@@ -1091,17 +1100,18 @@ class j2storeEmail extends j2storeText {
 		$return[$field->field_namekey] = $error;
 		return $error;
 	}
-
 }
 
-class j2storeLink extends j2storeText{
-	function show(&$field,$value){
+class j2storeLink extends j2storeText
+{
+	function show(&$field,$value)
+    {
 		return '<a href="'.$this->translate($value).'">'.$this->translate($value).'</a>';
 	}
 }
 
-
-class j2storeTextarea extends j2storeFieldItem {
+class j2storeTextarea extends j2storeFieldItem
+{
 	function display($field, $value, $name, $translate, $options = '', $test = false, $allFields = null, $allValues = null){
 		$js = '';
 		$html = '';
@@ -1137,17 +1147,19 @@ class j2storeTextarea extends j2storeFieldItem {
 		$cols = empty($field->field_options['cols']) ? '' : 'cols="'.intval($field->field_options['cols']).'"';
 		$rows = empty($field->field_options['rows']) ? '' : 'rows="'.intval($field->field_options['rows']).'"';
 		$options .= empty($field->field_options['readonly']) ? '' : ' readonly="readonly"';
-		return '<textarea class="inputbox" id="'.$this->prefix.@$field->field_namekey.$this->suffix.'" name="'.$name.'" '.$cols.' '.$rows.' '.$js.' '.$options.'>'.$value.'</textarea>'.$html;
+		return '<textarea class="form-control" id="'.$this->prefix.@$field->field_namekey.$this->suffix.'" name="'.$name.'" '.$cols.' '.$rows.' '.$js.' '.$options.'>'.$value.'</textarea>'.$html;
 	}
 
-	function show(&$field,$value){
+	function show(&$field,$value)
+    {
 		return nl2br(parent::show($field,$value));
 	}
 }
 
-
-class j2storeWysiwyg extends j2storeTextarea {
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
+class j2storeWysiwyg extends j2storeTextarea
+{
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		$editorHelper = j2storeSelectableHelper::getEditor();
 		$editorHelper->name = $map;
 		$editorHelper->content = $value;
@@ -1187,24 +1199,29 @@ class j2storeWysiwyg extends j2storeTextarea {
 		$cols = empty($field->field_options['cols']) ? '' : 'cols="'.intval($field->field_options['cols']).'"';
 		$rows = empty($field->field_options['rows']) ? '' : 'rows="'.intval($field->field_options['rows']).'"';
 		$options .= empty($field->field_options['readonly']) ? '' : ' readonly="readonly"';
-		return '<textarea class="inputbox" id="'.$this->prefix.@$field->field_namekey.$this->suffix.'" name="'.$map.'" '.$cols.' '.$rows.' '.$js.' '.$options.'>'.$value.'</textarea>'.$html;
+		return '<textarea class="form-control" id="'.$this->prefix.@$field->field_namekey.$this->suffix.'" name="'.$map.'" '.$cols.' '.$rows.' '.$js.' '.$options.'>'.$value.'</textarea>'.$html;
 	}
-	function show(&$field,$value){
+
+	function show(&$field,$value)
+    {
 		return $this->translate($value);
 	}
 }
 
-
-class j2storeCustomtext extends j2storeFieldItem{
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
+class j2storeCustomtext extends j2storeFieldItem
+{
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		return $this->translate($field->field_options['customtext']);
 	}
 }
 
-
-class j2storeDropdown extends j2storeFieldItem{
+class j2storeDropdown extends j2storeFieldItem
+{
 	var $type = '';
-	function show(&$field,$value){
+
+	function show(&$field,$value)
+    {
 		if(!empty($field->field_value) && !is_array($field->field_value)){
 			$field->field_value = $this->parent->explodeValues($field->field_value);
 		}
@@ -1212,7 +1229,8 @@ class j2storeDropdown extends j2storeFieldItem{
 		return parent::show($field,$value);
 	}
 
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		$string = '';
 		if(!empty($field->field_value) && !is_array($field->field_value)){
 			$field->field_value = $this->parent->explodeValues($field->field_value);
@@ -1244,7 +1262,7 @@ class j2storeDropdown extends j2storeFieldItem{
 				}
 			}
 		}
-		$string .= '<select id="'.$this->prefix.$field->field_namekey.$this->suffix.'" name="'.$map.'" '.$arg.$options.'>';
+        $string .= '<select id="'.$this->prefix.$field->field_namekey.$this->suffix.'" class="form-select" name="'.$map.'" '.$arg.$options.'>';
 		if(empty($field->field_value))
 			return $string.'</select>';
 
@@ -1263,20 +1281,28 @@ class j2storeDropdown extends j2storeFieldItem{
 	}
 }
 
-class j2storeSingledropdown extends j2storeDropdown{
+class j2storeSingledropdown extends j2storeDropdown
+{
 	var $type = 'single';
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
+
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		return parent::display($field,$value,$map,$inside,$options,$test,$allFields,$allValues);
 	}
 }
 
-class j2storeMultipledropdown extends j2storeDropdown{
+class j2storeMultipledropdown extends j2storeDropdown
+{
 	var $type = 'multiple';
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
+
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		$value = explode(',',$value);
 		return parent::display($field,$value,$map,$inside,$options,$test,$allFields,$allValues);
 	}
-	function show(&$field,$value){
+
+	function show(&$field,$value)
+    {
 		if(!is_array($value)){
 			$value = explode(',',$value);
 		}
@@ -1292,9 +1318,10 @@ class j2storeMultipledropdown extends j2storeDropdown{
 	}
 }
 
-class j2storeZone extends j2storeSingledropdown{
-
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
+class j2storeZone extends j2storeSingledropdown
+{
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		//echo "<pre>";print_r($field);echo "</pre>";
 		$app = JFactory::getApplication();
 
@@ -1372,15 +1399,17 @@ class j2storeZone extends j2storeSingledropdown{
 		return parent::display($field,$value,$map,$inside,$options,$test,$allFields,$allValues);
 	}
 
-	function JSCheck(&$oneField,&$requiredFields,&$validMessages,&$values){
+	function JSCheck(&$oneField,&$requiredFields,&$validMessages,&$values)
+    {
 	}
 }
 
-
-
-class j2storeRadioCheck extends j2storeFieldItem {
+class j2storeRadioCheck extends j2storeFieldItem
+{
 	var $radioType = 'checkbox';
-	function show(&$field,$value) {
+
+	function show(&$field,$value)
+    {
 		if(!empty($field->field_value) && !is_array($field->field_value)){
 			$field->field_value = $this->parent->explodeValues($field->field_value);
 		}
@@ -1388,7 +1417,8 @@ class j2storeRadioCheck extends j2storeFieldItem {
 		return parent::show($field,$value);
 	}
 
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		$type = $this->radioType;
 		$string = '<div id="'.$field->field_namekey.'">';
 		if($inside) $string = $this->translate($field->field_name).' ';
@@ -1411,22 +1441,30 @@ class j2storeRadioCheck extends j2storeFieldItem {
 	}
 }
 
-class j2storeRadio extends j2storeRadioCheck {
+class j2storeRadio extends j2storeRadioCheck
+{
 	var $radioType = 'radio';
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
+
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		return parent::display($field,$value,$map,$inside,$options,$test,$allFields,$allValues);
 	}
 }
 
-class j2storeCheckbox extends j2storeRadioCheck {
+class j2storeCheckbox extends j2storeRadioCheck
+{
 	var $radioType = 'checkbox';
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
+
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		if(!is_array($value)){
 			$value = explode(',',$value);
 		}
 		return parent::display($field,$value,$map,$inside,$options,$test,$allFields,$allValues);
 	}
-	function show(&$field,$value){
+
+	function show(&$field,$value)
+    {
 		if(!is_array($value)){
 			$value = explode(',',$value);
 		}
@@ -1441,7 +1479,8 @@ class j2storeCheckbox extends j2storeRadioCheck {
 		return implode(', ',$results);
 	}
 
-	function check(&$field,&$value,$oldvalue){
+	function check(&$field,&$value,$oldvalue)
+    {
 		$error = '';
 		if(!$field->field_required || is_array($value)){
 			return $error;
@@ -1458,12 +1497,12 @@ class j2storeCheckbox extends j2storeRadioCheck {
 
 		return $error;
 	}
-
 }
 
-class j2storeDate extends j2storeText{
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
-
+class j2storeDate extends j2storeText
+{
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		if(empty($field->field_options['format'])) $field->field_options['format'] = "yy-mm-dd";
 		$format = $field->field_options['format'];
 		$size = $options . empty($field->field_options['size']) ? '' : ' size="'.$field->field_options['size'].'"';
@@ -1487,9 +1526,10 @@ class j2storeDate extends j2storeText{
 	}
 }
 
-class j2storeDateTime extends j2storeText{
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
-
+class j2storeDateTime extends j2storeText
+{
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		if(empty($field->field_options['format'])) $field->field_options['format'] = "yy-mm-dd | HH:mm";
 		$format = $field->field_options['format'];
 		$size = $options . empty($field->field_options['size']) ? '' : ' size="'.$field->field_options['size'].'"';
@@ -1514,9 +1554,10 @@ class j2storeDateTime extends j2storeText{
 	}
 }
 
-class j2storeTime extends j2storeText{
-	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null){
-
+class j2storeTime extends j2storeText
+{
+	function display($field, $value, $map, $inside, $options = '', $test = false, $allFields = null, $allValues = null)
+    {
 		if(empty($field->field_options['format'])) $field->field_options['format'] = "HH:mm";
 		$format = $field->field_options['format'];
 		$size = $options . empty($field->field_options['size']) ? '' : ' size="'.$field->field_options['size'].'"';
@@ -1539,25 +1580,25 @@ class j2storeTime extends j2storeText{
 	}
 }
 
-class j2storeSelectableHelper {
-
-	public static function secureField($fieldName){
+class j2storeSelectableHelper
+{
+	public static function secureField($fieldName)
+    {
 		if (!is_string($fieldName) || preg_match('|[^a-z0-9#_.-]|i',$fieldName) !== 0 ){
 			die('field "'.$fieldName .'" not secured');
 		}
 		return $fieldName;
 	}
 
-	public static function getEditor() {
-
+	public static function getEditor()
+    {
 		$editor = new j2storeEditorHelper();
 		return $editor;
-
 	}
-
 }
 
-class j2storeEditorHelper{
+class j2storeEditorHelper
+{
 	var $width = '100%';
 	var $height = '500';
 	var $cols = 100;
@@ -1571,14 +1612,16 @@ class j2storeEditorHelper{
 		$this->options = array('pagebreak');
 	}
 
-	function setDescription(){
+	function setDescription()
+    {
 		$this->width = 700;
 		$this->height = 200;
 		$this->cols = 80;
 		$this->rows = 10;
 	}
 
-	function setContent($var){
+	function setContent($var)
+    {
 		$name = $this->myEditor->get('_name');
 		$function = "try{".$this->myEditor->setContent($this->name,$var)." }catch(err){alert('Error using the setContent function of the wysiwyg editor')}";
 		if(!empty($name)){
@@ -1602,18 +1645,23 @@ class j2storeEditorHelper{
 		return $function;
 	}
 
-	function getContent(){
+	function getContent()
+    {
 		return $this->myEditor->getContent($this->name);
 	}
-	function display(){
-		return $this->myEditor->display( $this->name,  $this->content ,$this->width, $this->height, $this->cols, $this->rows,$this->options, $this->id ) ;
 
+	function display()
+    {
+		return $this->myEditor->display( $this->name,  $this->content ,$this->width, $this->height, $this->cols, $this->rows,$this->options, $this->id ) ;
 	}
-	function jsCode(){
+
+	function jsCode()
+    {
 		return $this->myEditor->save( $this->name );
 	}
 
-	function displayCode($name,$content){
+	function displayCode($name,$content)
+    {
 		if($this->hasCodeMirror()){
 			$this->setEditor('codemirror');
 		}else{
@@ -1622,10 +1670,10 @@ class j2storeEditorHelper{
 		$this->myEditor->setContent($name,$content);
 
 		return $this->myEditor->display( $name,  $content ,$this->width, $this->height, $this->cols, $this->rows,false,$this->id) ;
-
 	}
 
-	function setEditor($editor=''){
+	function setEditor($editor='')
+    {
 		if(empty($editor)){
 			$config = JFactory::getConfig();
 			$this->editor = $config->get('editor',null);
@@ -1639,7 +1687,8 @@ class j2storeEditorHelper{
 		$this->myEditor->initialise();
 	}
 
-	function hasCodeMirror(){
+	function hasCodeMirror()
+    {
 		static $has = null;
 		if(!isset($has)){
 			$query = 'SELECT element FROM #__extensions WHERE element=\'codemirror\' AND folder=\'editors\' AND enabled=1 AND type=\'plugin\'';

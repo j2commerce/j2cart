@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
- * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
@@ -40,7 +40,7 @@ if (typeof j2store.jQuery === 'undefined') {
             // Prepare form data
             const formData = new FormData();
             const inputs = document.querySelectorAll('#j2store-postconfig-form input[type="text"], #j2store-postconfig-form input[type="checkbox"]:checked, #j2store-postconfig-form input[type="radio"]:checked, #j2store-postconfig-form input[type="hidden"], #j2store-postconfig-form select, #j2store-postconfig-form textarea');
-            
+
             inputs.forEach(input => {
                 formData.append(input.name, input.value);
             });

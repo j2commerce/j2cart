@@ -44,21 +44,28 @@ class J2StoreControllerCountries extends F0FController
                     'type' => 'text',
                     'name' => 'country_name',
                     'value' => $country_table->country_name,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'country_isocode_2' => array(
                     'label' => 'J2STORE_COUNTRY_CODE2',
                     'type' => 'text',
                     'name' => 'country_isocode_2',
                     'value' => $country_table->country_isocode_2,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'country_isocode_3' => array(
                     'label' => 'J2STORE_COUNTRY_CODE3',
                     'type' => 'text',
                     'name' => 'country_isocode_3',
                     'value' => $country_table->country_isocode_3,
-                    'options' => array('required' => 'true','class' => 'inputbox')
+                    'options' => array('required' => 'true','class' => 'form-control')
+                ),
+                'country_isocode_num' => array(
+                    'label' => 'J2STORE_COUNTRY_CODENUM',
+                    'type' => 'text',
+                    'name' => 'country_isocode_num',
+                    'value' => $country_table->country_isocode_num,
+                    'options' => array('required' => 'true','class' => 'form-control')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
@@ -109,6 +116,10 @@ class J2StoreControllerCountries extends F0FController
             'country_isocode_3' => array(
                 'sortable' => 'true',
                 'label' => 'J2STORE_COUNTRY_CODE3'
+            ),
+            'country_isocode_num' => array(
+                'sortable' => 'true',
+                'label' => 'J2STORE_COUNTRY_CODENUM'
             ),
             'enabled' => array(
                 'type' => 'published',

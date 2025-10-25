@@ -13,7 +13,9 @@
 		<filename plugin="app_currencyupdater">app_currencyupdater.php</filename>
 		<folder>app_currencyupdater</folder>
 	</files>
-
+    <media folder="media" destination="plg_j2store_app_currencyupdater">
+        <folder>images</folder>
+    </media>
 	<config>
 		<fields name="params">
 			<fieldset name="basic" label="J2STORE_BASIC_SETTINGS"

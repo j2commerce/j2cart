@@ -105,7 +105,7 @@ class J2StoreControllerCarts extends F0FController
 		//first clear cache
 		J2Store::utilities()->clear_cache();
 		J2Store::utilities()->nocache();
-		
+
 		$model = $this->getModel('Carts');
 		$result = $model->update();
 		if(isset($result['error'])) {
@@ -136,8 +136,8 @@ class J2StoreControllerCarts extends F0FController
 	}
 	function remove() {
 		J2Store::utilities()->clear_cache();
-		J2Store::utilities()->nocache();		
-		
+		J2Store::utilities()->nocache();
+
 		$model = $this->getModel('Carts' ,'J2StoreModel');
 		if($model->deleteItem()) {
 			$msg = JText::_('J2STORE_CART_UPDATED_SUCCESSFULLY');
@@ -191,7 +191,7 @@ class J2StoreControllerCarts extends F0FController
 		//no cache
 		J2Store::utilities()->clear_cache();
 		J2Store::utilities()->nocache();
-		
+
 		$app = JFactory::getApplication();
 		$currency = J2Store::currency();
 		$post = $app->input->getArray($_POST);
@@ -214,7 +214,7 @@ class J2StoreControllerCarts extends F0FController
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
-		
+
 		$model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
 		//coupon
 		$post_coupon = $this->input->getString('coupon', '');
@@ -235,7 +235,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function removeCoupon() {
-		
+
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
@@ -259,7 +259,7 @@ class J2StoreControllerCarts extends F0FController
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
-		
+
 
 		$model = F0FModel::getTmpInstance('Carts', 'J2StoreModel');
 		//coupon
@@ -281,7 +281,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function removeVoucher() {
-		
+
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
@@ -303,74 +303,81 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function estimate() {
-		
+
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
-		
+
 		$model = $this->getModel('Carts' ,'J2StoreModel');
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
 		$country_id = $this->input->getInt('country_id', 0);
 		$zone_id = $this->input->getInt('zone_id', 0);
 		$postcode  = $this->input->getString('postcode', 0);
+        $city  = $this->input->getString('city', '');
 		$country_required = $this->input->getString('country_required', 1);
 		$zone_required = $this->input->getString('zone_required', 1);
 		$postal_required = $this->input->getString('postal_required', 0);
-		
+
 		$json = array();
 		if(!$country_id && $country_required) $json['error']['country_id'] = JText::_('J2STORE_ESTIMATE_COUNTRY_REQUIRED');
 		if(!$zone_id && $zone_required) $json['error']['zone_id'] = JText::_('J2STORE_ESTIMATE_ZONE_REQUIRED');
-		
+
 		$params = J2Store::config();
 		if(	($postal_required ==1 || $params->get('postalcode_required', 0) ) && empty($postcode)){
 			$json['error']['postcode'] = JText::_('J2STORE_ESTIMATE_POSTALCODE_REQUIRED');
 		}
-		
+
 		//run a validation plugin event.
 		J2Store::plugin()->event('BeforeShippingEstimate', array(&$json));
-			
-		
+
+
 		if(!$json) {
-		
+
 			if($country_id || $zone_id) {
 				if($country_id) {
 					$session->set('billing_country_id', $country_id, 'j2store');
 					$session->set('shipping_country_id', $country_id, 'j2store');
 				}
-	
+
 				if($zone_id) {
 					$session->set('billing_zone_id', $zone_id, 'j2store');
 					$session->set('shipping_zone_id', $zone_id, 'j2store');
 				}
-	
+
 				$session->set('force_calculate_shipping', 1, 'j2store');
 			}
-	
+
 			if($postcode) {
 				$session->set('shipping_postcode', $postcode, 'j2store');
 				$session->set('billing_postcode', $postcode, 'j2store');
 			}
+
+            if($city) {
+                $session->set('shipping_city', $city, 'j2store');
+                $session->set('billing_city', $city, 'j2store');
+            }
+
 			$url = $model->getCartUrl();
 			$json['redirect'] = $url;
 		}
-		
-		//run after validation plugin event.
+
+        //run after the validation plugin event.
 		J2Store::plugin()->event('AfterShippingEstimate', array(&$json));
-		
+
 		echo json_encode($json);
 		$app->close();
 
 	}
 
 	function shippingUpdate() {
-		
+
 		//first clear cache
 		J2Store::utilities()->nocache();
 		J2Store::utilities()->clear_cache();
-		
+
 		$json = array();
-		
+
 		$model = $this->getModel('Carts' ,'J2StoreModel');
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
@@ -386,10 +393,10 @@ class J2StoreControllerCarts extends F0FController
 
 		$redirect = $model->getCartUrl();
 		$json['redirect'] = $redirect;
-		
+
 		//allow plugins to modify the output
 		J2Store::plugin()->event('AfterShippingUpdate', array(&$json));
-		
+
 		echo json_encode($json);
 		$app->close();
 	}
@@ -456,9 +463,9 @@ class J2StoreControllerCarts extends F0FController
 		echo json_encode($json);
 		JFactory::getApplication()->close();
 	}
-	
+
 	public function addtowishlist() {
-		
+
 		$app = JFactory::getApplication();
 		$model = $this->getModel('Carts', 'J2StoreModel');
 		$model->setCartType('wishlist');
