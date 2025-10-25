@@ -117,11 +117,9 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         'j2store_stats' => array('j2store-module-position-5', 1),
         'j2store_menu' => array('menu', 1)
       ),
-
       'site' => array(
         'mod_j2store_currency' => array('left', 0),
-        'mod_j2store_cart' => array('left', 0),
-        'mod_j2store_products_advanced' => array('j2store-product-module', 0)
+        'mod_j2store_cart' => array('left', 0)
       )
     ),
     'plugins' => array(
