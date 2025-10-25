@@ -868,10 +868,10 @@
             <condition type="true"/>
             <query><![CDATA[
                 ALTER TABLE `#__j2store_currencies`
-                MODIFY `currency_position` varchar(12) NULL DEFAULT 'pre' ,
+                MODIFY `currency_position` varchar(12) NULL DEFAULT 'pre',
                 MODIFY `currency_symbol` varchar(255) NULL DEFAULT NULL,
-                MODIFY `currency_decimal` varchar(12) NULL DEFAULT '.' ,
-                MODIFY `currency_thousands` char(1) NULL DEFAULT ',' ,
+                MODIFY `currency_decimal` varchar(12) NULL DEFAULT '.',
+                MODIFY `currency_thousands` char(1) NULL DEFAULT ',',
                 MODIFY `currency_num_decimals` INT(11) NULL DEFAULT 0,
                 MODIFY `currency_value` decimal(15,8) NULL DEFAULT 1.00000,
                 MODIFY `created_on` datetime NULL DEFAULT NULL,
