@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
- * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  * @author  Ramesh Elamathi (weblogicxindia.com)
  * @author  Adam Melcher adam@j2commerce.com
@@ -74,7 +74,7 @@ class JFormFieldTagTemplateList extends ListField {
 		}
 		array_unshift($options, HTMLHelper::_('select.option', 'tag_default', Text::_('J2STORE_USE_DEFAULT')));
 		return HTMLHelper::_('select.genericlist', $options, $fieldName, 'class="form-select"', 'value', 'text', $this->value, $this->control_name . $this->name);
-		
+
 	}
 
 }

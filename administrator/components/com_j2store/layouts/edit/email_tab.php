@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright Copyright (C) 2014-2019 Weblogicx India. All rights reserved.
- * @copyright Copyright (C) 2024 J2Commerce, Inc. All rights reserved.
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  * @website https://www.j2commerce.com
  */
@@ -18,11 +18,11 @@ $platform->loadExtra('behavior.modal');
 $platform->loadExtra('behavior.formvalidator');
 $row_class = 'row';
 $col_class = 'col-md-';
-$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.htmlspecialchars(Text::_('J2STORE_INVALID_INPUT_FIELD')).'</div></div></joomla-alert>' ;
+$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.htmlspecialchars(Text::_('JLIB_FORM_CONTAINS_INVALID_FIELDS')).'</div></div></joomla-alert>' ;
 if (version_compare(JVERSION, '3.99.99', 'lt')) {
     $row_class = 'row-fluid';
     $col_class = 'span';
-    $alert_html = '<div class="alert alert-error alert-danger">'.htmlspecialchars(Text::_('J2STORE_INVALID_INPUT_FIELD')).'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
+    $alert_html = '<div class="alert alert-error alert-danger">'.htmlspecialchars(Text::_('JLIB_FORM_CONTAINS_INVALID_FIELDS')).'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
 }
 ?>
 <script  type="text/javascript">

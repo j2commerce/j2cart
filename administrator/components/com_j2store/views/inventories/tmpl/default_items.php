@@ -2,7 +2,7 @@
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license GNU GPL v3 or later
  */
 // No direct access
@@ -238,7 +238,7 @@ function saveAllVariant(product_id) {
 	});
 
 }
-function j2storesaveinventory(variant){	
+function j2storesaveinventory(variant){
 	var qty = jQuery('#quantity_'+variant).val();
 	var availability = jQuery('#availability_'+variant).val();
 	var manage_stock = jQuery('#manage_stock_'+variant).val();
@@ -247,30 +247,30 @@ function j2storesaveinventory(variant){
 	jQuery.ajax({
 		url: 'index.php?option=com_j2store&view=inventories&task=update_inventory&manage_stock='+manage_stock+'&availability='+availability+'&quantity='+qty+'&variant_id='+variant+'&search='+search+'&inventry_stock='+inventry_stock,
 		type: 'post',
-		dataType: 'json',		
+		dataType: 'json',
 		cache: false,
 		contentType: false,
 		processData: false,
 		beforeSend: function() {
-			
+
 		},
 		complete: function() {
-			
+
 		},
 		success: function(json) {
 			jQuery('.text-danger, .text-success').remove();
 
 			if (json['error']) {
-				
+
 			}
 
-			if (json['success']) {		
-				window.location = json['success']; 																														
+			if (json['success']) {
+				window.location = json['success'];
 			}
 		},
 		error: function(xhr, ajaxOptions, thrownError) {
 			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
 		}
-	});	
+	});
 }
 </script>

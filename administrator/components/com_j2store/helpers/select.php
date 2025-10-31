@@ -2,7 +2,7 @@
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce . All rights reserved.
+ * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
  * @license GNU GPL v3 or later
  */
 
@@ -366,11 +366,11 @@ class J2StoreHelperSelect {
 		}
 		return $new_options;
 	}
-	
-	
+
+
 	public static function getOptionTypesList($name, $id, $item) {
 		$groups = array ();
-		
+
 		$types = self::getOptionTypes ();
 		foreach ( $types as $type_key => $typeitems ) {
 			$groups [$type_key] = array ();
@@ -380,7 +380,7 @@ class J2StoreHelperSelect {
 				$groups [$type_key] ['items'] [] = HTMLHelper::_( 'select.option', $type, Text::_( 'J2STORE_' . strtoupper ( $type ) ) );
 			}
 		}
-		
+
 		$attr = array (
 				'id' => $id,
 				'list.select' => $item->type,
@@ -392,11 +392,11 @@ class J2StoreHelperSelect {
 				$id,
 				$item,
 				$groups,
-				$attr 
+				$attr
 		) );
 		return HTMLHelper::_( 'select.groupedlist', $groups, $name, $attr);
 	}
-	
+
 	public static function getOptionTypes() {
 		$types = array ();
 		$choose = array ();
@@ -405,19 +405,19 @@ class J2StoreHelperSelect {
 		if (J2Store::isPro ()) {
 			$choose [] = 'checkbox';
 		}
-		
+
 		$types ['choose'] = $choose;
-		
+
 		if (J2Store::isPro ()) {
 			$types ['input'] = array (
 					'text',
 					'textarea',
-					'file' 
+					'file'
 			);
 			$types ['date'] = array (
 					'date',
 					'time',
-					'datetime' 
+					'datetime'
 			);
 		}
 		J2Store::plugin ()->event('GetOptionTypes', array (&$types));

@@ -55,7 +55,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                     JText::_('J2STORE_ATTENTION'),
                                     JText::_('J2STORE_COUPON_TYPES_EXTENDED_NOTIFICATION')
                                 ); ?>
-                                <?php if(JPluginHelper::isEnabled('system', 'cache')): ?>
+                                <?php if (JPluginHelper::isEnabled('system', 'cache')) : ?>
                                     <?php echo J2Store::help()->alert_with_static_message(
                                         'danger',
                                         JText::_('J2STORE_ATTENTION'),
@@ -63,8 +63,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                     ); ?>
                                 <?php endif; ?>
 
-                                <?php $content_plugin = JPluginHelper::isEnabled('content', 'socialshare'); ?>
-                                <?php if($content_plugin):?>
+                                <?php if (JPluginHelper::isEnabled('content', 'socialshare')) : ?>
                                     <?php echo J2Store::help()->alert_with_static_message(
                                         'danger',
                                         JText::_('J2STORE_ATTENTION'),
@@ -73,14 +72,6 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                     ?>
                                 <?php endif; ?>
 
-                                <div class="subscription_message" style="display:none;">
-                                    <div class="alert alert-block alert-warning">
-                                        <h4>
-                                            <span class="subscription"></span>
-                                        </h4>
-                                    </div>
-                                </div>
-                                <?php /*echo J2Store::help()->watch_video_tutorials();*/ ?>
                                 <div class="<?php echo $row_class;?>">
                                     <!-- Chart-->
                                     <div class="<?php echo $col_class;?>12 stats-mini">
