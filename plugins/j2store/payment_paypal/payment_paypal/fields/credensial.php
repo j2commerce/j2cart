@@ -13,6 +13,8 @@ jimport('joomla.form.formfield');
 jimport('joomla.form.helper');
 JFormHelper::loadFieldClass('list');
 
+\Joomla\CMS\HTML\HTMLHelper::_('jquery.framework');
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2html.php';
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2store.php';
 class JFormFieldCredensial extends JFormFieldList {
@@ -33,7 +35,7 @@ class JFormFieldCredensial extends JFormFieldList {
 			url : '".$url."',
 			type : 'get',
 			 cache: false,
-           
+
              dataType: 'json',
              beforeSend: function() {
              $('#check_credensial_'+mode).attr('disabled',true);
@@ -51,7 +53,7 @@ class JFormFieldCredensial extends JFormFieldList {
                 if(json['success']){
                 $('#check_credensial_'+mode).after('<span class=\'paypal_error text-success\'><strong>All Ok</strong></span>');
                 }
-            	console.log(json);	
+            	console.log(json);
 				return true;
 			}
 		});
