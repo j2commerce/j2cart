@@ -10,6 +10,8 @@ defined('_JEXEC') or die('Restricted access');
 // import the list field type
 jimport('joomla.form.helper');
 
+\Joomla\CMS\HTML\HTMLHelper::_('jquery.framework');
+
 class JFormFieldJ2Store extends JFormField
 {
     /**
@@ -58,13 +60,13 @@ class JFormFieldJ2Store extends JFormField
 					if (sessionStorage.getItem('active-tab')) {
 						sessionStorage.removeItem('active-tab');
 					}
-		
+
 					// Reset the array
 					activeTabsHrefs = [];
-		
+
 					// Save clicked tab href to the array
 					activeTabsHrefs.push(href);
-		
+
 					// Store the selected tabs hrefs in sessionStorage
 					sessionStorage.setItem(window.location.href.toString().split(window.location.host)[1].replace(/&return=[a-zA-Z0-9%]+/, '').replace(/&[a-zA-Z-_]+=[0-9]+/, ''), JSON.stringify(activeTabsHrefs));
         		}
@@ -78,7 +80,7 @@ class JFormFieldJ2Store extends JFormField
     			}
 			});
 		})(j2store.jQuery);
-		
+
 		</script>
 		";
             }else{
