@@ -7,6 +7,9 @@
 
 // No direct access
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Object\CMSObject;
+
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/models/behavior/autoload.php';
 class J2StoreModelProducts extends F0FModel {
 
@@ -1917,7 +1920,7 @@ class J2StoreModelProducts extends F0FModel {
 
         $app = JFactory::getApplication();
         JPluginHelper::importPlugin('content');
-        $item = new JObject();
+        $item = new CMSObject();
         $item->id = $id;
         $item->text = $description;
         J2Store::plugin ()->event ( 'ContentPrepare',array ($context, &$item, &$params, 0) );

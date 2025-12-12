@@ -4,8 +4,12 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
+
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Object\CMSObject;
+
 class J2StoreModelCartsBehaviorCartFlexiVariable extends F0FModelBehavior {
 
     public function getVariantByOptions($options, $product){
@@ -152,7 +156,7 @@ class J2StoreModelCartsBehaviorCartFlexiVariable extends F0FModelBehavior {
             //all good. Add the product to cart
 
             // create cart object out of item properties
-            $item = new JObject;
+            $item = new CMSObject;
             $item->user_id     = JFactory::getUser()->id;
             $item->product_id  = (int) $product->j2store_product_id;
             $item->variant_id  = (int) $variant->j2store_variant_id;
@@ -263,7 +267,7 @@ class J2StoreModelCartsBehaviorCartFlexiVariable extends F0FModelBehavior {
         foreach ($options as $product_option_id => $option_value) {
 
             $product_option = $product_helper->getCartProductOptions($product_option_id, $item->product_id);
-            
+
 
             if ($product_option) {
                 if ($product_option->type == 'select' || $product_option->type == 'radio') {

@@ -4,8 +4,12 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
+
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Object\CMSObject;
+
 class J2StoreModelCartsBehaviorCartVariable extends F0FModelBehavior {
 
 
@@ -44,7 +48,7 @@ class J2StoreModelCartsBehaviorCartVariable extends F0FModelBehavior {
 			$productHelper = J2Store::product();
 
 			//get variant by product options. This is not an effective method. Adds a load on the system
-//			
+//
 
 			//js based method implemented.
 			$variant_id = $app->input->getInt('variant_id', 0);
@@ -63,32 +67,32 @@ class J2StoreModelCartsBehaviorCartVariable extends F0FModelBehavior {
 				if($variant === false) {
 					$errors['error']['general'] = JText::_('J2STORE_VARIANT_NOT_FOUND');
 				}
-				
+
 			} else {
 				//variant id not found. fall back
-				$variant = $productHelper->getVariantByOptions($options, $product->j2store_product_id);				
+				$variant = $productHelper->getVariantByOptions($options, $product->j2store_product_id);
 			}
-			
+
 			$cart = $model->getCart();
 			if(!$errors && $cart->cart_type != 'wishlist') {
 				//before validating, get the total quantity of this variant in the cart
 				$cart_total_qty = $productHelper->getTotalCartQuantity($variant->j2store_variant_id);
-	
+
 				//validate minimum / maximum quantity
 				 $error = $productHelper->validateQuantityRestriction($variant, $cart_total_qty, $quantity);
 				 if(!empty($error)) {
 				 	$errors['error']['stock'] = $error;
 				 }
-	
+
 				//validate inventory
 				if($productHelper->check_stock_status($variant, $cart_total_qty+$quantity) === false ) {
 					if ( $variant->quantity > 0 ) {
-						$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $variant->quantity ); 
+						$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $variant->quantity );
 					}else{
-						$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK'); 
+						$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK');
 					}
 				}
-			}	
+			}
 
 		}
 
@@ -96,7 +100,7 @@ class J2StoreModelCartsBehaviorCartVariable extends F0FModelBehavior {
 			//all good. Add the product to cart
 
 			// create cart object out of item properties
-			$item = new JObject;
+			$item = new CMSObject;
 			$item->user_id     = JFactory::getUser()->id;
 			$item->product_id  = (int) $product->j2store_product_id;
 			$item->variant_id  = (int) $variant->j2store_variant_id;
@@ -146,12 +150,12 @@ class J2StoreModelCartsBehaviorCartVariable extends F0FModelBehavior {
 
 	}
 
-	
+
 	public function onGetCartItems(&$model, &$item) {
 
 		//sanity check
 		if($item->product_type != 'variable') return;
-		
+
 		$product_helper = J2Store::product();
         $platform = J2Store::platform();
 
@@ -241,7 +245,7 @@ class J2StoreModelCartsBehaviorCartVariable extends F0FModelBehavior {
 
 		//sanity check
 		if($cartitem->product_type != 'variable') return;
-		
+
 		$productHelper = J2Store::product();
 		$errors = array();
 

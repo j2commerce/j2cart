@@ -4,8 +4,11 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
+
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Object\CMSObject;
 
 class J2StoreTableProductFilter extends F0FTable
 {
@@ -67,7 +70,7 @@ class J2StoreTableProductFilter extends F0FTable
 							->where('product_id='.$db->q($product_id));
 			$row = $db->setQuery($query)->loadObject();
 			if(!$row) {
-				$object = new JObject();
+				$object = new CMSObject();
 				$object->product_id = $product_id;
 				$object->filter_id = $filter_id;
 				try {

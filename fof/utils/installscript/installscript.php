@@ -8,6 +8,8 @@
 
 defined('F0F_INCLUDED') or die;
 
+use Joomla\CMS\Object\CMSObject;
+
 JLoader::import('joomla.filesystem.folder');
 JLoader::import('joomla.filesystem.file');
 JLoader::import('joomla.installer.installer');
@@ -871,7 +873,7 @@ abstract class F0FUtilsInstallscript
 	 *
 	 * @param JInstaller $parent
 	 *
-	 * @return JObject The subextension installation status
+	 * @return CMSObject The subextension installation status
 	 */
 	protected function installSubextensions($parent)
 	{
@@ -879,7 +881,7 @@ abstract class F0FUtilsInstallscript
 
 		$db = F0FPlatform::getInstance()->getDbo();;
 
-		$status = new JObject();
+		$status = new CMSObject();
 		$status->modules = array();
 		$status->plugins = array();
 

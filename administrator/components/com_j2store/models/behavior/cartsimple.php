@@ -4,8 +4,12 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
+
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Object\CMSObject;
+
 class J2StoreModelCartsBehaviorCartSimple extends F0FModelBehavior {
 
 
@@ -55,9 +59,9 @@ class J2StoreModelCartsBehaviorCartSimple extends F0FModelBehavior {
 			//validate inventory
 			if($product_helper->check_stock_status($product->variants, $cart_total_qty+$quantity) === false) {
 				if ( $product->variants->quantity > 0 ) {
-					$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $product->variants->quantity ); 
+					$errors['error']['stock'] = JText::sprintf ( 'J2STORE_LOW_STOCK_WITH_QUANTITY', $product->variants->quantity );
 				}else{
-					$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK'); 
+					$errors['error']['stock'] = JText::_('J2STORE_OUT_OF_STOCK');
 				}
 			}
 		}
@@ -65,7 +69,7 @@ class J2StoreModelCartsBehaviorCartSimple extends F0FModelBehavior {
 		if(!$errors) {
 			//all good. Add the product to cart
 			// create cart object out of item properties
-			$item = new JObject;
+			$item = new CMSObject;
 			$item->user_id     = JFactory::getUser()->id;
 			$item->product_id  = (int) $product->j2store_product_id;
 			$item->variant_id  = (int) $product->variants->j2store_variant_id;
