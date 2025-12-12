@@ -12,10 +12,12 @@
  * --------------------------------------------------------------------------------
  *
  * */
+
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.plugin.plugin' );
 jimport('joomla.html.parameter');
+
+use Joomla\CMS\Plugin\CMSPlugin;
 
 // Make sure FOF is loaded, otherwise do not run
 if (!defined('F0F_INCLUDED'))
@@ -36,7 +38,7 @@ if (!JComponentHelper::isEnabled('com_j2store', true))
 	return;
 }
 
-class plgSystemJ2pagecache extends JPlugin
+class plgSystemJ2pagecache extends CMSPlugin
 {
 	var $_cache_key = null;
 	function __construct ( &$subject, $config )

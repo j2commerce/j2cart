@@ -22,7 +22,6 @@ require_once ( JPATH_BASE .DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'d
 require_once ( JPATH_BASE .DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'framework.php' );
 
 jimport('joomla.registry.registry');
-jimport( 'joomla.plugin.plugin' );
 jimport( 'joomla.session.session' );
 jimport( 'joomla.uri.uri' );
 
