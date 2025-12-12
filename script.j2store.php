@@ -70,7 +70,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
   protected $componentTitle = 'J2Store Joomla Shopping cart';
 
   protected $minimumJoomlaVersion = '4.0.0';
-  protected $maximumJoomlaVersion = '5.99.99';
+  protected $maximumJoomlaVersion = '6.99.99';
 
     /**
      * Store original error reporting level
