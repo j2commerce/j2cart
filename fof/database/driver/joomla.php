@@ -95,11 +95,6 @@ class F0FDatabaseDriverJoomla extends F0FDatabaseDriver implements F0FDatabaseIn
         return $this->dbo->execute();
     }
 
-    public function createQuery(): \Joomla\Database\QueryInterface
-    {
-        return $this->getQuery(true);
-    }
-
     /**
      * Get the query strings to alter the character set and collation of a table.
      *
@@ -579,6 +574,11 @@ class F0FDatabaseDriverJoomla extends F0FDatabaseDriver implements F0FDatabaseIn
         }
 
         return null;
+    }
+
+    public function createQuery(): \Joomla\Database\QueryInterface
+    {
+        return $this->getQuery(true);
     }
 
     public function getTableColumns($table, $typeOnly = true)
