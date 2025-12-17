@@ -335,6 +335,10 @@ class J2StorePlatform {
 
     public function getRegistry($json,$is_array = false)
     {
+        if ($json === null) {
+            return new JRegistry('{}');
+        }
+
         if (!$json instanceof JRegistry || !$json instanceof \Joomla\Registry\Registry) {
             $params = new JRegistry();
             try {
