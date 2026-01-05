@@ -351,18 +351,22 @@ class J2StorePlatform {
         }
         return $params;
     }
+
     public function getImagePath($path)
     {
-        $status = false;
-        if(empty($path)){
-            return $status;
+        if (empty($path)) {
+            return false;
         }
+
         $file_path = parse_url($path);
-        if(isset($file_path['path']) && !empty($file_path['path']) && JFile::exists(JPATH_SITE.'/'.urldecode($file_path['path']))){
-            $status = JUri::root().$file_path['path'];
+
+        if (!empty($file_path['path']) && file_exists(JPATH_SITE . '/' . urldecode($file_path['path']))) {
+            return Uri::root() . ltrim($file_path['path'], '/');
         }
-        return $status;
+
+        return false;
     }
+
     public function getLabel($label_info = ''){
         $label_class = 'badge bg-';
         if (version_compare(JVERSION, '3.99.99', 'lt')) {
