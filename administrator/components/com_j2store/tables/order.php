@@ -4,9 +4,11 @@
 * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
 * @license GNU GPL v3 or later
 */
+
 // No direct access to this file
 defined ( '_JEXEC' ) or die ();
 
+use Joomla\CMS\Object\CMSObject;
 
 class J2StoreTableOrder extends F0FTable
 {
@@ -26,7 +28,7 @@ class J2StoreTableOrder extends F0FTable
 	protected $_billing_geozones = array();
 	protected $_shipping_geozones = array();
 
-	/** @var array      The shipping totals JObjects */
+	/** @var array      The shipping totals CMSObjects */
 	protected $_shipping_totals = null;
 
 	/** @var boolean Has the recurring item been added to the order?
@@ -3119,7 +3121,7 @@ class J2StoreTableOrder extends F0FTable
 				$address->zone_name = F0FModel::getTmpInstance('Zones','J2StoreModel')->getItem($address->zone_id)->zone_name;
 				$input = J2Store::platform()->fromObject($address);
 				$values =array();
-				$return = new JObject();
+				$return = new CMSObject();
 				foreach($input as $k =>$value){
 					if($k == 'j2store_address_id'){
 						$k = $address_type.'_'.'address_id';
@@ -3159,7 +3161,7 @@ class J2StoreTableOrder extends F0FTable
 				$address->zone_name = F0FModel::getTmpInstance('Zones','J2StoreModel')->getItem($address->zone_id)->zone_name;
 				$input = J2Store::platform()->fromObject($address);
 				$values =array();
-				$return = new JObject();
+				$return = new CMSObject();
 				foreach($input as $k =>$value){
 					if($k == 'j2store_address_id'){
 						$k = $address_type.'_'.'address_id';

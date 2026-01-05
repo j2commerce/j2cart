@@ -167,10 +167,8 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
             </a>
         </div>
         <h3 class="text-black mb-0 ms-2 fw-bolder">v <?php echo isset($row->version) ? $row->version : J2STORE_VERSION; ?>
-            <?php if(J2Store::isPro() == 1): ?>
-                <?php echo 'PRO'; ?>
-            <?php else: ?>
-                <?php echo 'CORE'; ?>
+            <?php if (defined('J2STORE_EXTRA_VERSION')) : ?>
+                <?php echo ' ' . J2STORE_EXTRA_VERSION; ?>
             <?php endif; ?>
         </h3>
     </div>
@@ -179,10 +177,8 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
             <a class="navbar-brand d-flex align-items-center" href="<?php echo 'index.php?option=com_j2store&view=cpanels';?>">
                 <?php echo HTMLHelper::_('image', 'j2store/dashboard-logo.png', 'j2Commerce logo', ['class' => 'img-fluid'], true); ?>
                 <h5 class="mb-0 ms-2 fw-normal d-none d-sm-block d-lg-none text-white-50 small">v <?php echo isset($row->version) ? $row->version : J2STORE_VERSION; ?>
-                    <?php if(J2Store::isPro() == 1): ?>
-                        <?php echo 'PRO'; ?>
-                    <?php else: ?>
-                        <?php echo 'CORE'; ?>
+                    <?php if (defined('J2STORE_EXTRA_VERSION')) : ?>
+                        <?php echo ' ' . J2STORE_EXTRA_VERSION; ?>
                     <?php endif; ?>
                 </h5>
             </a>

@@ -12,6 +12,8 @@
 /** ensure this file is being included by a parent file */
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Object\CMSObject;
+
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/plugins/payment.php');
 
 class plgJ2StorePayment_moneyorder extends J2StorePaymentPlugin
@@ -49,7 +51,7 @@ class plgJ2StorePayment_moneyorder extends J2StorePaymentPlugin
 	function onJ2StoreCalculateFees($order) {
 		// is customer selected this method for payment ? If yes, apply the fees
 		$payment_method = $order->get_payment_method ();
-		
+
 		if ($payment_method == $this->_element) {
 			$total = $order->order_subtotal + $order->order_shipping + $order->order_shipping_tax;
 			$surcharge = 0;
@@ -60,11 +62,11 @@ class plgJ2StorePayment_moneyorder extends J2StorePaymentPlugin
 				if (( float ) $surcharge_percent > 0) {
 					$surcharge += ($total * ( float ) $surcharge_percent) / 100;
 				}
-				
+
 				if (( float ) $surcharge_fixed > 0) {
 					$surcharge += ( float ) $surcharge_fixed;
 				}
-				
+
 				$name = $this->params->get ( 'surcharge_name', JText::_ ( 'J2STORE_CART_SURCHARGE' ) );
 				$tax_class_id = $this->params->get ( 'surcharge_tax_class_id', '' );
 				$taxable = false;
@@ -89,7 +91,7 @@ class plgJ2StorePayment_moneyorder extends J2StorePaymentPlugin
     {
         // prepare the payment form
 
-        $vars = new JObject();
+        $vars = new CMSObject();
         $vars->order_id = $data['order_id'];
         $vars->orderpayment_id = $data['orderpayment_id'];
         $vars->orderpayment_amount = $data['orderpayment_amount'];
@@ -216,7 +218,7 @@ class plgJ2StorePayment_moneyorder extends J2StorePaymentPlugin
     function _renderForm( $data )
     {
     	$user = JFactory::getUser();
-        $vars = new JObject();
+        $vars = new CMSObject();
         $vars->onselection_text = $this->params->get('onselection', '');
         $html = $this->_getLayout('form', $vars);
         return $html;

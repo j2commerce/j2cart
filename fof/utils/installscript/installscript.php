@@ -8,6 +8,9 @@
 
 defined('F0F_INCLUDED') or die;
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Object\CMSObject;
+
 JLoader::import('joomla.filesystem.folder');
 JLoader::import('joomla.filesystem.file');
 JLoader::import('joomla.installer.installer');
@@ -871,7 +874,7 @@ abstract class F0FUtilsInstallscript
 	 *
 	 * @param JInstaller $parent
 	 *
-	 * @return JObject The subextension installation status
+	 * @return CMSObject The subextension installation status
 	 */
 	protected function installSubextensions($parent)
 	{
@@ -879,7 +882,7 @@ abstract class F0FUtilsInstallscript
 
 		$db = F0FPlatform::getInstance()->getDbo();;
 
-		$status = new JObject();
+		$status = new CMSObject();
 		$status->modules = array();
 		$status->plugins = array();
 
@@ -937,7 +940,12 @@ abstract class F0FUtilsInstallscript
 						}
 
 						$installer = new JInstaller;
-						$result = $installer->install($path);
+                        // Joomla 6+ requires the database to be set explicitly
+                        if (method_exists($installer, 'setDatabase')) {
+                            $installer->setDatabase(Factory::getDbo());
+                        }
+
+                        $result = $installer->install($path);
 						$status->modules[] = array(
 							'name'   => 'mod_' . $module,
 							'client' => $folder,
@@ -1081,6 +1089,10 @@ abstract class F0FUtilsInstallscript
 						}
 
 						$installer = new JInstaller;
+                        // Joomla 6+ requires the database to be set explicitly
+                        if (method_exists($installer, 'setDatabase')) {
+                            $installer->setDatabase(Factory::getDbo());
+                        }
 						$result = $installer->install($path);
 
 						$status->plugins[] = array('name' => 'plg_' . $plugin, 'group' => $folder, 'result' => $result);
@@ -1161,6 +1173,10 @@ abstract class F0FUtilsInstallscript
 						if ($id)
 						{
 							$installer = new JInstaller;
+                            // Joomla 6+ requires the database to be set explicitly
+                            if (method_exists($installer, 'setDatabase')) {
+                                $installer->setDatabase(Factory::getDbo());
+                            }
 							$result = $installer->uninstall('module', $id, 1);
 							$status->modules[] = array(
 								'name'   => 'mod_' . $module,
@@ -1202,6 +1218,10 @@ abstract class F0FUtilsInstallscript
 						if ($id)
 						{
 							$installer = new JInstaller;
+                            // Joomla 6+ requires the database to be set explicitly
+                            if (method_exists($installer, 'setDatabase')) {
+                                $installer->setDatabase(Factory::getDbo());
+                            }
 							$result = $installer->uninstall('plugin', $id, 1);
 							$status->plugins[] = array(
 								'name'   => 'plg_' . $plugin,
@@ -1342,6 +1362,10 @@ abstract class F0FUtilsInstallscript
 		{
 			$versionSource = 'package';
 			$installer = new JInstaller;
+            // Joomla 6+ requires the database to be set explicitly
+            if (method_exists($installer, 'setDatabase')) {
+                $installer->setDatabase(Factory::getDbo());
+            }
 			$installedFOF = $installer->install($source);
 		}
 		else
@@ -1465,6 +1489,10 @@ abstract class F0FUtilsInstallscript
 		{
 			$versionSource = 'package';
 			$installer = new JInstaller;
+            // Joomla 6+ requires the database to be set explicitly
+            if (method_exists($installer, 'setDatabase')) {
+                $installer->setDatabase(Factory::getDbo());
+            }
 			$installedStraper = $installer->install($source);
 		}
 		else
@@ -1559,6 +1587,10 @@ abstract class F0FUtilsInstallscript
 						if ($id)
 						{
 							$installer = new JInstaller;
+                            // Joomla 6+ requires the database to be set explicitly
+                            if (method_exists($installer, 'setDatabase')) {
+                                $installer->setDatabase(Factory::getDbo());
+                            }
 							$result = $installer->uninstall('module', $id, 1);
 							$status->modules[] = array(
 								'name'   => 'mod_' . $module,
@@ -1592,6 +1624,10 @@ abstract class F0FUtilsInstallscript
 						if ($id)
 						{
 							$installer = new JInstaller;
+                            // Joomla 6+ requires the database to be set explicitly
+                            if (method_exists($installer, 'setDatabase')) {
+                                $installer->setDatabase(Factory::getDbo());
+                            }
 							$result = $installer->uninstall('plugin', $id, 1);
 							$status->plugins[] = array(
 								'name'   => 'plg_' . $plugin,

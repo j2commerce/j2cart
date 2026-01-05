@@ -5,14 +5,17 @@
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
+
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Object\CMSObject;
 
 /**
  * J2Html class provides Form Inputs
  */
 
-class J2Product extends JObject{
-
+class J2Product extends CMSObject
+{
 	protected $state;
 	protected $item;
 	public static $instance;
@@ -25,7 +28,7 @@ class J2Product extends JObject{
 	public function __construct($properties=null) {
 
 		if(!is_object($this->state)) {
-			$this->state = new JObject();
+			$this->state = new CMSObject();
 		}
 		$this->options = array();
 		parent::__construct($properties);
@@ -113,7 +116,7 @@ class J2Product extends JObject{
 
 	public function clearState()
 	{
-		$this->state = new JObject();
+		$this->state = new CMSObject();
 		return $this;
 	}
 

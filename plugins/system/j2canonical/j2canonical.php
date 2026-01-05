@@ -4,8 +4,11 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
+
 // Check to ensure this file is included in Joomla!
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\CMS\Plugin\CMSPlugin;
 
 // Make sure FOF is loaded, otherwise do not run
 if (!defined('F0F_INCLUDED'))
@@ -21,8 +24,7 @@ if (!defined('F0F_INCLUDED') || !class_exists('F0FLess', true))
 // Set the separator as some idiot removed it from the core
 if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
 
-jimport( 'joomla.plugin.plugin' );
-class plgSystemJ2Canonical extends JPlugin {
+class plgSystemJ2Canonical extends CMSPlugin {
 
     protected $canonical = null;
 
