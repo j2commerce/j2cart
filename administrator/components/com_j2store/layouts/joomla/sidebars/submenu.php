@@ -167,10 +167,8 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
             </a>
         </div>
         <h3 class="text-black mb-0 ms-2 fw-bolder">v <?php echo isset($row->version) ? $row->version : J2STORE_VERSION; ?>
-            <?php if(J2Store::isPro() == 1): ?>
-                <?php echo 'PRO'; ?>
-            <?php else: ?>
-                <?php echo 'CORE'; ?>
+            <?php if (defined(J2STORE_EXTRA_VERSION)) : ?>
+                <?php echo ' ' . J2STORE_EXTRA_VERSION; ?>
             <?php endif; ?>
         </h3>
     </div>
