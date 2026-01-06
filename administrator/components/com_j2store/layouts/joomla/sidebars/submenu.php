@@ -194,7 +194,7 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
                     <?php $view = $app->input->getString('view'); ?>
                     <?php foreach($menus as $key => $value) : ?>
                         <?php if(isset($value['submenu']) && count($value['submenu'])):?>
-                            <li class="nav-item dropdown flex-lg-grow-1 flex-xl-grow-0 me-xl-2" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo $value['name'];?>">
+                            <li data-menu-key="<?php echo $key;?>" class="nav-item dropdown flex-lg-grow-1 flex-xl-grow-0 me-xl-2" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo $value['name'];?>">
                                 <a href="javascript:void(0);" class="nav-link dropdown-toggle submenu-dropdown-toggle text-lg-center" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-fw me-1 me-xxl-2 <?php echo isset($value['icon']) ? $value['icon'] : '';?>" aria-hidden="true"></i>
                                     <span class="submenu-title d-inline d-lg-none d-xl-inline fs-6"><?php echo $value['name'];?></span>
@@ -230,7 +230,7 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
                                                 $translatedTitle = Text::_('COM_J2STORE_MAINMENU_' . strtoupper($sub_key));
                                             }
                                         ?>
-                                        <li>
+                                        <li data-menu-key="<?php echo $sub_key;?>">
                                             <a class="dropdown-item <?php echo $class ?>" href="<?php echo Route::_($link_url);?>">
                                                 <i class="fa-fw me-1 me-xxl-2 <?php echo $sub_menu_icon_class;?>" aria-hidden="true"></i>
                                                 <span class="fs-6"><?php echo $translatedTitle; ?></span>
@@ -246,7 +246,7 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
                                 $active_class ='active';
                             }
                             ?>
-                            <li class="nav-item <?php echo $active_class;?> flex-lg-grow-1 flex-xl-grow-0 me-xl-2 position-relative">
+                            <li data-menu-key="<?php echo $key;?>" class="nav-item <?php echo $active_class;?> flex-lg-grow-1 flex-xl-grow-0 me-xl-2 position-relative">
                                 <?php if (isset($value['link']) && $value['link'] != '') : ?>
                                     <a class="nav-link text-lg-center text-nowrap" aria-current="page" href="<?php echo $value['link'];?>">
                                 <?php else : ?>
@@ -257,7 +257,7 @@ $wa->addInlineScript("window.addEventListener('resize', function () {
                                     <?php endif; ?>
                                 <?php endif; ?>
                                     <i class="fa-fw me-1 me-xxl-2 <?php echo isset($value['icon']) ? $value['icon'] : '';?>"></i>
-                                    <span class="submenu-title d-inline d-lg-none d-xl-inline fs-6"><?php echo Text::_('COM_J2STORE_MAINMENU_'.strtoupper($value['name']));?></span>
+                                    <span class="submenu-title d-inline d-lg-none d-xl-inline fs-6"><?php echo $value['name'];?></span>
                                 </a>
                             </li>
                         <?php endif; ?>
