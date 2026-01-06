@@ -180,46 +180,41 @@ class J2StorePlatform {
             }
         }
     }
-    public function addScript($asset, $uri ,$options = [], $attributes = [], $dependencies = []){
-        $url = trim(JURI::root(),'/').$uri;
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            $wa = $this->application()->getDocument()->getWebAssetManager();
-            $wa->registerAndUseScript($asset,$url,$options,$attributes,$dependencies);
-        }elseif (version_compare(JVERSION, '3.99.99', 'lt')){
-            $document = JFactory::getDocument();
-            $document->addScript($url,$options,$attributes);
+
+    public function addScript($asset, $uri ,$options = [], $attributes = [], $dependencies = [])
+    {
+        if (isset($options['relative']) && $options['relative']) {
+            $url = ltrim($uri, '/'); // relative path
+        } else {
+            $url = JURI::root() . ltrim($uri, '/'); // full path
         }
-    }
-    public function addStyle($asset, $uri ,$options = [], $attributes = [], $dependencies = []){
-        $url = trim(JURI::root(),'/').$uri;
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            $wa = $this->application()->getDocument()->getWebAssetManager();
-            $wa->registerAndUseStyle($asset,$url,$options,$attributes,$dependencies);
-        }elseif (version_compare(JVERSION, '3.99.99', 'lt')){
-            $document = JFactory::getDocument();
-            $document->addStyleSheet($url ,$options,$dependencies);
-        }
+        $wa = $this->application()->getDocument()->getWebAssetManager();
+        $wa->registerAndUseScript($asset, $url, $options, $attributes, $dependencies);
     }
 
-    public function addInlineScript( $content, $options = [], $attributes = [], $dependencies = []){
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            $wa = $this->application()->getDocument()->getWebAssetManager();
-            $wa->addInlineScript($content,$options,$attributes,$dependencies);
-        }elseif (version_compare(JVERSION, '3.99.99', 'lt')){
-            $document = JFactory::getDocument();
-            $document->addScriptDeclaration($content);
+    public function addStyle($asset, $uri ,$options = [], $attributes = [], $dependencies = [])
+    {
+        if (isset($options['relative']) && $options['relative']) {
+            $url = ltrim($uri, '/'); // relative path
+        } else {
+            $url = JURI::root() . ltrim($uri, '/'); // full path
         }
+        $wa = $this->application()->getDocument()->getWebAssetManager();
+        $wa->registerAndUseStyle($asset, $url, $options, $attributes, $dependencies);
     }
 
-    public function addInlineStyle( $content, $options = [], $attributes = [], $dependencies = []){
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            $wa = $this->application()->getDocument()->getWebAssetManager();
-            $wa->addInlineStyle($content,$options,$attributes,$dependencies);
-        }elseif (version_compare(JVERSION, '3.99.99', 'lt')){
-            $document = JFactory::getDocument();
-            $document->addStyleDeclaration($content);
-        }
+    public function addInlineScript( $content, $options = [], $attributes = [], $dependencies = [])
+    {
+        $wa = $this->application()->getDocument()->getWebAssetManager();
+        $wa->addInlineScript($content, $options, $attributes, $dependencies);
     }
+
+    public function addInlineStyle( $content, $options = [], $attributes = [], $dependencies = [])
+    {
+        $wa = $this->application()->getDocument()->getWebAssetManager();
+        $wa->addInlineStyle($content, $options, $attributes, $dependencies);
+    }
+
     public function raiseError($code, $message)
     {
         throw new Exception($message, $code);
