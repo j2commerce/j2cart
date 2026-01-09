@@ -6,6 +6,9 @@
  * @license GNU GPL v3 or later
  */
 /** ensure this file is being included by a parent file */
+
+use Joomla\CMS\Uri\Uri;
+
 defined('_JEXEC') or die('Restricted access');
 class J2StorePlatform {
 
