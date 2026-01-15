@@ -738,7 +738,7 @@ class J2Product extends JObject{
 				default:
 					// Quantity as Textbox
 					$text .= '<div class="product-qty">';
-					$text .= '<input type="number" name="'.$name.'" value="'. $value .'" class="'.$class.'" min="0" step="1" />' ;
+					$text .= '<input type="number" name="'.$name.'" value="'. $value .'" class="'.$class.'" min="0" step="1" aria-label="' . JText::_('COM_J2STORE_QUANTITY') . '" />' ;
 					$text .= '</div>';
 					break;
 			}
