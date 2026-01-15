@@ -45,7 +45,7 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 			<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>
 		</h3>
 		<?php if ($this->plugins): ?>
-
+			<?php $singlePlugin = (count($this->plugins) === 1); ?>
 			<?php foreach ($this->plugins as $plugin): ?>
 
 				<?php
@@ -57,7 +57,7 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 					<input value="<?php echo $plugin->element; ?>" class="payment_plugin"
 					       name="payment_plugin" type="radio"
 					       onclick="j2storeGetPaymentForm('<?php echo $plugin->element; ?>', 'payment_form_div');"
-						<?php echo (!empty($plugin->checked)) ? "checked" : ""; ?>
+						<?php echo (!empty($plugin->checked) || $singlePlugin) ? "checked" : ""; ?>
 						   title="<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>" />
 
 					<?php if(!empty($image)): ?>
