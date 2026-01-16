@@ -23,6 +23,14 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 		var data = 'option=com_j2store&view=checkout&task=getPaymentForm&tmpl=component&payment_element='+ element;
 		j2storeDoTask(url, container, document.adminForm, '', data);
 	}
+
+	// Auto-load payment form for pre-checked plugin on page init
+	document.addEventListener('DOMContentLoaded', function() {
+		var checkedPlugin = document.querySelector('input.payment_plugin:checked');
+		if (checkedPlugin) {
+			j2storeGetPaymentForm(checkedPlugin.value, 'payment_form_div');
+		}
+	});
 	//-->
 </script>
 <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayShippingPayment',array($this->order)); ?>
@@ -55,10 +63,10 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 				<?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayPaymentMethod',array($plugin->element, $this->order)); ?>
 				<label class="payment-plugin-image-label <?php echo $plugin->element; ?>" >
 					<input value="<?php echo $plugin->element; ?>" class="payment_plugin"
-					       name="payment_plugin" type="radio"
-					       onclick="j2storeGetPaymentForm('<?php echo $plugin->element; ?>', 'payment_form_div');"
-						<?php echo (!empty($plugin->checked) || $singlePlugin) ? "checked" : ""; ?>
-						   title="<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>" />
+					    name="payment_plugin" type="radio"
+					    onclick="j2storeGetPaymentForm('<?php echo $plugin->element; ?>', 'payment_form_div');"
+						<?php echo (!empty($plugin->checked) || $singlePlugin) ? 'checked="checked"' : ""; ?>
+						title="<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>" />
 
 					<?php if(!empty($image)): ?>
 						<img class="payment-plugin-image <?php echo $plugin->element; ?>" src="<?php echo JUri::root().JPath::clean($image); ?>" />

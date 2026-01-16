@@ -57,7 +57,8 @@ $platform = J2Store::platform();
         <?php else:?>
             <input	value="<?php echo $plugin->element; ?>" class="payment_plugin" name="payment_plugin" type="radio"
                 onclick="j2storeGetPaymentForm('<?php echo $plugin->element; ?>', 'payment_form_div');"
-				<?php echo (!empty($plugin->checked) || $singlePlugin) ? "checked" : ""; ?> 	title="<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>" />
+				<?php echo (!empty($plugin->checked) || $singlePlugin) ? 'checked="checked"' : ""; ?>
+                title="<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>" />
 		<?php endif;?>
 		<?php if(!empty($image)): ?>
 
@@ -90,3 +91,13 @@ $platform = J2Store::platform();
 	?>
 
 </div>
+
+<script type="text/javascript">
+	// Auto-load payment form for pre-checked plugin on page init
+	document.addEventListener('DOMContentLoaded', function() {
+		var checkedPlugin = document.querySelector('input.payment_plugin:checked');
+		if (checkedPlugin && typeof j2storeGetPaymentForm === 'function') {
+			j2storeGetPaymentForm(checkedPlugin.value, 'payment_form_div');
+		}
+	});
+</script>
