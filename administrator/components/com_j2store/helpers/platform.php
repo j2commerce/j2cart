@@ -189,7 +189,13 @@ class J2StorePlatform {
         if (isset($options['relative']) && $options['relative']) {
             $url = ltrim($uri, '/'); // relative path
         } else {
-            $url = JURI::root() . ltrim($uri, '/'); // full path
+            $root = JURI::root();
+            // Check if $uri already contains the full root URL (e.g., http://example.com/)
+            if (strpos($uri, $root) === 0 || strpos($uri, 'http://') === 0 || strpos($uri, 'https://') === 0) {
+                $url = $uri; // already a full URL, use as-is
+            } else {
+                $url = $root . ltrim($uri, '/'); // prepend root
+            }
         }
         $wa = $this->application()->getDocument()->getWebAssetManager();
         $wa->registerAndUseScript($asset, $url, $options, $attributes, $dependencies);
@@ -200,7 +206,13 @@ class J2StorePlatform {
         if (isset($options['relative']) && $options['relative']) {
             $url = ltrim($uri, '/'); // relative path
         } else {
-            $url = JURI::root() . ltrim($uri, '/'); // full path
+            $root = JURI::root();
+            // Check if $uri already contains the full root URL (e.g., http://example.com/)
+            if (strpos($uri, $root) === 0 || strpos($uri, 'http://') === 0 || strpos($uri, 'https://') === 0) {
+                $url = $uri; // already a full URL, use as-is
+            } else {
+                $url = $root . ltrim($uri, '/'); // prepend root
+            }
         }
         $wa = $this->application()->getDocument()->getWebAssetManager();
         $wa->registerAndUseStyle($asset, $url, $options, $attributes, $dependencies);
