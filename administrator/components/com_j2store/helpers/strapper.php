@@ -91,7 +91,6 @@ class J2StoreStrapper
             $platform->addScript('j2store-fancybox-script', 'j2store/jquery.fancybox.min.js', ['relative' => true, 'version' => 'auto'], [], ['jquery']);
         } else {
             $platform->addScript('j2store-jquery-zoom-script', 'j2store/jquery.zoom.min.js', ['relative' => true, 'version' => 'auto'], [], ['jquery']);
-            $platform->addScript('j2store-jquery-elevatezoom-script', 'j2store/jquery.elevatezoom.min.js', ['relative' => true, 'version' => 'auto'], [], ['j2store-jquery-zoom-script']);
             $platform->addScript('j2store-script', 'j2store/j2store.js', ['relative' => true, 'version' => 'auto'], [], ['jquery']);
             $platform->addScript('j2store-media-script', 'j2store/bootstrap-modal-conflit.js', ['relative' => true, 'version' => 'auto'], [], ['jquery']); // cannot rename as used in Newline code
             if($params->get('load_fancybox', 1)) {
