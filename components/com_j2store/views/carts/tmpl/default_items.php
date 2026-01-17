@@ -59,8 +59,8 @@ $platform = J2Store::platform();
 
 							<span class="cart-product-unit-price">
 								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>
-								<span class="cart-item-value"> 
-								<?php echo $this->currency->format($this->order->get_formatted_lineitem_price($item, $this->params->get('checkout_price_display_options', 1))); ?>								
+								<span class="cart-item-value">
+								<?php echo $this->currency->format($this->order->get_formatted_lineitem_price($item, $this->params->get('checkout_price_display_options', 1))); ?>
 								</span>
 							</span>
 						<?php endif; ?>
@@ -75,11 +75,11 @@ $platform = J2Store::platform();
 						<?php endif; ?>
 						<?php if($back_order_text):?>
                             <br>
-                            <span class="label label-inverse"><?php echo JText::_($back_order_text);?></span>
+                            <span class="label badge label-inverse text-bg-dark"><?php echo JText::_($back_order_text);?></span>
                         <?php endif;?>
 						<?php if(isset($this->onDisplayCartItem[$i])):?>
 							<br>
-							<?php echo $this->onDisplayCartItem[$i];?>						
+							<?php echo $this->onDisplayCartItem[$i];?>
 						<?php endif;?>
 						<?php $i++;?>
 						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitle', array($item, $this->order, &$this->params));?>
@@ -103,7 +103,7 @@ $platform = J2Store::platform();
 					<td class="cart-line-subtotal">
 						<?php echo $this->currency->format($this->order->get_formatted_lineitem_total($item, $this->params->get('checkout_price_display_options', 1))); ?>
 						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTotal', array($item, $this->order, $this->params));?>
-					</td>					
+					</td>
 				</tr>
 				<?php endforeach; ?>
 			</tbody>

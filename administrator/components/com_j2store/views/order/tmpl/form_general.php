@@ -32,7 +32,7 @@ $success_button = 'btn btn-success ';
 
 				<dt><?php echo JText::_("J2STORE_ORDER_STATUS"); ?></dt>
 				<dd>
-				<span class="label <?php echo $this->item->orderstatus_cssclass;?> order-state-label">
+				<span class="label badge <?php echo $this->item->orderstatus_cssclass;?> order-state-label">
 					<?php echo JText::_($this->item->orderstatus_name);?>
 				</span>
 				</dd>

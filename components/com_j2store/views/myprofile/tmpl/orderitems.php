@@ -77,7 +77,7 @@ if(empty($order->customer_language) || $order->customer_language == '*' || $orde
                     <?php endif; ?>
                     <?php if($back_order_text):?>
                         <br>
-                        <span class="label label-inverse"><?php echo $language->_($back_order_text);?></span>
+                        <span class="label badge label-inverse text-bg-dark"><?php echo $language->_($back_order_text);?></span>
                     <?php endif;?>
                     <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitleInOrder', array($item, $this->order, $this->params));?>
                 </td>

@@ -44,7 +44,7 @@ $colspan = '2';
 							</span>
 						<?php endif; ?>
 						<span class="cart-product-name">
-							<?php echo $item->orderitem_name; ?> 
+							<?php echo $item->orderitem_name; ?>
 						</span>
 						<br>
 						<?php if(isset($item->orderitemattributes)): ?>
@@ -62,7 +62,7 @@ $colspan = '2';
 							?>
 								<small>
 								- <?php echo JText::_($attribute->orderitemattribute_name); ?> : <?php echo nl2br($attribute_value); ?>
-								</small>						
+								</small>
              				   	<br>
 							<?php endforeach;?>
 							</span>
@@ -71,7 +71,7 @@ $colspan = '2';
 						<?php if($this->params->get('show_price_field', 1)): ?>
 
 							<span class="cart-product-unit-price">
-								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>								
+								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>
 								<span class="cart-item-value">
 								<?php echo $currency->format($this->order->get_formatted_lineitem_price($item, $this->params->get('checkout_price_display_options', 1))); ?>
 								</span>
@@ -89,7 +89,7 @@ $colspan = '2';
 
                         <?php if($back_order_text):?>
                             <br>
-                            <span class="label label-inverse"><?php echo JText::_($back_order_text);?></span>
+                            <span class="label badge label-inverse text-bg-dark"><?php echo JText::_($back_order_text);?></span>
                         <?php endif;?>
 						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitle', array($item, $this->order, $this->params));?>
 					</td>

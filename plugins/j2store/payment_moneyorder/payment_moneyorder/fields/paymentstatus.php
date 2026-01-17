@@ -20,13 +20,13 @@ class JFormFieldPaymentstatus extends JFormFieldList {
 
     public function getRepeatable()
     {
-        $html ='<label class="label label-success">'.JText::_('J2STORE_ALL');
+        $html ='<label class="label badge label-success text-bg-success">'.JText::_('J2STORE_ALL');
         if($this->item->orderstatus_id != '*'){
             $orderstatus = J2Store::fof()->loadTable('Orderstatus','J2StoreTable');
             $orderstatus->load($this->item->orderstatus_id);
-            $html ='<label class="label">'.JText::_($orderstatus->orderstatus_name);
+            $html ='<label class="label badge">'.JText::_($orderstatus->orderstatus_name);
             if(isset($orderstatus->orderstatus_cssclass) && $orderstatus->orderstatus_cssclass){
-                $html ='<label class="label  '.$orderstatus->orderstatus_cssclass.'">'.JText::_($orderstatus->orderstatus_name);
+                $html ='<label class="label badge '.$orderstatus->orderstatus_cssclass.'">'.JText::_($orderstatus->orderstatus_name);
             }
         }
         $html .='</label>';

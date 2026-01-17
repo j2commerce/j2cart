@@ -87,7 +87,7 @@ class JFormFieldJ2storeitem extends  JFormField
 		$html .='<ul id="j2store-product-item-list" >';
 		foreach($productarray as $key => $value){
 			$html .='<li class="j2store-product-list-menu" id="j2store-product-li-'.$key.'">';
-			$html .='<label class="label label-info">';
+			$html .='<label class="label badge label-info text-bg-info">';
 			$html .=$value;
 			$html .='<input type="hidden" value="'.$key.'" name="jform[request][j2store_item][ids][]">';
 			$html .='</label>';
