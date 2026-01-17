@@ -1,17 +1,28 @@
 <?php
 /**
- * @package J2Store
- * @author Alagesan
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2024-26 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-/** ensure this file is being included by a parent file */
 
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Component\Menus\Administrator\Helper\MenusHelper;
+use Joomla\Registry\Registry;
+use Joomla\Utilities\ArrayHelper;
 
-defined('_JEXEC') or die('Restricted access');
-class J2StorePlatform {
-
+class J2StorePlatform
+{
     /**
      * instance variable
      * @var null
@@ -19,19 +30,12 @@ class J2StorePlatform {
     public static $instance = null;
 
     /**
-     * J2StorePlatform constructor.
-     * @param null $properties
-     */
-    public function __construct($properties=null) {}
-
-    /**
      * class instance
      * @return J2StorePlatform|null
      */
     public static function getInstance()
     {
-        if (!is_object(self::$instance))
-        {
+        if (!is_object(self::$instance)) {
             self::$instance = new self();
         }
 
@@ -41,33 +45,28 @@ class J2StorePlatform {
     /**
      * @return \Joomla\CMS\Application\CMSApplication|null
      */
-    public function application(){
+    public function application()
+    {
         $app = null;
         try{
-            if(version_compare(JVERSION,'3.99.99','lt') && class_exists('\JFactory')){
-                $app = JFactory::getApplication();
-            }elseif(version_compare(JVERSION,'3.99.99','ge') && class_exists('\Joomla\CMS\Factory')){
-                $app = \Joomla\CMS\Factory::getApplication();
-            }
+            $app = Factory::getApplication();
         }catch (\Exception $e){
             $app = null;
         }
         return $app;
     }
 
-    public function redirect($url,$message = '',$notice = 'info'){
+    public function redirect($url,$message = '',$notice = 'info')
+    {
         $app = $this->application();
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            if(!empty($message)){
-                $app->enqueueMessage(JText::_($message),$notice);
-            }
-            $app->redirect($url);
-        } else if(version_compare(JVERSION, '3.99.99','lt')){
-            $app->redirect($url, JText::_($message));
+        if(!empty($message)){
+            $app->enqueueMessage(Text::_($message),$notice);
         }
+        $app->redirect($url);
     }
 
-    public function isClient($identifier = 'site'){
+    public function isClient($identifier = 'site')
+    {
         try{
             $status = $this->application()->isClient($identifier);
         }catch (\Exception $e){
@@ -76,111 +75,100 @@ class J2StorePlatform {
         return $status;
     }
 
-    public function toInteger($input,$default = null){
-        $output = array();
-        if (!empty($input) && version_compare(JVERSION, '3.99.99', 'ge') && class_exists(' \Joomla\Utilities\ArrayHelper')) {
-            $output = \Joomla\Utilities\ArrayHelper::toInteger($input,$default);
-        } else if(!empty($input) && version_compare(JVERSION, '3.99.99','lt') && class_exists('\JArrayHelper')){
-            \JArrayHelper::toInteger($input,$default);
-            $output = $input;
-        }else{
-            if (\is_array($input))
-            {
-                return array_map('intval', $input);
-            }
-            if ($default !== null)
-            {
-                $output = $default;
-            }
-        }
-        return $output;
+    public function toInteger($input,$default = null): array
+    {
+        return ArrayHelper::toInteger($input,$default);
     }
 
-    public function fromObject($source, $recurse = true, $regex = null){
-        $output = array();
-        if (version_compare(JVERSION, '3.99.99', 'ge') && class_exists('\Joomla\Utilities\ArrayHelper')) {
-            $output = \Joomla\Utilities\ArrayHelper::fromObject($source, $recurse, $regex);
-        } else if (version_compare(JVERSION, '3.99.99', 'lt') && class_exists('\JArrayHelper')) {
-            $output = \JArrayHelper::fromObject($source, $recurse, $regex);
-        }
-        return $output;
+    public function fromObject($source, $recurse = true, $regex = null): array
+    {
+        return ArrayHelper::fromObject($source, $recurse, $regex);
     }
 
-    public function toObject(array $array, $class = 'stdClass', $recursive = true){
-        $output = new stdClass();
-        if (version_compare(JVERSION, '3.99.99', 'ge') && class_exists('\Joomla\Utilities\ArrayHelper')) {
-            $output = \Joomla\Utilities\ArrayHelper::toObject($array, $class, $recursive);
-        } else if (version_compare(JVERSION, '3.99.99', 'lt') && class_exists('\JArrayHelper')) {
-            $output = JArrayHelper::toObject($array, $class, $recursive);
-        }
-        return $output;
+    public function toObject(array $array, $class = 'stdClass', $recursive = true): object
+    {
+        return ArrayHelper::toObject($array, $class, $recursive);
     }
 
-    public function toString(array $array, $innerGlue = '=', $outerGlue = ' ', $keepOuterKey = false){
-        $output = '';
-        if (version_compare(JVERSION, '3.99.99', 'ge') && class_exists('\Joomla\Utilities\ArrayHelper')) {
-            $output = \Joomla\Utilities\ArrayHelper::toString($array, $innerGlue, $outerGlue, $keepOuterKey);
-        } else if (version_compare(JVERSION, '3.99.99', 'lt') && class_exists('\JArrayHelper')) {
-            $output = JArrayHelper::toString($array, $innerGlue, $outerGlue, $keepOuterKey);
-        }
-        return $output;
+    public function toString(array $array, $innerGlue = '=', $outerGlue = ' ', $keepOuterKey = false): string
+    {
+        return ArrayHelper::toString($array, $innerGlue, $outerGlue, $keepOuterKey);
     }
 
-    public function getValue($array, $name, $default = null, $type = ''){
-        $output = $default;
-        if (version_compare(JVERSION, '3.99.99', 'ge') && class_exists('\Joomla\Utilities\ArrayHelper')) {
-            $output = \Joomla\Utilities\ArrayHelper::getValue($array, $name, $default, $type);
-        } else if (version_compare(JVERSION, '3.99.99', 'lt') && class_exists('\JArrayHelper')) {
-            $output = JArrayHelper::getValue($array, $name, $default, $type);
-        }
-        return $output;
+    public function getValue($array, $name, $default = null, $type = '')
+    {
+        return ArrayHelper::getValue($array, $name, $default, $type);
     }
 
-    public function loadExtra($behaviour,...$methodArgs){
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            if(!in_array($behaviour,array('behavior.framework','behavior.modal','bootstrap.tooltip','behavior.tooltip'))){
-                \Joomla\CMS\HTML\HTMLHelper::_($behaviour,implode(',',$methodArgs));
-            }elseif($behaviour == 'behavior.modal'){
-                \Joomla\CMS\HTML\HTMLHelper::_('script', 'system/fields/modal-fields.min.js', array('version' => 'auto', 'relative' => true));
-            }
-        }else if (version_compare(JVERSION, '3.99.99', 'lt') && class_exists('\JHtml')){
-            if(!in_array($behaviour,array('draggablelist.draggable'))){
-                JHtml::_($behaviour,implode(',',$methodArgs));
+    /**
+     * Load extra scripts, styles or behaviors
+     *
+     * @param string $behaviour
+     * @param mixed ...$methodArgs
+     */
+    public function loadExtra($behaviour, ...$methodArgs)
+    {
+        // Deal will add-on calls, redirect to the right way to call j2store.js
+        if ($behaviour === 'script') {
+            if (strpos($methodArgs[0], 'j2store.js') !== false) {
+                $this->loadCoreScript();
+                return;
             }
         }
-    }
-    public function addIncludePath($path){
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            \Joomla\CMS\HTML\HTMLHelper::addIncludePath($path);
-        }else if (version_compare(JVERSION, '3.99.99', 'lt') && class_exists('\JHtml')){
-             JHtml::addIncludePath($path);
+
+        if (!in_array($behaviour, ['behavior.framework','behavior.modal','bootstrap.tooltip','behavior.tooltip'])) {
+            HTMLHelper::_($behaviour, implode(',', $methodArgs));
+        } elseif ($behaviour === 'behavior.modal') {
+            // deprecated in Joomla 6 - use the new modal-content-select-field script
+            HTMLHelper::_('script', 'system/fields/modal-fields.min.js', array('version' => 'auto', 'relative' => true));
         }
     }
-    public function checkAdminMenuModule(){
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            $db = JFactory::getDbo();
-            $sql = $db->getQuery(true)
-                ->select('COUNT(*)')
-                ->from('#__modules')
-                ->where($db->qn('module') . ' = ' . $db->q('mod_j2store_menu'));
-            $db->setQuery($sql);
-            try
-            {
-                $count = $db->loadResult();
 
-                if($count > 0){
-                    $sql = $db->getQuery(true)
-                        ->update($db->qn('#__modules'))
-                        ->set($db->qn('published') . ' = ' . $db->q(0))
-                        ->where($db->qn('module') . ' = ' . $db->q('mod_j2store_menu'));
-                    $db->setQuery($sql);
-                    $db->execute();
-                }
-            }
-            catch (Exception $exc)
-            {
+    /**
+     * Load the core J2Store script
+     *
+     * This method is used to load the main J2Store JavaScript file.
+     * It registers the script with the web asset manager and sets it to be used.
+     */
+    public function loadCoreScript()
+    {
+        $this->addScript('j2store-script','j2store/j2store.js', ['relative' => true, 'version' => 'auto'], [], ['jquery']);
+    }
 
+    /**
+     * Add an include path for HTMLHelper
+     *
+     * @param string $path The path to add
+     */
+    public function addIncludePath($path)
+    {
+        HTMLHelper::addIncludePath($path); // Deprecated Joomla 6 ? HTMLHelper::getServiceRegistry()->getService($file);
+    }
+
+    public function checkAdminMenuModule()
+    {
+        $db = Factory::getContainer()->get('DatabaseDriver');
+        $sql = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from('#__modules')
+            ->where($db->qn('module') . ' = ' . $db->q('mod_j2store_menu'));
+        $db->setQuery($sql);
+        try
+        {
+            $count = $db->loadResult();
+
+            if($count > 0){
+                $sql = $db->getQuery(true)
+                    ->update($db->qn('#__modules'))
+                    ->set($db->qn('published') . ' = ' . $db->q(0))
+                    ->where($db->qn('module') . ' = ' . $db->q('mod_j2store_menu'));
+                $db->setQuery($sql);
+                $db->execute();
             }
+        }
+        catch (Exception $exc)
+        {
+
         }
     }
 
@@ -235,7 +223,8 @@ class J2StorePlatform {
         throw new Exception($message, $code);
     }
 
-    public function getMyprofileUrl($params = array(),$is_xml = false,$no_sef = false){
+    public function getMyprofileUrl($params = array(),$is_xml = false,$no_sef = false)
+    {
         require_once 'router.php';
         $qoptions = array(
             'option' => 'com_j2store',
@@ -251,12 +240,13 @@ class J2StorePlatform {
             $url .= '&Itemid='.$active->id;
         }
         if(!$no_sef){
-            $url = JRoute::link('site',$url,$is_xml);
+            $url = Route::link('site',$url,$is_xml);
         }
         return $url;
     }
 
-    public function getCheckoutUrl($params = array()){
+    public function getCheckoutUrl($params = array())
+    {
         require_once 'router.php';
         $qoptions = array(
             'option' => 'com_j2store',
@@ -267,10 +257,11 @@ class J2StorePlatform {
         if(isset($active) && is_object($active) && $active->id){
             $item_id = '&Itemid='.$active->id;
         }
-        return JRoute::link('site','index.php?option=com_j2store&view=checkout&'.http_build_query($params).$item_id,false);
+        return Route::link('site','index.php?option=com_j2store&view=checkout&'.http_build_query($params).$item_id,false);
     }
 
-    function getThankyouPageUrl($params = array()){
+    function getThankyouPageUrl($params = array())
+    {
         require_once 'router.php';
         $qoptions = array(
             'option' => 'com_j2store',
@@ -290,10 +281,11 @@ class J2StorePlatform {
                 $item_id = '&Itemid='.$active->id;
             }
         }
-        return JRoute::link('site','index.php?option=com_j2store&view=checkout&layout=postpayment&task=confirmPayment&'.http_build_query($params).$item_id,false);
+        return Route::link('site','index.php?option=com_j2store&view=checkout&layout=postpayment&task=confirmPayment&'.http_build_query($params).$item_id,false);
     }
 
-    public function getCartUrl($params = array()){
+    public function getCartUrl($params = array())
+    {
         require_once 'router.php';
         $qoptions = array(
             'option' => 'com_j2store',
@@ -304,16 +296,17 @@ class J2StorePlatform {
         if(isset($active) && is_object($active) && $active->id){
             $item_id = '&Itemid='.$active->id;
         }
-        return JRoute::link('site','index.php?option=com_j2store&view=carts&'.http_build_query($params).$item_id,false);
+        return Route::link('site','index.php?option=com_j2store&view=carts&'.http_build_query($params).$item_id,false);
     }
 
-    function getProductUrl($params = array(),$is_tag_view = false){
+    function getProductUrl($params = array(),$is_tag_view = false)
+    {
         require_once 'router.php';
         $qoptions = array(
             'option' => 'com_j2store',
         );
         $view = $this->application()->input->get('view','');
-        if($view == 'producttags'){
+        if($view === 'producttags'){
             $qoptions['view'] = 'producttags';
         }elseif($is_tag_view){
             $qoptions['view'] = 'producttags';
@@ -322,7 +315,7 @@ class J2StorePlatform {
         }
         $qoptions = array_merge($qoptions,$params);
 
-        if($qoptions['view'] == 'producttags'){
+        if($qoptions['view'] === 'producttags'){
             $active = J2StoreRouterHelper::findProductTagsMenu( $qoptions );
         }else{
             $active = J2StoreRouterHelper::findProductMenu( $qoptions );
@@ -331,12 +324,13 @@ class J2StorePlatform {
         if(isset($active) && is_object($active) && $active->id){
             $item_id = '&Itemid='.$active->id;
         }
-        return JRoute::link('site','index.php?option=com_j2store&view='.$qoptions['view'].'&'.http_build_query($params).$item_id,false);
+        return Route::link('site','index.php?option=com_j2store&view='.$qoptions['view'].'&'.http_build_query($params).$item_id,false);
     }
 
-    function getRootUrl(){
-        $rootURL = rtrim(JURI::base(),'/');
-        $subpathURL = JURI::base(true);
+    function getRootUrl()
+    {
+        $rootURL = rtrim(Uri::base(),'/');
+        $subpathURL = Uri::base(true);
         if(!empty($subpathURL) && ($subpathURL != '/')) {
             $rootURL = substr($rootURL, 0, -1 * strlen($subpathURL));
         }
@@ -345,8 +339,8 @@ class J2StorePlatform {
 
     public function getRegistry($json,$is_array = false)
     {
-        if (!$json instanceof JRegistry || !$json instanceof \Joomla\Registry\Registry) {
-            $params = new JRegistry();
+        if (!$json instanceof Registry) {
+            $params = new Registry();
             try {
                 if($is_array){
                     $params->loadArray($json);
@@ -354,7 +348,7 @@ class J2StorePlatform {
                     $params->loadString($json);
                 }
             } catch (\Exception $e) {
-                $params = new JRegistry('{}');
+                $params = new Registry('{}');
             }
         } else {
             $params = $json;
@@ -377,65 +371,27 @@ class J2StorePlatform {
         return false;
     }
 
-    public function getLabel($label_info = ''){
+    public function getLabel($label_info = '')
+    {
         $label_class = 'badge bg-';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $label_class = 'label label-';
-        }
         return $label_class.$label_info;
     }
-    public function getMenuLinks(){
-        if(version_compare(JVERSION,'3.99.99','lt')){
-            JLoader::register('MenusHelper', JPATH_ADMINISTRATOR . '/components/com_menus/helpers/menus.php');
-            $items = MenusHelper::getMenuLinks();
-        }else{
-            $items = \Joomla\Component\Menus\Administrator\Helper\MenusHelper::getMenuLinks();
-        }
-        return $items;
+
+    public function getMenuLinks()
+    {
+        return MenusHelper::getMenuLinks();
     }
 
-    public function eventTrigger($event_name,$args){
-        if(version_compare(JVERSION,'3.99.99','lt')){
-            JPluginHelper::importPlugin('j2store');
-            $allowed_plugins = $this->eventJ2Store4('onJ2StoreIsJ2Store4');
-            $event_dispactor = \JEventDispatcher::getInstance();
-            $observers = $event_dispactor->get('_observers');
-            $need_to_remove = array();
-            $test = array();
-            foreach ($observers as $handle_id => $observer) {
-                if (is_object($observer) && $handle_id > 0) {
-                    $type = $observer->get('_type');
-                    $element = $observer->get('_name');
-                    // $test[$handle_id] = $element;
-                    if (isset($element) && !in_array($element, $allowed_plugins) && $type == 'j2store') {
-                        $need_to_remove[] = $handle_id;
-                        //$test[$handle_id] = $element;
-                    }
-                }
-            }
-            $methods = $event_dispactor->get('_methods');
-            if (!empty($need_to_remove) && array_key_exists(strtolower($event_name), $methods)) {
-                foreach ($need_to_remove as $remove_id) {
-                    if (in_array($remove_id, $need_to_remove) && in_array($remove_id, $methods[strtolower($event_name)])) {
-                        $key = array_search($remove_id, $methods[strtolower($event_name)]);
-                        unset($methods[strtolower($event_name)][$key]);
-                        // echo "<pre>".$key.'<br>'.$remove_id.'<br>'.$event_name.'<br>'.$test[$remove_id].'<br></pre>';
-                    }
-                }
-            }
-            $event_dispactor->set('_methods', $methods);
-            $results = $event_dispactor->trigger($event_name, $args);
-        } else {
-            $results = $this->application()->triggerEvent($event_name, $args);
-        }
-
-        return $results;
+    public function eventTrigger($event_name,$args): array
+    {
+        return $this->application()->triggerEvent($event_name, $args);
     }
 
-    public function eventJ2Store4($eventName){
+    public function eventJ2Store4($eventName)
+    {
         $plugin_helper = J2Store::plugin();
         $return = array();
-        $db = JFactory::getDBO();
+        $db = Factory::getContainer()->get('DatabaseDriver');
         $order_query = " ORDER BY ordering ASC ";
         $query = "SELECT * FROM #__extensions WHERE  enabled = '1' AND folder=".$db->q('j2store')." AND type='plugin' {$order_query}";
         $db->setQuery( $query );
@@ -450,8 +406,8 @@ class J2StorePlatform {
                 }
             }
         }
-        JPluginHelper::importPlugin('j2store');
-        $app = JFactory::getApplication();
+        PluginHelper::importPlugin('j2store');
+        $app = Factory::getApplication();
         $app->triggerEvent('onJ2StoreAfterGetPluginsWithEvent', array(&$return));
         return $return;
     }
