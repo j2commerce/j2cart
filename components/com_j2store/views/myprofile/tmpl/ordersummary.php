@@ -44,7 +44,7 @@ $currency = J2Store::currency();
 						<?php if($this->params->get('show_price_field', 1)): ?>
 
 							<span class="cart-product-unit-price">
-								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>								
+								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>
 								<span class="cart-item-value">
 									<?php echo $currency->format($this->order->get_formatted_order_lineitem_price($item, $this->params->get('checkout_price_display_options', 1)), $this->order->currency_code, $this->order->currency_value);?>
 								</span>
@@ -61,18 +61,18 @@ $currency = J2Store::currency();
 						<?php endif; ?>
                         <?php if($back_order_text):?>
                             <br>
-                            <span class="label label-inverse"><?php echo JText::_($back_order_text);?></span>
+                            <span class="label badge label-inverse text-bg-dark"><?php echo JText::_($back_order_text);?></span>
                         <?php endif;?>
 						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitleInOrder', array($item, $this->order, $this->params));?>
 					</td>
 					<td><?php echo $item->orderitem_quantity; ?></td>
 					<td class="cart-line-subtotal">
-						<?php echo $currency->format($this->order->get_formatted_lineitem_total($item, $this->params->get('checkout_price_display_options', 1)), $this->order->currency_code, $this->order->currency_value ); ?>					
+						<?php echo $currency->format($this->order->get_formatted_lineitem_total($item, $this->params->get('checkout_price_display_options', 1)), $this->order->currency_code, $this->order->currency_value ); ?>
 					</td>
 				</tr>
 				<?php endforeach; ?>
 			</tbody>
-			
+
 			<tfoot class="cart-footer">
 				<?php if($totals = $this->order->get_formatted_order_totals()): ?>
 					<?php foreach($totals as $total): ?>
@@ -82,6 +82,6 @@ $currency = J2Store::currency();
 						</tr>
 					<?php endforeach; ?>
 				<?php endif; ?>
-			</tfoot>	
+			</tfoot>
 		</table>
 

@@ -24,14 +24,14 @@ class JFormFieldCouponExpireText extends F0FFormFieldText
 		if($diff->format("%R%a")==0)
 		{
 			$text = JText::sprintf('COM_J2STORE_COUPON_WILL_EXPIRE_TODAY',$diff->format("%a").' day (s) ');
-			$html ='<label class="label label-info" '.$style.'>'.$text.'</label>';
+			$html ='<label class="label badge label-info text-bg-info" '.$style.'>'.$text.'</label>';
 		}elseif($diff->format("%R%a")<=0)
 		{
 			$text = JText::sprintf('COM_J2STORE_COUPON_EXPIRED_BEFORE_DAYS',$diff->format("%a").' day (s) ');
-			$html ='<label class="label label-warning" '.$style.'>'.$text.'</label>';
+			$html ='<label class="label badge label-warning text-bg-warning" '.$style.'>'.$text.'</label>';
 		}else{
 			$text = JText::sprintf('COM_J2STORE_COUPON_WILL_EXPIRE_WITH_DAYS',$diff->format("%a").' day (s) ');
-			$html ='<label class="label label-success" '.$style.'>'.$text.'</label>';
+			$html ='<label class="label badge label-success text-bg-success" '.$style.'>'.$text.'</label>';
 		}
 		return $html;
 	}

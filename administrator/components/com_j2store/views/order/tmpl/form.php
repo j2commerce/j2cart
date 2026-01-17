@@ -31,7 +31,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		<div class="<?php echo $row_class ?>">
 			<div class="<?php echo $col_class ?>8">
 				<h2 class="invoice-text-muted"><?php echo JText::_('J2STORE_INVOICE'); ?>&nbsp; <?php echo $this->item->getInvoiceNumber(); ?>
-				<sup class="label <?php echo $this->item->orderstatus_cssclass;?> order-state-label">
+				<sup class="label badge <?php echo $this->item->orderstatus_cssclass;?> order-state-label">
 					<?php echo JText::_($this->item->orderstatus_name);?>
 				</sup>
 				</h2>
@@ -39,7 +39,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 			</div>
 			<div class="<?php echo $col_class ?>4">
 			<?php if($this->item->user_id == 0): ?>
-				<label class="label label-warning"><?php echo JText::_('J2STORE_GUEST')?></label>
+				<label class="label badge label-warning text-bg-warning"><?php echo JText::_('J2STORE_GUEST')?></label>
 				<br>
 				<small class="muted">(<?php echo JText::_('J2STORE_UNIQUE_TOKEN'); ?>: <?php echo $this->item->token;?>)</small>
 				<?php endif;?>

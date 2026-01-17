@@ -23,11 +23,11 @@ class JFormFieldCoreFieldtypes extends F0FFormFieldText
 
 	public function getRepeatable()
 	{
-		$html ='<label class="label label-warning">'.JText::_('J2STORE_CUSTOM_FIELDS_NOT_CORE').'</label>';
+		$html ='<label class="label badge label-warning text-bg-warning">'.JText::_('J2STORE_CUSTOM_FIELDS_NOT_CORE').'</label>';
 		if(isset($this->item->orderstatus_core) && $this->item->orderstatus_core ){
-			$html='<label class="label label-success">'.JText::_('J2STORE_CUSTOM_FIELDS_CORE').'</label>';
+			$html='<label class="label badge label-success text-bg-success">'.JText::_('J2STORE_CUSTOM_FIELDS_CORE').'</label>';
 			}elseif(isset($this->item->field_core) && $this->item->field_core){
-			$html='<label class="label label-success">'.JText::_('J2STORE_CUSTOM_FIELDS_CORE').'</label>';
+			$html='<label class="label badge label-success text-bg-success">'.JText::_('J2STORE_CUSTOM_FIELDS_CORE').'</label>';
 		}
 		return $html;
 	}

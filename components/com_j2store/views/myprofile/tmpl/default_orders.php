@@ -39,11 +39,11 @@ J2Store::strapper()->addFontAwesome();
                     <td><?php echo $currency->format($order->get_formatted_grandtotal()); ?></td>
                     <td>
                         <?php if(isset($item->orderstatus_name) && !empty($item->orderstatus_name)) : ?>
-                            <label class="label <?php echo $item->orderstatus_cssclass;?>">
+                            <label class="label badge <?php echo $item->orderstatus_cssclass;?>">
                                 <?php echo JText::_($item->orderstatus_name);?>
                             </label>
                         <?php else: //legacy compatibility ?>
-                            <label class="label">
+                            <label class="label badge">
                                 <?php echo JText::_($item->order_state);?>
                             </label>
                         <?php endif; ?>

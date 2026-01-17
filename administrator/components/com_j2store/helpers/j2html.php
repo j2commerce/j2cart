@@ -1731,38 +1731,15 @@ jQuery('.modal-backdrop').remove();
     }
     public static function orderStatusList($item)
     {
-
-            $success_class = 'badge bg-success';
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $success_class = 'label label-success';
-        }
+        $success_class = 'label badge label-success text-bg-success';
         $html ='';
         if($item->orderstatus_id != '*'){
-            if (version_compare(JVERSION, '3.99.99', 'lt')) {
-                $orderstatus = F0FTable::getAnInstance('Orderstatus', 'J2StoreTable');
-                $orderstatus->load($item->orderstatus_id);
-                $html = '<label class="label">' . Text::_($orderstatus->orderstatus_name);
-                if (isset($orderstatus->orderstatus_cssclass) && $orderstatus->orderstatus_cssclass) {
-                    $html = '<label class="label ' . $orderstatus->orderstatus_cssclass . '">' . Text::_($orderstatus->orderstatus_name);
-                }
-            }else if (version_compare(JVERSION, '3.99.99', 'ge')) {
-                $orderstatus = F0FTable::getAnInstance('Orderstatus', 'J2StoreTable');
-                $orderstatus->load($item->orderstatus_id);
-                $html = '<label class="label">' . Text::_($orderstatus->orderstatus_name);
-                if (isset($orderstatus->orderstatus_cssclass) && $orderstatus->orderstatus_cssclass) {
-                    if($orderstatus->orderstatus_cssclass == 'label-success'){
-                        $label_class = 'badge bg-success';
-                    }else if($orderstatus->orderstatus_cssclass == 'label-warning'){
-                        $label_class = 'badge bg-warning';
-                    }else if($orderstatus->orderstatus_cssclass == 'label-important'){
-                        $label_class = 'badge bg-important';
-                    }else if($orderstatus->orderstatus_cssclass == 'label-info'){
-                        $label_class = 'badge bg-info';
-                    }
-                    $html = '<label class="' .$label_class. '">' . Text::_($orderstatus->orderstatus_name);
-                }
+            $orderstatus = F0FTable::getAnInstance('Orderstatus', 'J2StoreTable');
+            $orderstatus->load($item->orderstatus_id);
+            $html = '<label class="label badge">' . Text::_($orderstatus->orderstatus_name);
+            if (isset($orderstatus->orderstatus_cssclass) && $orderstatus->orderstatus_cssclass) {
+                $html = '<label class="label badge ' . $orderstatus->orderstatus_cssclass . '">' . Text::_($orderstatus->orderstatus_name);
             }
-
         }else{
             $html ='<label class="'.$success_class.'">'.Text::_('J2STORE_ALL');
         }
@@ -1785,23 +1762,16 @@ jQuery('.modal-backdrop').remove();
         return '<a href="'.$url.'">'.$text.'</a>';
     }
 
-    public static function fieldCore($name, $field, $item){
-
-        if(version_compare(JVERSION,'3.99.99','lt')){
-            $html ='<label class="label label-warning">'.Text::_('J2STORE_CUSTOM_FIELDS_NOT_CORE').'</label>';
-            if(isset($item->$name) && $item->$name){
-                $html = '<label class="label label-success">'.Text::_('J2STORE_CUSTOM_FIELDS_CORE').'</label>';
-            }
-        }elseif(version_compare(JVERSION,'3.99.99','ge')){
-            $html ='<label class="badge bg-warning">'.Text::_('J2STORE_CUSTOM_FIELDS_NOT_CORE').'</label>';
-            if(isset($item->$name) && $item->$name){
-                $html = '<label class="badge bg-success">'.Text::_('J2STORE_CUSTOM_FIELDS_CORE').'</label>';
-            }
+    public static function fieldCore($name, $field, $item)
+    {
+        $html ='<label class="badge text-bg-warning">'.Text::_('J2STORE_CUSTOM_FIELDS_NOT_CORE').'</label>';
+        if(isset($item->$name) && $item->$name){
+            $html = '<label class="badge text-bg-success">'.Text::_('J2STORE_CUSTOM_FIELDS_CORE').'</label>';
         }
-
 
         return $html;
     }
+
 	public static function calculateDaysFromStartDate($customer_start_date)
 	{
 		$startDate = new DateTime($customer_start_date);

@@ -557,28 +557,28 @@ class F0FFormFieldRules extends JFormFieldRules implements F0FFormField
                     {
                         if ($inheritedRule === null)
                         {
-                            $html[] = '<span class="label label-important">' . JText::_('JLIB_RULES_NOT_ALLOWED') . '</span>';
+                            $html[] = '<span class="label badge label-important text-bg-danger">' . JText::_('JLIB_RULES_NOT_ALLOWED') . '</span>';
                         }
                         elseif ($inheritedRule === true)
                         {
-                            $html[] = '<span class="label label-success">' . JText::_('JLIB_RULES_ALLOWED') . '</span>';
+                            $html[] = '<span class="label badge label-success text-bg-success">' . JText::_('JLIB_RULES_ALLOWED') . '</span>';
                         }
                         elseif ($inheritedRule === false)
                         {
                             if ($assetRule === false)
                             {
-                                $html[] = '<span class="label label-important">' . JText::_('JLIB_RULES_NOT_ALLOWED') . '</span>';
+                                $html[] = '<span class="label badge label-important text-bg-danger">' . JText::_('JLIB_RULES_NOT_ALLOWED') . '</span>';
                             }
                             else
                             {
-                                $html[] = '<span class="label"><i class="icon-lock icon-white"></i> ' . JText::_('JLIB_RULES_NOT_ALLOWED_LOCKED')
+                                $html[] = '<span class="label badge"><i class="icon-lock icon-white"></i> ' . JText::_('JLIB_RULES_NOT_ALLOWED_LOCKED')
                                     . '</span>';
                             }
                         }
                     }
                     elseif (!empty($component))
                     {
-                        $html[] = '<span class="label label-success"><i class="icon-lock icon-white"></i> ' . JText::_('JLIB_RULES_ALLOWED_ADMIN')
+                        $html[] = '<span class="label badge label-success text-bg-success"><i class="icon-lock icon-white"></i> ' . JText::_('JLIB_RULES_ALLOWED_ADMIN')
                             . '</span>';
                     }
                     else
@@ -587,17 +587,17 @@ class F0FFormFieldRules extends JFormFieldRules implements F0FFormField
                         // The admin rights can be changed.
                         if ($action->name === 'core.admin')
                         {
-                            $html[] = '<span class="label label-success">' . JText::_('JLIB_RULES_ALLOWED') . '</span>';
+                            $html[] = '<span class="label badge label-success text-bg-success">' . JText::_('JLIB_RULES_ALLOWED') . '</span>';
                         }
                         elseif ($inheritedRule === false)
                         {
                             // Other actions cannot be changed.
-                            $html[] = '<span class="label label-important"><i class="icon-lock icon-white"></i> '
+                            $html[] = '<span class="label badge label-important text-bg-danger"><i class="icon-lock icon-white"></i> '
                                 . JText::_('JLIB_RULES_NOT_ALLOWED_ADMIN_CONFLICT') . '</span>';
                         }
                         else
                         {
-                            $html[] = '<span class="label label-success"><i class="icon-lock icon-white"></i> ' . JText::_('JLIB_RULES_ALLOWED_ADMIN')
+                            $html[] = '<span class="label badge label-success text-bg-success"><i class="icon-lock icon-white"></i> ' . JText::_('JLIB_RULES_ALLOWED_ADMIN')
                                 . '</span>';
                         }
                     }
