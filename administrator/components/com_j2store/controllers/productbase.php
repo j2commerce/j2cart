@@ -1318,13 +1318,12 @@ class J2StoreControllerProductsBase extends F0FController
             $html .= '<input type="hidden" name="product_id" id="product_id" value="' . $data['product_id'] . '"/>';
             echo $html;
 
-            $headData = $document->getHeadData();
-            $scripts = $headData['scripts'];
-            unset($scripts[JUri::root(true) . '/media/j2store/js/j2store.js']);
-            $headData['scripts'] = $scripts;
-            $document->setHeadData($headData);
-            $platform->addScript('j2store_admin','/media/j2store/js/j2store_admin.js');
-           // $document->addScript(JUri::root(true) . '/media/j2store/js/j2store_admin.js');
+            $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+            if ($wa->assetExists('script', 'j2store-script')) {
+                $wa->disableScript('j2store-script');
+            }
+
+            $platform->addScript('j2store-admin-script','j2store/j2store_admin.js', ['relative' => true, 'version' => 'auto'], [], ['jquery']);
         }
     }
 }
