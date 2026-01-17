@@ -1,11 +1,14 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (c) 2024 J2Commerce
- * @license GNU GPL v3 or later
+ * @package     Joomla.Component
+ * @subpackage  J2Store
+ *
+ * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (C) 2024-26 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
-// No direct access to this file
+
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
@@ -34,14 +37,22 @@ class J2Help {
 		return self::$instance;
 	}
 
-  public function watch_video_tutorials() { // update later with j2commerce youtube channel
-    $video_url = J2Store::buildHelpLink('support/video-tutorials.html', 'dashboard');
-    $html = '<div class="video-tutorial panel panel-solid-info">
-				<p class="panel-body">'.Text::_('J2STORE_VIDEO_TUTORIALS_HELP_TEXT').'
-						 				<a class="btn btn-success" target="_blank" href="'.$video_url.'">
-						 					'.Text::_('J2STORE_WATCH').'</a>
-						 			</p>
-						 		</div>';
+    public function watch_video_tutorials()
+    {
+        $html = '';
+
+        $video_url = 'https://www.youtube.com/@j2commerce';
+
+        $html .= '<div class="video-tutorial panel panel-solid-info alert alert-info" role="alert">';
+        $html .= '<span class="me-2">';
+        $html .= '<span class="fas fa-solid fa-info-circle flex-shrink-0 me-2" area-hidden="true"></span>';
+        $html .= Text::_('J2STORE_VIDEO_TUTORIALS_HELP_TEXT');
+        $html .= '</span>';
+        $html .= '<a class="btn btn-sm btn-primary text-light text-nowrap" target="_blank" href="' . $video_url . '">';
+        $html .= Text::_('J2STORE_WATCH');
+        $html .= '</a>';
+        $html .= '</div>';
+
     return $html;
   }
 
@@ -50,13 +61,19 @@ class J2Help {
 		if ( J2Store::isPro() ) {
 			return $html;
 		}
-		$free_topbar_url = J2Store::buildHelpLink('/j2store-pro-features.html', 'dashboard');
-		$html = '<div class="video-tutorial free-topbar panel panel-solid-info">
-				<p class="panel-body">'.Text::_('J2STORE_FREE_TOPBAR_HELP_TEXT').'
-						 				<a class="btn btn-success" target="_blank" href="'.$free_topbar_url.'">
-						 					'.Text::_('J2STORE_UPGRADE_PRO').'</a>
-						 			</p>
-						 		</div>';
+
+        $free_topbar_url = J2Store::buildSiteLink('download', 'prolink');
+
+        $html .= '<div class="free-topbar panel panel-solid-info alert alert-info" role="alert">';
+        $html .= '<span class="me-2">';
+        $html .= '<span class="fas fa-solid fa-info-circle flex-shrink-0 me-2" area-hidden="true"></span>';
+        $html .= Text::_('J2STORE_FREE_TOPBAR_HELP_TEXT');
+        $html .= '</span>';
+        $html .= '<a class="btn btn-sm btn-primary text-light text-nowrap" target="_blank" href="' . $free_topbar_url . '">';
+        $html .= Text::_('J2STORE_UPGRADE_PRO');
+        $html .= '</a>';
+        $html .= '</div>';
+
 		return $html;
 	}
 
@@ -66,23 +83,17 @@ class J2Help {
 
 	    $type = 'j2commerce_isnew';
 
-	    //check if this alert to be shown.
+        // Check if this alert to be shown.
 	    $params = J2Store::config();
 	    if ($params->get($type, 0)) {
 	        return $html;
 	    }
 
-	    if (version_compare(JVERSION,'3.99.99','lt')) {
-	        $class = 'alert alert-block';
-	    } else {
-	        $class = 'alert alert-info';
-	    }
-
 	    $url = Route::_ ('index.php?option=com_j2store&view=cpanels&task=notifications&message_type=' . $type . '&' . Session::getFormToken() . '=1');
 
-	    $html .= '<div class="user-notifications ' . $type . ' ' . $class . '" role="alert">';
+        $html .= '<div class="user-notifications alert alert-info ' . $type . '" role="alert">';
 	    $html .= '<p>';
-	    $html .= '<span class="fas fa-solid fa-info-circle flex-shrink-0 me-2"></span>';
+        $html .= '<span class="fas fa-solid fa-info-circle flex-shrink-0 me-2" area-hidden="true"></span>';
 	    $html .= Text::_('J2STORE_TAKEOVER_INFO');
 	    $html .= '</p>';
 	    $html .= '<a class="btn btn-sm btn-dark text-light text-nowrap me-3" href="' . $url . '">' . Text::_('J2STORE_GOT_IT_AND_HIDE') . '</a>';
@@ -96,20 +107,18 @@ class J2Help {
 
 		$html = '';
 
-		//check if this alert to be shown.
+        // Check if this alert to be shown.
 		$params = J2Store::config();
-		if($params->get($type, 0)) return $html;
-        if(version_compare(JVERSION,'3.99.99','lt')){
-            $class = 'alert alert-block';
-        }else{
-            $class = 'alert alert-info';
+        if ($params->get($type, 0)) {
+            return $html;
         }
-		//message not hidden
+
 		$url = Route::_ ( 'index.php?option=com_j2store&view=cpanels&task=notifications&message_type=' . $type . '&' . Session::getFormToken() . '=1' );
-		$html .= '<div class="user-notifications ' . $type . ' '.$class.'">';
-		$html .= '<h3>' . $title . '</h3>';
+
+        $html .= '<div class="user-notifications alert alert-info ' . $type . '" role="alert">';
+        $html .= '<h4 class="alert-heading">' . $title . '</h4>';
 		$html .= '<p>' . $message . '</p>';
-		$html .= '<a class="btn btn-sm btn-danger text-light text-nowrap" href="' . $url . '">' . Text::_ ( 'J2STORE_GOT_IT_AND_HIDE' ) . '</a>';
+        $html .= '<a class="btn btn-sm btn-dark text-light text-nowrap" href="' . $url . '">' . Text::_('J2STORE_GOT_IT_AND_HIDE') . '</a>';
 		$html .= '</div>';
 
 		return $html;
@@ -118,10 +127,11 @@ class J2Help {
 	public function alert_with_static_message($type, $title, $message) {
 
 		$html = '';
-		//message not hidden
-		$html .= '<div class="user-notifications alert alert-info alert-' . $type . ' ">';
-		$html .= '<h3>' . $title . '</h3>';
-		$html .= '<p><strong>' . $message . '</strong></p>';
+
+        // Message never hidden
+        $html .= '<div class="user-notifications alert alert-' . $type . '" role="alert">';
+        $html .= '<h4 class="alert-heading">' . $title . '</h4>';
+        $html .= '<p>' . $message . '</p>';
 		$html .= '</div>';
 
 		return $html;

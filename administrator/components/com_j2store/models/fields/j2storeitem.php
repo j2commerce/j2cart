@@ -73,7 +73,7 @@ class JFormFieldJ2storeitem extends  JFormField
 				;
 
         $platform->addInlineScript($js);
-        $platform->addStyle($js);
+        $platform->addInlineStyle($css);
 //		JFactory::getDocument()->addScriptDeclaration($js);
 //		JFactory::getDocument()->addStyleDeclaration($css);
 		$html .=JHTML::_('behavior.modal', 'a.modal');

@@ -21,7 +21,7 @@ $platform->loadExtra('behavior.tooltip');
 $platform->loadExtra('behavior.multiselect');
 $platform->loadExtra('dropdown.init');
 
-JHtml::_('script', 'media/j2store/js/j2store.js', false, false);
+$platform->loadCoreScript();
 ?>
 
 <script type="text/javascript">

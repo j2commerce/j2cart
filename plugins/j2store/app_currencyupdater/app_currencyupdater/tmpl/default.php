@@ -21,12 +21,10 @@ $platform->loadExtra('behavior.tooltip');
 $platform->loadExtra('behavior.multiselect');
 $platform->loadExtra('dropdown.init');
 
-JHtml::_('script', 'media/j2store/js/j2store.js', false, false);
+$platform->loadCoreScript();
+
 $row_class = 'row';
 $col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';}
 ?>
 
 <script type="text/javascript">

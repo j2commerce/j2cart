@@ -22,6 +22,7 @@ $page_heading_text = $page_heading->get('page_heading','');
     </div>
 <?php endif; ?>
 <?php echo J2Store::modules()->loadposition('j2store-cart-top'); ?>
+<?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayCartHtml', array($this->order)); ?>
 <div class="j2store">
 	<div class="j2store-cart">
 		<?php if(count($this->items)): ?>
@@ -99,4 +100,5 @@ $page_heading_text = $page_heading->get('page_heading','');
 		<?php endif; ?>
 	</div>
 </div>
+<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayCartHtml', array($this->order)); ?>
 <?php echo J2Store::modules()->loadposition('j2store-cart-bottom'); ?>

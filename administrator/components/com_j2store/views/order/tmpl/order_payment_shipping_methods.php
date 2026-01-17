@@ -9,7 +9,7 @@ defined('_JEXEC') or die;
 $platform = J2Store::platform();
 ?>
 <div class="j2store-shipping " id="shippingcost-pane">
-	<div id="onCheckoutShipping_wrapper">		
+	<div id="onCheckoutShipping_wrapper">
 		<h3>
 			<?php echo JText::_('J2STORE_ENTER_SHIPPING_DETAILS'); ?>
 		</h3>
@@ -34,7 +34,7 @@ $platform = J2Store::platform();
 					</td>
 				</tr>
 			</tbody>
-		</table>				
+		</table>
 	</div>
 </div>
 <div id='onCheckoutPayment_wrapper'>
@@ -42,6 +42,7 @@ $platform = J2Store::platform();
 		<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>
 	</h3>
 	<?php if (!empty($this->paymentplugins)): ?>
+	<?php $singlePlugin = (count($this->paymentplugins) === 1); ?>
 	<?php foreach ($this->paymentplugins as $plugin): ?>
 	<?php
 	$params= $platform->getRegistry($plugin->params);
@@ -49,14 +50,15 @@ $platform = J2Store::platform();
 	?>
 	<?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayPaymentMethod',array($plugin->element, $this->order)); ?>
 	<label class="payment-plugin-image-label <?php echo $plugin->element; ?>">
-			<?php if($this->order->orderpayment_type && $this->order->orderpayment_type == $plugin->element):?>
-			<input	value="<?php echo $plugin->element; ?>" class="payment_plugin" name="payment_plugin" type="radio"
+        <?php if($this->order->orderpayment_type && $this->order->orderpayment_type == $plugin->element):?>
+            <input	value="<?php echo $plugin->element; ?>" class="payment_plugin" name="payment_plugin" type="radio"
 				onclick="j2storeGetPaymentForm('<?php echo $plugin->element; ?>', 'payment_form_div');"
 				checked="checked" />
-			<?php else:?>
-			<input	value="<?php echo $plugin->element; ?>" class="payment_plugin" name="payment_plugin" type="radio"
-					onclick="j2storeGetPaymentForm('<?php echo $plugin->element; ?>', 'payment_form_div');"
-				<?php echo (!empty($plugin->checked)) ? "checked" : ""; ?> 	title="<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>" />
+        <?php else:?>
+            <input	value="<?php echo $plugin->element; ?>" class="payment_plugin" name="payment_plugin" type="radio"
+                onclick="j2storeGetPaymentForm('<?php echo $plugin->element; ?>', 'payment_form_div');"
+				<?php echo (!empty($plugin->checked) || $singlePlugin) ? 'checked="checked"' : ""; ?>
+                title="<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>" />
 		<?php endif;?>
 		<?php if(!empty($image)): ?>
 
@@ -89,3 +91,13 @@ $platform = J2Store::platform();
 	?>
 
 </div>
+
+<script type="text/javascript">
+	// Auto-load payment form for pre-checked plugin on page init
+	document.addEventListener('DOMContentLoaded', function() {
+		var checkedPlugin = document.querySelector('input.payment_plugin:checked');
+		if (checkedPlugin && typeof j2storeGetPaymentForm === 'function') {
+			j2storeGetPaymentForm(checkedPlugin.value, 'payment_form_div');
+		}
+	});
+</script>

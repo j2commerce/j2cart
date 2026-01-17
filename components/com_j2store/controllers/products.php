@@ -5,6 +5,7 @@
  * @license GNU GPL v3 or later
  */
 // No direct access to this file
+use Joomla\CMS\Factory;
 use Joomla\Registry\Format\Json;
 
 defined('_JEXEC') or die;
@@ -159,21 +160,19 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 			$this->processProducts($items);
 
 			$pagination = $model->getSFPagination();
-			//only do this if it is the default home page
-			if($active == $menus->getDefault($lang->getTag())) {
-				$post_data = $app->input->getArray($_GET);
 
-	            foreach($post_data as $key=>$value){
-	                if(is_array($value)){
-	                    foreach($value as $key_i=>$value_i){
-	                        //print_r($key_i);
-	                        $pagination->setAdditionalUrlParam($key.'['.$key_i.']',$value_i);
-	                    }
-	                }else{
-	                    $pagination->setAdditionalUrlParam($key,$value);
-	                }
-	            }
-			}
+            $pass_it_on = $this->input->getArray($_GET);
+
+            foreach($pass_it_on as $key=>$value){
+                if(is_array($value)){
+                    foreach($value as $key_i=>$value_i){
+                        $pagination->setAdditionalUrlParam($key.'['.$key_i.']',$value_i);
+                    }
+                }else{
+                    $pagination->setAdditionalUrlParam($key,$value);
+                }
+            }
+
             J2Store::plugin()->event('ViewProductListPagination', array(&$items, &$pagination, &$params, $model));
 			$view->assign('pagination', $pagination);
 		}
