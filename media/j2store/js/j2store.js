@@ -70,7 +70,7 @@ $( document ).on( 'click', '.j2store_add_to_cart_button', function(e) {
 
 		// Trigger event
 		$( 'body' ).trigger( 'adding_to_cart', [ $thisbutton, data ] );
-		
+
 		var href = $thisbutton.attr('href');
 		if(typeof href === 'undefined' || href === '') {
 			href = 'index.php';
@@ -90,16 +90,16 @@ $( document ).on( 'click', '.j2store_add_to_cart_button', function(e) {
 				window.location = response.product_url;
 				return;
 			}
-			
+
 			if (response['redirect']) {
 				window.location.href = response['redirect'];
 				return;
-			}				
+			}
 			if (response['success']) {
 			  $thisbutton.removeClass( 'loading' );
 			  // Changes button classes
 			  $thisbutton.addClass( 'added' );
-			  $thisbutton.parent().find('.cart-action-complete').show();			    
+			  $thisbutton.parent().find('.cart-action-complete').show();
 			  //if module is present, let us update it.
 			  $( 'body' ).trigger( 'after_adding_to_cart', [ $thisbutton, response, 'link'] );
 			   //doMiniCart();
@@ -107,7 +107,7 @@ $( document ).on( 'click', '.j2store_add_to_cart_button', function(e) {
 		}, 'json');
 
 		return false;
-	
+
 });
 })(j2store.jQuery);
 
@@ -115,10 +115,10 @@ $( document ).on( 'click', '.j2store_add_to_cart_button', function(e) {
 (function($) {
 	$(document).ready(function(){
 	$('.j2store-addtocart-form').each(function(){
-		$(this).submit(function(e) {	
+		$(this).submit(function(e) {
 		e.preventDefault();
 		var form = $(this);
-		
+
 		//this will help detect if the form is submitted via ajax or normal submit.
 		//sometimes people will submit the form before the DOM loads
 		form.find('input[name=\'ajax\']').val(1);
@@ -126,7 +126,7 @@ $( document ).on( 'click', '.j2store_add_to_cart_button', function(e) {
 		var values = form.find('input[type=\'text\'], input[type=\'number\'], input[type=\'hidden\'], input[type=\'radio\']:checked, input[type=\'checkbox\']:checked, select, textarea');
 		form.find('input[type=\'submit\']').val(form.find('input[type=\'submit\']').data('cart-action-always'));
 		form.find('input[type=\'submit\']').attr('disabled',true);
-		var href = form.attr('action');		
+		var href = form.attr('action');
 		if(typeof href == 'undefined' || href == '') {
 			var href = 'index.php';
 		}
@@ -138,17 +138,17 @@ $( document ).on( 'click', '.j2store_add_to_cart_button', function(e) {
 				type: 'post',
 				data: values,
 				dataType: 'json'
-					
+
 	 	 });
 
 	 	j2Ajax.done(function(json) {
 			    form.find('input[type=\'submit\']').attr('disabled',false);
 	 	 		form.find('.j2success, .j2warning, .j2attention, .j2information, .j2error').remove();
-				$('.j2store-notification').hide();				
+				$('.j2store-notification').hide();
 				if (json['error']) {
-					
+
 					form.find('input[type=\'submit\']').val(form.find('input[type=\'submit\']').data('cart-action-done'));
-					
+
 					if (json['error']['option']) {
 						for (i in json['error']['option']) {
 							form.find('#option-' + i).after('<span class="j2error">' + json['error']['option'][i] + '</span>');
@@ -157,40 +157,40 @@ $( document ).on( 'click', '.j2store_add_to_cart_button', function(e) {
 					if (json['error']['stock']) {
 						form.find('.j2store-notifications').html('<span class="j2error">' + json['error']['stock'] + '</span>');
 					}
-					
+
 					if (json['error']['general']) {
 						form.find('.j2store-notifications').html('<span class="j2error">' + json['error']['general'] + '</span>');
 					}
-					
+
 					if (json['error']['product']) {
 						form.find('.j2store-notifications').after('<span class="j2error">' + json['error']['product'] + '</span>');
 					}
-				}	
-				
+				}
+
 				if (json['redirect']) {
 					window.location.href = json['redirect'];
 					return;
 				}
-				
-				if (json['success']) {					
-					setTimeout(function() {						
+
+				if (json['success']) {
+					setTimeout(function() {
 						form.find('input[type=\'submit\']').val(form.find('input[type=\'submit\']').data('cart-action-done'));
 						form.find('.cart-action-complete').fadeIn('slow');
 					}, form.find('input[type=\'submit\']').data('cart-action-timeout'));
-					
-					$( 'body' ).trigger( 'after_adding_to_cart', [form, json, 'normal'] );	
+
+					$( 'body' ).trigger( 'after_adding_to_cart', [form, json, 'normal'] );
 					//if module is present, let us update it.
 					//	doMiniCart();
-				}				
-	 	})	 	
+				}
+	 	})
 	 	.fail(function( jqXHR, textStatus, errorThrown) {
 	 		form.find('input[type=\'submit\']').val(form.find('input[type=\'submit\']').data('cart-action-done'));
-	 		console.log(textStatus + errorThrown);	 		
+	 		console.log(textStatus + errorThrown);
 	 	})
 	 	.always(function(jqXHR, textStatus, errorThrown) {
-	 		//form.find('input[type=\'submit\']').val(form.find('input[type=\'submit\']').data('cart-action-always'));	 		
+	 		//form.find('input[type=\'submit\']').val(form.find('input[type=\'submit\']').data('cart-action-always'));
 	 	});
-		});	
+		});
 	});		//end of ajax call
   }); //end of document ready
 })(j2store.jQuery);
@@ -198,22 +198,22 @@ $( document ).on( 'click', '.j2store_add_to_cart_button', function(e) {
 
 (function($) {
 $(document).ready(function(){
-	
+
 	if ($('#j2store_shipping_make_same').length > 0) {
 		if ($('#j2store_shipping_make_same').is(':checked')) {
 			$('#j2store_shipping_section').css({'visible' : 'visible', 'display' : 'none'});
-			
+
 			$('#j2store_shipping_section').children(".input-label").removeClass("required");
-					
+
 			$('#j2store_shipping_section').children(".input-text").removeClass("required");
 		}
 	}
-	
+
 });
 })(j2store.jQuery);
 
 function doMiniCart() {
-(function($) {		
+(function($) {
 		var murl = j2storeURL
 			+ 'index.php?option=com_j2store&view=carts&task=ajaxmini';
 
@@ -223,11 +223,11 @@ function doMiniCart() {
 			cache : false,
 			contentType : 'application/json; charset=utf-8',
 			dataType : 'json',
-			success : function(json) {				
+			success : function(json) {
 				if (json != null && json['response']) {
 					$.each(json['response'], function(key, value) {
 						if ($('.j2store_cart_module_' + key).length) {
-							$('.j2store_cart_module_' + key).each(function() {							
+							$('.j2store_cart_module_' + key).each(function() {
 								$(this).html(value);
 							});
 						}
@@ -236,16 +236,16 @@ function doMiniCart() {
 			}
 
 		});
-	
+
 })(j2store.jQuery);
-	
+
 }
 
 function j2storeDoTask(url, container, form, msg, formdata) {
 
-	(function($) {		
+	(function($) {
 	//to make div compatible
-	container = '#'+container;	
+	container = '#'+container;
 
 	// if url is present, do validation
 	if (url && form) {
@@ -266,9 +266,9 @@ function j2storeDoTask(url, container, form, msg, formdata) {
              },
 			// data:{"elements":Json.toString(str)},
              success: function(json) {
-            	if ($(container).length > 0) {            		
+            	if ($(container).length > 0) {
             		$(container).html(json.msg);
-				}				
+				}
 				return true;
 			}
 		});
@@ -290,7 +290,7 @@ function j2storeDoTask(url, container, form, msg, formdata) {
              success: function(json) {
             	 if ($(container).length > 0) {
             		$(container).html(json.msg);
-				}				
+				}
 			}
 		});
 	}
@@ -299,7 +299,7 @@ function j2storeDoTask(url, container, form, msg, formdata) {
 
 function j2storeSetShippingRate(name, price, tax, extra, code, combined, ship_element, css_id )
 {
-	
+
 (function($) {
 	$("input[type='hidden'][name='shipping_name']").val(name);
 	$("input[type='hidden'][name='shipping_code']").val(code);
@@ -311,8 +311,8 @@ function j2storeSetShippingRate(name, price, tax, extra, code, combined, ship_el
 	$('#onCheckoutShipping_wrapper .'+css_id+'_select_text').show();
 })(j2store.jQuery);
 
-} 
-		
+}
+
 
 function doAjaxFilter(pov_id, product_id, po_id, id) {
 	(function($) {
@@ -320,11 +320,11 @@ function doAjaxFilter(pov_id, product_id, po_id, id) {
 		if (pov_id == '' || $('#ChildOptions' + po_id).length != 0) {
 			$('#ChildOptions' + po_id).html('');
 		}
-		
+
 		var form = $(id).closest('form');
 		//sanity check
-		if(form.data('product_id') != product_id) return;		
-		
+		if(form.data('product_id') != product_id) return;
+
 		var values = form.serializeArray();
 		// pop these params from values-> task : add & view : mycart
 		values.pop({
@@ -340,53 +340,53 @@ function doAjaxFilter(pov_id, product_id, po_id, id) {
 		values.push({
 			name : "product_id",
 			value :product_id
-		});	
-		
+		});
+
 		var arrayClean = function(thisArray) {
 		    "use strict";
 		    $.each(thisArray, function(index, item) {
 		        if (item.name == 'task' || item.name == 'view') {
-		            delete values[index];      
+		            delete values[index];
 		        }
 		    });
 		}
 		arrayClean(values);
-		
+
 		//variable check
 		if(form.data('product_type') == 'advancedvariable') {
-				
+
 				var csv = [];
-			form.find('input[type=\'radio\']:checked, select').each( function( index, el ) {	
-				if(el.value){					
-					if($(el).data('is-variant')){						
-						 csv.push(el.value);						 
+			form.find('input[type=\'radio\']:checked, select').each( function( index, el ) {
+				if(el.value){
+					if($(el).data('is-variant')){
+						 csv.push(el.value);
 					}
 				}
 			});
-						
-			//need to sort the csv array to make sure correct array orde passing			
-			
+
+			//need to sort the csv array to make sure correct array orde passing
+
 			var processed_csv =[];
-			processed_csv = csv.sort(function(a, b){return a-b});	
-			
+			processed_csv = csv.sort(function(a, b){return a-b});
+
 			var $selected_variant = processed_csv.join();
-			
+
 			//get all variants
-			//var $variants = form.data('product_variants');		
-			
-			
+			//var $variants = form.data('product_variants');
+
+
 			var $variants = form.data('product_variants');
-			
-			
-			var $variant_id = get_matching_variant($variants, $selected_variant);			
-			
-			form.find('input[name=\'variant_id\']').val($variant_id);		
-		
-			
+
+
+			var $variant_id = get_matching_variant($variants, $selected_variant);
+
+			form.find('input[name=\'variant_id\']').val($variant_id);
+
+
 				values.push({
 					name : "variant_id",
 					value :$variant_id
-				});		
+				});
 		}
 		values = values.filter(function( element ) {
 			return element !== undefined;
@@ -411,9 +411,9 @@ function doAjaxFilter(pov_id, product_id, po_id, id) {
 						$('.wait').remove();
 					},
 					success : function(response) {
-						
+
 						var $product = $('.product-'+ product_id);
-						
+
 						if ($product.length
 								&& typeof response.error == 'undefined') {
 
@@ -423,18 +423,18 @@ function doAjaxFilter(pov_id, product_id, po_id, id) {
 							}
 							//base price
 							if (response.pricing.base_price) {
-								$product.find('.base-price').html(response.pricing.base_price);						
+								$product.find('.base-price').html(response.pricing.base_price);
 							}
 							//price
 							if (response.pricing.price) {
 								$product.find('.sale-price').html(response.pricing.price);
 							}
-							
+
 							//afterDisplayPrice
 							if (response.afterDisplayPrice) {
 								$product.find('.afterDisplayPrice').html(response.afterDisplayPrice);
 							}
-							
+
 							//qty
 							if (response.quantity) {
 								$product.find('input[name="product_qty"]').val(response.quantity);
@@ -444,15 +444,15 @@ function doAjaxFilter(pov_id, product_id, po_id, id) {
 									});
 								}
 							}
-							
+
 							//dimensions
 							if (response.dimensions) {
-								$product.find('.product-dimensions').html(response.dimensions);						
+								$product.find('.product-dimensions').html(response.dimensions);
 							}
-							
+
 							//weight
 							if (response.weight) {
-								$product.find('.product-weight').html(response.weight);						
+								$product.find('.product-weight').html(response.weight);
 							}
 							// main image change
                             if(response.main_image){
@@ -473,18 +473,18 @@ function doAjaxFilter(pov_id, product_id, po_id, id) {
                             }
 
 							//stock status
-							
+
 							if (typeof response.stock_status != 'undefined') {
 								if (response.availability == 1) {
 									$product.find('.product-stock-container').html('<span class="instock">' + response.stock_status + '</span>');
 								}else {
 									$product.find('.product-stock-container').html('<span class="outofstock">' + response.stock_status + '</span>');
-								}	
+								}
 							}
-							
+
 							// option html
 							if (response.optionhtml) {
-								$product.find(' #ChildOptions' + po_id).html(response.optionhtml);								
+								$product.find(' #ChildOptions' + po_id).html(response.optionhtml);
 							}
 
 						}
@@ -499,21 +499,21 @@ function doAjaxFilter(pov_id, product_id, po_id, id) {
 }
 
 function get_matching_variant(variants, selected) {
-	for(var i in variants) {		
+	for(var i in variants) {
 		if(variants[i] == selected) return i;
 	}
 }
-			
+
 
 function doAjaxPrice(product_id, id) {
 	(function($) {
 		/* Get input values from form */
-		var form = $(id).closest('form');		
+		var form = $(id).closest('form');
 		//sanity check
 		if(form.data('product_id') != product_id) return;
 		form.find('input[type=\'submit\']').attr('disabled',true);
 		var values = form.serializeArray();
-		//pop these params from values-> task : add & view : mycart 			
+		//pop these params from values-> task : add & view : mycart
 		values.pop({
 			name : "task",
 			value : 'addItem'
@@ -527,48 +527,48 @@ function doAjaxPrice(product_id, id) {
 		values.push({
 			name : "product_id",
 			value :product_id
-		});	
+		});
 
 		var arrayClean = function(thisArray) {
 		    "use strict";
 		    $.each(thisArray, function(index, item) {
 		        if (item.name == 'task' || item.name == 'view') {
-		            delete values[index];      
+		            delete values[index];
 		        }
 		    });
 		}
 		arrayClean(values);
-		
+
 		//variable check
 		if(form.data('product_type') == 'variable' || form.data('product_type') == 'advancedvariable' || form.data('product_type') == 'variablesubscriptionproduct') {
 			var csv = [];
 			if(form.data('product_type') == 'advancedvariable') {
-				form.find('input[type=\'radio\']:checked, select').each( function( index, el ) {	
-					if(el.value){					
-						if($(el).data('is-variant')){						
-							 csv.push(el.value);						 
+				form.find('input[type=\'radio\']:checked, select').each( function( index, el ) {
+					if(el.value){
+						if($(el).data('is-variant')){
+							 csv.push(el.value);
 						}
 					}
-				});				
+				});
 			}else {
 				form.find('input[type=\'radio\']:checked, select').each( function( index, el ) {
-					csv.push(el.value);	
+					csv.push(el.value);
 				});
 			}
 			var processed_csv =[];
 			processed_csv = csv.sort(function(a, b){return a-b});
-			
+
 			var $selected_variant = processed_csv.join();
 			//get all variants
 			var $variants = form.data('product_variants');
-			 
+
 			var $variant_id = get_matching_variant($variants, $selected_variant);
 			form.find('input[name=\'variant_id\']').val($variant_id);
-			
+
 			values.push({
 				name : "variant_id",
 				value :$variant_id
-			});	
+			});
 		}
 		values = values.filter(function( element ) {
 			return element !== undefined;
@@ -581,7 +581,7 @@ function doAjaxPrice(product_id, id) {
 			data : values,
 			dataType : 'json',
 			success : function(response) {
-				
+
 				var $product = $('.product-'+ product_id);
 				form.find('input[type=\'submit\']').attr('disabled',false);
 				if ($product.length
@@ -628,23 +628,23 @@ function doAjaxPrice(product_id, id) {
 						$product.find('.j2store-product-additional-images .additional-mainimage').attr("src", response.main_image);
 					}
 					//stock status
-											
+
 					if (typeof response.stock_status != 'undefined') {
 						if (response.availability == 1) {
 							$product.find('.product-stock-container').html('<span class="instock">' + response.stock_status + '</span>');
 						}else {
 							$product.find('.product-stock-container').html('<span class="outofstock">' + response.stock_status + '</span>');
-						}	
+						}
 					}
-					
+
 					//dimensions
 					if (response.dimensions) {
-						$product.find('.product-dimensions').html(response.dimensions);						
+						$product.find('.product-dimensions').html(response.dimensions);
 					}
-					
+
 					//weight
 					if (response.weight) {
-						$product.find('.product-weight').html(response.weight);						
+						$product.find('.product-weight').html(response.weight);
 					}
 					// discount text
                     $product.find('.discount-percentage').html(response.pricing.discount_text);
@@ -665,31 +665,26 @@ function setMainPreview(addimagId, product_id, imageZoom, zoom_type){
 	zoom_type = zoom_type || "outer";
 	var src ="";
 	(function($){
-	src = $("#"+addimagId).attr('src');
-	//$("#main-image-hidden").show();
-	$("#j2store-item-main-image-"+product_id + " img").attr('src','');
-	$("#j2store-item-main-image-"+product_id + " img").attr('src',src);
-	if(imageZoom){
-		if(zoom_type=='outer') {
-			$('#j2store-item-main-image-'+product_id).elevateZoom({
-			cursor: "crosshair",
-			zoomWindowFadeIn: 500,
-			zoomWindowFadeOut: 750,
-			zoomWindowWidth:450,
-			zoomWindowHeight:300
-			 });
-		}else if(zoom_type=='inner') {
-			$("#j2store-item-main-image-"+product_id + " .zoomImg").attr('src',src);
-			$("#j2store-item-main-image-"+product_id + " img" ).attr('src',src);
-			$('#j2store-item-main-image-'+product_id).elevateZoom({
-				cursor: "crosshair",
-				zoomWindowFadeIn: 500,
-				zoomWindowFadeOut: 750,
-				zoomWindowWidth:450,
-				zoomWindowHeight:300
-			 });
-		}	
+	var $elem = $("#"+addimagId);
+	// Check if element exists
+	if(!$elem.length) {
+		return;
 	}
+	// Get src from the element itself if it's an img, or from the img inside it
+	src = $elem.is('img') ? $elem.attr('src') : $elem.find('img').attr('src');
+	// Only proceed if we have a valid src (not undefined, not empty, not "undefined" string)
+	if(!src || src === 'undefined' || typeof src === 'undefined' || src === '') {
+		return;
+	}
+
+	var $mainImg = $("#j2store-item-main-image-"+product_id + " img");
+	// Check if main image element exists
+	if(!$mainImg.length) {
+		return;
+	}
+	$mainImg.attr('src', src);
+	// Also update data-zoom-image to prevent elevateZoom from loading undefined
+	$mainImg.attr('data-zoom-image', src);
 	})(j2store.jQuery);
 }
 
@@ -722,13 +717,13 @@ function getJ2storeFiltersSubmit(){
 		});
 	}
 	//getJ2storeFiltersSubmit();
-}  
+}
 
 
 /**
  * Method to reset the vendor filter
  */
- function resetJ2storeVendorFilter(inputid){	 
+ function resetJ2storeVendorFilter(inputid){
 	if(inputid){
 		jQuery("#productsideFilters").find("#"+inputid).prop('checked',false);
 	}else{
@@ -752,11 +747,11 @@ function getJ2storeFiltersSubmit(){
 			//set the checked to false
 			this.checked = false;
 		});
-		
-	}else if(inputid){		
+
+	}else if(inputid){
 		jQuery("#productsideFilters").find("#"+inputid).prop('checked',false);
 	}
-//	getJ2storeFiltersSubmit();	
+//	getJ2storeFiltersSubmit();
 }
 
 /** Toggle Methods **/
