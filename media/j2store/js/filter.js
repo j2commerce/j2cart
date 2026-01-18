@@ -1,7 +1,7 @@
 jQuery(function($) {
 	var filters = {
 		/**
-		 * Method to return absoulte path
+		 * Method to return absolute path
 		 */
 		getAbsolutePath : function(url ,donotSet,options) {
 			var loc = window.location;
@@ -21,7 +21,7 @@ jQuery(function($) {
 				if(pathName_slash != '/'){
 					pathName = '/'+pathName;
 				}
-				var absoulte_url = origin+pathName;
+				var absolute_url = origin+pathName;
 				url_link = '';
 				if( $(options.form_id).length > 0  &&  $(options.form_id).attr('data-link') ){
 					if($(options.form_id).data('link')){
@@ -55,10 +55,10 @@ jQuery(function($) {
 					}
 
 				}
-				absoulte_url =absoulte_url + url_link;
+				absolute_url =absolute_url + url_link;
 //				url = url.indexOf('&',0)  === -1 ? "&"+url : url;
-				var absoulte_url_slash = absoulte_url.substring(absoulte_url.length-1,absoulte_url.length );
-				if(absoulte_url_slash == '/'){
+				var absolute_url_slash = absolute_url.substring(absolute_url.length-1,absolute_url.length );
+				if(absolute_url_slash == '/'){
 					url_slash = url.substring(0,1);
 					if(url_slash == '/'){
 						url = url.substring(1,url.length);
@@ -72,7 +72,7 @@ jQuery(function($) {
 				}
 				var index_file = loc.href.indexOf("index.php");
 				if(index_file){
-					absoulte_url = absoulte_url+"index.php";
+					absolute_url = absolute_url+"index.php";
 				}
 				url_check = url.indexOf("?") === -1 ? "?" : "&";
 				if(url_check == '?'){
@@ -84,13 +84,13 @@ jQuery(function($) {
 				}
 				url = url+option_url;
 				url = url_check + url ;
-				document.location.href  = absoulte_url+url;
+				document.location.href  = absolute_url+url;
 
 			}else{
-				var absoulte_url = loc.href.substring(0,loc.href.length	- ((loc.pathname + loc.search + loc.hash).length - pathName.length));	// remove the first occurance & sign from the url
+				var absolute_url = loc.href.substring(0,loc.href.length	- ((loc.pathname + loc.search + loc.hash).length - pathName.length));	// remove the first occurance & sign from the url
 
 				url = url.substr(1);
-				var site_url = absoulte_url.indexOf("?") === -1 ? "?" : "&";
+				var site_url = absolute_url.indexOf("?") === -1 ? "?" : "&";
 				if(donotSet == true){
 					return site_url + url;
 				}else{
@@ -144,33 +144,33 @@ jQuery(function($) {
 	}
 
 	$.J2StoreFilters.prototype = {
-				
-		init : function(options) {		 
-			
-			/**  
-			 * let us assing default value for the var . 
+
+		init : function(options) {
+
+			/**
+			 * let us assing default value for the var .
 			 * incase  the option is empty
-			 */  
-			if(options.form_id ==''){				
+			 */
+			if(options.form_id ==''){
 				options.form_id='#productsideFilters';
 			}
-			
+
 			if(options.topFilter_id ==''){
 				options.topFilter_id='#productFilters';
 			}
-		 
-			/** let us first check the element exists **/ 
+
+			/** let us first check the element exists **/
 			if((options.form_id).length != 0){
-				
-			/**  now  call  trigger the sideFilters  Brands , Vendors , Product Filters **/ 
-				this.sideFilter(options);			
-			
-			/**  now  call trigger the Category filters **/	
+
+			/**  now  call  trigger the sideFilters  Brands , Vendors , Product Filters **/
+				this.sideFilter(options);
+
+			/**  now  call trigger the Category filters **/
 				this.categoryFilter(options);
-				
+
 			/** now also call the price slider **/
 				//this.priceSlider(options);
-		
+
 			/** Will remove the href params query of manufacturer_ids[] * */
 			$(options.form_id).find('.manufacturer-filters a').on('click',function() {
 				document.getElementById('j2store-product-loading').style.display='block';
@@ -209,51 +209,51 @@ jQuery(function($) {
 									if (this.checked) {
 										url += '&' + this.name+ '=' + this.value;}
 								});
-					 
+
 					 	if($(options.form_id).find("li.active").length > 0){
 					 		var active_li = $(options.form_id).find("li.active").find('a');
 					 		url += '&' + $(active_li).data('key') + '='+ $(active_li).data('value');
 					 	}
-						
-					 	if( $(options.form_id+  " #j2store-slider-range").length !=0){					 		
+
+					 	if( $(options.form_id+  " #j2store-slider-range").length !=0){
 					 		//let us append price filters
-					 		url +='&pricefrom='+$(options.form_id).find("#min_price_input").attr('value');								
+					 		url +='&pricefrom='+$(options.form_id).find("#min_price_input").attr('value');
 					 		url +='&priceto='+$(options.form_id).find("#max_price_input").attr('value');
-					 	}						
+					 	}
 
 						 filters.getAbsolutePath(url ,false,options);
 						}
 				document.getElementById('j2store-product-loading').style.display='none';
 					});
 			}
-			
+
 			/** call the event fire for TopFilters **/
-			this.topFilter(options);		
-				
+			this.topFilter(options);
+
 		},
-		categoryFilter : function(options){			
+		categoryFilter : function(options){
 			$(options.form_id).find('.j2product-categories').on('click',function(e) {
 				document.getElementById('j2store-product-loading').style.display='block';
 				var url = '';
 				// we can make use this line to clear the filter
-				if($('.j2product-categories > a').data('key')) {				
+				if($('.j2product-categories > a').data('key')) {
 					 url += '&' + $(this).find('a').data('key')+ '='	+ $(this).find('a').data('value');
 				}
-				
+
 				if($(options.form_id).find("li.active").length != 0){
 					$(options.form_id).find('input[type="checkbox"]:checked').each(function(index, el) {
 						url += '&'+ $(el).attr('name')+ '='+ $(el).attr('value');
-					});					
+					});
 				}
-				
-				if($(options.topFilter_id).length != 0){	
+
+				if($(options.topFilter_id).length != 0){
 					if($(options.topFilter_id).find('input[name=search]').length != 0 ){
-						var search = $(options.topFilter_id).find('input[name=search]');				 	
+						var search = $(options.topFilter_id).find('input[name=search]');
 						if(search !=''){
 							url += '&' + $(search).attr('name') + '='+ $(search).attr('value');
 					 	}
 					}
-					
+
 					 if($(options.topFilter_id).find('select[name=sortby]').length !=0){
 						 var sortby = $(options.topFilter_id).find('select[name=sortby] option:selected');
 						 if(sortby){
@@ -261,76 +261,76 @@ jQuery(function($) {
 						 }
 					 }
 				}
-				
+
 				if( $(options.form_id+  " #j2store-slider-range").length !=0){
 					//let us append price filters
-					url +='&pricefrom='+$(options.form_id).find("#min_price_input").attr('value');								
+					url +='&pricefrom='+$(options.form_id).find("#min_price_input").attr('value');
 					url +='&priceto='+$(options.form_id).find("#max_price_input").attr('value');
 				}
-				
+
 				filters.getAbsolutePath(url,false,options);
 			});
 		},
-		
-		sideFilter : function(options){			
+
+		sideFilter : function(options){
 			$(options.form_id).find('input[type="checkbox"]').on('change',function(el) {
 				document.getElementById('j2store-product-loading').style.display='block';
-						var url = '';						
-						if((options.form_id).length != 0){							
+						var url = '';
+						if((options.form_id).length != 0){
 							$(options.form_id).find('input[type="checkbox"]').each(function() {
 								if (this.checked) {
 									url += '&' + this.name + '='+ this.value;
 								}
 							});
-							
-							
+
+
 							//let us check category related div exists
-							if($(options.form_id).find("li.active").length != 0){								
-								var active_li = $(options.form_id).find("li.active").find('a');							
+							if($(options.form_id).find("li.active").length != 0){
+								var active_li = $(options.form_id).find("li.active").find('a');
 								url += '&' + $(active_li).data('key') + '='+ $(active_li).data('value');
 							}
-													
-							
+
+
 							//check price slider exists
-							if($(options.form_id).find("#j2store-slider-range").length !=0){		
+							if($(options.form_id).find("#j2store-slider-range").length !=0){
 								//let us append price filters
-								url +='&pricefrom='+$(options.form_id).find("#min_price_input").attr('value');								
+								url +='&pricefrom='+$(options.form_id).find("#min_price_input").attr('value');
 								url +='&priceto='+$(options.form_id).find("#max_price_input").attr('value');
 							}
 						}
-						
+
 						if($(options.topFilter_id).length != 0){
-							// step 4 : let us check filter search exists				
+							// step 4 : let us check filter search exists
 							if($(options.topFilter_id).find('input[name=search]').length != 0 ){
 								 var search = $(options.topFilter_id).find('input[name=search]');
 								 	if(search !=''){
 								 		url += '&' + $(search).attr('name') + '='+ $(search).attr('value');
-								
-								 	}	
+
+								 	}
 							}
-						 	
-							if($(options.topFilter_id).find('select[name=sortby]').length !=0){						 
+
+							if($(options.topFilter_id).find('select[name=sortby]').length !=0){
 							 	var sortby = $(options.topFilter_id).find('select[name=sortby] option:selected');
 								 if(sortby){
 									 url += '&' + $(options.topFilter_id).find('select[name=sortby]').attr('name') + '='+ sortby.val();
 								 }
-							}													
-						}		
-						
-						 
+							}
+						}
+
+
 						filters.getAbsolutePath(url ,false ,options);
 
 					});
 		},
-		
+
 		topFilter : function(options){
 			if($(options.topFilter_id).length != 0){
-				var url ='';	
+				var url ='';
 				//prevent the form submit incase search filter exists
-				$(options.topFilter_id).submit(function(e){	
-					e.preventDefault();	
+				$(options.topFilter_id).submit(function(e){
+					e.preventDefault();
 					//let us check category related div exists
-					if($(options.form_id).find("li.active").length > 0){	
+					if($(options.form_id).find("li.active").length > 0){
 						var active_li = $(options.form_id).find("li.active").find('a');
 						url += '&' + $(active_li).data('key') + '='+ $(active_li).data('value');
 					}
@@ -339,43 +339,43 @@ jQuery(function($) {
 										url += '&'+ $(el).attr('name')+ '='+ $(el).attr('value');
 						 });
 					}
-							
+
 					 if($(options.topFilter_id).find('input[name=search]').length != 0 ){
-						 var search = $(options.topFilter_id).find('input[name=search]');						
+						 var search = $(options.topFilter_id).find('input[name=search]');
 						 if(search !=''){
 							 url += '&' + $(search).attr('name') + '='+ $(search).val();
-						 }				
+						 }
 					 }
-					 
+
 					 if($(options.topFilter_id).find('select[name=sortby]').length !=0){
 						 var sortby = $(options.topFilter_id).find('select[name=sortby] option:selected');
 						 url += '&' + $(options.topFilter_id).find('select[name=sortby]').attr('name') + '='+ sortby.val();
 					 }
-					
+
 					//check price slider exists
-					 if( $(options.form_id).find("#j2store-slider-range").length !=0){		 
+					 if( $(options.form_id).find("#j2store-slider-range").length !=0){
 							//let us append price filters
 							url +='&pricefrom='+$(options.form_id).find("#min_price_input").val();
 							url +='&priceto='+$(options.form_id).find("#max_price_input").val();
 					}
-						
+
 					 filters.getAbsolutePath(url ,false ,options);
 				});
-				
+
 			}
 		},
-		priceSlider:function(options){			
-			$(options.form_id).find("#j2store-slider-range").slider({				
-										
+		priceSlider:function(options){
+			$(options.form_id).find("#j2store-slider-range").slider({
+
 					slide: function( event, ui ) {
 						document.getElementById('j2store-product-loading').style.display='block';
-						var url = '';						
-						if((options.form_id).length != 0){		
-							if($(options.form_id).find("li.active").length > 0){								
+						var url = '';
+						if((options.form_id).length != 0){
+							if($(options.form_id).find("li.active").length > 0){
 								var active_li = $(options.form_id).find("li.active").find('a');
-									url += '&' + $(active_li).data('key') + '='+ $(active_li).data('value');									 
+									url += '&' + $(active_li).data('key') + '='+ $(active_li).data('value');
 							}
-							 
+
 							// step 2 :  let us check any filters like brand ,vendor , pfilters exists
 							if($(options.form_id).find('input[type="checkbox"]:checked').length !=0){
 								$(options.form_id).find('input[type="checkbox"]').each(function() {
@@ -384,36 +384,36 @@ jQuery(function($) {
 										}
 								});
 							}
-						
+
 						}
-						
-						
-						if($(options.topFilter_id).length != 0){				
-							var search = $(options.topFilter_id).find('input[name=search]').length;						 	 
+
+
+						if($(options.topFilter_id).length != 0){
+							var search = $(options.topFilter_id).find('input[name=search]').length;
 						 	if(search > 0 ){
 						 		url += '&' + $(options.topFilter_id).find('input[name=search]').attr('name') + '='+ $(options.topFilter_id).find('input[name=search]').attr('value');
-						
-						 	}						 	
-						 	var sortby = $(options.topFilter_id).find('select[name=sortby] option:selected');							
+
+						 	}
+						 	var sortby = $(options.topFilter_id).find('select[name=sortby] option:selected');
 							 if( $(options.topFilter_id).find('select[name=sortby]').length > 0){
 								 url += '&' + $(options.topFilter_id).find('select[name=sortby]').attr('name') + '='+ sortby.val();
 							 }
 						}
-						
-						if( $(options.form_id).find("#j2store-slider-range").length !=0){	
+
+						if( $(options.form_id).find("#j2store-slider-range").length !=0){
 							//let us append  price filters
 							url +='&pricefrom='+ui.values[0];
 							url +='&priceto='+ui.values[1];
-							
+
 							$(options.form_id).find( "#min_price" ).html(ui.values[ 0 ]);
 							$(options.form_id).find( "#max_price" ).html(  ui.values[ 1 ] );
-						}							
-						
+						}
+
 						filters.getAbsolutePath(url ,false ,options);
 
 					}
 			});
-		},			
+		},
 	};
 
 /*	var base_url;
@@ -421,7 +421,7 @@ jQuery(function($) {
 		base_url = window.location.href;
 		console.log(base_url);
 	  });*/
-	
+
 	// call the class
 	var myClassObj = new $.J2StoreFilters({'form_id':'#productsideFilters' ,'topFilter_id':'#productFilters'});
 
