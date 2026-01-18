@@ -546,7 +546,7 @@ CREATE TABLE IF NOT EXISTS `#__j2store_orderstatuses` (
 INSERT IGNORE INTO `#__j2store_orderstatuses` (`j2store_orderstatus_id`, `orderstatus_name`, `orderstatus_cssclass`, `orderstatus_core`, `enabled`, `ordering`) VALUES
 (1, 'J2STORE_CONFIRMED', 'label-success text-bg-success', 1, 1, 1),
 (2, 'J2STORE_PROCESSED', 'label-info text-bg-info', 1, 1, 2),
-(3, 'J2STORE_FAILED', 'label-important', 1, 1, 3),
+(3, 'J2STORE_FAILED', 'label-important text-bg-danger', 1, 1, 3),
 (4, 'J2STORE_PENDING', 'label-warning text-bg-warning', 1, 1, 4),
 (5, 'J2STORE_NEW', 'label-warning text-bg-warning', 1, 1, 5),
 (6, 'J2STORE_CANCELLED', 'label-warning text-bg-warning', 1, 1, 6);
