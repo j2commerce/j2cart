@@ -984,7 +984,7 @@ class J2Html
         $query->from('#__usergroups AS a');
         $query->group('a.id, a.title');
         $query->order('a.id ASC');
-        $query->order($query->qn('title') . ' ASC');
+        $query->order($db->quotename('a.title') . ' ASC');
 
         // Get the options.
         $db->setQuery($query);
