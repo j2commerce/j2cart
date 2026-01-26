@@ -27,7 +27,7 @@ class_exists('JDatabaseDriver', true);
  */
 class F0FDatabaseDriverJoomla extends F0FDatabaseDriver implements F0FDatabaseInterface //F0FDatabaseDriver //implements F0FDatabaseInterface//\Joomla\Database\DatabaseDriver//F0FDatabase implements F0FDatabaseInterface//
 {
-    
+
     /** @var F0FDatabase The real database connection object */
     protected $dbo;
 
@@ -574,6 +574,11 @@ class F0FDatabaseDriverJoomla extends F0FDatabaseDriver implements F0FDatabaseIn
         }
 
         return null;
+    }
+
+    public function createQuery(): \Joomla\Database\QueryInterface
+    {
+        return $this->getQuery(true);
     }
 
     public function getTableColumns($table, $typeOnly = true)

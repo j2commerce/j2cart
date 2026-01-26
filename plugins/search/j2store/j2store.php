@@ -4,8 +4,11 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
+
 /** ensure this file is being included by a parent file */
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\CMS\Plugin\CMSPlugin;
 
 require_once JPATH_SITE . '/components/com_content/router.php';
 
@@ -16,7 +19,7 @@ require_once JPATH_SITE . '/components/com_content/router.php';
  * @subpackage  Search.content
  * @since       1.6
  */
-class PlgSearchJ2Store extends JPlugin
+class PlgSearchJ2Store extends CMSPlugin
 {
 	/**
 	 * Determine areas searchable by this plugin.

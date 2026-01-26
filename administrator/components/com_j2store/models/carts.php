@@ -4,8 +4,11 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
+
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Object\CMSObject;
 
 require_once JPATH_ADMINISTRATOR.'/components/com_j2store/models/behavior/autoload.php';
 
@@ -26,7 +29,7 @@ class J2StoreModelCarts extends F0FModel {
 
 		$app = JFactory::getApplication();
 		$errors = array();
-		$json = new JObject();
+		$json = new CMSObject();
 
 		//first check if it has product id.
 		$product_id = $app->input->get('product_id');
@@ -391,7 +394,7 @@ class J2StoreModelCarts extends F0FModel {
 			if (empty ( $quantity ) || $quantity < 1) {
 				// the user wants to remove the item from cart. so remove it
 
-				$item = new JObject ();
+				$item = new CMSObject ();
 				$item->product_id = $cartitem->product_id;
 				$item->variant_id = $cartitem->variant_id;
 				$item->product_type = $cartitem->product_type;
@@ -425,7 +428,7 @@ class J2StoreModelCarts extends F0FModel {
 				return false;
 			}
 
-			$item = new JObject ();
+			$item = new CMSObject ();
 			$item->product_id = $cartitem->product_id;
 			$item->variant_id = $cartitem->variant_id;
 			$item->product_options = $cartitem->product_options;
@@ -448,7 +451,7 @@ class J2StoreModelCarts extends F0FModel {
 
 	function validate($cartitem, $quantity) {
 
-		$json = new JObject();
+		$json = new CMSObject();
 
 		$cart = $this->getCart($this->getCartId());
 		if($cart->cart_type != 'cart') return true;
@@ -502,7 +505,7 @@ class J2StoreModelCarts extends F0FModel {
 		$params = J2Store::config();
 		$type = $params->get('config_continue_shopping_page', 'previous');
 
-		$item = new JObject();
+		$item = new CMSObject();
 		$item->type = $type;
 
 		switch($type) {

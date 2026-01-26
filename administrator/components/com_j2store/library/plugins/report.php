@@ -8,8 +8,10 @@
 # Websites: http://j2store.org
 -------------------------------------------------------------------------*/
 
-/** ensure this file is being included by a parent file */
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\CMS\Object\CMSObject;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/_base.php');
 if (!class_exists('J2StoreReportPlugin')) {
     class J2StoreReportPlugin extends J2StorePluginBase
@@ -105,7 +107,7 @@ if (!class_exists('J2StoreReportPlugin')) {
          */
         function _getState()
         {
-            $state = new JObject();
+            $state = new CMSObject();
             $app = J2Store::platform()->application();
             foreach ($state->getProperties() as $key => $value) {
                 $new_value = $app->input->get($key);

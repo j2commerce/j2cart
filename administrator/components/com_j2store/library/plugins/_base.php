@@ -4,15 +4,19 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
+
 // No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\CMS\Plugin\CMSPlugin;
+
 /** Import library dependencies */
 if (!defined('F0F_INCLUDED')) {
     require_once JPATH_LIBRARIES . '/f0f/include.php';
 }
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/helpers/j2store.php');
 
-class J2StorePluginBase extends \JPlugin
+class J2StorePluginBase extends CMSPlugin
 {
     /**
      * @var $_element  string  Should always correspond with the plugin's filename,

@@ -12,7 +12,11 @@
  * --------------------------------------------------------------------------------
  *
  * */
+
 defined('_JEXEC') or die('Unauthorized Access');
+
+use Joomla\CMS\Plugin\CMSPlugin;
+
 // Make sure FOF is loaded, otherwise do not run
 if (!defined('F0F_INCLUDED'))
 {
@@ -37,7 +41,7 @@ if(!class_exists('J2Store')){
 }
 
 
-class plgUserJ2userregister extends JPlugin
+class plgUserJ2userregister extends CMSPlugin
 {
 
     public function __construct(& $subject, $config)

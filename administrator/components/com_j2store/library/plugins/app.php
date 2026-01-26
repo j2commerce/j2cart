@@ -4,8 +4,11 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
-/** ensure this file is being included by a parent file */
+
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\CMS\Object\CMSObject;
+
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/_base.php');
 if (!class_exists('J2StoreAppPlugin')) {
     class J2StoreAppPlugin extends J2StorePluginBase
@@ -94,7 +97,7 @@ if (!class_exists('J2StoreAppPlugin')) {
          */
         function _getState()
         {
-            $state = new JObject();
+            $state = new CMSObject();
             $app = J2Store::platform()->application();
             foreach ($state->getProperties() as $key => $value) {
                 $new_value = $app->input->get($key);

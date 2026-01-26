@@ -11,6 +11,8 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Object\CMSObject;
+
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/library/selectable/fields.php');
 
 class J2StoreSelectableBase
@@ -609,7 +611,7 @@ class J2StoreSelectableBase
 		$formData = $app->input->get('data', array(), 'ARRAY');
 
 		//initialise a object
-		$field = new JObject();
+		$field = new CMSObject();
 		$field->field_id = $field_id;
 		$field->j2store_customfield_id = $field_id;
 

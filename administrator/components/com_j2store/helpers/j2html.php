@@ -15,6 +15,7 @@ use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Object\CMSObject;
 
 /**
  * J2Html class provides Form Inputs
@@ -1841,7 +1842,7 @@ jQuery('.modal-backdrop').remove();
 
 }
 
-class J2Select extends JObject
+class J2Select extends CMSObject
 {
 
     protected $state;
@@ -1852,7 +1853,7 @@ class J2Select extends JObject
     {
 
         if (!is_object($this->state)) {
-            $this->state = new JObject();
+            $this->state = new CMSObject();
         }
         $this->options = array();
         parent::__construct($properties);
@@ -1930,7 +1931,7 @@ class J2Select extends JObject
 
     public function clearState()
     {
-        $this->state = new JObject();
+        $this->state = new CMSObject();
         return $this;
     }
 

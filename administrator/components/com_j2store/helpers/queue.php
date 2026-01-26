@@ -7,20 +7,15 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Object\CMSObject;
+
 /**
  * J2Html class provides Form Inputs
  */
 
-class J2Queue extends JObject
+class J2Queue extends CMSObject
 {
-
 	public static $instance;
-
-	public function __construct ( $properties = null )
-	{
-		parent::__construct ( $properties );
-
-	}
 
 	public static function getInstance ( $properties = null )
 	{
