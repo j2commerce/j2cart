@@ -339,6 +339,10 @@ class J2StorePlatform
 
     public function getRegistry($json,$is_array = false)
     {
+        if ($json === null) {
+            return new Registry('{}');
+        }
+
         if (!$json instanceof Registry) {
             $params = new Registry();
             try {
