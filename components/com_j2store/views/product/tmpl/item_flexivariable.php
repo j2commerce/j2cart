@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -11,12 +12,12 @@ $this->form_id = 'j2store-addtocart-form-'.$this->product->j2store_product_id;
 ?>
 <?php if($this->params->get('show_sku', 1) && J2Store::product()->canShowSku($this->params) && isset($this->product->variant->sku) && !empty($this->product->variant->sku)) : ?>
     <div class="product-sku">
-        <span class="sku-text"><?php echo JText::_('J2STORE_SKU')?> :</span>
+        <span class="sku-text"><?php echo Text::_('J2STORE_SKU')?> :</span>
         <span class="sku"> <?php echo $this->escape($this->product->variant->sku); ?> </span>
     </div>
 <?php elseif ($this->params->get('show_sku', 1) && J2Store::product()->canShowSku($this->params)) : ?>
     <div class="product-sku">
-        <span class="sku-text"><?php echo JText::_('J2STORE_SKU')?></span>
+        <span class="sku-text"><?php echo Text::_('J2STORE_SKU')?></span>
         <span class="sku"></span>
     </div>
 <?php endif; ?>
@@ -33,7 +34,7 @@ $this->form_id = 'j2store-addtocart-form-'.$this->product->j2store_product_id;
 			                    </span>
             <?php else: ?>
                 <span class="outofstock">
-				                    <?php echo JText::_('J2STORE_OUT_OF_STOCK'); ?>
+				                    <?php echo Text::_('J2STORE_OUT_OF_STOCK'); ?>
 			                    </span>
             <?php endif; ?>
         <?php else:?>
@@ -44,7 +45,7 @@ $this->form_id = 'j2store-addtocart-form-'.$this->product->j2store_product_id;
 
     <?php if(isset($this->product->variant->allow_backorder) && $this->product->variant->allow_backorder == 2 && !$this->product->variant->availability): ?>
         <span class="backorder-notification">
-			                <?php echo JText::_('J2STORE_BACKORDER_NOTIFICATION'); ?>
+			                <?php echo Text::_('J2STORE_BACKORDER_NOTIFICATION'); ?>
 		                </span>
     <?php else: ?>
         <span class="backorder-notification"></span>
@@ -67,6 +68,6 @@ $this->form_id = 'j2store-addtocart-form-'.$this->product->j2store_product_id;
 
         <?php echo $this->loadTemplate('cart'); ?>
         <div class="j2store-notifications"></div>
-        <input type="hidden" name="variant_id" value="<?php echo isset($this->product->variant->j2store_variant_id) ? $this->product->variant->j2store_variant_id: ''; ?>" />
+        <input type="hidden" name="variant_id" value="<?php echo $this->product->variant->j2store_variant_id ?? ''; ?>" />
     </form>
 <?php endif; ?>

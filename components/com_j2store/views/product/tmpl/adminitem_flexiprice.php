@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -9,11 +10,11 @@
 defined('_JEXEC') or die;
 $currency = J2Store::currency();
 ?>
-<?php echo J2Store::plugin()->eventWithHtml('BeforeRenderingProductPrice', array($this->product)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('BeforeRenderingProductPrice', [$this->product]); ?>
 <?php $min_price = (isset($this->product->min_price) && !empty($this->product->min_price)) ? J2Store::product()->displayPrice($this->product->min_price, $this->product, $this->params): $currency->format(0);?>
 <?php $max_price = (isset($this->product->max_price) && !empty($this->product->max_price)) ? J2Store::product()->displayPrice($this->product->max_price, $this->product, $this->params): $currency->format(0);?>
     <div class="flexi-product-price-range">
-        <strong><?php echo JText::_('J2STORE_PRODUCT_PRICE_RANGE');?></strong> <strong><?php echo JText::sprintf('J2STORE_PRICE_RANGE_FROM_TO',$min_price,$max_price); ?>	</strong>
+        <strong><?php echo Text::_('J2STORE_PRODUCT_PRICE_RANGE');?></strong> <strong><?php echo Text::sprintf('J2STORE_PRICE_RANGE_FROM_TO',$min_price,$max_price); ?>	</strong>
     </div>
 <?php if($this->params->get('show_base_price', 1) || $this->params->get('show_price_field', 1)): ?>
     <div class="product-price-container">
@@ -46,4 +47,4 @@ $currency = J2Store::currency();
     </div>
 <?php endif; ?>
 
-<?php echo J2Store::plugin()->eventWithHtml('AfterRenderingProductPrice', array($this->product)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('AfterRenderingProductPrice', [$this->product]); ?>

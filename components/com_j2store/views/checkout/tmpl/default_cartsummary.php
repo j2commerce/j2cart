@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Path;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -15,17 +18,17 @@ $currency = J2Store::currency();
 $colspan = '2';
 
 ?>
-	<h3><?php echo JText::_('J2STORE_ORDER_SUMMARY')?></h3>
+	<h3><?php echo Text::_('J2STORE_ORDER_SUMMARY')?></h3>
 	<table class="j2store-cart-table table table-bordered">
 		<thead>
 			<tr>
-				<th width="70%"><?php echo JText::_('J2STORE_CART_LINE_ITEM'); ?></th>
-				<th width="10%"><?php echo JText::_('J2STORE_CART_LINE_ITEM_QUANTITY'); ?></th>
-				<?php if(isset($this->taxes) && count($this->taxes) && $this->params->get('show_item_tax', 0)): ?>
+				<th width="70%"><?php echo Text::_('J2STORE_CART_LINE_ITEM'); ?></th>
+				<th width="10%"><?php echo Text::_('J2STORE_CART_LINE_ITEM_QUANTITY'); ?></th>
+				<?php if(isset($this->taxes) && (is_countable($this->taxes) ? count($this->taxes) : 0) && $this->params->get('show_item_tax', 0)): ?>
 					<?php $colspan = '3'; ?>
-					<th><?php echo JText::_('J2STORE_CART_LINE_ITEM_TAX'); ?></th>
+					<th><?php echo Text::_('J2STORE_CART_LINE_ITEM_TAX'); ?></th>
 				<?php endif; ?>
-				<th width="20%"><?php echo JText::_('J2STORE_CART_LINE_ITEM_TOTAL'); ?></th>
+				<th width="20%"><?php echo Text::_('J2STORE_CART_LINE_ITEM_TOTAL'); ?></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -38,9 +41,9 @@ $colspan = '2';
 				?>
 				<tr>
 					<td>
-						<?php if($this->params->get('show_thumb_cart', 1) && !empty($thumb_image) && JFile::exists(JPATH_SITE.JPath::clean('/'.$thumb_image))): ?>
+						<?php if($this->params->get('show_thumb_cart', 1) && !empty($thumb_image) && File::exists(JPATH_SITE.Path::clean('/'.$thumb_image))): ?>
 							<span class="cart-thumb-image">
-								<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo JURI::root(true).JPath::clean('/'.$thumb_image); ?>" >
+								<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo JURI::root(true).Path::clean('/'.$thumb_image); ?>" >
 							</span>
 						<?php endif; ?>
 						<span class="cart-product-name">
@@ -53,15 +56,15 @@ $colspan = '2';
 								if($attribute->orderitemattribute_type == 'file') {
 									unset($table);
 									$table = F0FTable::getInstance('Upload', 'J2StoreTable')->getClone();
-									if($table->load(array('mangled_name'=>$attribute->orderitemattribute_value))) {
+									if($table->load(['mangled_name'=>$attribute->orderitemattribute_value])) {
 										$attribute_value = $table->original_name;
 									}
 								}else {
-									$attribute_value = JText::_($attribute->orderitemattribute_value);
+									$attribute_value = Text::_($attribute->orderitemattribute_value);
 								}
 							?>
 								<small>
-								- <?php echo JText::_($attribute->orderitemattribute_name); ?> : <?php echo nl2br($attribute_value); ?>
+								- <?php echo Text::_($attribute->orderitemattribute_name); ?> : <?php echo nl2br((string) $attribute_value); ?>
 								</small>						
              				   	<br>
 							<?php endforeach;?>
@@ -71,7 +74,7 @@ $colspan = '2';
 						<?php if($this->params->get('show_price_field', 1)): ?>
 
 							<span class="cart-product-unit-price">
-								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>								
+								<span class="cart-item-title"><?php echo Text::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>								
 								<span class="cart-item-value">
 								<?php echo $currency->format($this->order->get_formatted_lineitem_price($item, $this->params->get('checkout_price_display_options', 1))); ?>
 								</span>
@@ -81,7 +84,7 @@ $colspan = '2';
 						<?php if($this->params->get('show_sku', 1)): ?>
 						<br>
 							<span class="cart-product-sku">
-								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
+								<span class="cart-item-title"><?php echo Text::_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
 								<span class="cart-item-value"><?php echo $item->orderitem_sku; ?></span>
 							</span>
 
@@ -89,19 +92,19 @@ $colspan = '2';
 
                         <?php if($back_order_text):?>
                             <br>
-                            <span class="label label-inverse"><?php echo JText::_($back_order_text);?></span>
+                            <span class="label label-inverse"><?php echo Text::_($back_order_text);?></span>
                         <?php endif;?>
-						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitle', array($item, $this->order, $this->params));?>
+						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitle', [$item, $this->order, $this->params]);?>
 					</td>
 					<td><?php echo $item->orderitem_quantity; ?></td>
 
-					<?php if(isset($this->taxes) && count($this->taxes) && $this->params->get('show_item_tax', 0)): ?>
+					<?php if(isset($this->taxes) && (is_countable($this->taxes) ? count($this->taxes) : 0) && $this->params->get('show_item_tax', 0)): ?>
 						<td><?php 	echo $currency->format($item->orderitem_tax);	?></td>
 					<?php endif; ?>
 
 					<td class="cart-line-subtotal">
 						<?php echo $currency->format($this->order->get_formatted_lineitem_total($item, $this->params->get('checkout_price_display_options', 1))); ?>
-						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTotal', array($item, $this->order, $this->params));?>
+						<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTotal', [$item, $this->order, $this->params]);?>
 					</td>
 				</tr>
 				<?php endforeach; ?>

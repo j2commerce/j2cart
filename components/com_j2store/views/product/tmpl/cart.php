@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -10,12 +11,12 @@ defined('_JEXEC') or die;
 
 $product = $this->singleton_product;
 $params = $this->singleton_params;
-$action = J2Store::platform()->getCartUrl(array('task' => 'addItem','product_id' => (int)$product->j2store_product_id));
+$action = J2Store::platform()->getCartUrl(['task' => 'addItem', 'product_id' => (int)$product->j2store_product_id]);
 
 if(!empty($product->addtocart_text)) {
-	$cart_text = JText::_($product->addtocart_text);
+	$cart_text = Text::_($product->addtocart_text);
 } else {
-	$cart_text = JText::_('J2STORE_ADD_TO_CART');
+	$cart_text = Text::_('J2STORE_ADD_TO_CART');
 }
 
 if($product->variant->availability || J2Store::product()->backorders_allowed($product->variant)) {
@@ -26,21 +27,21 @@ if($product->variant->availability || J2Store::product()->backorders_allowed($pr
 
 ?>
 
-<?php echo J2Store::plugin()->eventWithHtml('BeforeAddToCartButton', array($product, J2Store::utilities()->getContext('cart'))); ?>
+<?php echo J2Store::plugin()->eventWithHtml('BeforeAddToCartButton', [$product, J2Store::utilities()->getContext('cart')]); ?>
 <?php if($show): ?>
 	<div class="cart-action-complete" style="display:none;">
 			<p class="text-success">
-				<?php echo JText::_('J2STORE_ITEM_ADDED_TO_CART');?>
+				<?php echo Text::_('J2STORE_ITEM_ADDED_TO_CART');?>
 				<a href="<?php echo $product->checkout_link; ?>" class="j2store-checkout-link">
-					<?php echo JText::_('J2STORE_CHECKOUT'); ?>
+					<?php echo Text::_('J2STORE_CHECKOUT'); ?>
 				</a>
 			</p>
 	</div>
 	
-	<?php if(count($product->options) || $product->product_type == 'variable'): ?>
+	<?php if((is_countable($product->options) ? count($product->options) : 0) || $product->product_type == 'variable'): ?>
 				<a class="<?php echo $params->get('choosebtn_class', 'btn btn-success'); ?>"
 			    	href="<?php echo $product->product_view_url; ?>">
-							<?php echo JText::_('J2STORE_CART_CHOOSE_OPTIONS'); ?>
+							<?php echo Text::_('J2STORE_CART_CHOOSE_OPTIONS'); ?>
 				</a>
 			<?php else: ?>	
 	
@@ -54,8 +55,8 @@ if($product->variant->availability || J2Store::product()->backorders_allowed($pr
 
 <?php else: ?>
 	<span class="outofstock">
-		<?php echo JText::_('J2STORE_OUT_OF_STOCK'); ?>
+		<?php echo Text::_('J2STORE_OUT_OF_STOCK'); ?>
 	</span>
 <?php endif; ?>
 
-<?php echo J2Store::plugin()->eventWithHtml('AfterAddToCartButton', array($product, J2Store::utilities()->getContext('cart'))); ?>
+<?php echo J2Store::plugin()->eventWithHtml('AfterAddToCartButton', [$product, J2Store::utilities()->getContext('cart')]); ?>

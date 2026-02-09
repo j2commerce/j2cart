@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -25,10 +26,10 @@ $page_heading_text = $page_heading->get('page_heading','');
     </div>
 <?php endif; ?>
 <?php echo J2Store::modules()->loadposition('j2store-cart-top'); ?>
-<?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayCartHtml', array($this->order)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayCartHtml', [$this->order]); ?>
 <div class="j2store">
 	<div class="j2store-cart">
-		<?php if(count($this->items)): ?>
+		<?php if(is_countable($this->items) ? count($this->items) : 0): ?>
         <div class="<?php echo $J2gridRow;?>">
 			<div class="<?php echo $J2gridCol;?>12"><?php echo $this->before_display_cart;?></div>
         </div>
@@ -51,20 +52,20 @@ $page_heading_text = $page_heading->get('page_heading','');
 							<div class="buttons-left">
 				<span class="cart-continue-shopping-button">
 					<?php if($this->continue_shopping_url->type != 'previous'): ?>
-						<input class="btn btn-primary" type="button" onclick="window.location='<?php echo $this->continue_shopping_url->url; ?>';" value="<?php echo JText::_('J2STORE_CART_CONTINUE_SHOPPING'); ?>" />
+						<input class="btn btn-primary" type="button" onclick="window.location='<?php echo $this->continue_shopping_url->url; ?>';" value="<?php echo Text::_('J2STORE_CART_CONTINUE_SHOPPING'); ?>" />
 					<?php else: ?>
-						<input class="btn btn-primary" type="button" onclick="window.history.back();" value="<?php echo JText::_('J2STORE_CART_CONTINUE_SHOPPING'); ?>" />
+						<input class="btn btn-primary" type="button" onclick="window.history.back();" value="<?php echo Text::_('J2STORE_CART_CONTINUE_SHOPPING'); ?>" />
 					<?php endif;?>
 
 				</span>
 				<span class="cart-update-button">
-					<input class="btn btn-warning" type="submit" value="<?php echo JText::_('J2STORE_CART_UPDATE'); ?>" />
+					<input class="btn btn-warning" type="submit" value="<?php echo Text::_('J2STORE_CART_UPDATE'); ?>" />
 				</span>
 							</div>
 							<div class="buttons-right">
 								<?php if($this->params->get('show_clear_cart_button', 0)):?>
 								<span class="cart-clear-button">
-									<a class="btn btn-danger" href="<?php echo $platform->getCartUrl(array('task' => 'clearCart'));?>"><?php echo JText::_('J2STORE_EMPTY_CART')?></a>
+									<a class="btn btn-danger" href="<?php echo $platform->getCartUrl(['task' => 'clearCart']);?>"><?php echo Text::_('J2STORE_EMPTY_CART')?></a>
 								</span>
 								<?php endif;?>
 							</div>
@@ -98,10 +99,10 @@ $page_heading_text = $page_heading->get('page_heading','');
 
 		<?php else:  ?>
 			<span class="cart-no-items">
-				<?php echo JText::_('J2STORE_CART_NO_ITEMS'); ?>
+				<?php echo Text::_('J2STORE_CART_NO_ITEMS'); ?>
 			</span>
 		<?php endif; ?>
 	</div>
 </div>
-<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayCartHtml', array($this->order)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayCartHtml', [$this->order]); ?>
 <?php echo J2Store::modules()->loadposition('j2store-cart-bottom'); ?>

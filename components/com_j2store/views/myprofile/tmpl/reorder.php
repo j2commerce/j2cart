@@ -1,11 +1,14 @@
 <?php
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
-$ajax_base_url = JRoute::_('index.php');
+$ajax_base_url = Route::_('index.php');
 ?>
 <div id="j2store-checkout" class="j2store checkout">
 	<div id="j2store-checkout-content">
@@ -13,15 +16,15 @@ $ajax_base_url = JRoute::_('index.php');
 		<div id="shipping-payment-method">
 			<div class="checkout-heading">
 				<?php if ($this->showShipping) : ?>
-					<?php echo JText::_('J2STORE_CHECKOUT_SHIPPING_PAYMENT_METHOD'); ?>
+					<?php echo Text::_('J2STORE_CHECKOUT_SHIPPING_PAYMENT_METHOD'); ?>
 				<?php else: ?>
-					<?php echo JText::_('J2STORE_CHECKOUT_PAYMENT_METHOD'); ?>
+					<?php echo Text::_('J2STORE_CHECKOUT_PAYMENT_METHOD'); ?>
 				<?php endif;?>
 			</div>
 			<div class="checkout-content"></div>
 		</div>
 		<div id="confirm">
-			<div class="checkout-heading"><?php echo JText::_('J2STORE_CHECKOUT_CONFIRM');; ?></div>
+			<div class="checkout-heading"><?php echo Text::_('J2STORE_CHECKOUT_CONFIRM');; ?></div>
 			<div class="checkout-content"></div>
 		</div>
 	</div>
@@ -46,7 +49,7 @@ $ajax_base_url = JRoute::_('index.php');
 					$('#shipping-payment-method .checkout-heading a').remove();
 					//$('#payment-method .checkout-heading a').remove();
 
-					$('#shipping-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+					$('#shipping-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 					$(window).scrollTop(200);
 					//$('#shipping-payment-method .checkout-content input[name=view]').val('myprofile');
 				},
@@ -67,7 +70,7 @@ $ajax_base_url = JRoute::_('index.php');
 				dataType: 'json',
 				beforeSend: function() {
 					$('#button-payment-method').attr('disabled', true);
-					$('#button-payment-method').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+					$('#button-payment-method').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 				},
 				complete: function() {
 
@@ -114,7 +117,7 @@ $ajax_base_url = JRoute::_('index.php');
 
 								$('#shipping-payment-method .checkout-heading a').remove();
 
-								$('#shipping-payment-method .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+								$('#shipping-payment-method .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 							},
 							error: function(xhr, ajaxOptions, thrownError) {
 								//alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);

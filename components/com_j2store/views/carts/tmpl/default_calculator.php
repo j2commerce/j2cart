@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Uri\Uri;
 /*------------------------------------------------------------------------
 # com_j2store - J2Store
 # ------------------------------------------------------------------------
@@ -17,13 +20,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php if($this->params->get('show_tax_calculator', 1)): ?>
 <label>
 <input type="radio" name="next" value="shipping" id="shipping_estimate" />
-<?php echo JText::_('J2STORE_CART_TAX_SHIPPING_CALCULATOR_HEADING'); ?>
+<?php echo Text::_('J2STORE_CART_TAX_SHIPPING_CALCULATOR_HEADING'); ?>
 </label>
 <div id="shipping" class="content" style="display:none;">
-<form action="<?php echo JRoute::_('index.php');?>" method="post" id="shipping-estimate-form" onsubmit="return false;">
+<form action="<?php echo Route::_('index.php');?>" method="post" id="shipping-estimate-form" onsubmit="return false;">
       <table>
         <tr>
-          <td><span class="required">*</span> <?php echo JText::_('J2STORE_SELECT_A_COUNTRY'); ?></td>
+          <td><span class="required">*</span> <?php echo Text::_('J2STORE_SELECT_A_COUNTRY'); ?></td>
           <td><?php 
           $countryList = J2Html::select()->clearState()
           ->type('genericlist')
@@ -31,22 +34,17 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
            ->ordering('country_name')
           ->idTag('estimate_country_id')
           ->value($this->country_id)
-          ->setPlaceHolders(array(''=>JText::_('J2STORE_SELECT_OPTION')))
+          ->setPlaceHolders([''=>Text::_('J2STORE_SELECT_OPTION')])
           ->hasOne('Countries')
           ->setRelations(
-          array (
-          'fields' => array (
-          'key'=>'j2store_country_id',
-          'name'=>'country_name'
-          		)
-          )
+          ['fields' => ['key'=>'j2store_country_id', 'name'=>'country_name']]
           )->getHtml();
           echo $countryList; 
           ?>
           </td>
         </tr>
         <tr>
-          <td><span class="required">*</span> <?php echo JText::_('J2STORE_STATE_PROVINCE'); ?></td>
+          <td><span class="required">*</span> <?php echo Text::_('J2STORE_STATE_PROVINCE'); ?></td>
           <td><select id="estimate_zone_id" name="zone_id">
             </select></td>
         </tr>
@@ -55,13 +53,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
           <?php if($this->params->get('postalcode_required', 1)): ?>
           	<span class="required">*</span>
           <?php endif;?>
-          <?php echo JText::_('J2STORE_POSTCODE'); ?>
+          <?php echo Text::_('J2STORE_POSTCODE'); ?>
           </td>
           <td><input type="text" id="estimate_postcode" name="postcode" value="<?php echo $this->postcode; ?>" /></td>
         </tr>
-          <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayCalculatorField', array($this->order)); ?>
+          <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayCalculatorField', [$this->order]); ?>
       </table>
-      <input type="button" value="<?php echo JText::_('J2STORE_CART_CALCULATE_TAX_SHIPPING'); ?>" id="button-quote" class="btn btn-primary" />
+      <input type="button" value="<?php echo Text::_('J2STORE_CART_CALCULATE_TAX_SHIPPING'); ?>" id="button-quote" class="btn btn-primary" />
  
  	<input type="hidden" name="option" value="com_j2store" />
  	<input type="hidden" name="view" value="carts" />
@@ -91,7 +89,7 @@ j2store.jQuery('input[name=\'next\']').bind('click', function() {
 	 $(document).on('click', '#button-quote', function() {
 		 var values = $('#shipping-estimate-form').serializeArray();
 		 $.ajax({
-				url:'<?php echo JRoute::_('index.php'); ?>',
+				url:'<?php echo Route::_('index.php'); ?>',
 				type: 'get',
 				data: values,
 				dataType: 'json',
@@ -125,19 +123,19 @@ j2store.jQuery('input[name=\'next\']').bind('click', function() {
 (function($) {
 $('#shipping-estimate-form select[name=\'country_id\']').bind('change', function() {
 	$.ajax({
-		url:'<?php echo JRoute::_('index.php'); ?>',
+		url:'<?php echo Route::_('index.php'); ?>',
 		type: 'get',
 		data: 'option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
-			$('#shipping-estimate-form select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#shipping-estimate-form select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('.wait').remove();
 		},
 		success: function(json) {
 
-			html = '<option value=""><?php echo JText::_('J2STORE_SELECT_OPTION'); ?></option>';
+			html = '<option value=""><?php echo Text::_('J2STORE_SELECT_OPTION'); ?></option>';
 
 			if (json['zone'] != '') {
 				for (i = 0; i < json['zone'].length; i++) {					
@@ -150,7 +148,7 @@ $('#shipping-estimate-form select[name=\'country_id\']').bind('change', function
 	    			html += '>' + json['zone'][i]['zone_name'] + '</option>';
 				}
 			} else {
-				html += '<option value="0" selected="selected"><?php echo JText::_('J2STORE_CHECKOUT_ZONE_NONE'); ?></option>';
+				html += '<option value="0" selected="selected"><?php echo Text::_('J2STORE_CHECKOUT_ZONE_NONE'); ?></option>';
 			}
 
 			$('#shipping-estimate-form select[name=\'zone_id\']').html(html);

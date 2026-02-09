@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -11,7 +14,7 @@ $options = $this->product->options;
 $product_id = $this->product->j2store_product_id;
 $product_helper = J2Store::product();
 $platform = J2Store::platform();
-$ajax_url = JRoute::_('index.php',false);
+$ajax_url = Route::_('index.php',false);
 ?>
 <?php if ($options) { ?>
 
@@ -19,7 +22,7 @@ $ajax_url = JRoute::_('index.php',false);
 
         <?php foreach ($options as $option) { ?>
 
-        <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplaySingleProductOption', array($this->product, &$option)); ?>
+        <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplaySingleProductOption', [$this->product, &$option]); ?>
 
         <?php //var_dump($option); ?>
         <?php if ($option['type'] == 'select') { ?>
@@ -29,18 +32,18 @@ $ajax_url = JRoute::_('index.php',false);
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
 		<select
 			name="product_option[<?php echo $option['productoption_id']; ?>]"
 			onChange="doAjaxPrice(<?php echo $product_id?>,
           						'#option-<?php echo $option["productoption_id"]; ?>'
           						);">
-			<option value=""><?php echo JText::_('J2STORE_ADDTOCART_SELECT'); ?></option>
+			<option value=""><?php echo Text::_('J2STORE_ADDTOCART_SELECT'); ?></option>
             <?php foreach ($option['optionvalue'] as $option_value) { ?>
             	<?php $checked = ''; if($option_value['product_optionvalue_default']) $checked = 'selected="selected"'; ?>
 
             <option <?php echo $checked; ?>
-				value="<?php echo $option_value['product_optionvalue_id']; ?>"><?php echo stripslashes($this->escape(JText::_($option_value['optionvalue_name']))); ?>
+				value="<?php echo $option_value['product_optionvalue_id']; ?>"><?php echo stripslashes((string) $this->escape(Text::_($option_value['optionvalue_name']))); ?>
             <?php if ($option_value['product_optionvalue_price'] > 0 && $this->params->get('product_option_price', 1)) { ?>
             (
             <?php if($this->params->get('product_option_price_prefix', 1)): ?>
@@ -63,7 +66,7 @@ $ajax_url = JRoute::_('index.php',false);
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
           <?php foreach ($option['optionvalue'] as $option_value) { ?>
           	<?php $checked = ''; if($option_value['product_optionvalue_default']) $checked = 'checked="checked"'; ?>
           <input <?php echo $checked; ?> type="radio" autocomplete="off"
@@ -83,10 +86,10 @@ $ajax_url = JRoute::_('index.php',false);
           ?>
 				<img
 			class="optionvalue-image-<?php echo $option_value['product_optionvalue_id']; ?>"
-			src="<?php echo JUri::root(true).'/'.$option_value['optionvalue_image']; ?>" />
+			src="<?php echo Uri::root(true).'/'.$option_value['optionvalue_image']; ?>" />
           <?php endif; ?>
           <label
-			for="option-value-<?php echo $option_value['product_optionvalue_id']; ?>"><?php echo stripslashes(JText::_($option_value['optionvalue_name'])); ?>
+			for="option-value-<?php echo $option_value['product_optionvalue_id']; ?>"><?php echo stripslashes((string) Text::_($option_value['optionvalue_name'])); ?>
             <?php if ($option_value['product_optionvalue_price'] > 0 && $this->params->get('product_option_price', 1)) { ?>
 	         	(
 	         	<?php if($this->params->get('product_option_price_prefix', 1)): ?>
@@ -110,7 +113,7 @@ $ajax_url = JRoute::_('index.php',false);
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
           <?php foreach ($option['optionvalue'] as $option_value) { ?>
           <input type="checkbox"
 			name="product_option[<?php echo $option['productoption_id']; ?>][]"
@@ -124,10 +127,10 @@ $ajax_url = JRoute::_('index.php',false);
                   ?>
                   <img
                           class="optionvalue-image-<?php echo $option_value['product_optionvalue_id']; ?>"
-                          src="<?php echo JUri::root(true).'/'.$option_value['optionvalue_image']; ?>" />
+                          src="<?php echo Uri::root(true).'/'.$option_value['optionvalue_image']; ?>" />
               <?php endif; ?>
 		<label
-			for="option-value-<?php echo $option_value['product_optionvalue_id']; ?>"><?php echo stripslashes(JText::_($option_value['optionvalue_name'])); ?>
+			for="option-value-<?php echo $option_value['product_optionvalue_id']; ?>"><?php echo stripslashes((string) Text::_($option_value['optionvalue_name'])); ?>
             <?php if ($option_value['product_optionvalue_price'] > 0 && $this->params->get('product_option_price', 1)) { ?>
                (
                <?php if($this->params->get('product_option_price_prefix', 1)): ?>
@@ -165,7 +168,7 @@ $ajax_url = JRoute::_('index.php',false);
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
 		<input type="text"
 			name="product_option[<?php echo $option['productoption_id']; ?>]"
 			value="<?php echo $option['optionvalue']; ?>"
@@ -183,7 +186,7 @@ $ajax_url = JRoute::_('index.php',false);
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
 		<textarea
 			name="product_option[<?php echo $option['productoption_id']; ?>]"
 			cols="40" rows="5"><?php echo $option['optionvalue']; ?></textarea>
@@ -198,12 +201,12 @@ $ajax_url = JRoute::_('index.php',false);
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
 		<button type="button"
 			id="product-option-<?php echo $option['productoption_id']; ?>"
-			data-loading-text="<?php echo JText::_('J2STORE_LOADING')?>"
+			data-loading-text="<?php echo Text::_('J2STORE_LOADING')?>"
 			class="btn btn-default">
-			<i class="fa fa-upload"></i> <?php echo JText::_('J2STORE_PRODUCT_OPTION_CHOOSE_FILE')?></button>
+			<i class="fa fa-upload"></i> <?php echo Text::_('J2STORE_PRODUCT_OPTION_CHOOSE_FILE')?></button>
 		<input type="hidden"
 			name="product_option[<?php echo $option['productoption_id']; ?>]"
 			value="" id="input-option<?php echo $option['productoption_id']; ?>" />
@@ -222,7 +225,7 @@ $ajax_url = JRoute::_('index.php',false);
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
 		<input type="text"
 			name="product_option[<?php echo $option['productoption_id']; ?>]"
 			value="<?php echo $option['optionvalue']; ?>"
@@ -241,7 +244,7 @@ $ajax_url = JRoute::_('index.php',false);
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
 		<input type="text"
 			name="product_option[<?php echo $option['productoption_id']; ?>]"
 			value="<?php echo $option['optionvalue']; ?>"
@@ -258,16 +261,16 @@ $ajax_url = JRoute::_('index.php',false);
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
 		<input type="text"
 			name="product_option[<?php echo $option['productoption_id']; ?>]"
 			value="<?php echo $option['optionvalue']; ?>" class="j2store_time" />
 	</div>
 	<br>
         <?php } ?>
-        <?php echo J2Store::plugin()->eventWithHtml('AfterDisplaySingleProductOption', array($this->product, $option)); ?>
+        <?php echo J2Store::plugin()->eventWithHtml('AfterDisplaySingleProductOption', [$this->product, $option]); ?>
 
-	    <?php } ?>
+<?php } ?>
       </div>
 <?php } ?>
 

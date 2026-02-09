@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -16,13 +17,13 @@ defined('_JEXEC') or die;
 			</span>	
 		<?php else: ?>
 			<span class="outofstock">
-				<?php echo JText::_('J2STORE_OUT_OF_STOCK'); ?>
+				<?php echo Text::_('J2STORE_OUT_OF_STOCK'); ?>
 			</span>
 		<?php endif; ?>
 	</div>
 
 	<?php if($this->product->variant->allow_backorder == 2 && !$this->product->variant->availability): ?>
 		<span class="backorder-notification">
-			<?php echo JText::_('J2STORE_BACKORDER_NOTIFICATION'); ?>
+			<?php echo Text::_('J2STORE_BACKORDER_NOTIFICATION'); ?>
 		</span>	
 	<?php endif; ?>

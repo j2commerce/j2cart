@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /*------------------------------------------------------------------------
 # com_j2store - J2Store
 # ------------------------------------------------------------------------
@@ -11,17 +14,17 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-$ajax_base_url = JRoute::_('index.php');
+$ajax_base_url = Route::_('index.php');
 ?>
 
-<?php if($this->params->get('show_tax_calculator', 1) && isset($this->shipping_methods) && count($this->shipping_methods)): ?>
-<form action="<?php echo JRoute::_('index.php'); ?>"
+<?php if($this->params->get('show_tax_calculator', 1) && isset($this->shipping_methods) && (is_countable($this->shipping_methods) ? count($this->shipping_methods) : 0)): ?>
+<form action="<?php echo Route::_('index.php'); ?>"
 				name="j2store-cart-shipping-form"
 				id="j2store-cart-shipping-form"
 				enctype="multipart/form-data"
 				>
 <div id="j2store-cart-shipping" class="j2store-cart-shipping">
-	<h3><?php echo JText::_('J2STORE_CHECKOUT_SELECT_A_SHIPPING_METHOD');?></h3>
+	<h3><?php echo Text::_('J2STORE_CHECKOUT_SELECT_A_SHIPPING_METHOD');?></h3>
 	<?php foreach($this->shipping_methods as $method): ?>
 	<?php
 		$checked = '';
@@ -29,9 +32,9 @@ $ajax_base_url = JRoute::_('index.php');
 			$checked = 'checked';
 		}
 	?>
-	<input type="radio" id="shipping_<?php echo $method['element']; ?>_<?php echo str_replace(' ', '', $method['name']); ?>" rel="<?php echo addslashes($method['name'])?>" name="shipping_method" <?php echo $checked; ?> onClick="j2storeUpdateShipping('<?php echo addslashes($method['name']); ?>','<?php echo $method['price']; ?>',<?php echo $method['tax']; ?>,<?php echo $method['extra']; ?>, '<?php echo $method['code']; ?>', true );" />
-	<label for="shipping_<?php echo $method['element']; ?>_<?php echo str_replace(' ', '', $method['name']); ?>" onClick="j2storeUpdateShipping('<?php echo addslashes($method['name']); ?>','<?php echo $method['price']; ?>',<?php echo $method['tax']; ?>,<?php echo $method['extra']; ?>, '<?php echo $method['code']; ?>', true );">
-		<?php echo stripslashes(JText::_($method['name'])); ?> ( <?php echo $this->currency->format( $method['total']); ?> )
+	<input type="radio" id="shipping_<?php echo $method['element']; ?>_<?php echo str_replace(' ', '', (string) $method['name']); ?>" rel="<?php echo addslashes((string) $method['name'])?>" name="shipping_method" <?php echo $checked; ?> onClick="j2storeUpdateShipping('<?php echo addslashes((string) $method['name']); ?>','<?php echo $method['price']; ?>',<?php echo $method['tax']; ?>,<?php echo $method['extra']; ?>, '<?php echo $method['code']; ?>', true );" />
+	<label for="shipping_<?php echo $method['element']; ?>_<?php echo str_replace(' ', '', (string) $method['name']); ?>" onClick="j2storeUpdateShipping('<?php echo addslashes((string) $method['name']); ?>','<?php echo $method['price']; ?>',<?php echo $method['tax']; ?>,<?php echo $method['extra']; ?>, '<?php echo $method['code']; ?>', true );">
+		<?php echo stripslashes((string) Text::_($method['name'])); ?> ( <?php echo $this->currency->format( $method['total']); ?> )
 	</label>
 
 	<?php endforeach; ?>
@@ -65,7 +68,7 @@ $ajax_base_url = JRoute::_('index.php');
 				dataType: 'json',
 				cache: false,
 				beforeSend: function() {
-					$('#j2store-cart-shipping').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+					$('#j2store-cart-shipping').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 				},
 				complete: function() {
 					$('.wait').remove();

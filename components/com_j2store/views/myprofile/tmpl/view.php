@@ -33,7 +33,7 @@ $task = Factory::getApplication()->input->getString('task');
 <div class="j2store-order">
 	<div class="j2store-invoice-template">
 	<?php if(isset($this->order) && $this->error == false): ?>
-		<?php echo J2Store::invoice()->getFormatedInvoice($this->order,array()); ?>
+		<?php echo J2Store::invoice()->getFormatedInvoice($this->order,[]); ?>
 		
 	<?php else: ?>
 		<div class="alert alert-block alert-warning">

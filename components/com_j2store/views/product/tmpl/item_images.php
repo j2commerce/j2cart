@@ -32,7 +32,7 @@ $platform = J2Store::platform();
                         </a>
                     <?php endif;?>
                 <?php elseif(!empty($this->product->thumb_image)):?>
-                    <?php echo J2Store::product()->displayImage($this->product,array('type'=>'ItemThumb','params' => $this->params, 'alt' => $this->product->thumb_image_alt)); ?>
+                    <?php echo J2Store::product()->displayImage($this->product,['type'=>'ItemThumb', 'params' => $this->params, 'alt' => $this->product->thumb_image_alt]); ?>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
@@ -67,23 +67,23 @@ $platform = J2Store::platform();
                         });
                     </script>
                 <?php elseif(!empty($this->product->main_image)):?>
-                    <?php echo J2Store::product()->displayImage($this->product,array('type'=>'ItemMain','params' => $this->params, 'alt'=>$this->product->main_image_alt)); ?>
+                    <?php echo J2Store::product()->displayImage($this->product,['type'=>'ItemMain', 'params' => $this->params, 'alt'=>$this->product->main_image_alt]); ?>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
 
         <?php if ($this->params->get('show_additional_image') && isset($this->product->additional_images) && !empty($this->product->additional_images)): ?>
             <?php
-            $additional_images = json_decode($this->product->additional_images);
+            $additional_images = json_decode((string) $this->product->additional_images, null, 512, JSON_THROW_ON_ERROR);
             $additional_images = array_filter((array)$additional_images);
             if ($additional_images):
                 ?>
                 <div class="j2store-product-additional-images">
                     <ul class="additional-image-list">
                         <?php
-                        $additional_images = json_decode($this->product->additional_images,true);
-                        if (isset($additional_images) && count($additional_images)):
-                            $additional_images_alt = json_decode($this->product->additional_images_alt, true);
+                        $additional_images = json_decode((string) $this->product->additional_images,true, 512, JSON_THROW_ON_ERROR);
+                        if (isset($additional_images) && (is_countable($additional_images) ? count($additional_images) : 0)):
+                            $additional_images_alt = json_decode((string) $this->product->additional_images_alt, true, 512, JSON_THROW_ON_ERROR);
                             foreach ($additional_images as $key => $image):
                                 $image_src = $platform->getImagePath($image);
                                 ?>
@@ -99,7 +99,7 @@ $platform = J2Store::platform();
                                     />
                                 </li>
                             <?php elseif (!empty($image)): ?>
-                                <?php echo J2Store::product()->displayImage($this->product, array('type' => 'ViewAdditional', 'params' => $this->params, 'key' => $key, 'image' => $image, 'alt' => (isset($additional_images_alt[$key]) && !empty($additional_images_alt[$key])) ? $this->escape($additional_images_alt[$key]) : $this->escape($this->product->product_name))); ?>
+                                <?php echo J2Store::product()->displayImage($this->product, ['type' => 'ViewAdditional', 'params' => $this->params, 'key' => $key, 'image' => $image, 'alt' => (isset($additional_images_alt[$key]) && !empty($additional_images_alt[$key])) ? $this->escape($additional_images_alt[$key]) : $this->escape($this->product->product_name)]); ?>
                             <?php endif; ?>
                             <?php endforeach; ?>
                             <?php if (!empty($main_image)): ?>
@@ -114,7 +114,7 @@ $platform = J2Store::platform();
                                 />
                             </li>
                         <?php elseif (!empty($this->product->main_image)): ?>
-                            <?php echo J2Store::product()->displayImage($this->product, array('type' => 'AdditionalMain', 'params' => $this->params, 'alt' => $this->escape($this->product->main_image_alt))); ?>
+                            <?php echo J2Store::product()->displayImage($this->product, ['type' => 'AdditionalMain', 'params' => $this->params, 'alt' => $this->escape($this->product->main_image_alt)]); ?>
                         <?php endif; ?>
                         <?php endif; ?>
                     </ul>

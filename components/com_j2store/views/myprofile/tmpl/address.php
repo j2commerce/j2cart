@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -32,30 +34,30 @@ if(empty($user->id)){
 }
 </style>
 <form class="form-horizontal" id="j2storeaddressForm" name="addressForm" method="post" action="<?php echo $back_url; ?>" >
-	<h3><?php echo JText::_('J2STORE_ADDRESS_EDIT');?></h3>
+	<h3><?php echo Text::_('J2STORE_ADDRESS_EDIT');?></h3>
 	<div id="address">
 		<div class="j2store-address-alert">
 		</div>
 		 <div class="pull-right">
-			 <a  onclick="J2storeSubmitForm(this,'apply')" class="button btn btn-success"><span class="icon-apply icon-white"></span><?php echo JText::_('JSAVE'); ?></a>
-			 <a  onclick="J2storeSubmitForm(this,'save')" class="button btn "><span class="icon-save"></span><?php echo JText::_('JTOOLBAR_SAVE'); ?></a>
+			 <a  onclick="J2storeSubmitForm(this,'apply')" class="button btn btn-success"><span class="icon-apply icon-white"></span><?php echo Text::_('JSAVE'); ?></a>
+			 <a  onclick="J2storeSubmitForm(this,'save')" class="button btn "><span class="icon-save"></span><?php echo Text::_('JTOOLBAR_SAVE'); ?></a>
 	  	</div>
 		<div class="pull-left">
 			<a class="btn btn-warning" href="<?php echo $back_url;?>" >
 				<span class="fa fa-chevron-left"></span>
-				<?php echo JText::_('J2STORE_BACK_TO_PROFILE');?>
+				<?php echo Text::_('J2STORE_BACK_TO_PROFILE');?>
 			</a>
 		</div>
 		<br>
 		<br>
 		<div class="control-group">
-		  	<?php echo J2Html::label(JText::_('J2STORE_ADDRESS_TYPE') ,array('class'=>'control-label'));?>
+		  	<?php echo J2Html::label(Text::_('J2STORE_ADDRESS_TYPE') ,['class'=>'control-label']);?>
 			  <?php echo J2Html::select()->clearState()
 			  			->type('genericlist')
 			  			->name('type')
 			  			->value($this->address->type)
 			  			->setPlaceHolders(
-			  				array('billing'=>JText::_('J2STORE_BILLING_ADDRESS'), 'shipping'=>JText::_('J2STORE_SHIPPING_ADDRESS'))
+			  				['billing'=>Text::_('J2STORE_BILLING_ADDRESS'), 'shipping'=>Text::_('J2STORE_SHIPPING_ADDRESS')]
 			  			)->getHtml();
 			  ?>
 	  </div>
@@ -78,7 +80,7 @@ if(empty($user->id)){
 		<?php $onWhat='onchange'; if($oneExtraField->field_type=='radio') $onWhat='onclick';?>
 			<?php if(property_exists($this->address, $fieldName)):
 				if(($fieldName !='email')){
-                    $placeholder =  (isset($oneExtraField->field_options['placeholder']) ? $oneExtraField->field_options['placeholder'] : "");
+                    $placeholder =  ($oneExtraField->field_options['placeholder'] ?? "");
                     $field_options = '';
                     if($placeholder){
                         $field_options .= ' placeholder="'.$placeholder.'" ';
@@ -93,7 +95,7 @@ if(empty($user->id)){
 	 		 //check for unprocessed fields.
 	 		 //If the user forgot to add the
 	 		 //fields to the checkout layout in store profile, we probably have some.
-	 	 		$unprocessedFields = array();
+	 	 		$unprocessedFields = [];
 			  foreach($this->fields as $fieldName => $oneExtraField):
 	  			if(!in_array($fieldName, $checkoutFields[1])):
 	  				$unprocessedFields[$fieldName] = $oneExtraField;
@@ -116,7 +118,7 @@ if(empty($user->id)){
 						<?php if(property_exists($this->address, $fieldName)): ?>
 							<?php
 							if(($fieldName !='email')){
-                                $placeholder =  (isset($oneExtraField->field_options['placeholder']) ? $oneExtraField->field_options['placeholder'] : "");
+                                $placeholder =  ($oneExtraField->field_options['placeholder'] ?? "");
                                 $field_options = '';
                                 if($placeholder){
                                     $field_options .= ' placeholder="'.$placeholder.'" ';
@@ -220,7 +222,7 @@ $('#address select[name=\'country_id\']').bind('change', function() {
 		url: 'index.php?option=com_j2store&view=myprofile&task=getCountry&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
-			$('#address select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#address select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 
@@ -233,7 +235,7 @@ $('#address select[name=\'country_id\']').bind('change', function() {
 				$('#shipping-postcode-required').hide();
 			}
 
-			html = '<option value=""><?php echo JText::_('J2STORE_SELECT_OPTION'); ?></option>';
+			html = '<option value=""><?php echo Text::_('J2STORE_SELECT_OPTION'); ?></option>';
 
 			if (json['zone'] != '') {
 
@@ -247,7 +249,7 @@ $('#address select[name=\'country_id\']').bind('change', function() {
 	    			html += '>' + json['zone'][i]['zone_name'] + '</option>';
 				}
 			} else {
-				html += '<option value="0" selected="selected"><?php echo JText::_('J2STORE_CHECKOUT_NONE'); ?></option>';
+				html += '<option value="0" selected="selected"><?php echo Text::_('J2STORE_CHECKOUT_NONE'); ?></option>';
 			}
 
 			$('#address select[name=\'zone_id\']').html(html);

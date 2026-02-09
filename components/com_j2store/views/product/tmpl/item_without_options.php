@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -36,12 +38,12 @@ $platform = J2Store::platform();
 		enctype="multipart/form-data"
 		>
 		<?php 
-		$plugin = JPluginHelper::getPlugin('content', 'j2store');
+		$plugin = PluginHelper::getPlugin('content', 'j2store');
 		$pluginParams = $platform->getRegistry($plugin->params);
 		?>
-		<?php if((count($this->product->options) && $pluginParams->get('category_product_options', 1) == 2 ) || $pluginParams->get('category_product_options', 1) == 3 ): ?>
+		<?php if(((is_countable($this->product->options) ? count($this->product->options) : 0) && $pluginParams->get('category_product_options', 1) == 2 ) || $pluginParams->get('category_product_options', 1) == 3 ): ?>
 			<!-- Product has options. Redirect -->
-			<a class="cartbutton btn btn-primary" href="<?php echo $this->product->product_view_url; ?>" ><?php echo JText::_('J2STORE_CART_CHOOSE_OPTIONS'); ?></a>
+			<a class="cartbutton btn btn-primary" href="<?php echo $this->product->product_view_url; ?>" ><?php echo Text::_('J2STORE_CART_CHOOSE_OPTIONS'); ?></a>
 		<?php else: ?>
 			<?php echo $this->loadTemplate('cart'); ?>
 		<?php endif; ?>

@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 /**
  * @package J2Store
 * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -12,10 +14,10 @@ $J2gridRow = ($config->get('bootstrap_version', 2) == 2) ? 'row-fluid' : 'row';
 $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 ?>
 
-<h3 class="myprofile-address-list-heading"><?php echo JText::_('J2STORE_ADDRESS_LIST');?></h3>
+<h3 class="myprofile-address-list-heading"><?php echo Text::_('J2STORE_ADDRESS_LIST');?></h3>
 	<div class="myprofile-address-addnew">
 		<?php //echo J2StorePopup::popupAdvanced('index.php?option=com_j2store&view=myprofile&task=editAddress&layout=address&tmpl=component&address_id=', JText::_('J2STORE_ADD') ,array('update'=>true,'class'=>'btn btn-success','width'=>800 , 'height'=>600));?>
-		<a href="<?php echo J2Store::platform()->getMyprofileUrl(array('task' => 'editAddress','layout' => 'address','address_id' => 0));?>"><?php echo JText::_('J2STORE_ADD');?></a>
+		<a href="<?php echo J2Store::platform()->getMyprofileUrl(['task' => 'editAddress', 'layout' => 'address', 'address_id' => 0]);?>"><?php echo Text::_('J2STORE_ADD');?></a>
 
 	</div>
 <hr>
@@ -30,9 +32,9 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 
 			$fields =  $this->fieldClass->getFields($addressTable->type,$addressTable,'address');
 
-			$html = $config->get('store_'.strtolower($addressTable->type).'_layout', '');
+			$html = $config->get('store_'.strtolower((string) $addressTable->type).'_layout', '');
 
-			if(empty($html) || strlen($html) < 5) {
+			if(empty($html) || strlen((string) $html) < 5) {
 				//we dont have a profile set in the store profile. So use the default one.
 				$html = '<div class="'.$J2gridRow.'">
 					<div class="'.$J2gridCol.'6">[first_name] [last_name] [email] [phone_1] [phone_2] [country_id] [zone_id] </div>
@@ -40,7 +42,7 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 					</div>';
 				}
 			//first find all the checkout fields
-			preg_match_all("^\[(.*?)\]^",$html,$checkoutFields, PREG_PATTERN_ORDER);
+			preg_match_all("^\[(.*?)\]^",(string) $html,$checkoutFields, PREG_PATTERN_ORDER);
 
 			//var_dump($fields);
 		?>
@@ -48,18 +50,18 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 			<ul class="j2store-myprofile-address-controls inline pull-right">
 				<li class="myprofile-address-control-edit">
 					<?php //echo J2StorePopup::popup('index.php?option=com_j2store&view=myprofile&task=editAddress&layout=address&tmpl=component&address_id='.$orderinfo->j2store_address_id, JText::_('J2STORE_EDIT') ,array('update'=>true,'width'=>800 , 'height'=>500));?>
-					<a href="<?php echo J2Store::platform()->getMyprofileUrl(array('task' => 'editAddress','layout' => 'address','address_id' => $orderinfo->j2store_address_id));?>"><?php echo JText::_('J2STORE_EDIT');?></a>
+					<a href="<?php echo J2Store::platform()->getMyprofileUrl(['task' => 'editAddress', 'layout' => 'address', 'address_id' => $orderinfo->j2store_address_id]);?>"><?php echo Text::_('J2STORE_EDIT');?></a>
 				</li>
 				<li class="myprofile-address-control-delete">
 					<a onclick="deleteAddress('<?php echo $orderinfo->j2store_address_id;?>')" href="#" >
-						<?php echo JText::_('J2STORE_DELETE');?>
+						<?php echo Text::_('J2STORE_DELETE');?>
 					</a>
 				</li>
 			</ul>
 			<?php foreach ($fields as $fieldName => $oneExtraField):?>
 					<?php if(property_exists($addressTable, $fieldName)):?>
 					<?php
-						$label = '<strong>'.JText::_($oneExtraField->field_name).'</strong> : ';
+						$label = '<strong>'.Text::_($oneExtraField->field_name).'</strong> : ';
 						if($fieldName == 'country_id') {
 							$value = $orderinfo->country_name;
 						}elseif($fieldName == 'zone_id') {
@@ -67,7 +69,7 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 						}else {
 							$value =$addressTable->$fieldName;
 						}
-						$html = str_replace('['.$fieldName.']',$label.$value.'</br>', $html);
+						$html = str_replace('['.$fieldName.']',$label.$value.'</br>', (string) $html);
 					?>
 					<?php endif;?>
 				<?php endforeach;?>
@@ -75,7 +77,7 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 				<?php
 
 				//check for unprocessed fields. If the user forgot to add the fields to the checkout layout in store profile, we probably have some.
-				$unprocessedFields = array();
+				$unprocessedFields = [];
 				foreach($fields as $fieldName => $oneExtraField) {
 					if(!in_array($fieldName, $checkoutFields[1])) {
 						$unprocessedFields[$fieldName] = $oneExtraField;
@@ -83,9 +85,9 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 				}
 
 				//now we have unprocessed fields. remove any other square brackets found.
-				preg_match_all("^\[(.*?)\]^",$html,$removeFields, PREG_PATTERN_ORDER);
+				preg_match_all("^\[(.*?)\]^",(string) $html,$removeFields, PREG_PATTERN_ORDER);
 				foreach($removeFields[1] as $fieldName) {
-					$html = str_replace('['.$fieldName.']', '', $html);
+					$html = str_replace('['.$fieldName.']', '', (string) $html);
 				}
 				?>
 			<?php echo $html; ?>
@@ -97,11 +99,11 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 										<?php
 
 										if(property_exists($addressTable, $fieldName)) {
-											$label = '<strong>'.JText::_($oneExtraField->field_name).'</strong> : ';
+											$label = '<strong>'.Text::_($oneExtraField->field_name).'</strong> : ';
 											if($fieldName == 'country_id') {
-												$value = JText::_($orderinfo->country_name);
+												$value = Text::_($orderinfo->country_name);
 											}elseif($fieldName == 'zone_id') {
-												$value = JText::_($orderinfo->zone_name);
+												$value = Text::_($orderinfo->zone_name);
 											}else {
 												$value = $addressTable->$fieldName;
 											}
@@ -114,7 +116,7 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 				</div>
 				<?php endif; ?>
 		</li>
-	<?php endforeach;?>
+<?php endforeach;?>
 	<?php endif;?>
 </ul>
 <div class="before-profile">
@@ -133,7 +135,7 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 	function deleteAddress(id) {
 		(function ($) {
 			$('#system-message-container').html('');
-			var c=confirm('<?php echo addslashes(JText::_("J2STORE_MYPROFILE_DELETE_CONFIRM_MESSAGE"));?>');
+			var c=confirm('<?php echo addslashes((string) Text::_("J2STORE_MYPROFILE_DELETE_CONFIRM_MESSAGE"));?>');
 			if (c){
                 var data = {
                     option: 'com_j2store',
@@ -142,7 +144,7 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
                     address_id: id
                 };
                 $.ajax({
-                    url : '<?php echo JRoute::_('index.php');?>',
+                    url : '<?php echo Route::_('index.php');?>',
                     type: 'post',
                     data :data,
                     dataType: 'json',

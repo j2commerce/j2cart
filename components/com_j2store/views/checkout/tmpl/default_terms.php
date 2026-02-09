@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /*------------------------------------------------------------------------
 # com_j2store - J2Store
 # ------------------------------------------------------------------------
@@ -22,7 +23,7 @@ defined('_JEXEC') or die('Restricted access');
 		<?php echo $this->html; ?>
 		</div>
 		<div class="modal-footer">
-		<a class="btn" data-dismiss="modal"><?php echo JText::_('J2STORE_CLOSE')?></a>
+		<a class="btn" data-dismiss="modal"><?php echo Text::_('J2STORE_CLOSE')?></a>
 		</div>
 	</div>
 </div>
