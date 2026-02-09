@@ -25,12 +25,12 @@ $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" rol
 if (version_compare(JVERSION, '3.99.99', 'lt')) {
     $row_class = 'row-fluid';
     $col_class = 'span';
-    $alert_html = '<div class="alert alert-error alert-danger">'.htmlspecialchars(Text::_('JLIB_FORM_CONTAINS_INVALID_FIELDS')).'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
+    $alert_html = '<div class="alert alert-error alert-danger">'.htmlspecialchars((string) Text::_('JLIB_FORM_CONTAINS_INVALID_FIELDS')).'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
 }
 $config = Factory::getApplication()->getConfig();
 $asset_id = $config->get('asset_id');
 
-$optionvalues=array();
+$optionvalues=[];
 if(isset($this->optionvalues))
 {
  $optionvalues = $this->optionvalues;
@@ -80,7 +80,7 @@ $this->item->option_params = $platform->getRegistry($this->item->option_params);
                                 <label for="option_name"><?php echo Text::_( 'J2STORE_OPTION_DISPLAY_NAME' ); ?></label>
                             </div>
                             <div class="controls">
-                                <input type="text" name="option_name" id="option_name" class="form-control required" value="<?php echo htmlentities($this->item->option_name);?>" />
+                                <input type="text" name="option_name" id="option_name" class="form-control required" value="<?php echo htmlentities((string) $this->item->option_name);?>" />
                             </div>
                         </div>
                         <div class="control-group">
@@ -88,7 +88,7 @@ $this->item->option_params = $platform->getRegistry($this->item->option_params);
                                 <label for="option_unique_name"><?php echo Text::_( 'J2STORE_OPTION_UNIQUE_NAME' ); ?></label>
                             </div>
                             <div class="controls">
-                                <input type="text" name="option_unique_name" id="option_unique_name" class="form-control required" value="<?php echo htmlentities($this->item->option_unique_name);?>" />
+                                <input type="text" name="option_unique_name" id="option_unique_name" class="form-control required" value="<?php echo htmlentities((string) $this->item->option_unique_name);?>" />
                             </div>
                         </div>
                         <div class="control-group">
@@ -96,7 +96,7 @@ $this->item->option_params = $platform->getRegistry($this->item->option_params);
                                 <label for="type"><?php echo Text::_( 'J2STORE_OPTION_TYPE' ); ?></label>
                             </div>
                             <div class="controls">
-	                            <?php echo J2StoreHelperSelect::getOptionTypesList('type', 'option-type', $this->item); ?>
+	                            <?php echo \J2Commerce\J2Cart\Administrator\Helper\SelectHelper::getOptionTypesList('type', 'option-type', $this->item); ?>
                             </div>
                         </div>
 
@@ -106,7 +106,7 @@ $this->item->option_params = $platform->getRegistry($this->item->option_params);
                                     <label for="option_unique_name"><?php echo Text::_( 'J2STORE_OPTION_PLACEHOLDER' ); ?></label>
                                 </div>
                                 <div class="controls">
-	                                <?php echo J2Html::text('option_params[place_holder]', $this->item->option_params->get('place_holder', '' ),array('class' => 'form-control')); ?>
+	                                <?php echo J2Html::text('option_params[place_holder]', $this->item->option_params->get('place_holder', '' ),['class' => 'form-control']); ?>
                                 </div>
                             </div>
 	                    <?php endif;?>
@@ -116,7 +116,7 @@ $this->item->option_params = $platform->getRegistry($this->item->option_params);
                                 <label for="enabled"><?php echo Text::_( 'J2STORE_OPTION_STATE' ); ?></label>
                             </div>
                             <div class="controls">
-			                    <?php echo J2StoreHelperSelect::publish('enabled',$this->item->enabled); ?>
+			                    <?php echo \J2Commerce\J2Cart\Administrator\Helper\SelectHelper::publish('enabled',$this->item->enabled); ?>
                             </div>
                         </div>
 	                    <?php if($this->item->type == 'date' || $this->item->type == 'datetime'  ):?>
@@ -133,7 +133,7 @@ $this->item->option_params = $platform->getRegistry($this->item->option_params);
                                     <label for="option_params[date_format]"><?php echo Text::_( 'J2STORE_CONF_DATE_FORMAT_LABEL' ); ?></label>
                                 </div>
                                 <div class="controls">
-	                                <?php echo J2Html::text('option_params[date_format]', $this->item->option_params->get('date_format', 'yy-mm-dd'),array('class' => 'form-control')); ?>
+	                                <?php echo J2Html::text('option_params[date_format]', $this->item->option_params->get('date_format', 'yy-mm-dd'),['class' => 'form-control']); ?>
                                 </div>
                             </div>
 		                    <?php if($this->item->type == 'datetime'): ?>
@@ -142,7 +142,7 @@ $this->item->option_params = $platform->getRegistry($this->item->option_params);
                                         <label for="option_params[time_format]"><?php echo Text::_( 'J2STORE_CONF_TIME_FORMAT_LABEL' ); ?></label>
                                     </div>
                                     <div class="controls">
-	                                    <?php echo J2Html::text('option_params[time_format]', $this->item->option_params->get('time_format', 'HH:mm' ),array('class' => 'form-control')); ?>
+	                                    <?php echo J2Html::text('option_params[time_format]', $this->item->option_params->get('time_format', 'HH:mm' ),['class' => 'form-control']); ?>
                                     </div>
                                 </div>
 		                    <?php endif; ?>
@@ -176,11 +176,11 @@ $this->item->option_params = $platform->getRegistry($this->item->option_params);
                                     </td>
                                     <td class="border-bottom">
                                         <input type="hidden"  name="option_value[<?php echo $option_value_row; ?>][j2store_optionvalue_id]" value="<?php echo $option_value->j2store_optionvalue_id	; ?>" />
-                                        <input type="text" class="form-control required w-100"   name="option_value[<?php echo $option_value_row; ?>][optionvalue_name]" value="<?php echo isset($option_value->optionvalue_name) ? htmlentities($option_value->optionvalue_name): ''; ?>" />
+                                        <input type="text" class="form-control required w-100"   name="option_value[<?php echo $option_value_row; ?>][optionvalue_name]" value="<?php echo isset($option_value->optionvalue_name) ? htmlentities((string) $option_value->optionvalue_name): ''; ?>" />
                                     </td>
                                     <td class="border-bottom d-none d-lg-table-cell">
                                         <div class="input-prepend input-append">
-							                <?php echo J2Html::media('option_value['.$option_value_row.'][optionvalue_image]', $option_value->optionvalue_image, array('id' => 'jform_optionvalue_image_'.$option_value->j2store_optionvalue_id, 'image_id' => 'input-optionvalue-image-'.$option_value->j2store_optionvalue_id, 'no_hide' => '')); ?>
+							                <?php echo J2Html::media('option_value['.$option_value_row.'][optionvalue_image]', $option_value->optionvalue_image, ['id' => 'jform_optionvalue_image_'.$option_value->j2store_optionvalue_id, 'image_id' => 'input-optionvalue-image-'.$option_value->j2store_optionvalue_id, 'no_hide' => '']); ?>
                                         </div>
                                     </td>
                                     <td class="d-none d-lg-table-cell border-bottom">
@@ -281,7 +281,7 @@ $this->item->option_params = $platform->getRegistry($this->item->option_params);
         html += '</td>';
         html += '<td class="d-none d-lg-table-cell text-center border-bottom">';
         html += '<input type="hidden" name="option_value[' + option_value_row + '][optionvalue_image]" value="" />';
-        html += '<span class="text text-info"><?php echo addslashes(Text::_('J2STORE_OPTIONVALUE_INSERT_IMAGE_HELP'));?></span>';
+        html += '<span class="text text-info"><?php echo addslashes((string) Text::_('J2STORE_OPTIONVALUE_INSERT_IMAGE_HELP'));?></span>';
         html += '<td class="border-bottom"><input class="form-control text-center" type="text" name="option_value[' + option_value_row + '][ordering]" value="0" size="1" /></td>';
         html += '<td class="border-bottom"><a onclick="document.getElementById(\'option-value-row' + option_value_row + '\').remove();" class="btn btn-danger btn-sm"><?php echo Text::_('J2STORE_REMOVE'); ?></a></td>';
         html += '</tr>';

@@ -18,7 +18,7 @@ $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
 $platform->loadExtra('behavior.formvalidator');
 jimport('joomla.filesystem.file');
-$countries = J2StoreHelperSelect::getCountries();
+$countries = \J2Commerce\J2Cart\Administrator\Helper\SelectHelper::getCountries();
 $row_class = 'row';
 $col_class = 'col-md-';
 $btn_class = 'btn-sm';
@@ -42,7 +42,7 @@ $btn_class = 'btn-sm';
                                         <label><?php echo Text::_('J2STORE_GEOZONE_NAME'); ?></label>
                                     </div>
                                     <div class="controls">
-                                        <?php echo J2Html::text('geozone_name', $this->item->geozone_name, array('class'=>'form-control')); ?>
+                                        <?php echo J2Html::text('geozone_name', $this->item->geozone_name, ['class'=>'form-control']); ?>
                                     </div>
                                 </div>
                                 <div class="control-group">
@@ -55,9 +55,9 @@ $btn_class = 'btn-sm';
                                             ->type('genericlist')
                                             ->name('enabled')
                                             ->value($this->item->enabled)
-                                            ->attribs(array('class'=>'form-select'))
+                                            ->attribs(['class'=>'form-select'])
                                             ->setPlaceHolders(
-                                                array(0 => Text::_('J2STORE_DISABLE'), 1 => Text::_('J2STORE_ENABLED'))
+                                                [0 => Text::_('J2STORE_DISABLE'), 1 => Text::_('J2STORE_ENABLED')]
                                             )->getHtml();
                                         ?>
                                     </div>
@@ -74,10 +74,10 @@ $btn_class = 'btn-sm';
                     <?php if ($this->item->j2store_geozone_id): ?>
                         <div class="btn-toolbar gap-2">
                             <div class="btn-wrapper">
-                                <?php echo J2StorePopup::popupAdvanced('index.php?option=com_j2store&view=countries&layout=modal&task=elements&tmpl=component&geozone_id=' . $this->item->j2store_geozone_id, '<i class="icon icon-download"></i> ' . Text::_('J2STORE_IMPORT_COUNTRIES'), array('class' => 'btn btn-sm btn-success', 'width' => 800, 'height' => 600, 'refresh' => true,'id'=>'fancybox')); ?>
+                                <?php echo J2StorePopup::popupAdvanced('index.php?option=com_j2store&view=countries&layout=modal&task=elements&tmpl=component&geozone_id=' . $this->item->j2store_geozone_id, '<i class="icon icon-download"></i> ' . Text::_('J2STORE_IMPORT_COUNTRIES'), ['class' => 'btn btn-sm btn-success', 'width' => 800, 'height' => 600, 'refresh' => true, 'id'=>'fancybox']); ?>
                             </div>
                             <div class="btn-wrapper">
-                                <?php echo J2StorePopup::popupAdvanced('index.php?option=com_j2store&view=zones&layout=modal&task=elements&tmpl=component&geozone_id=' . $this->item->j2store_geozone_id, '<i class="icon icon-download"></i> ' . Text::_('J2STORE_IMPORT_ZONES'), array('class' => 'btn btn-sm btn-success', 'width' => 800, 'height' => 600, 'refresh' => true,'id'=>'fancybox')); ?>
+                                <?php echo J2StorePopup::popupAdvanced('index.php?option=com_j2store&view=zones&layout=modal&task=elements&tmpl=component&geozone_id=' . $this->item->j2store_geozone_id, '<i class="icon icon-download"></i> ' . Text::_('J2STORE_IMPORT_ZONES'), ['class' => 'btn btn-sm btn-success', 'width' => 800, 'height' => 600, 'refresh' => true, 'id'=>'fancybox']); ?>
                             </div>
                         </div>
                     <?php endif; ?>
@@ -106,22 +106,17 @@ $btn_class = 'btn-sm';
                                     <tr id="zone-to-geo-zone-row<?php echo $zone_to_geo_zone_row; ?>" style="display: none;">
                                         <td>
                                             <?php
-                                            $attr = array("onchange" => "getZones($zone_to_geo_zone_row,this.value)","class"=>"form-select");
+                                            $attr = ["onchange" => "getZones($zone_to_geo_zone_row,this.value)", "class"=>"form-select"];
                                             echo J2Html::select()->clearState()
                                                 ->type('genericlist')
                                                 ->name('zone_to_geo_zone[' . $zone_to_geo_zone_row . '][country_id]')
                                                 ->value($geozonerule->country_id)
                                                 ->attribs($attr)
                                                 ->setPlaceHolders(
-                                                    array('' => Text::_('J2STORE_SELECT_OPTION'))
+                                                    ['' => Text::_('J2STORE_SELECT_OPTION')]
                                                 )
                                                 ->hasOne('Countries')
-                                                ->setRelations(array(
-                                                        'fields' => array(
-                                                            'key' => 'j2store_country_id',
-                                                            'name' => array('country_name')
-                                                        )
-                                                    )
+                                                ->setRelations(['fields' => ['key' => 'j2store_country_id', 'name' => ['country_name']]]
                                                 )->getHtml();
 
 
@@ -184,7 +179,7 @@ $btn_class = 'btn-sm';
        html += '<tr>';
        html += '<td><select name="zone_to_geo_zone[' + zone_to_geo_zone_row + '][country_id]" class="form-select" id="country' + zone_to_geo_zone_row + '" onchange="getZones(' + zone_to_geo_zone_row + ', this.value)">';
        <?php foreach ($countries as $key => $value) { ?>
-       html += '<option value="<?php echo $key; ?>"><?php echo addslashes($value); ?></option>';
+       html += '<option value="<?php echo $key; ?>"><?php echo addslashes((string) $value); ?></option>';
        <?php } ?>
        html += '</select></td>';
        html += '<td><select name="zone_to_geo_zone[' + zone_to_geo_zone_row + '][zone_id]" class="form-select" id="zone' + zone_to_geo_zone_row + '"></select></td>';

@@ -21,11 +21,8 @@ use Joomla\CMS\Language\Text;
 		    ->name('config_including_tax')
 		    ->idTag('config_including_tax')
 		    ->value($this->params->get('config_including_tax', 0))
-		    ->attribs(array('class'=>'form-select'))
-		    ->setPlaceHolders(array(
-			    '0'=>Text::_('J2STORE_PRICES_EXCLUDING_TAXES'),
-			    '1'=>Text::_('J2STORE_PRICES_INCLUDING_TAXES')
-		    ))
+		    ->attribs(['class'=>'form-select'])
+		    ->setPlaceHolders(['0'=>Text::_('J2STORE_PRICES_EXCLUDING_TAXES'), '1'=>Text::_('J2STORE_PRICES_INCLUDING_TAXES')])
 		    ->getHtml();
 	    ?>
         <small class="form-text"><?php echo Text::_('J2STORE_CONF_INCLUDING_TAX_DESC')?></small>
@@ -36,7 +33,7 @@ use Joomla\CMS\Language\Text;
 		<?php echo J2Html::label(Text::_('J2STORE_DEFAULT_TAX_RATE'), 'tax_rate');?>
     </div>
     <div class="controls">
-	    <?php echo J2Html::text('tax_rate', '', array('id'=>'tax_rate','class'=>'form-control'));?>
+	    <?php echo J2Html::text('tax_rate', '', ['id'=>'tax_rate', 'class'=>'form-control']);?>
         <small class="form-text"><?php echo Text::_('J2STORE_DEFAULT_TAX_RATE_DESC')?></small>
     </div>
 </div>

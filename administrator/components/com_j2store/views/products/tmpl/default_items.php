@@ -108,11 +108,7 @@ $wa->useScript('table.columns')->useScript('multiselect');
                             <div class="small text-capitalize"><?php echo Text::_('J2STORE_PRODUCT_TYPE')?>:<b class="ms-2 text-capitalize"><?php echo $item->product_type; ?></b></div>
                             <div class="small text-capitalize"><?php echo Text::_('J2STORE_PRODUCT_VISIBILITY')?>:<b class="ms-2 text-<?php echo $item->visibility ? 'success':'danger'; ?>"><?php echo $item->visibility ? Text::_('JYES'):Text::_('JNO'); ?></b></div>
                             <div class="small text-capitalize"><?php echo Text::_('J2STORE_ARTICLE_STATUS')?>:
-                                <?php $state_array = array (
-                                    '-2' => array('danger', 'JTRASHED'),
-                                    '0' => array('danger', 'JUNPUBLISHED'),
-                                    '1' => array('success', 'JPUBLISHED')
-                                );
+                                <?php $state_array = ['-2' => ['danger', 'JTRASHED'], '0' => ['danger', 'JUNPUBLISHED'], '1' => ['success', 'JPUBLISHED']];
                                 ?>
                                 <b class="ms-2 text-capitalize text-<?php echo $state_array[$item->source->state][0]; ?>"><?php echo Text::_($state_array[$item->source->state][1]);?></b>
                             </div>
@@ -171,7 +167,7 @@ $wa->useScript('table.columns')->useScript('multiselect');
                                     $variant_model = F0FModel::getTmpInstance('Variants', 'J2StoreModel');
                                     $variant_model->setState('product_type', $item->product_type);
                                     $variants = $variant_model->product_id($item->j2store_product_id)->is_master(0)->getList();
-                                    if(isset($variants) && count($variants)):
+                                    if(isset($variants) && (is_countable($variants) ? count($variants) : 0)):
                                         foreach($variants as $variant):?>
                                             <div class="list-group">
                                                 <div class="list-group-item mb-1">

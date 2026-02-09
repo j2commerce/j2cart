@@ -40,15 +40,15 @@ use Joomla\CMS\Language\Text;
                                         <?php echo J2Html::hidden($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][j2store_productoption_id]', $poption->j2store_productoption_id);?>
                                         <?php echo J2Html::hidden($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][option_id]', $poption->option_id);?>
                                         <small>(<?php  echo $this->escape($poption->option_unique_name);?>)</small>
-                                        <small><?php Text::_('J2STORE_OPTION_TYPE');?> <?php echo Text::_('J2STORE_'.strtoupper($poption->type))?></small>
+                                        <small><?php Text::_('J2STORE_OPTION_TYPE');?> <?php echo Text::_('J2STORE_'.strtoupper((string) $poption->type))?></small>
                                         <?php if(isset($poption->type) && ($poption->type =='select' || $poption->type =='radio' || $poption->type =='checkbox')):?>
                                             <small class="d-block">
-                                                <?php echo J2StorePopup::popup("index.php?option=com_j2store&view=products&task=setproductoptionvalues&product_id=".$this->item->j2store_product_id."&productoption_id=".$poption->j2store_productoption_id."&layout=productoptionvalues&tmpl=component", Text::_( "J2STORE_OPTION_SET_VALUES" ), array());?>
+                                                <?php echo J2StorePopup::popup("index.php?option=com_j2store&view=products&task=setproductoptionvalues&product_id=".$this->item->j2store_product_id."&productoption_id=".$poption->j2store_productoption_id."&layout=productoptionvalues&tmpl=component", Text::_( "J2STORE_OPTION_SET_VALUES" ), []);?>
                                             </small>
                                         <?php endif;?>
                                     </td>
                                     <td>
-                                        <?php echo J2Html::text($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][ordering]',$poption->ordering,array('id'=>'ordering' ,'class'=>'form-control form-control-sm'));?>
+                                        <?php echo J2Html::text($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][ordering]',$poption->ordering,['id'=>'ordering', 'class'=>'form-control form-control-sm']);?>
                                     </td>
                                     <td>
                                         <span class="optionRemove" onClick="removePAOption(<?php echo $poption->j2store_productoption_id;?>)">

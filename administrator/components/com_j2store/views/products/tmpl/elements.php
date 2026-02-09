@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\HTML\HTMLHelper;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -21,21 +24,21 @@ $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
 ?>
 
-<form action="<?php echo JRoute::_('index.php?option=com_j2store&view=products&task=setProducts');?>" method="post" name="adminForm" id="productadminForm" class="form-inline">
-	<h5><?php echo JText::_('COM_J2STORE_PRODUCTS');?></h5>
+<form action="<?php echo Route::_('index.php?option=com_j2store&view=products&task=setProducts');?>" method="post" name="adminForm" id="productadminForm" class="form-inline">
+	<h5><?php echo Text::_('COM_J2STORE_PRODUCTS');?></h5>
 	<div class="row-fluid">
 		<table class="adminlist table table-striped">
 			<tr>
 				<td>
-					<?php echo J2Html::label(JText::_('JCATEGORY'));?>
+					<?php echo J2Html::label(Text::_('JCATEGORY'));?>
 					<?php
-						$catlist = array();
-						$catlist[''] = JText::_('J2STORE_SELECT_OPTION');
+						$catlist = [];
+						$catlist[''] = Text::_('J2STORE_SELECT_OPTION');
 						foreach($this->categories as $key => $value){
 							$catlist[$value->value] = $value->text;
 						}
 						echo J2Html::select()->clearState()->type('genericlist')->idTag('catid')
-											 ->attribs(array('onchange'=>'this.form.submit();'))
+											 ->attribs(['onchange'=>'this.form.submit();'])
 											 ->setPlaceholders($catlist)
 											 ->name('filter_category')
 											 ->value($this->state->get('filter_category',''))
@@ -51,15 +54,15 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 			<thead>
 				<tr>
 					<th>
-						<input class="btn btn-success" id="setAllProductsBnt" type="button" value="<?php echo JText::_('J2STORE_SET');?>"  style="display:none;"/>
+						<input class="btn btn-success" id="setAllProductsBnt" type="button" value="<?php echo Text::_('J2STORE_SET');?>"  style="display:none;"/>
 						<br>
-						<?php echo JHtml::_('grid.checkall'); ?>
+						<?php echo HTMLHelper::_('grid.checkall'); ?>
 					</th>
 					<th class="title">
-						<?php echo JHtml::_('grid.sort', 'J2STORE_PRODUCT_NAME', 'a.j2store_product_id', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'J2STORE_PRODUCT_NAME', 'a.j2store_product_id', $listDirn, $listOrder); ?>
 					</th>
 					<th width="1%" class="center nowrap">
-						<?php echo JHtml::_('grid.sort', 'J2STORE_ENABLE', 'a.enabled', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'J2STORE_ENABLE', 'a.enabled', $listDirn, $listOrder); ?>
 					</th>
 				</tr>
 			</thead>
@@ -75,18 +78,18 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 				<?php $canChange  = 1;?>
 				<tr>
 					<td>
-						<?php echo JHtml::_('grid.id',$item->j2store_product_id,$item->j2store_product_id);?>
-						<?php echo J2html::hidden('tmp_product_title['.$item->j2store_product_id.']', $item->product_name ,array('class'=>'tmp_product_title')); ?>
+						<?php echo HTMLHelper::_('grid.id',$item->j2store_product_id,$item->j2store_product_id);?>
+						<?php echo J2html::hidden('tmp_product_title['.$item->j2store_product_id.']', $item->product_name ,['class'=>'tmp_product_title']); ?>
 					</td>
 					<td>
 						<a href="javascript:void(0)"
-							onclick="window.parent.jSelectItem('<?php echo $item->j2store_product_id; ?>', '<?php echo str_replace(array("'", "\""), array("\\'", ""),$item->product_name); ?>', '<?php echo $app->input->getCmd('object','id'); ?>');"
+							onclick="window.parent.jSelectItem('<?php echo $item->j2store_product_id; ?>', '<?php echo str_replace(["'", "\""], ["\\'", ""],(string) $item->product_name); ?>', '<?php echo $app->input->getCmd('object','id'); ?>');"
 							>
 							<?php echo $item->product_name; ?>
 						</a>
 					</td>
 					<td>
-						<?php echo JHtml::_('jgrid.published', $item->enabled, $key, 'products.', $canChange, 'cb', 1,0); ?>
+						<?php echo HTMLHelper::_('jgrid.published', $item->enabled, $key, 'products.', $canChange, 'cb', 1,0); ?>
 					</td>
 				</tr>
 				<?php endforeach;?>
@@ -100,7 +103,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 		<input type="hidden" name="boxchecked" value="0" />
 		<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>" />
 		<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
-		<?php echo JHtml::_('form.token'); ?>
+		<?php echo HTMLHelper::_('form.token'); ?>
 	</div>
 </form>
 <script>

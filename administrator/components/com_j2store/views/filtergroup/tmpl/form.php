@@ -24,7 +24,7 @@ $alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" rol
 if (version_compare(JVERSION, '3.99.99', 'lt')) {
     $row_class = 'row-fluid';
     $col_class = 'span';
-    $alert_html = '<div class="alert alert-error alert-danger">'.htmlspecialchars(Text::_('JLIB_FORM_CONTAINS_INVALID_FIELDS')).'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
+    $alert_html = '<div class="alert alert-error alert-danger">'.htmlspecialchars((string) Text::_('JLIB_FORM_CONTAINS_INVALID_FIELDS')).'<button type="button" class="close" data-dismiss="alert">×</button></div>' ;
 }
 
 
@@ -71,7 +71,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                 <label for="group_name"><?php echo Text::_('J2STORE_PRODUCT_FILTER_NAME'); ?></label>
                             </div>
                             <div class="controls">
-	                            <?php echo J2Html::text('group_name', $this->item->group_name, array('class' => 'required form-control')); ?>
+	                            <?php echo J2Html::text('group_name', $this->item->group_name, ['class' => 'required form-control']); ?>
                             </div>
                         </div>
                         <div class="control-group">
@@ -79,7 +79,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                 <label for="enabled"><?php echo Text::_('J2STORE_OPTION_STATE'); ?></label>
                             </div>
                             <div class="controls">
-	                            <?php echo J2StoreHelperSelect::publish('enabled', $this->item->enabled); ?>
+	                            <?php echo \J2Commerce\J2Cart\Administrator\Helper\SelectHelper::publish('enabled', $this->item->enabled); ?>
                             </div>
                         </div>
                         <div class="control-group">
@@ -87,7 +87,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                 <label for="ordering"><?php echo Text::_('JGRID_HEADING_ORDERING'); ?></label>
                             </div>
                             <div class="controls">
-	                            <?php echo J2Html::text('ordering', $this->item->ordering, array('class' => 'required form-control')); ?>
+	                            <?php echo J2Html::text('ordering', $this->item->ordering, ['class' => 'required form-control']); ?>
                             </div>
                         </div>
 
@@ -118,14 +118,14 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                     </td>
                                     <td class="border-bottom">
                                         <?php echo J2Html::hidden('filter_value[' . $filter_value->j2store_filter_id . '][j2store_filter_id]', $filter_value->j2store_filter_id); ?>
-                                        <?php echo J2Html::text('filter_value[' . $filter_value->j2store_filter_id . '][filter_name]', $filter_value->filter_name,array('class' => 'form-control')); ?>
+                                        <?php echo J2Html::text('filter_value[' . $filter_value->j2store_filter_id . '][filter_name]', $filter_value->filter_name,['class' => 'form-control']); ?>
                                     </td>
                                     <td class="border-bottom">
-                                        <?php echo J2Html::text('filter_value[' . $filter_value->j2store_filter_id . '][ordering]', $filter_value->ordering, array('class' => 'form-control text-center', 'size'=>'1')); ?>
+                                        <?php echo J2Html::text('filter_value[' . $filter_value->j2store_filter_id . '][ordering]', $filter_value->ordering, ['class' => 'form-control text-center', 'size'=>'1']); ?>
                                     </td>
 
                                     <td class="border-bottom text-end">
-                                        <?php echo J2html::button('delete', Text::_('J2STORE_REMOVE'), array('class' => 'btn btn-danger btn-sm', "id" => "filterValueDeleteBtn-$filter_value->j2store_filter_id", 'onclick' => 'DeleteFilterValue(' . $filter_value->j2store_filter_id . ',' . $product_filter_value_row . ')')); ?>
+                                        <?php echo J2html::button('delete', Text::_('J2STORE_REMOVE'), ['class' => 'btn btn-danger btn-sm', "id" => "filterValueDeleteBtn-$filter_value->j2store_filter_id", 'onclick' => 'DeleteFilterValue(' . $filter_value->j2store_filter_id . ',' . $product_filter_value_row . ')']); ?>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -152,7 +152,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
             <?php
             $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
             $script = "
-                var filter_value_row = ".json_encode($product_filter_value_row).";
+                var filter_value_row = ".json_encode($product_filter_value_row, JSON_THROW_ON_ERROR).";
 
                 function j2storeAddFilterToGroup() {
                     var html = '';

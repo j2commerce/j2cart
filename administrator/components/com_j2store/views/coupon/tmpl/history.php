@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\HTML\Helpers\Sidebar;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -18,7 +19,7 @@ $platform = J2Store::platform();
 $platform->loadExtra('bootstrap.tooltip');
 $platform->loadExtra('behavior.framework',true);
 
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 $row_class = 'row';
 $col_class = 'col-md-';
 ?>

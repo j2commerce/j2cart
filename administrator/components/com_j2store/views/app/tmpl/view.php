@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -9,6 +10,6 @@ defined('_JEXEC') or die;
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
 $row = $this->item;?>
-	<?php $results = J2Store::plugin()->eventWithHtml('GetAppView', array($row)); ?>
-	<h3><?php echo JText::_($row->name); ?></h3>
+	<?php $results = J2Store::plugin()->eventWithHtml('GetAppView', [$row]); ?>
+	<h3><?php echo Text::_($row->name); ?></h3>
 	<?php echo $results; ?>

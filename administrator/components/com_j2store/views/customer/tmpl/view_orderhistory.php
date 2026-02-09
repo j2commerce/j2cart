@@ -58,7 +58,7 @@ $dateFormat = $j2params->get('date_format');
                     </tbody>
                 </table>
             </div>
-	        <?php echo J2Store::plugin()->eventWithHtml('BeforeCustomerOrderList',array($this->orders)); ?>
+	        <?php echo J2Store::plugin()->eventWithHtml('BeforeCustomerOrderList',[$this->orders]); ?>
         </div>
     </div>
 </div>

@@ -39,7 +39,7 @@ J2Store::plugin()->importCatalogPlugins();
 						<?php foreach($upsells as $key=>$related_product):?>
 						<?php
 						$app = Factory::getApplication();
-						$app->triggerEvent('onJ2StoreAfterGetProduct', array(&$related_product));
+						$app->triggerEvent('onJ2StoreAfterGetProduct', [&$related_product]);
 						?>
 						<?php if(isset($related_product->product_source_id)):?>
                             <tr id="upSell-<?php echo $related_product->j2store_product_id;?>">
@@ -67,7 +67,7 @@ J2Store::plugin()->importCatalogPlugins();
                     <tr>
                         <td colspan="2">
                             <small><strong><?php echo Text::_('J2STORE_SEARCH_AND_RELATED_PRODUCTS');?></strong></small>
-							<?php echo J2Html::text('upsellSelector' ,'' , array('id'=>'upsellSelector','class'=>'form-control ms-2'));?>
+							<?php echo J2Html::text('upsellSelector' ,'' , ['id'=>'upsellSelector', 'class'=>'form-control ms-2']);?>
                         </td>
                     </tr>
                     </tbody>
@@ -90,7 +90,7 @@ J2Store::plugin()->importCatalogPlugins();
                             ?>
                             <?php foreach($crosssells as $key=>$related_product):
                                 $app = Factory::getApplication();
-                                $app->triggerEvent('onJ2StoreAfterGetProduct', array(&$related_product));
+                                $app->triggerEvent('onJ2StoreAfterGetProduct', [&$related_product]);
                             ?>
                                 <?php if(isset($related_product->product_source_id)):?>
                                     <tr id="crossSell-<?php echo $related_product->j2store_product_id;?>">
@@ -118,7 +118,7 @@ J2Store::plugin()->importCatalogPlugins();
                     <tr>
                         <td colspan="2">
                             <small><strong><?php echo Text::_('J2STORE_SEARCH_AND_RELATED_PRODUCTS');?></strong></small>
-			                <?php echo J2Html::text('crossSellSelector' ,'', array('id'=>'crossSellSelector','class'=>'form-control ms-2'));?>
+			                <?php echo J2Html::text('crossSellSelector' ,'', ['id'=>'crossSellSelector', 'class'=>'form-control ms-2']);?>
                         </td>
                     </tr>
                     </tbody>

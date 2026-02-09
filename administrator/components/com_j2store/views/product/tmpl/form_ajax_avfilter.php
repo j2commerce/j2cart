@@ -25,7 +25,7 @@ use Joomla\CMS\Language\Text;
         </tr>
         </thead>
         <tbody>
-            <?php if(isset($this->product_filters) && count($this->product_filters)): ?>
+            <?php if(isset($this->product_filters) && (is_countable($this->product_filters) ? count($this->product_filters) : 0)): ?>
                 <?php foreach($this->product_filters as $group_id=>$filters):?>
                     <tr>
                         <td colspan="2"><h4 class="mb-0"><?php echo Text::_($this->escape($filters['group_name'])); ?></h4></td>
@@ -49,7 +49,7 @@ use Joomla\CMS\Language\Text;
             <tr class="j2store_a_filter">
                 <td colspan="2">
                     <small><strong><?php echo Text::_('J2STORE_SEARCH_AND_PRODUCT_FILTERS');?></strong></small>
-	                <?php echo J2Html::text('productfilter' ,'' ,array('id' =>'J2StoreproductFilter','class'=>'form-control ms-2'));?>
+	                <?php echo J2Html::text('productfilter' ,'' ,['id' =>'J2StoreproductFilter', 'class'=>'form-control ms-2']);?>
                 </td>
             </tr>
         </tbody>

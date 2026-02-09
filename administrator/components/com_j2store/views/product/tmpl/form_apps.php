@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -12,6 +13,6 @@
 defined('_JEXEC') or die;
 ?>
 <div class="alert alert-block alert-info">
-	<?php echo JText::_('J2STORE_APP_TAB_HELP')?>
+	<?php echo Text::_('J2STORE_APP_TAB_HELP')?>
 </div>
-<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayProductForm', array($this, $this->item)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayProductForm', [$this, $this->item]); ?>

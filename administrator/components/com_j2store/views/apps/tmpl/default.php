@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -12,25 +13,22 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\HTML\Helpers\Sidebar;
 use Joomla\CMS\Uri\Uri;
 
 
 // load tooltip behavior
 $platform = J2Store::platform();
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 $platform->loadExtra('behavior.modal');
 $platform->loadExtra('behavior.framework');
 $platform->loadExtra('behavior.tooltip');
 $platform->loadExtra('behavior.multiselect');
 $platform->loadExtra('dropdown.init');
 
-$sortFields = array(
-    'id' => Text::_('JGRID_HEADING_ID'),
-    'name' => Text::_('COM_ATS_TICKETS_HEADING_TITLE'),
-    'state' => Text::_('JSTATUS'),
-);
+$sortFields = ['id' => Text::_('JGRID_HEADING_ID'), 'name' => Text::_('COM_ATS_TICKETS_HEADING_TITLE'), 'state' => Text::_('JSTATUS')];
 
-$total = count($this->items);
+$total = is_countable($this->items) ? count($this->items) : 0;
 $counter = 0;
 $col = 3;
 $row_class = 'row';

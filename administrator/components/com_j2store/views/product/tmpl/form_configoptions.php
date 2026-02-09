@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 
-$base_path = rtrim(Uri::root(),'/').'/administrator';
+$base_path = rtrim((string) Uri::root(),'/').'/administrator';
 ?>
 <div class="j2store-product-configuration-options">
     <fieldset class="options-form">
@@ -50,7 +50,7 @@ $base_path = rtrim(Uri::root(),'/').'/administrator';
                                     <?php echo J2Html::hidden($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][j2store_productoption_id]', $poption->j2store_productoption_id);?>
                                     <?php echo J2Html::hidden($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][option_id]', $poption->option_id);?>
                                     <small>(<?php  echo $this->escape($poption->option_unique_name);?>)</small>
-                                    <small><?php Text::_('J2STORE_OPTION_TYPE');?><?php echo Text::_('J2STORE_'.strtoupper($poption->type))?></small>
+                                    <small><?php Text::_('J2STORE_OPTION_TYPE');?><?php echo Text::_('J2STORE_'.strtoupper((string) $poption->type))?></small>
                                     <?php if(isset($poption->type) && ($poption->type =='select' || $poption->type =='radio' || $poption->type =='checkbox')):?>
                                         <a class="small d-block" data-fancybox data-type="iframe" data-src="<?php echo $base_path."/index.php?option=com_j2store&view=products&task=setproductoptionvalues&product_id=".$this->item->j2store_product_id."&productoption_id=".$poption->j2store_productoption_id."&layout=productoptionvalues&tmpl=component";?>" href="javascript:;">
                                             <?php echo Text::_( "J2STORE_OPTION_SET_VALUES" );?>
@@ -59,13 +59,13 @@ $base_path = rtrim(Uri::root(),'/').'/administrator';
                                 </td>
                                 <td>
                                     <?php
-                                    $parent_options  = J2StoreHelperSelect::getParentOption($poption->j2store_productoption_id,$poption->parent_id,$poption->option_id);
+                                    $parent_options  = \J2Commerce\J2Cart\Administrator\Helper\SelectHelper::getParentOption($poption->j2store_productoption_id,$poption->parent_id,$poption->option_id);
                                     echo J2Html::select()->clearState()
                                         ->type('genericlist')
                                         ->name($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][parent_id]')
                                         ->value($poption->parent_id)
                                         ->setPlaceHolders($parent_options)
-                                        ->attribs(array('class'=>'form-select'))
+                                        ->attribs(['class'=>'form-select'])
                                         ->getHtml();
                                     ?>
                                 </td>
@@ -74,12 +74,12 @@ $base_path = rtrim(Uri::root(),'/').'/administrator';
                                         ->type('genericlist')
                                         ->name($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][required]')
                                         ->value($poption->required)
-                                        ->setPlaceHolders(array('0' => Text::_('J2STORE_NO') ,'1' => Text::_('J2STORE_YES')))
-                                        ->attribs(array('class'=>'form-select'))
+                                        ->setPlaceHolders(['0' => Text::_('J2STORE_NO'), '1' => Text::_('J2STORE_YES')])
+                                        ->attribs(['class'=>'form-select'])
                                         ->getHtml();
                                     ?>
                                 </td>
-                                <td><?php echo J2Html::text($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][ordering]',$poption->ordering,array('id'=>'ordering' ,'class'=>'form-control'));?></td>
+                                <td><?php echo J2Html::text($this->form_prefix.'[item_options]['.$poption->j2store_productoption_id .'][ordering]',$poption->ordering,['id'=>'ordering', 'class'=>'form-control']);?></td>
                                 <td class="text-end">
                                     <span class="optionRemove" onClick="removePAOption(<?php echo $poption->j2store_productoption_id;?>,'<?php echo $this->item->product_type;?>')"><span class="icon icon-trash"></span></span>
                                 </td>
@@ -108,7 +108,7 @@ $base_path = rtrim(Uri::root(),'/').'/administrator';
                     <tfoot>
                     <tr>
                         <td colspan="5">
-                            <?php echo J2StorePopup::popup($base_path."/index.php?option=com_j2store&view=products&task=setpaimport&product_type=".$this->item->product_type."&product_id=".$this->item->j2store_product_id."&layout=paimport&tmpl=component", Text::_('J2STORE_IMPORT_PRODUCT_OPTIONS'), array('class'=>'btn btn-primary btn-sm text-capitalize','width'=>800 , 'height'=>500));?>
+                            <?php echo J2StorePopup::popup($base_path."/index.php?option=com_j2store&view=products&task=setpaimport&product_type=".$this->item->product_type."&product_id=".$this->item->j2store_product_id."&layout=paimport&tmpl=component", Text::_('J2STORE_IMPORT_PRODUCT_OPTIONS'), ['class'=>'btn btn-primary btn-sm text-capitalize', 'width'=>800, 'height'=>500]);?>
                         </td>
                     </tr>
                     </tfoot>

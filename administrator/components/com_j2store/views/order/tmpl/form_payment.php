@@ -29,7 +29,7 @@ foreach ($imageExtensions as $extension) {
 		break;
 	}
 }
-$pay_html = trim(J2Store::getSelectableBase()->getFormatedCustomFields($this->orderinfo, 'customfields', 'payment'));
+$pay_html = trim((string) J2Store::getSelectableBase()->getFormatedCustomFields($this->orderinfo, 'customfields', 'payment'));
 ?>
 <div class="border rounded-3 px-3 py-3 payment-information">
     <div class="d-flex align-items-start min-ht-50">
@@ -42,7 +42,7 @@ $pay_html = trim(J2Store::getSelectableBase()->getFormatedCustomFields($this->or
                     <h6 class="mb-0"><?php echo Text::_($this->item->orderpayment_type); ?></h6>
                     <small class="d-block"><?php echo Text::_('J2STORE_ORDER_TRANSACTION_ID'); ?> : <span class="d-inline-block fw-medium text-success fs-6"><?php echo $this->item->transaction_id; ?></span>
 	                    <?php if($pay_html ):?>
-                            <?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->item->order_id."&address_type=payment&layout=address&tmpl=component",'',array('class'=>'fa fa-pencil','refresh'=>true,'id'=>'fancybox ms-2','width'=>700,'height'=>600));?>
+                            <?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->item->order_id."&address_type=payment&layout=address&tmpl=component",'',['class'=>'fa fa-pencil', 'refresh'=>true, 'id'=>'fancybox ms-2', 'width'=>700, 'height'=>600]);?>
 	                    <?php endif;?>
                     </small>
                 </div>

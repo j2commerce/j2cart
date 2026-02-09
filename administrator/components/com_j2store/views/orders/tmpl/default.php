@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\HTML\Helpers\Sidebar;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -16,7 +17,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 $this->params = J2Store::config();
 
 $shouldExpand = $this->state->since || $this->state->until || $this->state->paykey || $this->state->moneysum || $this->state->toinvoice || $this->state->coupon_code || $this->state->user_id;
@@ -30,7 +31,7 @@ $shouldExpand = $this->state->since || $this->state->until || $this->state->payk
     <form action="index.php?option=com_j2store&view=orders" method="post" name="adminForm" id="adminForm">
         <?php echo J2Html::hidden('option', 'com_j2store'); ?>
         <?php echo J2Html::hidden('view', 'orders'); ?>
-        <?php echo J2Html::hidden('task', 'browse', array('id' => 'task')); ?>
+        <?php echo J2Html::hidden('task', 'browse', ['id' => 'task']); ?>
         <?php echo J2Html::hidden('boxchecked', '0'); ?>
         <?php echo J2Html::hidden('filter_order', ''); ?>
         <?php echo J2Html::hidden('filter_order_Dir', ''); ?>

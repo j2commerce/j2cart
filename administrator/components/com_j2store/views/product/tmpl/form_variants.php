@@ -30,7 +30,7 @@ $wa->addInlineStyle($style, [], []);
     <fieldset class="options-form">
         <legend><?php echo Text::_('J2STORE_PRODUCT_VARIANTS');?></legend>
         <?php if(isset($this->item->product_options) && !empty($this->item->product_options)):?>
-            <?php if(isset($this->item->variants) && count($this->item->variants)):?>
+            <?php if(isset($this->item->variants) && (is_countable($this->item->variants) ? count($this->item->variants) : 0)):?>
                 <div class="d-flex justify-content-start align-items-center mb-3">
                     <div class="form-check pt-0 me-2">
                         <input class="form-check-input" type="checkbox" value="" id="toggleAllCheckboxes">

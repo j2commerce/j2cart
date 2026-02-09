@@ -32,8 +32,8 @@ $currency_value = $currency->getValue();
     <form class="form-validate" id="adminForm" name="adminForm" method="post" action="index.php">
 		<?php echo J2Html::hidden('option','com_j2store');?>
 		<?php echo J2Html::hidden('view','customer');?>
-		<?php echo J2Html::hidden('task','',array('id'=>'task'));?>
-		<?php echo J2Html::hidden('email',$this->email ,array('id' =>'customer_email_id'));?>
+		<?php echo J2Html::hidden('task','',['id'=>'task']);?>
+		<?php echo J2Html::hidden('email',$this->email ,['id' =>'customer_email_id']);?>
 		<?php echo HTMLHelper::_('form.token'); ?>
         <div class="<?php echo $row_class ?>">
 
@@ -100,7 +100,7 @@ $currency_value = $currency->getValue();
                         </div>
                         <div class="controls align-self-end" id="customer-email-edit-info" style="display:none;">
                             <div class="input-group">
-			                    <?php echo J2Html::text('new_email',$this->email ,array('id'=>'new-email-input','class'=>'form-control form-control-sm'));?>
+			                    <?php echo J2Html::text('new_email',$this->email ,['id'=>'new-email-input', 'class'=>'form-control form-control-sm']);?>
                                 <button id="customer-save-btn" class="btn btn-success btn-sm" type="button" onclick="getUpdatedEmail(this,'changeEmail');"><?php echo Text::_('JAPPLY'); ?></button>
                                 <button id="customer-confirm-btn" class="btn btn-warning btn-sm" type="button" onclick="getUpdatedEmail(this,'confirmchangeEmail');" style="display:none;"><?php echo Text::_('J2STORE_CONFIRM_UPDATE'); ?></button>
                                 <button class="btn btn-primary btn-sm" type="button" onclick="canUpdate();"><?php echo Text::_('JCANCEL'); ?></button>
@@ -114,7 +114,7 @@ $currency_value = $currency->getValue();
                     </div>
                     <div class="card-body text-subdued">
 	                    <?php if($this->addresses && !empty($this->addresses)):
-		                    echo J2Store::plugin()->eventWithHtml('BeforeCustomerAddressList',array($this->addresses));
+		                    echo J2Store::plugin()->eventWithHtml('BeforeCustomerAddressList',[$this->addresses]);
 		                    foreach($this->addresses as $item):
 			                    $this->item = $item;
 			                    ?>

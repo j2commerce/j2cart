@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\HTML\Helpers\Sidebar;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -17,7 +18,7 @@ use Joomla\CMS\Router\Route;
 
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 
 $this->params = J2Store::config();
 
@@ -39,11 +40,11 @@ $this->tab_name = 'com-j2store-wizard';
 	                <?php $message = $shipping_message['message']; ?>
 		            <?php foreach ($shipping_message as $shipping_messages): ?>
 			            <?php if (empty($shipping_messages['shipping_name'])): ?>
-				            <?php echo HTMLHelper::_('uitab.addTab', $this->tab_name, str_replace(" ", "_", trim($name)), Text::_($name)); ?>
+				            <?php echo HTMLHelper::_('uitab.addTab', $this->tab_name, str_replace(" ", "_", trim((string) $name)), Text::_($name)); ?>
                                 <table class="table itemList">
                                     <tbody>
                                     <?php foreach ($message as $key => $value):
-	                                    if (strpos($value['value'], 'icon-unpublish') !== false) {
+	                                    if (str_contains((string) $value['value'], 'icon-unpublish')) {
                                             $class = 'text-danger';
 	                                    } else {
 		                                    $class = 'text-success';

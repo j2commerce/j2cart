@@ -27,7 +27,7 @@ $lastKey = array_key_last($this->orderhistory);
 			$keywords = ['success', 'info', 'primary', 'warning', 'danger', 'important'];
 			$foundKeyword = null;
 			foreach ($keywords as $keyword) {
-				if (strpos($item->orderstatus_cssclass, $keyword) !== false) {
+				if (str_contains((string) $item->orderstatus_cssclass, $keyword)) {
 					if($keyword == 'important'){
 						$foundKeyword = 'danger';
 					} else {
@@ -52,9 +52,9 @@ $lastKey = array_key_last($this->orderhistory);
                 $col2 = ' border-end';
 			    $icon = 'fas fa-solid border border-2 rounded-circle border-white fa-circle fa-fw text-'.$foundKeyword;
             }
-			if (strpos($history->comment, 'notified with') !== false) {
+			if (str_contains((string) $history->comment, 'notified with')) {
 				$icon = 'fas fa-solid fa-envelope fa-fw text-' . $foundKeyword;
-			} elseif (strpos($history->comment, 'item removed') !== false) {
+			} elseif (str_contains((string) $history->comment, 'item removed')) {
 			    $icon = 'fas fa-solid fa-trash fa-fw text-'.$foundKeyword;
             } else {
 				$icon = $icon;
@@ -80,7 +80,7 @@ $lastKey = array_key_last($this->orderhistory);
                             <div class="float-end text-subdued small fw-bold"><?php echo HTMLHelper::_('date', $history->created_on, $this->params->get('date_format', Text::_('DATE_FORMAT_LC1'))); ?></div>
                             <?php if($history->order_state_id):?>
                                 <h4 class="card-title text-subdued small"><div class="badge rounded-2 px-2 text-bg-<?php echo $foundKeyword;?>"><?php echo Text::_($item->orderstatus_name);?></div><?php //echo J2Html::getOrderStatusHtml($history->order_state_id);?></h4>
-                            <?php endif;?>
+<?php endif;?>
 
                             <p class="card-text text-subdued small"><?php echo Text::_($history->comment);?></p>
                         </div>

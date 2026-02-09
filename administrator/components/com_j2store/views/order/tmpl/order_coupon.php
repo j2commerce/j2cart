@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -14,7 +15,7 @@ defined('_JEXEC') or die;
 		$coupon = F0FModel::getTmpInstance ( 'Coupons', 'J2StoreModel' )->get_coupon();
 	    ?>
 		<input type="text" name="coupon" value="<?php echo $coupon; ?>" />
-		<input type="button" onClick="applyCoupon()" value="<?php echo JText::_('J2STORE_APPLY_COUPON')?>" class="button btn btn-primary" />
+		<input type="button" onClick="applyCoupon()" value="<?php echo Text::_('J2STORE_APPLY_COUPON')?>" class="button btn btn-primary" />
 
 	    </div>
     <?php endif; ?>

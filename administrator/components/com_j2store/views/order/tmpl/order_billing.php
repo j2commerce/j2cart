@@ -24,7 +24,7 @@ $row_class = 'row';
 $col_class = 'col-md-';
 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
 
-$script = "document.addEventListener('DOMContentLoaded',function(){document.getElementById('billing-address-existing').addEventListener('click',function(){document.getElementById('orderinfo-billing-" . $this->order->j2store_order_id . "').style.display='none';document.getElementById('nextlayout').style.display='none';document.getElementById('saveAndNext').style.display='block';document.querySelectorAll('.j2error').forEach(el=>el.remove());});document.getElementById('billing-address-new').addEventListener('click',function(){document.getElementById('orderinfo-billing-" . $this->order->j2store_order_id . "').style.display='block';document.getElementById('nextlayout').style.display='block';document.getElementById('saveAndNext').style.display='none';document.querySelectorAll('.j2error').forEach(el=>el.remove());});const countryElement=document.getElementById('country_id');if(countryElement){countryElement.addEventListener('change',function(){if(this.value==='')return;const loader=document.createElement('span');loader.className='wait';loader.innerHTML='&nbsp;<img src=\"" . Uri::root(true) . "/media/j2store/images/loader.gif\" alt=\"\" />';countryElement.after(loader);fetch('index.php?option=com_j2store&view=orders&task=getCountry&country_id='+this.value,{method:'GET',headers:{'Accept':'application/json'}}).then(response=>{if(!response.ok){throw new Error('Network response was not ok');}return response.json();}).then(json=>{document.querySelectorAll('.wait').forEach(el=>el.remove());const postcodeRequired=document.getElementById('billing-postcode-required');if(postcodeRequired){postcodeRequired.style.display=json['postcode_required']==='1'?'block':'none';}let html='<option value=\"\">" . JText::_('J2STORE_SELECT_OPTION') . "</option>';if(json['zone']&&json['zone'].length>0){json['zone'].forEach(zone=>{html+='<option value=\"'+zone.j2store_zone_id+'\"';if(zone.j2store_zone_id==='" . $this->address->zone_id . "'){html+=' selected=\"selected\"';}html+='>'+zone.zone_name+'</option>';});}else{html+='<option value=\"0\" selected=\"selected\">" . JText::_('J2STORE_CHECKOUT_NONE') . "</option>';}document.getElementById('zone_id').innerHTML=html;}).catch(error=>{console.error('Fetch error:',error);});});countryElement.dispatchEvent(new Event('change'));}});";
+$script = "document.addEventListener('DOMContentLoaded',function(){document.getElementById('billing-address-existing').addEventListener('click',function(){document.getElementById('orderinfo-billing-" . $this->order->j2store_order_id . "').style.display='none';document.getElementById('nextlayout').style.display='none';document.getElementById('saveAndNext').style.display='block';document.querySelectorAll('.j2error').forEach(el=>el.remove());});document.getElementById('billing-address-new').addEventListener('click',function(){document.getElementById('orderinfo-billing-" . $this->order->j2store_order_id . "').style.display='block';document.getElementById('nextlayout').style.display='block';document.getElementById('saveAndNext').style.display='none';document.querySelectorAll('.j2error').forEach(el=>el.remove());});const countryElement=document.getElementById('country_id');if(countryElement){countryElement.addEventListener('change',function(){if(this.value==='')return;const loader=document.createElement('span');loader.className='wait';loader.innerHTML='&nbsp;<img src=\"" . Uri::root(true) . "/media/j2store/images/loader.gif\" alt=\"\" />';countryElement.after(loader);fetch('index.php?option=com_j2store&view=orders&task=getCountry&country_id='+this.value,{method:'GET',headers:{'Accept':'application/json'}}).then(response=>{if(!response.ok){throw new Error('Network response was not ok');}return response.json();}).then(json=>{document.querySelectorAll('.wait').forEach(el=>el.remove());const postcodeRequired=document.getElementById('billing-postcode-required');if(postcodeRequired){postcodeRequired.style.display=json['postcode_required']==='1'?'block':'none';}let html='<option value=\"\">" . Text::_('J2STORE_SELECT_OPTION') . "</option>';if(json['zone']&&json['zone'].length>0){json['zone'].forEach(zone=>{html+='<option value=\"'+zone.j2store_zone_id+'\"';if(zone.j2store_zone_id==='" . $this->address->zone_id . "'){html+=' selected=\"selected\"';}html+='>'+zone.zone_name+'</option>';});}else{html+='<option value=\"0\" selected=\"selected\">" . Text::_('J2STORE_CHECKOUT_NONE') . "</option>';}document.getElementById('zone_id').innerHTML=html;}).catch(error=>{console.error('Fetch error:',error);});});countryElement.dispatchEvent(new Event('change'));}});";
 
 //$wa->addInlineScript($script, [], []);
 ?>
@@ -32,7 +32,7 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
     <legend><?php echo Text::_('J2STORE_BILLING_ADDRESS');?></legend>
     <div class="mb-4">
         <div class="d-block mb-4">
-            <?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->order->order_id."&address_type=billing&layout=address&tmpl=component",Text::_('J2STORE_ADDRESS_EDIT_BTN'),array('refresh'=>true,'id'=>'fancybox btn btn-primary btn-sm','width'=>700,'height'=>600));?>
+            <?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->order->order_id."&address_type=billing&layout=address&tmpl=component",Text::_('J2STORE_ADDRESS_EDIT_BTN'),['refresh'=>true, 'id'=>'fancybox btn btn-primary btn-sm', 'width'=>700, 'height'=>600]);?>
             <a href="#" class="btn btn-outline-primary btn-sm collapse ms-2 show" data-bs-toggle="collapse" data-bs-target="#collapseChangeBillingAddress" aria-expanded="false" aria-controls="collapseChangeBillingAddress"><?php echo Text::_("J2STORE_CHOOSE_ALTERNATE_ADDRESS");?></a>
         </div>
         <div class="d-block mb-3"><span class="fas fa-solid fa-user me-3 fa-fw"></span><?php echo $this->orderinfo->billing_first_name." ".$this->orderinfo->billing_last_name; ?></div>
@@ -82,13 +82,13 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
 
         <div class="form-check form-switch mb-4">
             <input class="form-check-input" type="checkbox" name="save_shipping" role="switch" id="flexSwitchsave_shipping" checked>
-            <label class="form-check-label" for="flexSwitchsave_shipping"><?php echo JText::_('J2STORE_SAME_AS_SHIPPING');?></label>
+            <label class="form-check-label" for="flexSwitchsave_shipping"><?php echo Text::_('J2STORE_SAME_AS_SHIPPING');?></label>
         </div>
 
         <input type="hidden" value="<?php echo $this->address_type;?>" name="address_type" />
         <div class="display_message" id="display_message"></div>
         <div class="billing-infos ">
-		    <?php if (isset($this->addresses) && count($this->addresses) > 0) : ?>
+		    <?php if (isset($this->addresses) && (is_countable($this->addresses) ? count($this->addresses) : 0) > 0) : ?>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="address" id="billing-address-existing" value="existing" checked="checked">
                     <label class="form-check-label" for="billing-address-existing"><?php echo Text::_('J2STORE_ADDRESS_EXISTING'); ?></label>
@@ -97,11 +97,11 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
 				    <?php foreach ($this->addresses as $address) :  ?>
 					    <?php if ($address->j2store_address_id == $this->billing_address_id) : ?>
                             <option value="<?php echo $address->j2store_address_id; ?>" selected="selected">
-							    <?php echo $address->first_name; ?> 	<?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo JText::_($address->zone_name); ?>, <?php echo JText::_($address->country_name); ?>
+							    <?php echo $address->first_name; ?> 	<?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo Text::_($address->zone_name); ?>, <?php echo Text::_($address->country_name); ?>
                             </option>
 					    <?php else: ?>
                             <option value="<?php echo $address->j2store_address_id; ?>">
-							    <?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo JText::_($address->zone_name); ?>, <?php echo JText::_($address->country_name); ?>
+							    <?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo Text::_($address->zone_name); ?>, <?php echo Text::_($address->country_name); ?>
                             </option>
 					    <?php endif; ?>
 				    <?php endforeach; ?>
@@ -122,7 +122,7 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
                     <legend><?php echo Text::_('J2STORE_ADDRESS_EDIT');?></legend>
                     <?php
                     $html = $this->storeProfile->get('store_billing_layout');
-                    if(empty($html) || strlen($html) < 5) {
+                    if(empty($html) || strlen((string) $html) < 5) {
                         //we don't have a profile set in the store profile. So use the default one.
 
                         $html = '<div class="'.$row_class.'">
@@ -141,7 +141,7 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
                                     </div>';
                     }
                     //first find all the checkout fields
-                    preg_match_all("^\[(.*?)\]^",$html,$checkoutFields, PREG_PATTERN_ORDER);
+                    preg_match_all("^\[(.*?)\]^",(string) $html,$checkoutFields, PREG_PATTERN_ORDER);
                     $allFields = $this->fields;
                     ?>
                     <?php foreach ($this->fields as $fieldName => $oneExtraField):?>
@@ -151,13 +151,13 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
                             if(($fieldName !='email')){ ?>
                                 <?php
                                 $oneExtraField->display_label = 'yes';?>
-                                <?php $html = str_replace('['.$fieldName.']',$this->fieldClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName,$fieldName,false, $options = '', $test = false, $allFields, $allValues = null),$html);
+                                <?php $html = str_replace('['.$fieldName.']',$this->fieldClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName,$fieldName,false, $options = '', $test = false, $allFields, $allValues = null),(string) $html);
                             }
                             ?>
                         <?php endif;?>
                     <?php endforeach; ?>
                     <?php
-                    $unprocessedFields = array();
+                    $unprocessedFields = [];
                     foreach($this->fields as $fieldName => $oneExtraField):
                         if(!in_array($fieldName, $checkoutFields[1])):
                             $unprocessedFields[$fieldName] = $oneExtraField;
@@ -165,9 +165,9 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
                     endforeach;
 
                     //now we have unprocessed fields. remove any other square brackets found.
-                    preg_match_all("^\[(.*?)\]^",$html,$removeFields, PREG_PATTERN_ORDER);
+                    preg_match_all("^\[(.*?)\]^",(string) $html,$removeFields, PREG_PATTERN_ORDER);
                     foreach($removeFields[1] as $fieldName) {
-                        $html = str_replace('['.$fieldName.']', '', $html);
+                        $html = str_replace('['.$fieldName.']', '', (string) $html);
                     }
                     ?>
                     <?php echo $html; ?>
@@ -209,7 +209,7 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
             $('#nextlayout').hide();
             $('#saveAndNext').show();
             $('#baddress-info').hide();
-            $('#display_message').after('<button id="close_address" class="btn btn-warning pull-right"><?php echo JText::_('J2STORE_CLOSE');?></button>');
+            $('#display_message').after('<button id="close_address" class="btn btn-warning pull-right"><?php echo Text::_('J2STORE_CLOSE');?></button>');
         });
 
     })(j2store.jQuery);
@@ -234,7 +234,7 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
                 url: 'index.php?option=com_j2store&view=orders&task=getCountry&country_id=' + this.value,
                 dataType: 'json',
                 beforeSend: function() {
-                    $('#country_id').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+                    $('#country_id').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
                 },
                 complete: function() {
                     $('.wait').remove();
@@ -246,7 +246,7 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
                         $('#billing-postcode-required').hide();
                     }
 
-                    html = '<option value=""><?php echo JText::_('J2STORE_SELECT_OPTION'); ?></option>';
+                    html = '<option value=""><?php echo Text::_('J2STORE_SELECT_OPTION'); ?></option>';
 
                     if (json['zone'] != '') {
 
@@ -260,7 +260,7 @@ $script = "document.addEventListener('DOMContentLoaded',function(){document.getE
                             html += '>' + json['zone'][i]['zone_name'] + '</option>';
                         }
                     } else {
-                        html += '<option value="0" selected="selected"><?php echo JText::_('J2STORE_CHECKOUT_NONE'); ?></option>';
+                        html += '<option value="0" selected="selected"><?php echo Text::_('J2STORE_CHECKOUT_NONE'); ?></option>';
                     }
 
                     /*$("#<?php echo $this->address_type;?>_zone_id").html(html);*/

@@ -32,8 +32,8 @@ $wa->addInlineStyle($style, [], []);
         <div class="row">
             <div class="col-lg-6 mb-4 "><?php echo $this->loadTemplate('payment');?></div>
             <div class="col-lg-6 mb-4 "><?php echo $this->loadTemplate('shipping');?></div>
-			<?php echo J2Store::plugin()->eventWithHtml('AdminOrderAfterPaymentInformation', array($this)); ?>
-			<?php echo J2Store::plugin()->eventWithHtml('AdminOrderAfterShippingInformation', array($this)); ?>
+			<?php echo J2Store::plugin()->eventWithHtml('AdminOrderAfterPaymentInformation', [$this]); ?>
+			<?php echo J2Store::plugin()->eventWithHtml('AdminOrderAfterShippingInformation', [$this]); ?>
         </div>
     </div>
 </div>

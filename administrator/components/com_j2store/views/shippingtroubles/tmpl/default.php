@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\HTML\Helpers\Sidebar;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -16,7 +17,7 @@ use Joomla\CMS\Router\Route;
 
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 $this->params = J2Store::config();
 ?>
 <?php if (!empty($sidebar)): ?>

@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Plugin\PluginHelper;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -11,15 +14,15 @@ $platform->loadExtra('behavior.modal');
 ?>
 <?php $row = $this->item;?>
     <!-- shipping plg name -->
-    <h3><?php echo JText::_($row->name); ?></h3>
+    <h3><?php echo Text::_($row->name); ?></h3>
 <?php
-$app = JFactory::getApplication();
+$app = Factory::getApplication();
 
-JPluginHelper::importPlugin('j2store');
+PluginHelper::importPlugin('j2store');
 
-$results = $app->triggerEvent( 'onJ2StoreGetShippingView',array( $row ));
+$results = $app->triggerEvent( 'onJ2StoreGetShippingView',[$row]);
 
-for ($i=0; $i<count($results); $i++)
+for ($i=0; $i<(is_countable($results) ? count($results) : 0); $i++)
 {
     $result = $results[$i];
     echo $result;

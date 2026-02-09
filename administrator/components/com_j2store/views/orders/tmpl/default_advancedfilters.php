@@ -48,17 +48,11 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		        ->type('genericlist')
 		        ->name('paykey')
 		        ->value($this->state->paykey)
-		        ->attribs(array('onchange' => 'this.form.submit', 'class' => 'form-select j2store-product-filters'))
-		        ->setPlaceHolders(array('' => Text::_('J2STORE_FILTER_PAYMENTS')))
+		        ->attribs(['onchange' => 'this.form.submit', 'class' => 'form-select j2store-product-filters'])
+		        ->setPlaceHolders(['' => Text::_('J2STORE_FILTER_PAYMENTS')])
 		        ->hasOne('Payments')
 		        ->setRelations(
-			        array(
-				        'fields' => array
-				        (
-					        'key' => 'element',
-					        'name' => 'element'
-				        )
-			        )
+			        ['fields' => ['key' => 'element', 'name' => 'element']]
 		        )->getHtml();
 	        ?>
         </div>
@@ -74,7 +68,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                     <input type="text" class="input-small" name="user_name" value="<?php echo $user_name; ?>" id="jform_user_id_name" readonly aria-invalid="false"/>
                     <input type="hidden" onchange="j2storeGetAddress()" name="user_id" value="<?php echo $this->state->user_id; ?>" id="jform_user_id" class="j2store-order-filters" readonly />
                     <?php $url = 'index.php?option=com_users&view=users&layout=modal&tmpl=component&field=jform_user_id'; ?>
-                    <?php echo J2StorePopup::popup($user_modal_url, '<span class="icon icon-user"></span>', array('class' => 'btn btn-primary modal_jform_created_by')); ?>
+                    <?php echo J2StorePopup::popup($user_modal_url, '<span class="icon icon-user"></span>', ['class' => 'btn btn-primary modal_jform_created_by']); ?>
                 <?php elseif ($version == 'new'): ?>
                     <div data-button-select=".button-select" data-input-name=".field-user-input-name"
                          data-input=".field-user-input" data-modal-height="400px"
@@ -127,31 +121,31 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
             </div>
         </div>
         <div class="col-lg-2 col-md-4 mb-2">
-	        <?php echo J2Html::text('moneysum', $this->state->moneysum, array('class' => 'form-control j2store-order-filters','placeholder'=>Text::_('J2STORE_ORDER_AMOUNT')));?>
+	        <?php echo J2Html::text('moneysum', $this->state->moneysum, ['class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_ORDER_AMOUNT')]);?>
         </div>
         <div class="col-lg-2 col-md-4 mb-2">
-	        <?php echo J2Html::text('coupon_code', $this->state->coupon_code, array('class' => 'form-control j2store-order-filters','placeholder'=>Text::_('J2STORE_FILTER_COUPON_CODE')));?>
+	        <?php echo J2Html::text('coupon_code', $this->state->coupon_code, ['class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_FILTER_COUPON_CODE')]);?>
         </div>
         <div class="col-lg-2 col-md-4 mb-2">
-	        <?php echo J2Html::calendar('since', $this->state->since, array('class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_ORDER_DATE_FROM')));?>
+	        <?php echo J2Html::calendar('since', $this->state->since, ['class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_ORDER_DATE_FROM')]);?>
         </div>
         <div class="col-lg-2 col-md-4 mb-2">
-	        <?php echo J2Html::calendar('until', $this->state->until, array('class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_ORDER_DATE_TO')));?>
+	        <?php echo J2Html::calendar('until', $this->state->until, ['class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_ORDER_DATE_TO')]);?>
         </div>
         <div class="col-lg-2 col-md-4 mb-2">
             <div class="input-group">
                 <span class="input-group-text"><span class="fas fa-solid fa-list-alt"></span></span>
-	            <?php echo J2Html::text('frominvoice', $this->state->frominvoice, array('class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_ORDER_ID_FROM')));?>
+	            <?php echo J2Html::text('frominvoice', $this->state->frominvoice, ['class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_ORDER_ID_FROM')]);?>
             </div>
         </div>
         <div class="col-lg-2 col-md-4 mb-2">
             <div class="input-group">
                 <span class="input-group-text"><span class="fas fa-solid fa-list-alt"></span></span>
-		        <?php echo J2Html::text('toinvoice', $this->state->toinvoice, array('class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_ORDER_ID_TO')));?>
+		        <?php echo J2Html::text('toinvoice', $this->state->toinvoice, ['class' => 'form-control j2store-order-filters', 'placeholder'=>Text::_('J2STORE_ORDER_ID_TO')]);?>
             </div>
         </div>
         <div class="col-lg-2 col-md-4 mb-2">
-	        <?php echo J2Html::button('advanced_search', Text::_('J2STORE_APPLY_FILTER'), array('class' => 'btn btn-primary w-100', 'onclick' => 'this.form.submit();')); ?>
+	        <?php echo J2Html::button('advanced_search', Text::_('J2STORE_APPLY_FILTER'), ['class' => 'btn btn-primary w-100', 'onclick' => 'this.form.submit();']); ?>
 
         </div>
     </div>

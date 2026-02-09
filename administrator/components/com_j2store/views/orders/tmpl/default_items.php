@@ -47,7 +47,7 @@ $wa->addInlineStyle($style, [], []);
                 <th scope="col"><?php echo HTMLHelper::_('grid.sort','J2STORE_PAYMENT', 'orderpayment_type', $this->state->filter_order_Dir,$this->state->filter_order); ?>
                 </th>
                 <th scope="col"><?php echo Text::_('J2STORE_ORDER_STATUS'); ?></th>
-                <?php echo J2Store::plugin()->eventWithHtml('AdminOrderListTab', array($this->state))?>
+                <?php echo J2Store::plugin()->eventWithHtml('AdminOrderListTab', [$this->state])?>
                 <th scope="col"><?php echo Text::_('J2STORE_ACTIONS');?></th>
             </tr>
         </thead>
@@ -57,7 +57,7 @@ $wa->addInlineStyle($style, [], []);
                 $link 	= Route::_( 'index.php?option=com_j2store&view=order&id='.$row->j2store_order_id  );
                 $checked = HTMLHelper::_('grid.id', $i, $row->j2store_order_id );
                 $order = F0FTable::getInstance('Order', 'J2StoreTable');
-                $order->load(array('order_id'=>$row->order_id));
+                $order->load(['order_id'=>$row->order_id]);
             ?>
                 <tr>
                     <td class="w-1 text-center"><?php echo $checked; ?></td>
@@ -87,7 +87,7 @@ $wa->addInlineStyle($style, [], []);
                         $keywords = ['success', 'info', 'primary', 'warning', 'danger', 'important'];
                         $foundKeyword = null;
                         foreach ($keywords as $keyword) {
-                            if (str_contains($row->orderstatus_cssclass, $keyword)) {
+                            if (str_contains((string) $row->orderstatus_cssclass, $keyword)) {
                                 if($keyword == 'important'){
                                     $foundKeyword = 'danger';
                                 } else {
@@ -101,7 +101,7 @@ $wa->addInlineStyle($style, [], []);
                         ?>
                         <a href="<?php echo $link ?>" title="<?php echo Text::_( 'J2STORE_ORDER_STATUS');?>" class="badge rounded-2 px-2 text-bg-<?php echo $foundKeyword;?>"> <?php echo Text::_($row->orderstatus_name); ?></a>
                     </td>
-                    <?php echo J2Store::plugin ()->eventWithHtml ( 'AdminOrderListTabContent', array($row))?>
+                    <?php echo J2Store::plugin ()->eventWithHtml ( 'AdminOrderListTabContent', [$row])?>
                     <td class="small">
                         <?php $print_url = Route::_('index.php?option=com_j2store&view=orders&task=printOrder&tmpl=component&order_id='.$row->order_id);?>
                         <?php $edit_url = Route::_('index.php?option=com_j2store&view=orders&task=createOrder&oid='.$row->j2store_order_id);?>
@@ -109,24 +109,18 @@ $wa->addInlineStyle($style, [], []);
                         <div class="d-flex">
                             <div class="status-selector">
                                 <div class="input-group input-group-sm mb-0">
-                                    <?php $attr = array("class"=>"form-select form-select-sm form-select-border-".$foundKeyword , "id"=>"order_state_id_".$row->j2store_order_id);?>
+                                    <?php $attr = ["class"=>"form-select form-select-sm form-select-border-".$foundKeyword, "id"=>"order_state_id_".$row->j2store_order_id];?>
                                     <?php echo J2Html::select()->clearState()
                                         ->type('genericlist')
                                         ->name('order_state_id')
                                         ->value($row->order_state_id)
                                         ->idTag('order_state_id_'.$row->j2store_order_id)
                                         ->attribs($attr)
-                                        ->setPlaceHolders(array(''=>Text::_('J2STORE_SELECT_OPTION')))
+                                        ->setPlaceHolders([''=>Text::_('J2STORE_SELECT_OPTION')])
                                         ->hasOne('Orderstatuses')
                                         ->ordering('ordering')
                                         ->setRelations(
-                                            array (
-                                                'fields' => array
-                                                (
-                                                    'key'=>'j2store_orderstatus_id',
-                                                    'name'=>'orderstatus_name'
-                                                )
-                                            )
+                                            ['fields' => ['key'=>'j2store_orderstatus_id', 'name'=>'orderstatus_name']]
                                         )->getHtml();
 
                                     ?>

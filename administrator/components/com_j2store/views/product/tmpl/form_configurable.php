@@ -21,16 +21,11 @@ $this->lengths = J2Html::select()->clearState()
     ->type('genericlist')
     ->name($this->form_prefix.'[length_class_id]')
     ->value($this->variant->length_class_id)
-    ->attribs(array('class'=>'form-select'))
-    ->setPlaceHolders(array(''=>Text::_('J2STORE_SELECT_OPTION')))
+    ->attribs(['class'=>'form-select'])
+    ->setPlaceHolders([''=>Text::_('J2STORE_SELECT_OPTION')])
     ->hasOne('Lengths')
     ->setRelations(
-        array (
-            'fields' => array (
-                'key'=>'j2store_length_id',
-                'name'=>'length_title'
-            )
-        )
+        ['fields' => ['key'=>'j2store_length_id', 'name'=>'length_title']]
     )->getHtml();
 
 //weights
@@ -39,16 +34,11 @@ $this->weights = J2Html::select()->clearState()
     ->type('genericlist')
     ->name($this->form_prefix.'[weight_class_id]')
     ->value($this->variant->weight_class_id)
-    ->attribs(array('class'=>'form-select'))
-    ->setPlaceHolders(array(''=>Text::_('J2STORE_SELECT_OPTION')))
+    ->attribs(['class'=>'form-select'])
+    ->setPlaceHolders([''=>Text::_('J2STORE_SELECT_OPTION')])
     ->hasOne('Weights')
     ->setRelations(
-        array (
-            'fields' => array (
-                'key'=>'j2store_weight_id',
-                'name'=>'weight_title'
-            )
-        )
+        ['fields' => ['key'=>'j2store_weight_id', 'name'=>'weight_title']]
     )->getHtml();
 
 //backorder
@@ -56,24 +46,19 @@ $this->allow_backorder = J2Html::select()->clearState()
     ->type('genericlist')
     ->name($this->form_prefix.'[allow_backorder]')
     ->value($this->variant->allow_backorder)
-    ->attribs(array('class'=>'form-select'))
+    ->attribs(['class'=>'form-select'])
     ->setPlaceHolders(
-        array('0' => Text::_('COM_J2STORE_DO_NOT_ALLOW_BACKORDER'),
-            '1' => Text::_('COM_J2STORE_DO_ALLOW_BACKORDER'),
-            '2' => Text::_('COM_J2STORE_ALLOW_BUT_NOTIFY_CUSTOMER')
-        ))
+        ['0' => Text::_('COM_J2STORE_DO_NOT_ALLOW_BACKORDER'), '1' => Text::_('COM_J2STORE_DO_ALLOW_BACKORDER'), '2' => Text::_('COM_J2STORE_ALLOW_BUT_NOTIFY_CUSTOMER')])
     ->getHtml();
 
 $this->availability =J2Html::select()->clearState()
     ->type('genericlist')
     ->name($this->form_prefix.'[availability]')
-    ->attribs(array('class'=>'form-select'))
+    ->attribs(['class'=>'form-select'])
     ->value($this->variant->availability)
     ->default(1)
     ->setPlaceHolders(
-        array('0' => Text::_('COM_J2STORE_PRODUCT_OUT_OF_STOCK') ,
-            '1'=> Text::_('COM_J2STORE_PRODUCT_IN_STOCK') ,
-        )
+        ['0' => Text::_('COM_J2STORE_PRODUCT_OUT_OF_STOCK'), '1'=> Text::_('COM_J2STORE_PRODUCT_IN_STOCK')]
     )
     ->getHtml();
 $row_class = 'row';

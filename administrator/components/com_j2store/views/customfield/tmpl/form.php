@@ -67,7 +67,7 @@ $wa->addInlineScript("
                                 <table class="table align-middle">
                                     <tr>
                                         <td class="key"><label><?php echo Text::_('J2STORE_CUSTOM_FIELDS_NAME');?></label></td>
-                                        <td><?php echo J2Html::text('data[field][field_name]' ,$this->item->field_name,array('class'=>'form-control w-100','id'=>'field_name'));?></td>
+                                        <td><?php echo J2Html::text('data[field][field_name]' ,$this->item->field_name,['class'=>'form-control w-100', 'id'=>'field_name']);?></td>
                                     </tr>
                                     <tr>
                                         <td class="key"><?php echo Text::_( 'J2STORE_CUSTOM_FIELDS_TABLE' ); ?></td>
@@ -79,7 +79,7 @@ $wa->addInlineScript("
                                         <td class="key"><?php echo Text::_( 'J2STORE_CUSTOM_FIELDS_COLUMN' ); ?></td>
                                         <td>
                                             <?php if(empty($this->item->j2store_customfield_id)): ?>
-                                                <?php echo J2Html::text('data[field][field_namekey]' ,$this->item->field_namekey,array('class'=>'form-control w-100','id'=>'field_namekey'));?>
+                                                <?php echo J2Html::text('data[field][field_namekey]' ,$this->item->field_namekey,['class'=>'form-control w-100', 'id'=>'field_namekey']);?>
                                             <?php else: ?>
                                                 <?php echo $this->item->field_namekey; ?>
                                             <?php endif; ?>
@@ -105,18 +105,15 @@ $wa->addInlineScript("
                                                 ->type('genericlist')
                                                 ->name('data[field][field_required]')
                                                 ->value($this->item->field_required)
-                                                ->attribs(array('class'=>'form-select'))
+                                                ->attribs(['class'=>'form-select'])
                                                 ->setPlaceholders(
-                                                    array(
-                                                        '0' => Text::_('JNO'),
-                                                        '1' => Text::_('JYES')
-                                                    ))
+                                                    ['0' => Text::_('JNO'), '1' => Text::_('JYES')])
                                                 ->getHtml();
                                             ?></td>
                                     </tr>
                                     <tr class="required">
                                         <td class="key"><?php echo Text::_( 'J2STORE_CUSTOM_FIELD_ERROR' ); ?></td>
-                                        <td><?php echo J2Html::text('field_options[errormessage]',@$this->escape($this->item->field_options['errormessage']),array('class'=>'form-control w-100','id'=>'errormessage'));?></td>
+                                        <td><?php echo J2Html::text('field_options[errormessage]',@$this->escape($this->item->field_options['errormessage']),['class'=>'form-control w-100', 'id'=>'errormessage']);?></td>
                                     </tr>
                                     <tr class="default">
                                         <td class="key"><?php echo Text::_( 'J2STORE_CUSTOM_FIELD_DEFAULT' ); ?></td>
@@ -163,17 +160,14 @@ $wa->addInlineScript("
                                                         </tr>
                                                     <?php } }?>
                                                 <tr>
-                                                    <td><?php echo J2Html::text('field_values[title][]' ,'',array('class' =>'form-control'));?></td>
-                                                    <td><?php echo J2Html::text('field_values[value][]' ,'',array('class' =>'form-control'));?></td>
+                                                    <td><?php echo J2Html::text('field_values[title][]' ,'',['class' =>'form-control']);?></td>
+                                                    <td><?php echo J2Html::text('field_values[value][]' ,'',['class' =>'form-control']);?></td>
                                                     <td><?php echo J2Html::select()->clearState()
                                                             ->type('genericlist')
                                                             ->name('field_values[disabled][]')
                                                             ->value(0)
                                                             ->setPlaceholders(
-                                                                array(
-                                                                    '0' => Text::_('JNO'),
-                                                                    '1' => Text::_('JYES')
-                                                                ))
+                                                                ['0' => Text::_('JNO'), '1' => Text::_('JYES')])
                                                             ->getHtml();
                                                         ?>
                                                     </td>
@@ -193,24 +187,24 @@ $wa->addInlineScript("
                                         <td class="key"><?php echo Text::_( 'J2STORE_CUSTOM_FIELD_MAXLENGTH' ); ?></td>
                                         <td>
                                             <?php $maxlength =  (isset($this->item->field_options['maxlength']) ? (int)$this->item->field_options['maxlength'] : ""); ?>
-                                            <?php echo J2Html::text('field_options[maxlength]',$maxlength,array('id' =>'maxlength','class'=>'form-control'));?>
+                                            <?php echo J2Html::text('field_options[maxlength]',$maxlength,['id' =>'maxlength', 'class'=>'form-control']);?>
                                         </td>
                                     </tr>
 
                                     <tr class="place_holder">
                                         <td class="key"><?php echo Text::_( 'J2STORE_CUSTOM_FIELD_PLACEHOLDER' ); ?></td>
                                         <td>
-                                            <?php $placeholder =  (isset($this->item->field_options['placeholder']) ? $this->item->field_options['placeholder'] : ""); ?>
-                                            <?php echo J2Html::text('field_options[placeholder]',$placeholder,array('id' =>'placeholder','class'=>'form-control'));?>
+                                            <?php $placeholder =  ($this->item->field_options['placeholder'] ?? ""); ?>
+                                            <?php echo J2Html::text('field_options[placeholder]',$placeholder,['id' =>'placeholder', 'class'=>'form-control']);?>
                                         </td>
                                     </tr>
                                     <tr class="size">
                                         <td class="key"><?php echo Text::_( 'J2STORE_CUSTOM_FIELD_SIZE' ); ?></td>
-                                        <td><?php echo J2Html::text('field_options[size]',@$this->item->field_options['size'],array('id' =>'size','class'=>'form-control'));?></td>
+                                        <td><?php echo J2Html::text('field_options[size]',@$this->item->field_options['size'],['id' =>'size', 'class'=>'form-control']);?></td>
                                     </tr>
                                     <tr class="rows">
                                         <td class="key"><?php echo Text::_( 'J2STORE_CUSTOM_FIELD_ROWS' ); ?></td>
-                                        <td><?php echo J2Html::text('field_options[size]',$this->item->field_options['size'],array('id' =>'size','class'=>'form-control'));?>
+                                        <td><?php echo J2Html::text('field_options[size]',$this->item->field_options['size'],['id' =>'size', 'class'=>'form-control']);?>
                                         </td>
                                     </tr>
 

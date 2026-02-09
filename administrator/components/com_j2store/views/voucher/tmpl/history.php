@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\HTML\Helpers\Sidebar;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -18,7 +19,7 @@ $platform = J2Store::platform();
 $platform->loadExtra('bootstrap.tooltip');
 $platform->loadExtra('behavior.framework',true);
 
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 $row_class = 'row';
 $col_class = 'col-md-';
 ?>
@@ -48,7 +49,7 @@ $col_class = 'col-md-';
                 </tr>
 	        </thead>
 	        <tbody>
-                <?php if(count($this->vouchers)): ?>
+                <?php if(is_countable($this->vouchers) ? count($this->vouchers) : 0): ?>
                     <?php foreach($this->vouchers as $item): ?>
                         <?php $link = 'index.php?option=com_j2store&view=order&id='.$item->order->j2store_order_id; ?>
                         <tr>

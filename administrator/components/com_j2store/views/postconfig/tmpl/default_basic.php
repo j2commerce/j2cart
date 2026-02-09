@@ -16,7 +16,7 @@ use Joomla\CMS\Language\Text;
         <?php echo J2Html::label(Text::_('J2STORE_STORE_NAME'), 'store_name');?>
     </div>
     <div class="controls">
-        <?php echo J2Html::text('store_name', $this->params->get('store_name'), array('id'=>'store_name','class'=>'form-control'));?>
+        <?php echo J2Html::text('store_name', $this->params->get('store_name'), ['id'=>'store_name', 'class'=>'form-control']);?>
     </div>
 </div>
 <div class="control-group">
@@ -24,7 +24,7 @@ use Joomla\CMS\Language\Text;
         <?php echo J2Html::label(Text::_('J2STORE_ADDRESS_ZIP'), 'store_zip');?>
     </div>
     <div class="controls">
-        <?php echo J2Html::text('store_zip', $this->params->get('store_zip'), array('id'=>'store_zip','class'=>'form-control'));?>
+        <?php echo J2Html::text('store_zip', $this->params->get('store_zip'), ['id'=>'store_zip', 'class'=>'form-control']);?>
     </div>
 </div>
 <div class="control-group">
@@ -37,16 +37,11 @@ use Joomla\CMS\Language\Text;
             ->name('country_id')
             ->idTag('country_id')
             ->value($this->params->get('country_id'))
-            ->attribs(array('class'=>'form-select'))
-            ->setPlaceHolders(array(''=>Text::_('J2STORE_SELECT_OPTION')))
+            ->attribs(['class'=>'form-select'])
+            ->setPlaceHolders([''=>Text::_('J2STORE_SELECT_OPTION')])
             ->hasOne('Countries')
             ->setRelations(
-                array (
-                    'fields' => array (
-                        'key'=>'j2store_country_id',
-                        'name'=>'country_name'
-                    )
-                )
+                ['fields' => ['key'=>'j2store_country_id', 'name'=>'country_name']]
             )->getHtml();
         ?>
     </div>
@@ -62,7 +57,7 @@ use Joomla\CMS\Language\Text;
 			->type('genericlist')
 			->name('config_currency')
 			->value($this->params->get('config_currency', 'USD'))
-			->attribs(array('class'=>'form-select'))
+			->attribs(['class'=>'form-select'])
 			->setPlaceHolders($currencies)
 			->getHtml();
 		?>
@@ -75,7 +70,7 @@ use Joomla\CMS\Language\Text;
 		<?php echo J2Html::label(Text::_('J2STORE_CURRENCY_SYMBOL_LABEL'), 'config_currency_symbol');?>
     </div>
     <div class="controls">
-	    <?php echo J2Html::text('config_currency_symbol', '', array('id'=>'config_currency_symbol', 'placeholder'=>'$','class'=>'form-control'));?>
+	    <?php echo J2Html::text('config_currency_symbol', '', ['id'=>'config_currency_symbol', 'placeholder'=>'$', 'class'=>'form-control']);?>
     </div>
 </div>
 <div class="control-group">
@@ -87,11 +82,8 @@ use Joomla\CMS\Language\Text;
 		    ->type('genericlist')
 		    ->name('config_currency_auto')
 		    ->value($this->params->get('config_currency_auto', 1))
-		    ->attribs(array('class'=>'form-select'))
-		    ->setPlaceHolders(array(
-			    '0'=>Text::_('JNO'),
-			    '1'=>Text::_('JYES')
-		    ))
+		    ->attribs(['class'=>'form-select'])
+		    ->setPlaceHolders(['0'=>Text::_('JNO'), '1'=>Text::_('JYES')])
 		    ->getHtml();
 	    ?>
     </div>
@@ -105,16 +97,11 @@ use Joomla\CMS\Language\Text;
 		    ->type('genericlist')
 		    ->name('config_weight_class_id')
 		    ->value($this->params->get('config_weight_class_id', 1))
-		    ->attribs(array('class'=>'form-select'))
-		    ->setPlaceHolders(array(''=>Text::_('J2STORE_SELECT_OPTION')))
+		    ->attribs(['class'=>'form-select'])
+		    ->setPlaceHolders([''=>Text::_('J2STORE_SELECT_OPTION')])
 		    ->hasOne('Weights')
 		    ->setRelations(
-			    array (
-				    'fields' => array (
-					    'key'=>'j2store_weight_id',
-					    'name'=>'weight_title'
-				    )
-			    )
+			    ['fields' => ['key'=>'j2store_weight_id', 'name'=>'weight_title']]
 		    )->getHtml();
 	    ?>
     </div>
@@ -128,16 +115,11 @@ use Joomla\CMS\Language\Text;
 		    ->type('genericlist')
 		    ->name('config_length_class_id')
 		    ->value($this->params->get('config_length_class_id', 1))
-		    ->attribs(array('class'=>'form-select'))
-		    ->setPlaceHolders(array(''=>Text::_('J2STORE_SELECT_OPTION')))
+		    ->attribs(['class'=>'form-select'])
+		    ->setPlaceHolders([''=>Text::_('J2STORE_SELECT_OPTION')])
 		    ->hasOne('Lengths')
 		    ->setRelations(
-			    array (
-				    'fields' => array (
-					    'key'=>'j2store_length_id',
-					    'name'=>'length_title'
-				    )
-			    )
+			    ['fields' => ['key'=>'j2store_length_id', 'name'=>'length_title']]
 		    )->getHtml();
 	    ?>
     </div>

@@ -1,4 +1,8 @@
 <?php
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package     J2Store
  * @author      Alagesan, J2Store <support@j2store.org>
@@ -17,7 +21,7 @@ $platform->loadExtra('dropdown.init');
 
 $current_page = $this->state->get('current_page', 'popular');
 
-$total = count($this->items);
+$total = is_countable($this->items) ? count($this->items) : 0;
 $counter = 0;
 $col = 3;
 $row_class = 'row';
@@ -28,7 +32,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 }
 ?>
 <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
-<form action="<?php echo JRoute::_('index.php?option=com_j2store&view=appstores'); ?>" method="post"
+<form action="<?php echo Route::_('index.php?option=com_j2store&view=appstores'); ?>" method="post"
       name="adminForm"
       id="adminForm">
     <input type="hidden" name="task" value="browse"/>
@@ -36,7 +40,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
     <input type="hidden" name="page" value="<?php echo $current_page; ?>"/>
     <input type="hidden" name="filter_order" value="<?php echo $this->state->filter_order; ?>"/>
     <input type="hidden" name="filter_order_Dir" value="<?php echo $this->state->filter_order_Dir; ?>"/>
-    <input type="hidden" id="token" name="<?php echo JFactory::getSession()->getFormToken(); ?>" value="1"/>
+    <input type="hidden" id="token" name="<?php echo Factory::getSession()->getFormToken(); ?>" value="1"/>
     <div class="<?php echo $row_class; ?>">
         <div id="j2-main-container">
             <div class="j2store apps">
@@ -45,18 +49,18 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                         <input type="text" name="search" id="search"
                                value="<?php echo $this->escape($this->state->search); ?>"
                                class="input-large" onchange="document.adminForm.submit();"
-                               placeholder="<?php echo JText::_('J2STORE_PLUGIN_NAME'); ?>"
+                               placeholder="<?php echo Text::_('J2STORE_PLUGIN_NAME'); ?>"
                         />
                         <nobr>
                             <button class="btn btn-success"
-                                    type="submit"><?php echo JText::_('JSEARCH_FILTER_SUBMIT'); ?></button>
+                                    type="submit"><?php echo Text::_('JSEARCH_FILTER_SUBMIT'); ?></button>
                             <button class="btn btn-inverse" type="button"
-                                    onclick="document.adminForm.search.value='';document.adminForm.submit();"><?php echo JText::_('JSEARCH_FILTER_CLEAR'); ?></button>
+                                    onclick="document.adminForm.search.value='';document.adminForm.submit();"><?php echo Text::_('JSEARCH_FILTER_CLEAR'); ?></button>
                         </nobr>
                     </div>
                     <div class="<?php echo $col_class; ?>6">
                         <label for="plugin_type"
-                               style="display: inline;"><strong><?php echo JText::_('J2STORE_PLUGIN_TYPES'); ?></strong></label>&nbsp;&nbsp;&nbsp;&nbsp;
+                               style="display: inline;"><strong><?php echo Text::_('J2STORE_PLUGIN_TYPES'); ?></strong></label>&nbsp;&nbsp;&nbsp;&nbsp;
                         <select name="plugin_type" id="j2_plugin_type" onchange="document.adminForm.submit();"
                                 style="display: inline;">
                             <?php foreach ($this->plugin_types as $plugin_key => $plugin_value): ?>
@@ -80,17 +84,17 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                 foreach ($this->items as $i => $app): ?>
                     <?php
                     $i++;
-                    $element = isset($app['element']) ? $app['element'] : '';
-                    $image_url = isset($app['main_image']) ? trim($app['main_image']) : '';
+                    $element = $app['element'] ?? '';
+                    $image_url = isset($app['main_image']) ? trim((string) $app['main_image']) : '';
                     if (empty($image_url)) {
-                        $image_url = JUri::root(true) . '/media/j2store/images/app_placeholder.png';
+                        $image_url = Uri::root(true) . '/media/j2store/images/app_placeholder.png';
                     }
-                    $plugin_name = isset($app['plugin_name']) ? $app['plugin_name'] : '';
-                    $short_desc = isset($app['short_desc']) ? $app['short_desc'] : '';
-                    $author = isset($app['developer']) ? $app['developer'] : 'J2Store';
-                    $app_version = isset($app['version']) ? $app['version'] : '1.0.0';
-                    $buy_url = isset($app['site_url']) ? $app['site_url'] : '';
-                    $document_url = isset($app['documentation-url']) ? $app['documentation-url'] : '';
+                    $plugin_name = $app['plugin_name'] ?? '';
+                    $short_desc = $app['short_desc'] ?? '';
+                    $author = $app['developer'] ?? 'J2Store';
+                    $app_version = $app['version'] ?? '1.0.0';
+                    $buy_url = $app['site_url'] ?? '';
+                    $document_url = $app['documentation-url'] ?? '';
 
                     //load the language files
                     //JFactory::getLanguage()->load('plg_j2store_'.$app['element'], JPATH_ADMINISTRATOR);
@@ -112,12 +116,12 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                     </div>
 
                                     <div class="app-name">
-                                        <h3 class="panel-title"><?php echo JText::_($plugin_name); ?></h3>
+                                        <h3 class="panel-title"><?php echo Text::_($plugin_name); ?></h3>
                                     </div>
 
                                     <div class="app-description">
                                         <?php
-                                        echo substr(JText::_($short_desc), 0, 100) . '...';
+                                        echo substr((string) Text::_($short_desc), 0, 100) . '...';
                                         ?>
                                     </div>
                                     <div class="app-footer">
@@ -125,23 +129,23 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 							<?php echo $author; ?>
 						</span>
 
-                                        <span class="version pull-right"><strong><?php echo JText::_('J2STORE_APP_VERSION'); ?> : <?php echo $app_version; ?></strong></span>
+                                        <span class="version pull-right"><strong><?php echo Text::_('J2STORE_APP_VERSION'); ?> : <?php echo $app_version; ?></strong></span>
                                     </div>
                                 </div>
                                 <div class="panel-footer">
                                     <div class="app-action">
                                         <?php if (in_array($element, $this->installed_plugin)): ?>
                                             <?php
-                                            $installed_version = isset($this->plugin_version[$element]) ? $this->plugin_version[$element] : '1.0.0';
+                                            $installed_version = $this->plugin_version[$element] ?? '1.0.0';
                                             $is_need_update = false;
                                             $class = 'app-button j2-flat-button btn-success';
-                                            $display_text = JText::_('J2STORE_INSTALLED');
+                                            $display_text = Text::_('J2STORE_INSTALLED');
                                             $url = 'javascript:void(0)';
                                             $target = '';
                                             if (version_compare($installed_version, $app_version, 'lt')) {
                                                 $is_need_update = true;
                                                 $class = 'app-button btn-primary j2-flat-button';
-                                                $display_text = JText::_('J2STORE_UPDATE_PLUGIN');
+                                                $display_text = Text::_('J2STORE_UPDATE_PLUGIN');
                                                 $url = 'https://www.j2store.org/my-account/my-downloads.html';
                                                 $target = '_blank';
                                             }
@@ -150,21 +154,21 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                             ?>
                                             <a class="<?php echo $class; ?>" href="<?php echo $url; ?>"
                                                target="<?php echo $target; ?>"><?php echo $display_text; ?></a>
-                                        <?php else: ?>
+<?php else: ?>
                                             <a class="app-button app-button-publish j2-flat-button"
                                                target="_blank"
                                                href="<?php echo $buy_url; ?>">
-                                                <?php echo JText::_('J2STORE_BUY'); ?>
+                                                <?php echo Text::_('J2STORE_BUY'); ?>
                                             </a>
                                         <?php endif; ?>
                                         <?php if (!empty($document_url)): ?>
                                             <a class="app-button btn-info j2-flat-button" target="_blank"
                                                href="<?php echo $document_url; ?>">
-                                                <?php echo JText::_('J2STORE_DOCUMENT'); ?>
+                                                <?php echo Text::_('J2STORE_DOCUMENT'); ?>
                                             </a>
                                         <?php endif; ?>
                                         <?php if (isset($app['price'])): ?>
-                                            <strong class="pull-right"><?php echo JText::_('J2STORE_PRODUCT_PRICE'); ?>
+                                            <strong class="pull-right"><?php echo Text::_('J2STORE_PRODUCT_PRICE'); ?>
                                                 : <?php echo $app['price']; ?></strong>
                                         <?php endif; ?>
                                     </div>
@@ -180,7 +184,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                     <?php if (($rowcount == $col) or ($counter == $total)) : ?>
                         </div>
                     <?php endif; ?>
-                <?php endforeach; ?>
+<?php endforeach; ?>
                 <?php //  echo $this->pagination->getPagesLinks(); ?>
                 <div class="pagination">
                     <?php echo $this->pagination->getListFooter(); ?>

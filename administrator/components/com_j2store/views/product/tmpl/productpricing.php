@@ -27,8 +27,8 @@ HTMLHelper::_('bootstrap.tooltip', '[data-bs-toggle="tooltip"]', ['placement' =>
 	<form class="form-horizontal form-validate" id="adminForm" 	name="adminForm" method="post" action="index.php">
 		<?php echo J2Html::hidden('option','com_j2store');?>
 		<?php echo J2Html::hidden('view','products');?>
-		<?php echo J2Html::hidden('task','',array('id'=>'task'));?>
-		<?php echo J2Html::hidden('variant_id', $this->variant_id, array('id'=>'variant_id'));?>
+		<?php echo J2Html::hidden('task','',['id'=>'task']);?>
+		<?php echo J2Html::hidden('variant_id', $this->variant_id, ['id'=>'variant_id']);?>
 		<?php echo HTMLHelper::_( 'form.token' ); ?>
 	<div class="note <?php echo $row_class;?> mb-3">
         <fieldset class="options-form">
@@ -47,22 +47,22 @@ HTMLHelper::_('bootstrap.tooltip', '[data-bs-toggle="tooltip"]', ['placement' =>
                 <tr>
                     <td>
                         <div class="input-group">
-					        <?php echo J2Html::calendar('date_from','',array('class'=>'form-control','id'=>'price_date_from','format' => '%d-%m-%Y %H:%M:%S','showTime' => true ));?>
+					        <?php echo J2Html::calendar('date_from','',['class'=>'form-control', 'id'=>'price_date_from', 'format' => '%d-%m-%Y %H:%M:%S', 'showTime' => true]);?>
                             <span class="input-group-text mx-2"><?php echo Text::_('J2STORE_TO');?></span>
-					        <?php echo J2Html::calendar('date_to','',array('class'=>'form-control','id'=>'price_date_to','format' => '%d-%m-%Y %H:%M:%S','showTime' => true ));?>
+					        <?php echo J2Html::calendar('date_to','',['class'=>'form-control', 'id'=>'price_date_to', 'format' => '%d-%m-%Y %H:%M:%S', 'showTime' => true]);?>
                         </div>
                     </td>
                     <td>
                         <div class="input-group">
-					        <?php echo J2Html::text('quantity_from', '',array('class'=>'form-control')); ?>
+					        <?php echo J2Html::text('quantity_from', '',['class'=>'form-control']); ?>
                             <span class="input-group-text"><?php echo Text::_('J2STORE_QUANTITY_AND_ABOVE');?></span>
                         </div>
                     </td>
                     <td>
-				        <?php echo HTMLHelper::_('select.genericlist', $this->groups, 'customer_group_id', array('class'=>'form-select'), 'value', 'text',''); ?>
+				        <?php echo HTMLHelper::_('select.genericlist', $this->groups, 'customer_group_id', ['class'=>'form-select'], 'value', 'text',''); ?>
                     </td>
                     <td>
-				        <?php echo J2Html::price('price','',array('class'=>'form-control')); ?>
+				        <?php echo J2Html::price('price','',['class'=>'form-control']); ?>
                     </td>
                     <td class="text-end">
                         <button class="btn btn-success" onclick="document.getElementById('task').value='createproductprice'; document.adminForm.submit();">
@@ -100,24 +100,24 @@ HTMLHelper::_('bootstrap.tooltip', '[data-bs-toggle="tooltip"]', ['placement' =>
                         <tr class="row<?php echo $key%2;?>" id="productprice-row-<?php echo $pricing->j2store_productprice_id;?>">
                             <td>
                                 <div class="input-group">
-	                                <?php echo J2Html::calendar($this->prefix."[$pricing->j2store_productprice_id][date_from]",$utility->convert_utc_current($pricing->date_from),array('class'=>'form-control','id'=>"price_date_from_$key",'format' => '%d-%m-%Y %H:%M:%S','showTime' => true ));?>
+	                                <?php echo J2Html::calendar($this->prefix."[$pricing->j2store_productprice_id][date_from]",$utility->convert_utc_current($pricing->date_from),['class'=>'form-control', 'id'=>"price_date_from_$key", 'format' => '%d-%m-%Y %H:%M:%S', 'showTime' => true]);?>
                                     <span class="input-group-text mx-2"><?php echo Text::_('J2STORE_TO');?></span>
-	                                <?php echo J2Html::calendar($this->prefix."[$pricing->j2store_productprice_id][date_to]",$utility->convert_utc_current($pricing->date_to),array('class'=>'form-control','id'=>"price_date_to_$key",'format' => '%d-%m-%Y %H:%M:%S','showTime' => true ));?>
+	                                <?php echo J2Html::calendar($this->prefix."[$pricing->j2store_productprice_id][date_to]",$utility->convert_utc_current($pricing->date_to),['class'=>'form-control', 'id'=>"price_date_to_$key", 'format' => '%d-%m-%Y %H:%M:%S', 'showTime' => true]);?>
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group">
-	                                <?php echo J2Html::text($this->prefix."[$pricing->j2store_productprice_id][quantity_from]",$pricing->quantity_from,array('class'=>'form-control')); ?>
+	                                <?php echo J2Html::text($this->prefix."[$pricing->j2store_productprice_id][quantity_from]",$pricing->quantity_from,['class'=>'form-control']); ?>
                                     <span class="input-group-text"><?php echo Text::_('J2STORE_QUANTITY_AND_ABOVE');?></span>
                                 </div>
                             </td>
                             <td>
-                                <?php echo HTMLHelper::_('select.genericlist', $this->groups, $this->prefix."[$pricing->j2store_productprice_id][customer_group_id]", array('class'=>'form-select'), 'value', 'text',$pricing->customer_group_id);?>
+                                <?php echo HTMLHelper::_('select.genericlist', $this->groups, $this->prefix."[$pricing->j2store_productprice_id][customer_group_id]", ['class'=>'form-select'], 'value', 'text',$pricing->customer_group_id);?>
                             </td>
                             <td>
-                                <?php echo J2Html::price_with_data($this->prefix, $pricing->j2store_productprice_id, "[$pricing->j2store_productprice_id][price]",$pricing->price,array('class'=>'form-control'), $pricing); ?>
-                                <?php echo J2Html::hidden($this->prefix."[$pricing->j2store_productprice_id][j2store_productprice_id]",$pricing->j2store_productprice_id,array('id'=>"product_price_id_$pricing->j2store_productprice_id"));?>
-                                <?php echo J2Html::hidden($this->prefix."[$pricing->j2store_productprice_id][variant_id]",$pricing->variant_id,array('id'=>"variant_id_$pricing->j2store_productprice_id"));?>
+                                <?php echo J2Html::price_with_data($this->prefix, $pricing->j2store_productprice_id, "[$pricing->j2store_productprice_id][price]",$pricing->price,['class'=>'form-control'], $pricing); ?>
+                                <?php echo J2Html::hidden($this->prefix."[$pricing->j2store_productprice_id][j2store_productprice_id]",$pricing->j2store_productprice_id,['id'=>"product_price_id_$pricing->j2store_productprice_id"]);?>
+                                <?php echo J2Html::hidden($this->prefix."[$pricing->j2store_productprice_id][variant_id]",$pricing->variant_id,['id'=>"variant_id_$pricing->j2store_productprice_id"]);?>
                             </td>
                             <td class="text-end">
                                 <a class="btn btn-danger" href="index.php?option=com_j2store&view=products&task=removeproductprice&variant_id=<?php echo $pricing->variant_id;?>&productprice_id=<?php echo $pricing->j2store_productprice_id; ?>&cid[]=<?php echo $pricing->j2store_productprice_id;?>">

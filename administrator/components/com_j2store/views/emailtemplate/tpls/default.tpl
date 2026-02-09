@@ -116,13 +116,13 @@ $params = J2Store::config();
 
 	<!-- Order items -->
 
-	<h3><?php echo JText::_('J2STORE_ORDER_SUMMARY')?></h3>
+	<h3><?php echo Joomla\CMS\Language\Text::_('J2STORE_ORDER_SUMMARY')?></h3>
 	<table class="emailtemplate-table" width="100%" cellspacing="0" cellpadding="0" border="0">
 		<thead>
 			<tr>
-				<th align="left"><?php echo JText::_('J2STORE_CART_LINE_ITEM'); ?></th>
-              <th align="left"><?php echo JText::_('J2STORE_CART_LINE_ITEM_QUANTITY'); ?></th>
-				<th align="left"><?php echo JText::_('J2STORE_CART_LINE_ITEM_TOTAL'); ?></th>
+				<th align="left"><?php echo Joomla\CMS\Language\Text::_('J2STORE_CART_LINE_ITEM'); ?></th>
+              <th align="left"><?php echo Joomla\CMS\Language\Text::_('J2STORE_CART_LINE_ITEM_QUANTITY'); ?></th>
+				<th align="left"><?php echo Joomla\CMS\Language\Text::_('J2STORE_CART_LINE_ITEM_TOTAL'); ?></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -138,8 +138,8 @@ $params = J2Store::config();
 					<td>
 						<?php if($params->get('show_thumb_cart', 1) && !empty($thumb_image)): ?>
 							<span class="cart-thumb-image">
-								<?php if(JFile::exists(JPATH_SITE.'/'.$thumb_image)): ?>
-								<img style="float: left;" width="120" src="<?php echo JUri::root(true).'/'.$thumb_image; ?>" >
+								<?php if(Joomla\CMS\Filesystem\File::exists(JPATH_SITE.'/'.$thumb_image)): ?>
+								<img style="float: left;" width="120" src="<?php echo Joomla\CMS\Uri\Uri::root(true).'/'.$thumb_image; ?>" >
 								<?php endif;?>
 							</span>
 						<?php endif; ?>
@@ -151,7 +151,7 @@ $params = J2Store::config();
 							<span class="">
 							<?php foreach ($item->orderitemattributes as $attribute): ?>
 								<small>
-								- <?php echo JText::_($attribute->orderitemattribute_name); ?> : <?php echo $attribute->orderitemattribute_value; ?>
+								- <?php echo Joomla\CMS\Language\Text::_($attribute->orderitemattribute_name); ?> : <?php echo $attribute->orderitemattribute_value; ?>
 								</small>
 
 								<br>
@@ -162,7 +162,7 @@ $params = J2Store::config();
 						<?php if($params->get('show_price_field', 1)): ?>
 
 							<span class="cart-product-unit-price">
-								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>								
+								<span class="cart-item-title"><?php echo Joomla\CMS\Language\Text::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?></span>								
 								<span class="cart-item-value">
 									<?php echo $currency->format($order->get_formatted_order_lineitem_price($item, $params->get('checkout_price_display_options', 1)), $order->currency_code, $order->currency_value);?>
 								</span>
@@ -172,7 +172,7 @@ $params = J2Store::config();
 						<?php if(!empty($item->orderitem_sku)): ?>
 						<br>
 							<span class="cart-product-sku">
-								<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
+								<span class="cart-item-title"><?php echo Joomla\CMS\Language\Text::_('J2STORE_CART_LINE_ITEM_SKU'); ?></span>
 								<span class="cart-item-value"><?php echo $item->orderitem_sku; ?></span>
 							</span>
 
