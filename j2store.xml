@@ -6,7 +6,7 @@
 	<copyright>Copyright (c) 2024 J2Commerce. All rights reserved.</copyright>
 	<authorEmail>support@j2commerce.com</authorEmail>
 	<authorUrl>https://j2commerce.com</authorUrl>
-	<version>4.0.20</version>
+	<version>4.1.0</version>
 	<license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later</license>
 	<description><![CDATA[<h3>J2Commerce V4 Professional</h3>
         Flexible and native Joomla shopping cart solution. <br>
@@ -14,8 +14,6 @@
         Start setting up your store now. <br>
         <a target="_blank" href="https://j2commerce.com">Learn more</a>]]>
 	</description>
-
-    <changelogurl>https://updates.j2commerce.com/j2store/changelog.xml</changelogurl>
 
 	<!-- Public front end files -->
 	<files folder="components/com_j2store">
