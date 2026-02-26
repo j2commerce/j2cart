@@ -42,6 +42,10 @@ class PlgInstallerJ2Store extends CMSPlugin
             $uri = new Uri($url);
             $uri->setVar('dlid', $downloadId);
             $url = $uri->render();
+
+            Factory::getApplication()->enqueueMessage('If you encounter a download error, make sure the Download Id/Key in the <a href="' . Uri::base() . 'index.php?option=com_j2store&view=configuration">configuration settings of J2Commerce</a> is correct and that you have an active subscription.');
+        } else {
+            Factory::getApplication()->enqueueMessage('If you encounter a download error, you are missing the Download Id/Key in the <a href="' . Uri::base() . 'index.php?option=com_j2store&view=configuration">configuration settings of J2Commerce (Update tab)</a>. Check your account at <a href="https://www.j2commerce.com/my-account" target="_blank">J2Commerce.com</a>.');
         }
 
         return true;
