@@ -9,6 +9,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Uri\Uri;
 use Joomla\Component\Content\Site\Helper\RouteHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
@@ -545,13 +546,58 @@ class plgContentJ2Store extends CMSPlugin
                 // Only generate URLs for non-API requests to avoid ApiRouter::build() errors
                 $app = Factory::getApplication();
                 if (!$app->isClient('api')) {
-                    $product->product_edit_url = Route::_('index.php?option=com_content&task=article.edit&id='.$content->id);
-                $com_path = JPATH_SITE.'/components/com_content/';
+                    $contentUrl = RouteHelper::getArticleRoute($content->id, $content->catid, $content->language);
 
-                $link = 'index.php';
-                    $link = RouteHelper::getArticleRoute($content->id, $content->catid, $content->language);
+                    $return = '';
 
-                    $product->product_view_url = Route::_($link);
+                    if ($app->isClient('administrator')) {
+                        $input = $app->getInput();
+
+                        $uri = Uri::getInstance();
+                        $uri->setVar('option', 'com_j2store');
+                        $uri->setVar('view', 'products');
+                        if ($input->getString('search', '')) {
+                            $uri->setVar('search', $input->getString('search', ''));
+                        }
+                        if ($input->getString('product_type', '')) {
+                            $uri->setVar('product_type', $input->getString('product_type', ''));
+                        }
+                        if ($input->getInt('manufacturer_id', 0) > 0) {
+                            $uri->setVar('manufacturer_id', $input->getInt('manufacturer_id', 0));
+                        }
+                        if ($input->getInt('vendor_id', 0) > 0) {
+                            $uri->setVar('vendor_id', $input->getInt('vendor_id', 0));
+                        }
+                        if ($input->getInt('taxprofile_id', 0) > 0) {
+                            $uri->setVar('taxprofile_id', $input->getInt('taxprofile_id', 0));
+                        }
+                        if ($input->getString('visible', '')) {
+                            $uri->setVar('visible', $input->getString('visible', ''));
+                        } // '' on purpose, because we want to pass the value as it is. If we set default to 0, then it will always pass 0 even when the user does not select anything.
+                        if ($input->getString('since', '')) {
+                            $uri->setVar('since', $input->getString('since', ''));
+                        }
+                        if ($input->getString('until', '')) {
+                            $uri->setVar('until', $input->getString('until', ''));
+                        }
+                        if ($input->getString('productid_from', '')) {
+                            $uri->setVar('productid_from', $input->getString('productid_from', ''));
+                        }
+                        if ($input->getString('productid_to', '')) {
+                            $uri->setVar('productid_to', $input->getString('productid_to', ''));
+                        }
+                        if ($input->getString('pricefrom', '')) {
+                            $uri->setVar('pricefrom', $input->getString('pricefrom', ''));
+                        }
+                        if ($input->getString('priceto', '')) {
+                            $uri->setVar('priceto', $input->getString('priceto', ''));
+                        }
+
+                        $return = '&return=' . base64_encode($uri->toString());
+                    }
+
+                    $product->product_edit_url = Route::_($contentUrl . '&task=article.edit' . $return);
+                    $product->product_view_url = Route::_($contentUrl);
                 } else {
                     // For API requests, set empty URLs or null to avoid routing errors
                     $product->product_edit_url = '';
