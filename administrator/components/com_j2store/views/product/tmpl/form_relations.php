@@ -98,7 +98,7 @@ J2Store::plugin()->importCatalogPlugins();
                             <?php if($app->isClient('site')):?>
                                 <?php echo isset($related_product->sku) && !empty($related_product->sku) ? $this->escape($related_product->product_name).'('.$this->escape($related_product->sku).')' : $this->escape($related_product->product_name);?>
                             <?php else: ?>
-                                <a href="index.php?option=com_content&task=article.edit&id=<?php echo $related_product->product_source_id;?>" target="_blank">
+                                <a href="<?php echo $related_product->product_edit_url; ?>" target="_blank">
                                     <?php echo isset($related_product->sku) && !empty($related_product->sku) ? $this->escape($related_product->product_name).'('.$this->escape($related_product->sku).')' : $this->escape($related_product->product_name);?>
                                 </a>
                             <?php endif;?>
