@@ -97,10 +97,14 @@ class plgContentJ2Store extends CMSPlugin
             if($product->get_product_by_source('com_content', $article->id)) {
                 $html = $this->getProductBlock($product, $context, $article, $params, $page);
                 $image_html = $this->getProductImageHtml($product, $context, $article, $params, $page);
+
+                // Load the template
+                $output = $this->loadProductTemplate($product, $html, $image_html, $article, $context, $params, $position, $page);
+
                 if($position == 'top') {
-                    $text = $image_html.$html.$article->text;
+                    $text = $output.$article->text;
                 } else {
-                    $text = $article->text.$image_html.$html;
+                    $text = $article->text.$output;
                 }
                 $article->text = $text;
             }
@@ -700,5 +704,70 @@ class plgContentJ2Store extends CMSPlugin
             $status = true;
         }
         return $status;
+    }
+
+    /**
+     * Load product template with override support
+     *
+     * @param object $product      The J2Store product object
+     * @param string $product_html The generated product block HTML
+     * @param string $image_html   The generated product image HTML
+     * @param object $article      The Joomla article object
+     * @param string $context      The context (com_content.category, com_content.article, etc.)
+     * @param object $params       The plugin parameters
+     * @param string $position     The position (top, bottom, etc.)
+     * @param int    $page         The page number
+     *
+     * @return string The rendered template output
+     */
+    protected function loadProductTemplate($product, $product_html, $image_html, $article, $context, $params, $position, $page = 0) {
+        $app = Factory::getApplication();
+        $template = $app->getTemplate();
+
+        // Determine layout based on context
+        $layout = 'default';
+        if($context == 'com_content.category' || $context == 'com_content.featured') {
+            $layout = 'category';
+        } else if($context == 'com_content.article') {
+            $layout = 'item';
+        }
+
+        // Allow override via plugin parameter
+        $custom_layout = $this->params->get('product_template_layout', '');
+        if(!empty($custom_layout)) {
+            $layout = $custom_layout;
+        }
+
+        // Build template paths with override support
+        $templatePaths = array();
+
+        // 1. Template override (highest priority)
+        $templatePaths[] = JPATH_SITE . '/templates/' . $template . '/html/plg_content_j2store/' . $layout . '.php';
+        $templatePaths[] = JPATH_SITE . '/templates/' . $template . '/html/plg_content_j2store/default.php';
+
+        // 2. Plugin template directory
+        $templatePaths[] = __DIR__ . '/tmpl/' . $layout . '.php';
+        $templatePaths[] = __DIR__ . '/tmpl/default.php';
+
+        // Find the first existing template file
+        $templateFile = null;
+        foreach($templatePaths as $path) {
+            if(file_exists($path)) {
+                $templateFile = $path;
+                break;
+            }
+        }
+
+        // If no template found, return basic output
+        if(!$templateFile) {
+            return $image_html . $product_html;
+        }
+
+        // Set up variables for the template
+        ob_start();
+        include $templateFile;
+        $output = ob_get_clean();
+
+        return $output;
     }
 }
