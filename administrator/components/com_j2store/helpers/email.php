@@ -12,6 +12,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\Filesystem\File;
 
 class J2Email {
 
@@ -238,13 +239,13 @@ class J2Email {
 					// External link, skip
 					$temp .= $url;
 				} else {
-					$ext = strtolower(JFile::getExt($url));
-					if(!JFile::exists($url)) {
+					$ext = strtolower(File::getExt($url));
+					if(!is_file($url)) {
 						// Relative path, make absolute
 						//$url = $baseURL.ltrim($url,'/');
 						$url = $image_url.ltrim($url,'/');
 					}
-					if( !JFile::exists($url) || !in_array($ext, array('jpg','png','gif')) ) {
+					if( !is_file($url) || !in_array($ext, array('jpg','png','gif')) ) {
 						// Not an image or inexistent file
 						$temp .= $url;
 					} else {
@@ -738,15 +739,15 @@ class J2Email {
 					// External link, skip
 					$temp .= $url;
 				} else {
-					 $ext = strtolower(JFile::getExt($url));
-					if(!JFile::exists($url)) {
+					 $ext = strtolower(File::getExt($url));
+					if(!is_file($url)) {
 						$base_path = str_replace('/administrator', '', JURI::base(true));
 						//replace sub path
 						$url = str_replace ( $base_path,'' ,$url );
 						// Relative path, make absolute
 						$url = $baseURL.ltrim($url,'/');
 					}
-					if( !JFile::exists($url) || !in_array($ext, array('jpg','png','gif')) ) {
+					if( !is_file($url) || !in_array($ext, array('jpg','png','gif')) ) {
 						// Not an image or inexistent file
 						$temp .= $url;
 					} else {
@@ -816,12 +817,12 @@ class J2Email {
 					// External link, skip
 					$temp .= $url;
 				} else {
-					$ext = strtolower(JFile::getExt($url));
-					if(!JFile::exists($url)) {
+					$ext = strtolower(File::getExt($url));
+					if(!is_file($url)) {
 						// Relative path, make absolute
 						$url = $baseURL.ltrim($url,'/');
 					}
-					if( !JFile::exists($url) || !in_array($ext, array('jpg','png','gif')) ) {
+					if( !is_file($url) || !in_array($ext, array('jpg','png','gif')) ) {
 						// Not an image or inexistent file
 						$temp .= $url;
 					} else {
