@@ -4,7 +4,7 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  *
- * Bootstrap 2 layout of products
+ * Bootstrap 4 layout of products
  */
 // No direct access
 defined('_JEXEC') or die;
@@ -16,7 +16,8 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 		<input type="hidden" name="filter_catid" id="sort_filter_catid"  value ="<?php echo $filter_catid;?>" />
 		<?php if($this->params->get('list_show_filter_search')):?>
 		<?php $search = htmlspecialchars($this->state->search);?>
-   		<?php echo J2html::text('search',$search,array('class'=>'j2store-product-search-input'));?>
+        <label for="j2store-search-input" class="sr-only"><?php echo JText::_('J2STORE_SEARCH'); ?></label>
+   		<?php echo J2html::text('search',$search,array('class'=>'j2store-product-search-input', 'id'=>'j2store-search-input'));?>
 			<input  type="button" value="<?php echo JText::_('J2STORE_FILTER_GO');?>"
 									class="btn btn-success"
 								    onclick="jQuery(this.form).submit();" />
@@ -27,11 +28,12 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
         <?php endif;?>
 		<!-- Sorting -->
    		<?php if($this->params->get('list_show_filter_sorting')):?>
+        <label for="j2store_sortby" class="sr-only"><?php echo JText::_('J2STORE_SORT_BY'); ?></label>
 		<?php
 		echo J2Html::select()->clearState()
 					->type('genericlist')
 					->name('sortby')
-					->attribs(array('class'=>'input','onchange'=>'jQuery(this.form).submit()'))
+					->attribs(array('class'=>'input','onchange'=>'jQuery(this.form).submit()','id'=>'j2store_sortby'))
 					->value($this->state->sortby)
 					->setPlaceHolders($this->filters['sorting'])->getHtml();
 			?>
