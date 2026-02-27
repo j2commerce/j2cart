@@ -4,9 +4,11 @@
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
  * @license GNU GPL v3 or later
  */
-// No direct access to this file
 
+// No direct access to this file
 defined('_JEXEC') or die;
+
+use Joomla\Filesystem\File;
 
 class J2Invoice {
 
@@ -40,8 +42,8 @@ class J2Invoice {
 		$userLang = $order->customer_language;
 		if(empty($userLang) && (JFactory::getUser($order->user_id)->id > 0)){
 			$userLang = JFactory::getUser($order->user_id)->getParam('language','');
-		}		
-		
+		}
+
 		$languages = array(
 				$userLang, $jLang->getTag(), $jLang->getDefault(), 'en-GB', '*'
 		);
@@ -154,12 +156,12 @@ class J2Invoice {
 					// External link, skip
 					$temp .= $url;
 				} else {
-					$ext = strtolower(JFile::getExt($url));
-					if(!JFile::exists($url)) {
+					$ext = strtolower(File::getExt($url));
+					if(!is_file($url)) {
 						// Relative path, make absolute
 						$url = $baseURL.ltrim($url,'/');
 					}
-					if( !JFile::exists($url) || !in_array($ext, array('jpg','png','gif')) ) {
+					if( !is_file($url) || !in_array($ext, array('jpg','png','gif')) ) {
 						// Not an image or inexistent file
 						$temp .= $url;
 					} else {
