@@ -1,86 +1,99 @@
 <?php
 /**
- * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
- * @license GNU GPL v3 or later
+ * @package     Joomla.Plugin
+ * @subpackage  system_j2canonical
+ *
+ * @copyright Copyright (C) 2024-2026 J2Commerce, LLC. All rights reserved.
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
+ * @website https://www.j2commerce.com
  */
 
-// Check to ensure this file is included in Joomla!
-defined( '_JEXEC' ) or die( 'Restricted access' );
+namespace J2Commerce\Plugin\System\J2canonical\Extension;
 
+use Joomla\Database\DatabaseAwareTrait;
 use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\Event\SubscriberInterface;
+use Joomla\CMS\Router\Route;
 
-// Make sure FOF is loaded, otherwise do not run
-if (!defined('F0F_INCLUDED'))
-{
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
+
+if (!defined('F0F_INCLUDED')) {
     include_once JPATH_LIBRARIES . '/f0f/include.php';
 }
+require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2store.php');
 
-if (!defined('F0F_INCLUDED') || !class_exists('F0FLess', true))
+final class J2canonical extends CMSPlugin implements SubscriberInterface
 {
-    return;
-}
+    use DatabaseAwareTrait;
 
-// Set the separator as some idiot removed it from the core
-if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
+    /**
+     * Cache of product→category mappings
+     *
+     * @var   array
+     */
+    protected static $j2_products = [];
 
-class plgSystemJ2Canonical extends CMSPlugin {
+    /**
+     * Load plugin language files automatically
+     *
+     * @var    boolean
+     */
+    protected $autoloadLanguage = true;
 
-    protected $canonical = null;
-
-    static $j2_menus = array() ;
-
-    static $j2_products = array() ;
-
-    function __construct(&$subject, $config) {
-        parent::__construct($subject, $config);
+    /**
+     * Returns an array of events this subscriber will listen to.
+     *
+     * @return  array
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            'onBeforeCompileHead' => 'onBeforeCompileHead',
+            'onAfterRoute'        => 'onAfterRoute',
+        ];
     }
 
-    function onBeforeCompileHead () {
-        $app = JFactory::getApplication();
-
-        if (J2Store::platform()->isClient('administrator')) {
+    public function onBeforeCompileHead()
+    {
+        $app = $this->getApplication();
+        if ($app->isClient('administrator')) {
             return;
         }
 
         $option = $app->input->get('option');
-        $view = $app->input->get('view');
-        $task = $app->input->get('task');
-        // don't remove canonical until , j2store canonical url found
+        $view   = $app->input->get('view');
+        $task   = $app->input->get('task');
+
         if($option == 'com_j2store' && in_array($view, array('products','producttags'))  && $task == 'view' && $this->canonical) {
-            $doc = JFactory::getDocument();
-            // remove the shits set by Joomla!
+            $doc = $app->getDocument();
+
             foreach ( $doc->_links as $k => $array ) {
                 if ( $array['relation'] == 'canonical' ) {
                     unset($doc->_links[$k]);
                 }
             }
-
-            // Set the correct URL as canonical if we were able to generate it
             if(!empty($this->canonical)){
                 $doc->addHeadLink(htmlspecialchars($this->canonical), 'canonical');
             }
         }
-
     }
 
-    /**
-     *
-     * */
-    public function onAfterRoute(){
-        $platform = J2Store::platform();
-        $app = $platform->application();
-
-        //don't load in administration
-        if ($platform->isClient('administrator')) {
+    public function onAfterRoute()
+    {
+        // Get the application object
+        $app = $this->getApplication();
+        if ($app->isClient('administrator')) {
             return;
         }
-        $fof_helper = J2Store::fof();
+
+        $fof_helper = \J2Store::fof();
         $option = $app->input->get('option');
         $view = $app->input->get('view');
         $task = $app->input->get('task');
         $item_id = $app->input->get('Itemid',0);
-        //j2store product view should be taken as canonical
+
         if($option == 'com_j2store' && in_array($view, array('products','producttags')) && $task == 'view' && $item_id) {
 
             //get the product id
@@ -100,7 +113,6 @@ class plgSystemJ2Canonical extends CMSPlugin {
             $j2prod = $fof_helper->loadTable('Products','J2StoreTable');
             $j2prod->load($j2_product_id);
             if($j2prod->j2store_product_id == $j2_product_id){
-                $base = trim(JUri::base(),'/');
                 $url = '';
                 $current_url_canonical = $this->params->get('current_url_canonical',1);
                 if($view == 'products'){
@@ -108,6 +120,8 @@ class plgSystemJ2Canonical extends CMSPlugin {
                     // for multi category
                     if($cat_ids){
                         $cat_ids = explode(',',$cat_ids);
+                    } else {
+                        $cat_ids = array(); // Empty array when $cat_ids is 0 or empty
                     }
 
                     if(empty($canonical_item) && $current_url_canonical){
@@ -145,31 +159,30 @@ class plgSystemJ2Canonical extends CMSPlugin {
                 }
 
                 if ( !empty($url) ) {
-                    $url = JRoute::_($url);
-                    $this->canonical = $base.'/'.trim($url,'/');
+                    $this->canonical = Route::_($url, true, Route::TLS_IGNORE, true); // automatically returns the full path
                 }
             }
         }
-
     }
-
 
     /**
      * Get the products and their category ids mapped in a static variable
      * @param int $product_id J2Store product id
      * @return string category ids as csv
-     * */
-    public function getProductCatId($product_id) {
+     */
+    public function getProductCatId($product_id)
+    {
         if ( !empty(self::$j2_products) && isset(self::$j2_products[$product_id]) ) {
             return self::$j2_products[$product_id];
         }
-        $db = JFactory::getDbo();
-        $qry = $db->getQuery(true);
-        $qry -> select('jp.j2store_product_id,c.catid')
-            -> from('#__j2store_products jp')
-            -> where('jp.product_source='.$db->q('com_content'))
-            -> join('LEFT','#__content c ON c.id=jp.product_source_id');
-        $db->setQuery($qry);
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('jp.j2store_product_id,c.catid')
+            ->from('#__j2store_products jp')
+            ->where('jp.product_source='.$db->q('com_content'))
+            ->join('LEFT','#__content c ON c.id=jp.product_source_id');
+        $db->setQuery($query);
         self::$j2_products = $db->loadAssocList('j2store_product_id', 'catid');
 
         if ( !empty(self::$j2_products) && isset(self::$j2_products[$product_id]) ) {
@@ -179,10 +192,11 @@ class plgSystemJ2Canonical extends CMSPlugin {
         }
     }
 
-    public function getProductTags($source_id,$source_type){
+    public function getProductTags($source_id,$source_type)
+    {
         $tag_list = array();
         if($source_type == 'com_content'){
-            $db = JFactory::getDBo();
+            $db = $this->getDatabase();
             $query = $db->getQuery(true);
             $query->select('tmap.tag_id,tag.alias')->from('#__contentitem_tag_map as tmap')
                 ->join('LEFT','#__tags as tag ON tmap.tag_id = tag.id')
