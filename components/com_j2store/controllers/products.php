@@ -161,7 +161,17 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 
 			$pagination = $model->getSFPagination();
 
+            // Blacklist system parameters that should not be passed to pagination
+            $excluded_params = [
+                'base_path',
+            ];
+
             $pass_it_on = $this->input->getArray($_GET);
+
+            // Remove excluded system parameters
+            foreach($excluded_params as $param) {
+                unset($pass_it_on[$param]);
+            }
 
             foreach($pass_it_on as $key=>$value){
                 if(is_array($value)){
