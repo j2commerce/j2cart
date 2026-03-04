@@ -40,9 +40,9 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 
                     <div class="filter-search-bar btn-group">
                         <div class="input-group">
-                            <?php echo J2Html::text('search',htmlspecialchars($this->state->search),array('id'=>'search','class'=>'form-control','placeholder'=>Text::_('J2STORE_PRODUCT_SKU')));?>
-                            <?php echo J2Html::buttontype('go','<span class="filter-search-bar__button-icon icon-search" aria-hidden="true"></span>' ,array('class'=>'btn btn-primary','onclick'=>'this.form.submit();'));?>
-                            <?php echo J2Html::buttontype('reset', Text::_('JCLEAR'), array('id' => 'reset-filter-search', 'class' => 'filter-search-actions__button btn btn-primary js-stools-btn-clear')); ?>
+                            <?php echo J2Html::text('search',htmlspecialchars((string) $this->state->search),['id'=>'search', 'class'=>'form-control', 'placeholder'=>Text::_('J2STORE_PRODUCT_SKU')]);?>
+                            <?php echo J2Html::buttontype('go','<span class="filter-search-bar__button-icon icon-search" aria-hidden="true"></span>' ,['class'=>'btn btn-primary', 'onclick'=>'this.form.submit();']);?>
+                            <?php echo J2Html::buttontype('reset', Text::_('JCLEAR'), ['id' => 'reset-filter-search', 'class' => 'filter-search-actions__button btn btn-primary js-stools-btn-clear']); ?>
 					</div>
                     </div>
                     <div class="ordering-select">
@@ -84,7 +84,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 				<tr>
 					<td>
                         <input data-product-title="<?php echo $item->product_name;?>" id="cb<?php echo $item->j2store_product_id;?>" type="checkbox" onclick="Joomla.isChecked(this.checked);" value="<?php echo $item->j2store_product_id;?>" name="cid[]" class="form-check-input">
-						<?php echo J2html::hidden('tmp_product_title['.$item->j2store_product_id.']', $item->product_name ,array('class'=>'tmp_product_title')); ?>
+						<?php echo J2html::hidden('tmp_product_title['.$item->j2store_product_id.']', $item->product_name ,['class'=>'tmp_product_title']); ?>
 					</td>
 					<td>
                         <a href="javascript:if (window.parent) window.parent.<?php echo $db->escape($function);?>('<?php echo $item->j2store_product_id; ?>','<?php echo $item->product_name;?>' ,'<?php echo $field;?>');">
@@ -100,13 +100,13 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 										$variants = $variant_model->product_id($item->j2store_product_id)
 													->is_master(0)
 													->getList();
-										if(isset($variants) && count($variants)):?>
+										if(isset($variants) && (is_countable($variants) ? count($variants) : 0)):?>
 
                                     <?php
                                     $skus = []; // Initialize an array to store SKUs
                                     foreach ($variants as $variant) {
                                         if (!empty($variant->sku)) {
-                                            $skus[] = '<small>' . htmlspecialchars($variant->sku) . '</small>';
+                                            $skus[] = '<small>' . htmlspecialchars((string) $variant->sku) . '</small>';
                                         }
                                     }
                                     echo implode(', ', $skus);
@@ -124,7 +124,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
         <?php echo J2Html::hidden('option','com_j2store');?>
         <?php echo J2Html::hidden('view','coupons');?>
         <?php echo J2Html::hidden('tmpl','component');?>
-        <?php echo J2Html::hidden('task','setProducts',array('id'=>'task'));?>
+        <?php echo J2Html::hidden('task','setProducts',['id'=>'task']);?>
         <?php echo J2Html::hidden('layout','products');?>
         <?php echo J2Html::hidden('boxchecked',0);?>
         <?php echo J2Html::hidden('filter_order',$listOrder);?>

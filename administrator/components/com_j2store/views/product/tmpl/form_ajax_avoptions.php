@@ -42,16 +42,14 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
 			$variant_main_image = $param_data->get('variant_main_image','');
 			$is_main_as_thum = $param_data->get('is_main_as_thum',0);
             $variant_names = $this->escape(J2Store::product()->getVariantNamesByCSV($this->variant->variant_name));
-            $parts = preg_split('/,(?!\d{3})/', $variant_names);
-            $boldParts = array_map(function($part) {
-                return "<b>" . trim($part) . "</b>";
-            }, $parts);
+            $parts = preg_split('/,(?!\d{3})/', (string) $variant_names);
+            $boldParts = array_map(fn($part) => "<b>" . trim((string) $part) . "</b>", $parts);
             $variantNames = implode(' - ', $boldParts);
 
 			?>
             <div class="variant-item border mb-3 rounded-3 px-3 py-2 text-subdued" data-variant-id="<?php echo $this->variant->j2store_variant_id;?>">
                 <div class="accordion-header d-flex align-items-center justify-content-start">
-                    <?php echo J2Html::hidden($prefix.'[isdefault_variant]',  (isset($this->variant->isdefault_variant))?$this->variant->isdefault_variant : '',array('class'=>'input','id' => 'isdefault_'.$this->variant->j2store_variant_id)); ?>
+                    <?php echo J2Html::hidden($prefix.'[isdefault_variant]',  $this->variant->isdefault_variant ?? '',['class'=>'input', 'id' => 'isdefault_'.$this->variant->j2store_variant_id]); ?>
                     <input id="cid<?php echo $this->variant->j2store_variant_id;?>" class="me-2" type="checkbox" name="vid[]" value="<?php echo $this->variant->j2store_variant_id;?>" />
                     <button class="accordion-button variant-button collapsed p-0 small ps-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $this->variant->j2store_variant_id;?>" aria-expanded="false" aria-controls="collapse<?php echo $this->variant->j2store_variant_id;?>">
                         <span class="variant__id fw-bold me-1 ms-4">(#<?php echo $this->variant->j2store_variant_id;?>)</span>
@@ -79,33 +77,33 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                     <div class="col-lg-6 j2commerce-variant-general">
                                         <fieldset class="options-form px-3">
                                             <legend class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_TAB_GENERAL');?></legend>
-                                            <?php echo J2Html::hidden($prefix.'[j2store_variant_id]', $this->variant->j2store_variant_id,array('class'=>'input-small','id'=>'variant_'.$this->variant->j2store_variant_id)); ?>
+                                            <?php echo J2Html::hidden($prefix.'[j2store_variant_id]', $this->variant->j2store_variant_id,['class'=>'input-small', 'id'=>'variant_'.$this->variant->j2store_variant_id]); ?>
 
                                             <div class="control-group">
                                                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_SKU'), 'sku'); ?></div>
                                                 <div class="controls">
-                                                    <?php echo J2Html::text($prefix.'[sku]', $this->variant->sku,array('class'=>'form-control form-control-sm','id'=>'sku_'.$this->variant->j2store_variant_id)); ?>
+                                                    <?php echo J2Html::text($prefix.'[sku]', $this->variant->sku,['class'=>'form-control form-control-sm', 'id'=>'sku_'.$this->variant->j2store_variant_id]); ?>
                                                 </div>
                                             </div>
                                             <div class="control-group">
                                                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_UPC'), 'upc'); ?></div>
                                                 <div class="controls">
-                                                    <?php echo J2Html::text($prefix.'[upc]', $this->variant->upc,array('class'=>'form-control form-control-sm','id'=>'upc_'.$this->variant->j2store_variant_id)); ?>
+                                                    <?php echo J2Html::text($prefix.'[upc]', $this->variant->upc,['class'=>'form-control form-control-sm', 'id'=>'upc_'.$this->variant->j2store_variant_id]); ?>
                                                 </div>
                                             </div>
                                             <div class="control-group">
                                                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_REGULAR_PRICE'), 'price'); ?></div>
                                                 <div class="controls">
-                                                    <?php echo J2Html::price($prefix.'[price]', $this->variant->price,array('class'=>'form-control form-control-sm','id'=>'price_'.$this->variant->j2store_variant_id)); ?>
+                                                    <?php echo J2Html::price($prefix.'[price]', $this->variant->price,['class'=>'form-control form-control-sm', 'id'=>'price_'.$this->variant->j2store_variant_id]); ?>
                                                 </div>
                                             </div>
                                             <div class="control-group">
                                                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_SET_ADVANCED_PRICING'), 'sale_price'); ?></div>
                                                 <div class="controls">
                                                     <?php
-                                                    $base_path = rtrim(Uri::root(),'/').'/administrator';
+                                                    $base_path = rtrim((string) Uri::root(),'/').'/administrator';
                                                     $url = $base_path."/index.php?option=com_j2store&view=products&task=setproductprice&variant_id=".$this->variant->j2store_variant_id."&layout=productpricing&tmpl=component";?>
-                                                    <?php echo J2StorePopup::popup($url , Text::_( "J2STORE_PRODUCT_SET_PRICES" ), array('class'=>'btn btn-success btn-sm'));?>
+                                                    <?php echo J2StorePopup::popup($url , Text::_( "J2STORE_PRODUCT_SET_PRICES" ), ['class'=>'btn btn-success btn-sm']);?>
                                                 </div>
                                             </div>
                                             <div class="control-group">
@@ -116,14 +114,14 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                         ->type('genericlist')
                                                         ->name($prefix.'[pricing_calculator]')
                                                         ->value($this->variant->pricing_calculator)
-                                                        ->attribs(array('id' =>'pricing_calculator_'.$this->variant->j2store_variant_id ,'class'=>'form-select form-select-sm'))
+                                                        ->attribs(['id' =>'pricing_calculator_'.$this->variant->j2store_variant_id, 'class'=>'form-select form-select-sm'])
                                                         ->setPlaceHolders(J2Store::product()->getPricingCalculators())
                                                         ->getHtml();
                                                     ?>
                                                 </div>
                                             </div>
-                                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariableProductForm',array(&$this->variant,$prefix));?>
-                                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantGeneral', array($this, $this->variant,$prefix)); ?>
+                                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariableProductForm',[&$this->variant, $prefix]);?>
+                                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantGeneral', [$this, $this->variant, $prefix]); ?>
                                         </fieldset>
                                     </div>
                                     <div class="col-lg-6 j2commerce-variant-shipping">
@@ -137,8 +135,8 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                         ->type('genericlist')
                                                         ->name($prefix.'[shipping]')
                                                         ->value($this->variant->shipping)
-                                                        ->attribs(array('id' =>'shipping_'.$this->variant->j2store_variant_id ,'class'=>'form-select form-select-sm'))
-                                                        ->setPlaceHolders(array(1 => Text::_('J2STORE_YES'),0 => Text::_('J2STORE_NO')))
+                                                        ->attribs(['id' =>'shipping_'.$this->variant->j2store_variant_id, 'class'=>'form-select form-select-sm'])
+                                                        ->setPlaceHolders([1 => Text::_('J2STORE_YES'), 0 => Text::_('J2STORE_NO')])
                                                         ->getHtml();
                                                     ?>
                                                 </div>
@@ -147,9 +145,9 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_DIMENSIONS'), 'dimensions'); ?></div>
                                                 <div class="controls">
                                                     <div class="input-group">
-                                                        <?php echo J2Html::text($prefix.'[length]',$this->variant->length,array('class'=>'form-control form-control-sm'));?>
-                                                        <?php echo J2Html::text($prefix.'[width]',$this->variant->width,array('class'=>'form-control form-control-sm'));?>
-                                                        <?php echo J2Html::text($prefix.'[height]',$this->variant->height,array('class'=>'form-control form-control-sm'));?>
+                                                        <?php echo J2Html::text($prefix.'[length]',$this->variant->length,['class'=>'form-control form-control-sm']);?>
+                                                        <?php echo J2Html::text($prefix.'[width]',$this->variant->width,['class'=>'form-control form-control-sm']);?>
+                                                        <?php echo J2Html::text($prefix.'[height]',$this->variant->height,['class'=>'form-control form-control-sm']);?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -161,7 +159,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                         ->type('genericlist')
                                                         ->name($prefix.'[length_class_id]')
                                                         ->value($default_length)
-                                                        ->attribs(array('id' =>'length_class_'.$this->variant->j2store_variant_id ,'class'=>'form-select form-select-sm'))
+                                                        ->attribs(['id' =>'length_class_'.$this->variant->j2store_variant_id, 'class'=>'form-select form-select-sm'])
                                                         ->setPlaceHolders($this->lengths)
                                                         ->getHtml();
                                                     ?>
@@ -170,7 +168,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                             <div class="control-group">
                                                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_WEIGHT'), 'weight'); ?></div>
                                                 <div class="controls">
-                                                    <?php echo J2Html::text($prefix.'[weight]',$this->variant->weight ,array('class'=>'form-control form-control-sm'));?>
+                                                    <?php echo J2Html::text($prefix.'[weight]',$this->variant->weight ,['class'=>'form-control form-control-sm']);?>
                                                 </div>
                                             </div>
                                             <div class="control-group">
@@ -181,13 +179,13 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                         ->type('genericlist')
                                                         ->name($prefix.'[weight_class_id]')
                                                         ->value($default_weight)
-                                                        ->attribs(array('id' =>'weight_class_'.$this->variant->j2store_variant_id ,'class'=>'form-select form-select-sm'))
+                                                        ->attribs(['id' =>'weight_class_'.$this->variant->j2store_variant_id, 'class'=>'form-select form-select-sm'])
                                                         ->setPlaceHolders($this->weights)
                                                         ->getHtml();
                                                     ?>
                                                 </div>
                                             </div>
-                                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantShipping', array($this, $this->variant,$prefix)); ?>
+                                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantShipping', [$this, $this->variant, $prefix]); ?>
                                         </fieldset>
                                     </div>
                                     <div class="col-lg-6 j2commerce-variant-main-image">
@@ -195,7 +193,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                             <legend class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_MAIN_IMAGE');?></legend>
                                             <div class="control-group mb-0">
                                                 <div class="controls">
-                                                    <?php echo J2Html::media($prefix.'[params][variant_main_image]' ,$variant_main_image,array('id'=>'variant_main_image'.$this->variant->j2store_variant_id ,'image_id'=>'input-variant-main-image'.$this->variant->j2store_variant_id));?>
+                                                    <?php echo J2Html::media($prefix.'[params][variant_main_image]' ,$variant_main_image,['id'=>'variant_main_image'.$this->variant->j2store_variant_id, 'image_id'=>'input-variant-main-image'.$this->variant->j2store_variant_id]);?>
                                                 </div>
                                             </div>
                                             <div class="control-group">
@@ -206,7 +204,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                     </div>
                                                 </div>
                                             </div>
-                                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantImage', array($this, $this->variant,$prefix)); ?>
+                                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantImage', [$this, $this->variant, $prefix]); ?>
                                         </fieldset>
                                     </div>
                                 </div>
@@ -228,8 +226,8 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                     ->type('genericlist')
                                                     ->name($prefix.'[manage_stock]')
                                                     ->value($this->variant->manage_stock)
-                                                    ->attribs(array('id' =>'manage_stock_'.$this->variant->j2store_variant_id ,'class'=>'form-select form-select-sm'))
-                                                    ->setPlaceHolders(array(0 => Text::_('J2STORE_NO'), 1 => Text::_('J2STORE_YES')))
+                                                    ->attribs(['id' =>'manage_stock_'.$this->variant->j2store_variant_id, 'class'=>'form-select form-select-sm'])
+                                                    ->setPlaceHolders([0 => Text::_('J2STORE_NO'), 1 => Text::_('J2STORE_YES')])
                                                     ->getHtml();
                                                 ?>
                                             </div>
@@ -237,8 +235,8 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                         <div class="control-group">
                                             <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_QUANTITY'), 'quantity');?></div>
                                             <div class="controls">
-                                                <?php echo J2Html::hidden($prefix.'[quantity][j2store_productquantity_id]', $this->variant->j2store_productquantity_id,array('class'=>'input','id' => 'productquantity_'.$this->variant->j2store_variant_id)); ?>
-                                                <?php echo J2Html::text($prefix.'[quantity][quantity]', $this->variant->quantity,array('class'=>'form-control form-control-sm' ,'id' => 'quantity_'.$this->variant->j2store_variant_id)); ?>
+                                                <?php echo J2Html::hidden($prefix.'[quantity][j2store_productquantity_id]', $this->variant->j2store_productquantity_id,['class'=>'input', 'id' => 'productquantity_'.$this->variant->j2store_variant_id]); ?>
+                                                <?php echo J2Html::text($prefix.'[quantity][quantity]', $this->variant->quantity,['class'=>'form-control form-control-sm', 'id' => 'quantity_'.$this->variant->j2store_variant_id]); ?>
                                             </div>
                                         </div>
                                         <div class="control-group">
@@ -247,13 +245,10 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                 <?php echo  J2Html::select()->clearState()
                                                     ->type('genericlist')
                                                     ->name($prefix.'[allow_backorder]')
-                                                    ->attribs(array('id' =>'allowbackorder_'.$this->variant->j2store_variant_id,'class'=>'form-select form-select-sm'))
+                                                    ->attribs(['id' =>'allowbackorder_'.$this->variant->j2store_variant_id, 'class'=>'form-select form-select-sm'])
                                                     ->value($this->variant->allow_backorder)
                                                     ->setPlaceHolders(
-                                                        array('0' => Text::_('COM_J2STORE_DO_NOT_ALLOW_BACKORDER'),
-                                                              '1' => Text::_('COM_J2STORE_DO_ALLOW_BACKORDER'),
-                                                              '2' => Text::_('COM_J2STORE_ALLOW_BUT_NOTIFY_CUSTOMER')
-                                                        ))
+                                                        ['0' => Text::_('COM_J2STORE_DO_NOT_ALLOW_BACKORDER'), '1' => Text::_('COM_J2STORE_DO_ALLOW_BACKORDER'), '2' => Text::_('COM_J2STORE_ALLOW_BUT_NOTIFY_CUSTOMER')])
                                                     ->getHtml(); ?>
                                             </div>
                                         </div>
@@ -263,11 +258,10 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                 <?php echo J2Html::select()->clearState()
                                                     ->type('genericlist')
                                                     ->name($prefix.'[availability]')
-                                                    ->attribs(array('class'=>'form-select form-select-sm'))
+                                                    ->attribs(['class'=>'form-select form-select-sm'])
                                                     ->value($this->variant->availability)
                                                     ->setPlaceHolders(
-                                                        array('0' => Text::_('COM_J2STORE_PRODUCT_OUT_OF_STOCK') ,
-                                                              '1'=> Text::_('COM_J2STORE_PRODUCT_IN_STOCK'))
+                                                        ['0' => Text::_('COM_J2STORE_PRODUCT_OUT_OF_STOCK'), '1'=> Text::_('COM_J2STORE_PRODUCT_IN_STOCK')]
                                                     )
                                                     ->getHtml();
                                                 ?>
@@ -277,7 +271,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                             <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_NOTIFY_QUANTITY'), 'notify_qty'); ?></div>
                                             <div class="controls">
                                                 <?php
-                                                $attribs = (isset($this->variant->use_store_config_notify_qty) && !empty($this->variant->use_store_config_notify_qty)) ? array('id' =>'notify_qty_'.$this->variant->j2store_variant_id,'disabled'=>'','class'=>'form-control form-control-sm') : array('id' =>'notify_qty_'.$this->variant->j2store_variant_id,'class'=>'form-control form-control-sm');
+                                                $attribs = (isset($this->variant->use_store_config_notify_qty) && !empty($this->variant->use_store_config_notify_qty)) ? ['id' =>'notify_qty_'.$this->variant->j2store_variant_id, 'disabled'=>'', 'class'=>'form-control form-control-sm'] : ['id' =>'notify_qty_'.$this->variant->j2store_variant_id, 'class'=>'form-control form-control-sm'];
                                                 echo J2Html::text($prefix.'[notify_qty]', $this->variant->notify_qty ,$attribs); ?>
                                             </div>
                                         </div>
@@ -299,8 +293,8 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                                     ->type('genericlist')
                                                     ->name($prefix.'[quantity_restriction]')
                                                     ->value($this->variant->quantity_restriction)
-                                                    ->attribs(array('id' =>'quantity_restriction_'.$this->variant->j2store_variant_id ,'class'=>'form-select form-select-sm'))
-                                                    ->setPlaceHolders(array(1 => Text::_('J2STORE_YES'),0 => Text::_('J2STORE_NO')))
+                                                    ->attribs(['id' =>'quantity_restriction_'.$this->variant->j2store_variant_id, 'class'=>'form-select form-select-sm'])
+                                                    ->setPlaceHolders([1 => Text::_('J2STORE_YES'), 0 => Text::_('J2STORE_NO')])
                                                     ->getHtml();
                                                 ?>
                                             </div>
@@ -309,7 +303,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                             <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_MAX_SALE_QUANTITY'), 'max_sale_qty'); ?></div>
                                             <div class="controls">
                                                 <?php
-                                                $attribs = (isset($this->variant->use_store_config_max_sale_qty) && !empty($this->variant->use_store_config_max_sale_qty) ) ? array('id'=>'max_sale_qty_'.$this->variant->j2store_variant_id, 'disabled'=>'','class'=>'form-control form-control-sm'): array('id'=>'max_sale_qty_'.$this->variant->j2store_variant_id,'class'=>'form-control form-control-sm');
+                                                $attribs = (isset($this->variant->use_store_config_max_sale_qty) && !empty($this->variant->use_store_config_max_sale_qty) ) ? ['id'=>'max_sale_qty_'.$this->variant->j2store_variant_id, 'disabled'=>'', 'class'=>'form-control form-control-sm']: ['id'=>'max_sale_qty_'.$this->variant->j2store_variant_id, 'class'=>'form-control form-control-sm'];
                                                 echo J2Html::text($prefix.'[max_sale_qty]', $this->variant->max_sale_qty,$attribs); ?>
                                             </div>
                                         </div>
@@ -328,7 +322,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                             <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_MIN_SALE_QUANTITY'), 'min_sale_qty'); ?></div>
                                             <div class="controls">
                                                 <?php
-                                                $attribs = (isset($this->variant->use_store_config_min_sale_qty) && !empty($this->variant->use_store_config_min_sale_qty)) ? array('id' =>'min_sale_qty','disabled'=>'','class'=>'form-control form-control-sm'): array('id'=>'min_sale_qty_'.$this->variant->j2store_variant_id,'class'=>'form-control form-control-sm');
+                                                $attribs = (isset($this->variant->use_store_config_min_sale_qty) && !empty($this->variant->use_store_config_min_sale_qty)) ? ['id' =>'min_sale_qty', 'disabled'=>'', 'class'=>'form-control form-control-sm']: ['id'=>'min_sale_qty_'.$this->variant->j2store_variant_id, 'class'=>'form-control form-control-sm'];
                                                 echo J2Html::text($prefix.'[min_sale_qty]', $this->variant->min_sale_qty,$attribs); ?>
                                             </div>
                                         </div>
@@ -390,11 +384,11 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                                     <?php else:?>
                                         <?php echo J2Html::pro(); ?>
                                     <?php endif;?>
-                                    <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantInventory', array($this, $this->variant,$prefix)); ?>
+                                    <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantInventory', [$this, $this->variant, $prefix]); ?>
                                 </fieldset>
                             </div>
                             <div class="col-12">
-                                <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantForm', array($this, $this->variant,$prefix)); ?>
+                                <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayVariantForm', [$this, $this->variant, $prefix]); ?>
                             </div>
                         </div>
                     </div>

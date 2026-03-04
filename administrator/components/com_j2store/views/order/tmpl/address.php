@@ -75,7 +75,7 @@ $script = "document.addEventListener('DOMContentLoaded',function(){const country
 	            //check for unprocessed fields.
 	            //If the user forgot to add the
 	            //fields to the checkout layout in store profile, we probably have some.
-	            $unprocessedFields = array();
+	            $unprocessedFields = [];
 	            foreach($this->fields as $fieldName => $oneExtraField):
 		            if(!in_array($fieldName, $checkoutFields[1])):
 			            $unprocessedFields[$fieldName] = $oneExtraField;

@@ -41,7 +41,7 @@ $platform->loadExtra('behavior.formvalidator');
                                 <label for="taxprofile_name"><?php echo Text::_('J2STORE_TAXPROFILE_NAME'); ?></label>
                             </div>
                             <div class="controls">
-                                <?php echo J2Html::text('taxprofile_name', $this->item->taxprofile_name, array('class'=>'form-control','id'=>'taxprofile_name','required'=>'')); ?>
+                                <?php echo J2Html::text('taxprofile_name', $this->item->taxprofile_name, ['class'=>'form-control', 'id'=>'taxprofile_name', 'required'=>'']); ?>
                             </div>
                         </div>
                         <div class="control-group">
@@ -49,7 +49,7 @@ $platform->loadExtra('behavior.formvalidator');
                                 <label for="taxprofile_name"><?php echo Text::_('J2STORE_ENABLED'); ?></label>
                             </div>
                             <div class="controls">
-                                <?php echo J2StoreHelperSelect::publish('enabled',$this->item->enabled);?>
+                                <?php echo \J2Commerce\J2Cart\Administrator\Helper\SelectHelper::publish('enabled',$this->item->enabled);?>
                             </div>
                         </div>
                     </div>
@@ -71,7 +71,7 @@ $platform->loadExtra('behavior.formvalidator');
                                 </tr>
                             </thead>
                             <?php $taxrule_row = 0;?>
-                            <?php if(isset($this->item->taxrules) && count($this->item->taxrules)): ?>
+                            <?php if(isset($this->item->taxrules) && (is_countable($this->item->taxrules) ? count($this->item->taxrules) : 0)): ?>
                                 <?php foreach ($this->item->taxrules as  $i => $taxrule): ?>
                                     <tbody id="tax-to-taxrule-row<?php echo $taxrule_row; ?>">
                                         <tr>
@@ -132,7 +132,7 @@ $platform->loadExtra('behavior.formvalidator');
             html +='<td></td>';
                 html += '<td><select name="tax-to-taxrule-row[' + taxrule_row + '][taxrate_id]" class="form-select">';
             <?php foreach ($this->item->taxrates as $taxrate) : ?>
-            html += '      <option value="<?php echo $taxrate->j2store_taxrate_id; ?>"><?php echo addslashes($taxrate->taxrate_name); ?></option>';
+            html += '      <option value="<?php echo $taxrate->j2store_taxrate_id; ?>"><?php echo addslashes((string) $taxrate->taxrate_name); ?></option>';
                 <?php endforeach; ?>
             html += '    </select></td>';
                 html += '<td><select name="tax-to-taxrule-row[' + taxrule_row + '][address]" class="form-select">';

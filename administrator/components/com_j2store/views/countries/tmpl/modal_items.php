@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -12,13 +13,13 @@ defined('_JEXEC') or die('Restricted access');
 			<tr>
 				<th>
 					<input type="checkbox" name="checkall-toggle"
-					value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>"
+					value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>"
 					onclick="Joomla.checkAll(this)" />
 				</th>
-				<th><?php echo JText::_('J2STORE_COUNTRY_NAME');?></th>
-				<th><?php echo JText::_('J2STORE_COUNTRY_CODE2');?></th>
-				<th><?php echo JText::_('J2STORE_COUNTRY_CODE3');?></th>
-                <th><?php echo JText::_('J2STORE_COUNTRY_CODENUM');?></th>
+				<th><?php echo Text::_('J2STORE_COUNTRY_NAME');?></th>
+				<th><?php echo Text::_('J2STORE_COUNTRY_CODE2');?></th>
+				<th><?php echo Text::_('J2STORE_COUNTRY_CODE3');?></th>
+                <th><?php echo Text::_('J2STORE_COUNTRY_CODENUM');?></th>
 			</tr>
 		</thead>
 		<tfoot>
@@ -44,7 +45,7 @@ defined('_JEXEC') or die('Restricted access');
 			<?php else:?>
 			<tr>
 				<td colspan="5">
-					<?php echo JText::_('J2STORE_NO_ITEMS_FOUND');?>
+					<?php echo Text::_('J2STORE_NO_ITEMS_FOUND');?>
 				</td>
 			</tr>
 			<?php endif;?>

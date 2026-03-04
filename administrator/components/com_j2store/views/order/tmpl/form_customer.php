@@ -70,7 +70,7 @@ if($this->item->user_id > 0)
                     <div class="d-flex">
                         <span class="fas fa-solid fa-map-marker-alt"></span>
                         <div class="ms-4">
-                            <h5 class="mb-0"><?php echo Text::_('J2STORE_BILLING_ADDRESS');?><?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->item->order_id."&address_type=billing&layout=address&tmpl=component",'',array('class'=>'fas fa-solid fa-edit','refresh'=>true,'id'=>'fancybox ms-2'));?></h5>
+                            <h5 class="mb-0"><?php echo Text::_('J2STORE_BILLING_ADDRESS');?><?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->item->order_id."&address_type=billing&layout=address&tmpl=component",'',['class'=>'fas fa-solid fa-edit', 'refresh'=>true, 'id'=>'fancybox ms-2']);?></h5>
                             <small><?php echo $this->orderinfo->billing_first_name.' '.$this->orderinfo->billing_last_name; ?></small>
                         </div>
                     </div>
@@ -130,9 +130,9 @@ if($this->item->user_id > 0)
                         <span class="fas fa-solid fa-map-marker-alt"></span>
                         <div class="ms-4">
                             <h5 class="mb-0"><?php echo Text::_('J2STORE_SHIPPING_ADDRESS');?>
-	                            <?php echo J2StorePopup::popupAdvanced('index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id='.$this->item->order_id.'&address_type=shipping&layout=address&tmpl=component','',array('class'=>'fas fa-solid fa-edit','refresh'=>true,'id'=>'fancybox ms-2'));?>
+	                            <?php echo J2StorePopup::popupAdvanced('index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id='.$this->item->order_id.'&address_type=shipping&layout=address&tmpl=component','',['class'=>'fas fa-solid fa-edit', 'refresh'=>true, 'id'=>'fancybox ms-2']);?>
                                 &nbsp;
-	                            <?php echo J2StorePopup::popupAdvanced('index.php?option=com_j2store&view=orders&task=printShipping&tmpl=component&order_id='.$this->orderinfo->order_id,'', array('class'=>'fas fa-solid fa-print','width'=>800 ,'height'=>600,'id'=>'ms-2'));?>
+	                            <?php echo J2StorePopup::popupAdvanced('index.php?option=com_j2store&view=orders&task=printShipping&tmpl=component&order_id='.$this->orderinfo->order_id,'', ['class'=>'fas fa-solid fa-print', 'width'=>800, 'height'=>600, 'id'=>'ms-2']);?>
                                 </h5>
                             <small><?php echo $this->orderinfo->shipping_first_name.' '.$this->orderinfo->shipping_last_name; ?></small>
                         </div>

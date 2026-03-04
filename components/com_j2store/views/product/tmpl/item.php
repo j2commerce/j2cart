@@ -14,5 +14,5 @@ defined('_JEXEC') or die;
 	<?php else: ?>	
 		<?php echo $this->loadTemplate($this->product->product_type); ?>
 	<?php endif;?>
-	<?php echo J2Store::plugin ()->eventWithHtml ( 'AfterProductDisplay', array($this->product,$this) )?>
+	<?php echo J2Store::plugin ()->eventWithHtml ( 'AfterProductDisplay', [$this->product, $this] )?>
 </div>

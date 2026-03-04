@@ -18,24 +18,18 @@ use Joomla\CMS\Router\Route;
 HTMLHelper::_('bootstrap.collapse', '[data-bs-toggle="collapse"]');
 
 $order_state_save_link = Route::_('index.php?option=com_j2store&view=orders&task=orderstatesave');
-$attr = array('class'=>'form-select form-select-sm');
+$attr = ['class'=>'form-select form-select-sm'];
 $this->order_state = J2Html::select()
 	->type('genericlist')
 	->name('order_state_id')
 	->value($this->item->order_state_id)
 	->idTag("order_state_id_".$this->item->j2store_order_id)
 	->attribs($attr)
-	->setPlaceHolders(array(''=>JText::_('J2STORE_SELECT_OPTION')))
+	->setPlaceHolders([''=>Text::_('J2STORE_SELECT_OPTION')])
 	->hasOne('Orderstatuses')
 	->ordering('ordering')
 	->setRelations(
-		array (
-			'fields' => array
-			(
-				'key'=>'j2store_orderstatus_id',
-				'name'=>'orderstatus_name'
-			)
-		)
+		['fields' => ['key'=>'j2store_orderstatus_id', 'name'=>'orderstatus_name']]
 	)->getHtml();
 ?>
 <div class="j2-right-top d-flex align-items-center mb-1 justify-content-lg-end">

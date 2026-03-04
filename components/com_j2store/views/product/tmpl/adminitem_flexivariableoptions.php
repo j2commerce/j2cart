@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -8,9 +10,9 @@
 // No direct access
 defined('_JEXEC') or die;
 $options = $this->product->options;
-$variant_name = array();
+$variant_name = [];
 if(isset($this->product->variant->variant_name) && $this->product->variant->variant_name){
-    $variant_name = explode(',',$this->product->variant->variant_name);
+    $variant_name = explode(',',(string) $this->product->variant->variant_name);
 }
 ?>
 <?php if ($options) { ?>
@@ -31,7 +33,7 @@ if(isset($this->product->variant->variant_name) && $this->product->variant->vari
             $default_option_value_name = '';
             $option_count = 0;
             ?>
-            <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplaySingleProductOption', array($this->product, &$option)); ?>
+            <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplaySingleProductOption', [$this->product, &$option]); ?>
 
             <?php //var_dump($option); ?>
             <?php if ($option['type'] == 'select') { ?>
@@ -40,7 +42,7 @@ if(isset($this->product->variant->variant_name) && $this->product->variant->vari
                     <?php if ($option['required']) { ?>
                         <span class="required">*</span>
                     <?php } ?>
-                    <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+                    <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
                     <select name="product_option[<?php echo $option['productoption_id']; ?>]"
                             onChange="doFlexiAjaxPrice(
                             <?php echo $this->product->j2store_product_id?>,
@@ -48,15 +50,15 @@ if(isset($this->product->variant->variant_name) && $this->product->variant->vari
                                     )"
                     >
                         <option value="*" >
-                            <?php echo stripslashes($this->escape(JText::_('J2STORE_CHOOSE')));?>
+                            <?php echo stripslashes((string) $this->escape(Text::_('J2STORE_CHOOSE')));?>
                         </option>
                         <?php foreach ($option['option_value'] as $option_value) { ?>
                             <?php $checked = ''; if($default_option_value_id == $option_value->j2store_optionvalue_id) $checked = 'selected="selected"'; ?>
                             <?php //$checked = ''; if($default_option_value_name == $option_value->optionvalue_name) $checked = 'selected="selected"'; ?>
                             <option <?php echo $checked; ?> value="<?php echo $option_value->j2store_optionvalue_id; ?>">
-                                <?php echo stripslashes($this->escape(JText::_($option_value->optionvalue_name)));?>
+                                <?php echo stripslashes((string) $this->escape(Text::_($option_value->optionvalue_name)));?>
                             </option>
-                        <?php } ?>
+<?php } ?>
                     </select>
                 </div>
                 <br>
@@ -69,7 +71,7 @@ if(isset($this->product->variant->variant_name) && $this->product->variant->vari
                     <?php if ($option['required']) { ?>
                         <span class="required">*</span>
                     <?php } ?>
-                    <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+                    <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
                     <?php foreach ($option['option_value'] as $option_value) { ?>
                         <?php $checked = ''; if($default_option_value_id == $option_value->j2store_optionvalue_id) $checked = 'checked="checked"'; ?>
                         <?php //$checked = ''; if(isset($option_value->j2store_optionvalue_id) && isset($variant_name[$option_key]) && $option_value->j2store_optionvalue_id == $variant_name[$option_key]) $checked = 'checked="checked"'; ?>
@@ -91,17 +93,17 @@ if(isset($this->product->variant->variant_name) && $this->product->variant->vari
                             ?>
                             <img
                                     class="optionvalue-image-<?php echo $option['productoption_id']; ?>-<?php echo $option_value->j2store_optionvalue_id; ?>"
-                                    src="<?php echo JUri::root(true).'/'.$option_value->optionvalue_image; ?>" />
+                                    src="<?php echo Uri::root(true).'/'.$option_value->optionvalue_image; ?>" />
                         <?php endif; ?>
                         <label for="option-value-<?php echo $option_value->j2store_optionvalue_id; ?>"  >
-                            <?php echo stripslashes($this->escape(JText::_($option_value->optionvalue_name))); ?>
+                            <?php echo stripslashes((string) $this->escape(Text::_($option_value->optionvalue_name))); ?>
                         </label>
                         <br>
-                    <?php } ?>
+<?php } ?>
                 </div>
                 <br>
             <?php } ?>
-            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplaySingleProductOption', array($this->product, $option)); ?>
-        <?php } ?>
+            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplaySingleProductOption', [$this->product, $option]); ?>
+<?php } ?>
     </div>
 <?php } ?>

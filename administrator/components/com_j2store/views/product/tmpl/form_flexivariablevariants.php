@@ -48,7 +48,7 @@ $wa->addInlineStyle($style, [], []);
             <?php endif;?>
         </div>
         <div id="variant_display_block">
-            <?php if(isset($this->item->variants) && count($this->item->variants)):?>
+            <?php if(isset($this->item->variants) && (is_countable($this->item->variants) ? count($this->item->variants) : 0)):?>
                 <div class="d-flex justify-content-start align-items-center mb-3">
                     <div class="form-check pt-0 me-2">
                         <input class="form-check-input" type="checkbox" value="" id="toggleAllCheckboxes">

@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /*------------------------------------------------------------------------
 # com_j2store - J2Store
 # ------------------------------------------------------------------------
@@ -18,10 +20,10 @@ use Joomla\CMS\Factory;
 $J2gridRow = ($this->params->get('bootstrap_version', 2) == 2) ? 'row-fluid' : 'row';
 $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
 
-if (isset($this->addresses) && count($this->addresses) > 0) : ?>
+if (isset($this->addresses) && (is_countable($this->addresses) ? count($this->addresses) : 0) > 0) : ?>
 
 	<input type="radio" name="billing_address" value="existing" id="billing-address-existing" checked="checked" />
-	<label for="billing-address-existing"><?php echo JText::_('J2STORE_ADDRESS_EXISTING'); ?></label>
+	<label for="billing-address-existing"><?php echo Text::_('J2STORE_ADDRESS_EXISTING'); ?></label>
 	<div id="billing-existing">
 		<select name="address_id" style="width: 100%; margin-bottom: 15px;" size="5">
 
@@ -31,12 +33,12 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 				} ?>
 				<?php if ($address->j2store_address_id == $this->address_id) : ?>
 					<option value="<?php echo $address->j2store_address_id; ?>" selected="selected">
-						<?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo JText::_($address->zone_name); ?>, <?php echo JText::_($address->country_name); ?>
+						<?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo Text::_($address->zone_name); ?>, <?php echo Text::_($address->country_name); ?>
 					</option>
 
 				<?php else: ?>
 					<option value="<?php echo $address->j2store_address_id; ?>">
-						<?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo JText::_($address->zone_name); ?>, <?php echo JText::_($address->country_name); ?>
+						<?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo Text::_($address->zone_name); ?>, <?php echo Text::_($address->country_name); ?>
 					</option>
 				<?php endif; ?>
 
@@ -45,7 +47,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 	</div>
 	<p>
 		<input type="radio" name="billing_address" value="new" id="billing-address-new" />
-		<label for="billing-address-new"><?php echo JText::_('J2STORE_ADDRESS_NEW'); ?></label>
+		<label for="billing-address-new"><?php echo Text::_('J2STORE_ADDRESS_NEW'); ?></label>
 	</p>
 
 <?php endif;  ?>
@@ -55,7 +57,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 	<?php
 	$html = $this->storeProfile->get('store_billing_layout');
 
-	if(empty($html) || strlen($html) < 5) {
+	if(empty($html) || strlen((string) $html) < 5) {
 		//we dont have a profile set in the store profile. So use the default one.
 		$html = '<div class="'. $J2gridRow .'">
 		<div class="'. $J2gridCol .'6">[first_name] [last_name] [phone_1] [phone_2] [company] [tax_number]</div>
@@ -64,7 +66,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 	}
 
 	//first find all the checkout fields
-	preg_match_all("^\[(.*?)\]^",$html,$checkoutFields, PREG_PATTERN_ORDER);
+	preg_match_all("^\[(.*?)\]^",(string) $html,$checkoutFields, PREG_PATTERN_ORDER);
 
 	$allFields = $this->fields;
 
@@ -73,19 +75,19 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 		<?php
 		$onWhat='onchange'; if($oneExtraField->field_type=='radio') $onWhat='onclick';
 		if(property_exists($this->address, $fieldName) && $fieldName != 'email') {
-            $placeholder =  (isset($oneExtraField->field_options['placeholder']) ? $oneExtraField->field_options['placeholder'] : "");
+            $placeholder =  ($oneExtraField->field_options['placeholder'] ?? "");
             $field_options = '';
             if($placeholder){
                 $field_options .= ' placeholder="'.$placeholder.'" ';
             }
-			$html = str_replace('['.$fieldName.']',$this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null).'</br />',$html);
+			$html = str_replace('['.$fieldName.']',$this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null).'</br />',(string) $html);
 		}
 		?>
 	<?php endforeach; ?>
 
 	<?php
 	//check for unprocessed fields. If the user forgot to add the fields to the checkout layout in store profile, we probably have some.
-	$unprocessedFields = array();
+	$unprocessedFields = [];
 	foreach($this->fields as $fieldName => $oneExtraField) {
 		if(!in_array($fieldName, $checkoutFields[1]) &&  $fieldName != 'email') {
 			$unprocessedFields[$fieldName] = $oneExtraField;
@@ -93,10 +95,10 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 	}
 
 	//now we have unprocessed fields. remove any other square brackets found.
-	preg_match_all("^\[(.*?)\]^",$html,$removeFields, PREG_PATTERN_ORDER);
+	preg_match_all("^\[(.*?)\]^",(string) $html,$removeFields, PREG_PATTERN_ORDER);
 	foreach($removeFields[1] as $fieldName) {
         if(!empty($fieldName)){
-            $html = str_replace('['.$fieldName.']', '', $html);
+            $html = str_replace('['.$fieldName.']', '', (string) $html);
         }
 	}
 
@@ -113,7 +115,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 					$onWhat='onchange'; if($oneExtraField->field_type=='radio') $onWhat='onclick';
 					//echo $this->fieldsClass->display($oneExtraField,@$this->address->$fieldName,$fieldName,false);
 					if(property_exists($this->address, $fieldName)) {
-                        $placeholder =  (isset($oneExtraField->field_options['placeholder']) ? $oneExtraField->field_options['placeholder'] : "");
+                        $placeholder =  ($oneExtraField->field_options['placeholder'] ?? "");
                         $field_options = '';
                         if($placeholder){
                             $field_options .= ' placeholder="'.$placeholder.'" ';
@@ -129,11 +131,11 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 	<?php endif; ?>
 
 </div>
-<?php echo J2Store::plugin()->eventWithHtml('CheckoutBilling', array($this)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('CheckoutBilling', [$this]); ?>
 <br>
 <div class="buttons">
 	<div class="left">
-		<input type="button" value="<?php echo JText::_('J2STORE_CHECKOUT_CONTINUE'); ?>" id="button-billing-address" class="button btn btn-primary" />
+		<input type="button" value="<?php echo Text::_('J2STORE_CHECKOUT_CONTINUE'); ?>" id="button-billing-address" class="button btn btn-primary" />
 	</div>
 </div>
 <input type="hidden" name="email" value="<?php echo Factory::getApplication()->getIdentity()->email; ?>" />
@@ -163,7 +165,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 				url: 'index.php?option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
 				dataType: 'json',
 				beforeSend: function() {
-					$('#billing-address select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+					$('#billing-address select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 				},
 				complete: function() {
 					$('.wait').remove();
@@ -175,7 +177,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 						$('#billing-postcode-required').hide();
 					}
 
-					html = '<option value=""><?php echo JText::_('J2STORE_SELECT_OPTION'); ?></option>';
+					html = '<option value=""><?php echo Text::_('J2STORE_SELECT_OPTION'); ?></option>';
 
 					if (json['zone'] != '') {
 						default_zone_id = $('#billing-address #zone_id_default_value').val();
@@ -189,7 +191,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 							html += '>' + json['zone'][i]['zone_name'] + '</option>';
 						}
 					} else {
-						html += '<option value="0" selected="selected"><?php echo JText::_('J2STORE_CHECKOUT_NONE'); ?></option>';
+						html += '<option value="0" selected="selected"><?php echo Text::_('J2STORE_CHECKOUT_NONE'); ?></option>';
 					}
 
 					$('#billing-address select[name=\'zone_id\']').html(html);

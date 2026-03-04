@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\HTML\HTMLHelper;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -52,7 +53,7 @@ $document->getWebAssetManager()->useScript('webcomponent.field-user');
 	            <?php echo J2Html::label(Text::_('J2STORE_ORDER_DATE') ,'created-on'); ?>
             </div>
             <div class="controls">
-	            <?php echo JHtml::calendar($this->order->created_on, $this->form_prefix.'[created_on]','order-created-on','%d-%m-%Y', array('class'=>'form-control'));?>
+	            <?php echo HTMLHelper::calendar($this->order->created_on, $this->form_prefix.'[created_on]','order-created-on','%d-%m-%Y', ['class'=>'form-control']);?>
             </div>
         </div>
         <div class="control-group">
@@ -108,7 +109,7 @@ $document->getWebAssetManager()->useScript('webcomponent.field-user');
 	            <?php echo J2Html::select()->clearState()
 		            ->type('genericlist')
 		            ->name($this->form_prefix.'[customer_language]')
-		            ->attribs(array('class'=>'form-select'))
+		            ->attribs(['class'=>'form-select'])
 		            ->value($this->order->customer_language)
 		            ->setPlaceHolders($this->languages)
 		            ->getHtml();
@@ -121,7 +122,7 @@ $document->getWebAssetManager()->useScript('webcomponent.field-user');
 			    <?php echo J2Html::label(Text::_('J2STORE_ORDER_STATUS') ,'order_status'); ?>
             </div>
             <div class="controls">
-	            <?php echo str_replace(['<label', '</label', 'label '], ['<span', '</span', 'badge '], $this->order_status);?>
+	            <?php echo str_replace(['<label', '</label', 'label '], ['<span', '</span', 'badge '], (string) $this->order_status);?>
                 <input type="hidden" name="<?php echo $this->form_prefix.'[order_state_id]';?>" value="<?php echo (isset($this->order->order_state_id) && !empty($this->order->order_state_id)) ? $this->order->order_state_id : 5;?>"/>
             </div>
         </div>

@@ -1,4 +1,8 @@
 <?php
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -14,9 +18,9 @@ $platform->loadExtra('bootstrap.modal');
 
 $key = 0;
 $route = JURI::root(true)."/index.php";
-$document =JFactory::getDocument();
+$document =Factory::getDocument();
 
-$document->addScript(JUri::root(true).'/media/j2store/js/jquery-ui-timepicker-addon.js');
+$document->addScript(Uri::root(true).'/media/j2store/js/jquery-ui-timepicker-addon.js');
 //JHTML::_('behavior.modal');
 $add_product_link = $route."?option=com_j2store&view=products&task=displayAdminProduct&tmpl=component&user_id=".$this->order->user_id."&oid=".$this->order->j2store_order_id."&product_id=";
 $item_url = "index.php?option=com_j2store&view=orders&task=saveAdminOrder&layout=items&next_layout=items&oid=".$this->order->j2store_order_id;
@@ -33,24 +37,24 @@ $col_class = 'col-md-';
 	<div class="<?php echo $row_class ?>">
 		<div class="<?php echo $col_class ?>12">
 			<h4>
-				<?php echo JText::_('J2STORE_ORDER_SUMMARY');?>
+				<?php echo Text::_('J2STORE_ORDER_SUMMARY');?>
 			</h4>
 			<table class="j2store-cart-table table table-bordered">
 				<thead>
 					<tr>
 						<th width="20"><input type="checkbox" name="checkall-toggle"
-					value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>"
+					value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>"
 					onclick="Joomla.checkAll(this)" />
-						<th><?php echo JText::_('J2STORE_CART_LINE_ITEM'); ?></th>
-						<th><?php echo JText::_('J2STORE_CART_LINE_ITEM_QUANTITY'); ?></th>
-						<?php if(isset($this->taxes) && count($this->taxes) && $this->params->get('show_item_tax', 0)): ?>
-						<th><?php echo JText::_('J2STORE_CART_LINE_ITEM_TAX'); ?>
+						<th><?php echo Text::_('J2STORE_CART_LINE_ITEM'); ?></th>
+						<th><?php echo Text::_('J2STORE_CART_LINE_ITEM_QUANTITY'); ?></th>
+						<?php if(isset($this->taxes) && (is_countable($this->taxes) ? count($this->taxes) : 0) && $this->params->get('show_item_tax', 0)): ?>
+						<th><?php echo Text::_('J2STORE_CART_LINE_ITEM_TAX'); ?>
 						<?php endif;?>
-						<th><?php echo JText::_('J2STORE_CART_INVENTORY'); ?></th>
-						<th><?php echo JText::_('J2STORE_CART_LINE_ITEM_TOTAL'); ?></th>
+						<th><?php echo Text::_('J2STORE_CART_INVENTORY'); ?></th>
+						<th><?php echo Text::_('J2STORE_CART_LINE_ITEM_TOTAL'); ?></th>
 					</tr>
 				</thead>
-				<?php echo J2Html::input('hidden','user_id', $this->order->user_id,array('id'=>'user_id'));?>
+				<?php echo J2Html::input('hidden','user_id', $this->order->user_id,['id'=>'user_id']);?>
 				<?php echo J2Html::input('hidden', 'boxchecked',0);?>
 				<tbody id="j2store-oitem-body">
 					<?php if(!empty($this->orderitems)):?>
@@ -66,20 +70,20 @@ $col_class = 'col-md-';
 						<td>
 							<?php if($this->params->get('show_thumb_cart', 1) && !empty($thumb_image)): ?>
 								<span class="cart-thumb-image">
-									<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo JUri::root().$thumb_image; ?>" />
+									<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo Uri::root().$thumb_image; ?>" />
 								</span>
 							<?php endif; ?>
 							<span class="cart-product-name">
 								<?php echo $item->orderitem_name; ?>
 										<?php if(!$this->params->get('show_qty_field', 1)) : ?> <a
 										class="j2store-remove remove-icon"
-										href="<?php echo J2Store::platform()->getCartUrl(array('task' => 'remove','cartitem_id' => $item->cartitem_id));//JRoute::_('index.php?option=com_j2store&view=carts&task=remove&cartitem_id='.$item->cartitem_id); ?>">X</a>
-										<?php endif; ?>
+										href="<?php echo J2Store::platform()->getCartUrl(['task' => 'remove', 'cartitem_id' => $item->cartitem_id]);//JRoute::_('index.php?option=com_j2store&view=carts&task=remove&cartitem_id='.$item->cartitem_id); ?>">X</a>
+<?php endif; ?>
 							</span>
 							<br>
 							<?php if(isset($item->orderitemattributes) && $item->orderitemattributes): ?>
 							<span class="cart-item-options"> <?php foreach ($item->orderitemattributes as $attribute): ?>
-								<small> - <?php echo JText::_($attribute->orderitemattribute_name); ?>
+								<small> - <?php echo Text::_($attribute->orderitemattribute_name); ?>
 									: <?php echo $attribute->orderitemattribute_value; ?>
 							</small> <br> <?php endforeach;?>
 							</span>
@@ -87,18 +91,18 @@ $col_class = 'col-md-';
 
 							<?php if($this->params->get('show_price_field', 1)): ?>
 								<span class="cart-product-unit-price">
-									<span class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?>
+									<span class="cart-item-title"><?php echo Text::_('J2STORE_CART_LINE_ITEM_UNIT_PRICE'); ?>
 								</span>
 							<span class="cart-item-value">
 								<?php echo $this->currency->format($this->order->get_formatted_lineitem_price($item, $this->params->get('checkout_price_display_options', 1))); ?>
 							</span>
 						</span> <?php endif; ?> <?php if($this->params->get('show_sku', 1)): ?>
 							<br> <span class="cart-product-sku"> <span
-								class="cart-item-title"><?php echo JText::_('J2STORE_CART_LINE_ITEM_SKU'); ?>
+								class="cart-item-title"><?php echo Text::_('J2STORE_CART_LINE_ITEM_SKU'); ?>
 							</span> <span class="cart-item-value"><?php echo $item->orderitem_sku; ?>
 							</span>
 						</span> <?php endif; ?>
-                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitle', array($item, $this->order, $this->params));?>
+                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitle', [$item, $this->order, $this->params]);?>
                             <?php if(isset($this->onDisplayCartItem[$i])):?>
 							<br> <?php echo $this->onDisplayCartItem[$i];?> <?php endif;?>
 							<?php $i++;?>
@@ -111,19 +115,19 @@ $col_class = 'col-md-';
 							type="number" value="<?php echo $item->orderitem_quantity; ?>" />
 							<!--
 							<a class="btn btn-small btn-danger btn-xs j2store-remove remove-icon"
-								href="<?php echo JRoute::_('index.php?option=com_j2store&view=orders&task=removeOrderitem&layout=items&oid='.$this->order->j2store_order_id.'&orderitem_id='.$item->j2store_orderitem_id); ?>">
+								href="<?php echo Route::_('index.php?option=com_j2store&view=orders&task=removeOrderitem&layout=items&oid='.$this->order->j2store_order_id.'&orderitem_id='.$item->j2store_orderitem_id); ?>">
 								<i class="fa fa-trash"></i>
 							</a>
 							-->
 						</td>
-						<?php if(isset($this->taxes) && count($this->taxes) && $this->params->get('show_item_tax', 0)): ?>
+						<?php if(isset($this->taxes) && (is_countable($this->taxes) ? count($this->taxes) : 0) && $this->params->get('show_item_tax', 0)): ?>
 						<td>
 							<?php 	echo $this->currency->format($item->orderitem_tax); 	?>
 						</td>
 						<?php endif; ?>
 						<td>
-							<a href="#" onclick="addInventry('<?php echo $item->variant_id;?>','<?php echo $item->orderitem_quantity;?>','<?php echo $this->order->order_id;?>')" class="btn btn-primary"><?php echo JText::_('J2STORE_INCREASE_STOCK');?></a>
-							<a href="#" onclick="removeInventry('<?php echo $item->variant_id;?>','<?php echo $item->orderitem_quantity;?>','<?php echo $this->order->order_id;?>')" class="btn btn-danger"><?php echo JText::_('J2STORE_DECREASE_STOCK');?></a>
+							<a href="#" onclick="addInventry('<?php echo $item->variant_id;?>','<?php echo $item->orderitem_quantity;?>','<?php echo $this->order->order_id;?>')" class="btn btn-primary"><?php echo Text::_('J2STORE_INCREASE_STOCK');?></a>
+							<a href="#" onclick="removeInventry('<?php echo $item->variant_id;?>','<?php echo $item->orderitem_quantity;?>','<?php echo $this->order->order_id;?>')" class="btn btn-danger"><?php echo Text::_('J2STORE_DECREASE_STOCK');?></a>
 						</td>
 						<td class="cart-line-subtotal">
 							<?php echo $this->currency->format($this->order->get_formatted_lineitem_total($item, $this->params->get('checkout_price_display_options', 1)), $this->order->currency_code, $this->order->currency_value ); ?>
@@ -136,12 +140,12 @@ $col_class = 'col-md-';
 					<tr>
 					<?php if(!empty($this->orderitems)):?>
 						<?php $colspan=5;
-						if(isset($this->taxes) && count($this->taxes) && $this->params->get('show_item_tax', 0)){
+						if(isset($this->taxes) && (is_countable($this->taxes) ? count($this->taxes) : 0) && $this->params->get('show_item_tax', 0)){
 							$colspan=6;
 						}
 						?>
-						<td colspan="<?php echo $colspan;?>"><a class="btn btn-large btn-warning" onclick="update()" id="update_quantity"><?php echo JText::_('J2STORE_CART_UPDATE');?></a>
-						<a class="btn btn-large btn-danger" onclick="remove_all()" id="remove_quantity"><?php echo JText::_('J2STORE_REMOVE');?></a>
+						<td colspan="<?php echo $colspan;?>"><a class="btn btn-large btn-warning" onclick="update()" id="update_quantity"><?php echo Text::_('J2STORE_CART_UPDATE');?></a>
+						<a class="btn btn-large btn-danger" onclick="remove_all()" id="remove_quantity"><?php echo Text::_('J2STORE_REMOVE');?></a>
 						</td>
 					<?php endif;?>
 					</tr>
@@ -155,15 +159,15 @@ $col_class = 'col-md-';
 					<tr>
 						<td colspan="2">
 							<h4>
-								<?php echo JText::_('J2STORE_ADD_ITEM');?>
+								<?php echo Text::_('J2STORE_ADD_ITEM');?>
 							</h4>
 						</td>
 					</tr>
 					<tr id="selector-row">
-						<td><?php echo JText::_('J2STORE_CHOOSE_PRODUCTS');?></td>
+						<td><?php echo Text::_('J2STORE_CHOOSE_PRODUCTS');?></td>
 						 <td>
-						 <?php echo J2Html::text('product_name' ,'',array('id'=>'productselector'));?>
-							<?php echo J2Html::hidden('product_id' ,'',array()) ;?>
+						 <?php echo J2Html::text('product_name' ,'',['id'=>'productselector']);?>
+							<?php echo J2Html::hidden('product_id' ,'',[]) ;?>
 						</td>
 					</tr>
 				</table>
@@ -171,7 +175,7 @@ $col_class = 'col-md-';
 			<div id="j2store-product-display" style="display:none;">
 				<span id="j2store-product-name"></span>
 				<?php //"window.parent.location='index.php?option=com_j2store&view=orders&task=createOrder&layout=items&oid={$this->order->j2store_order_id}"?>
-				<?php echo J2StorePopup::popupAdvanced($add_product_link,JText::_( "J2STORE_ORDER_ADD_ITEM" ), array('width'=>800 ,'height'=>400 ,'class'=>'btn btn-success','refresh'=>true,'id'=>'fancybox'));?>
+				<?php echo J2StorePopup::popupAdvanced($add_product_link,Text::_( "J2STORE_ORDER_ADD_ITEM" ), ['width'=>800, 'height'=>400, 'class'=>'btn btn-success', 'refresh'=>true, 'id'=>'fancybox']);?>
             </div>
 		</div>
 		<div class="<?php echo $col_class ?>4">
@@ -281,7 +285,7 @@ function update(){
 			data : data1,
 			dataType: "json",
 			beforeSend: function() {
-				$('#update_quantity').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+				$('#update_quantity').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 				$('#update_quantity').attr('disabled',true);
 
 			},
@@ -315,7 +319,7 @@ function remove_all(){
 			data : post_data,
 			dataType: "json",
 			beforeSend: function() {
-				$('#remove_quantity').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+				$('#remove_quantity').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 				$('#remove_quantity').attr('disabled',true);
 
 			},

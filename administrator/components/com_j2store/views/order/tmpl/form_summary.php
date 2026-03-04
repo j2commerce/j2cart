@@ -39,7 +39,7 @@ $image_path = Uri::root();
             $thumb_image_raw = $platform->getImagePath($thumb_image);
 
 		    $img = HTMLHelper::_('image', $thumb_image_raw, '', '', true, 1);
-		    $path = parse_url($img, PHP_URL_PATH);
+		    $path = parse_url((string) $img, PHP_URL_PATH);
 	    ?>
             <div class="border mb-4 rounded-3 px-4 py-3 text-subdued">
                 <div class="row align-items-lg-start">
@@ -57,7 +57,7 @@ $image_path = Uri::root();
                             <div class="col-lg-8">
 	                            <?php echo $this->order->get_admin_formatted_lineitem_name($item,'admin');?>
 
-	                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitleInOrder', array($item, $this->order, $this->params));?>
+	                            <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitleInOrder', [$item, $this->order, $this->params]);?>
 
 	                            <?php if(!empty($item->orderitem_sku)): ?>
                                     <div class="small d-flex align-items-center">

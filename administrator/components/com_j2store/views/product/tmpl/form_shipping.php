@@ -39,15 +39,15 @@ $wa->addInlineScript($script, [], []);
         <div class="form-grid">
             <div class="control-group">
                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_ENABLE_SHIPPING'), 'shipping'); ?></div>
-				<?php echo J2Html::radioBooleanList($this->form_prefix.'[shipping]',(isset($this->variant->shipping)) ? $this->variant->shipping:''); ?>
+				<?php echo J2Html::radioBooleanList($this->form_prefix.'[shipping]',$this->variant->shipping ?? ''); ?>
             </div>
             <div class="control-group">
                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_DIMENSIONS'), 'dimensions'); ?></div>
                 <div class="controls">
                     <div class="input-group">
-	                    <?php echo J2Html::text($this->form_prefix.'[length]',(isset($this->variant->length))?$this->variant->length:'',array('class'=>'form-control', 'placeholder'=>Text::_('J2STORE_LENGTH'),'field_type'=>'integer'));?>
-	                    <?php echo J2Html::text($this->form_prefix.'[width]',(isset($this->variant->width)) ? $this->variant->width:'',array('class'=>'form-control', 'placeholder'=>Text::_('J2STORE_WIDTH'),'field_type'=>'integer'));?>
-	                    <?php echo J2Html::text($this->form_prefix.'[height]',(isset($this->variant->height)) ? $this->variant->height : '',array('class'=>'form-control', 'placeholder'=>Text::_('J2STORE_HEIGHT'),'field_type'=>'integer'));?>
+	                    <?php echo J2Html::text($this->form_prefix.'[length]',$this->variant->length ?? '',['class'=>'form-control', 'placeholder'=>Text::_('J2STORE_LENGTH'), 'field_type'=>'integer']);?>
+	                    <?php echo J2Html::text($this->form_prefix.'[width]',$this->variant->width ?? '',['class'=>'form-control', 'placeholder'=>Text::_('J2STORE_WIDTH'), 'field_type'=>'integer']);?>
+	                    <?php echo J2Html::text($this->form_prefix.'[height]',$this->variant->height ?? '',['class'=>'form-control', 'placeholder'=>Text::_('J2STORE_HEIGHT'), 'field_type'=>'integer']);?>
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@ $wa->addInlineScript($script, [], []);
             <div class="control-group">
                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_WEIGHT'), 'weight'); ?></div>
                 <div class="controls">
-	                <?php echo J2Html::text($this->form_prefix.'[weight]',(isset($this->variant->weight))?$this->variant->weight:'',array('class'=>'form-control','field_type'=>'integer'));?>
+	                <?php echo J2Html::text($this->form_prefix.'[weight]',$this->variant->weight ?? '',['class'=>'form-control', 'field_type'=>'integer']);?>
                 </div>
             </div>
             <div class="control-group">

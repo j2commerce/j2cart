@@ -50,7 +50,7 @@ $platform->loadExtra('behavior.modal','a.modal');
                 </div>
             </div>
             <div class="mt-4 mt-lg-0">
-	            <?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=customer&task=editAddress&id=".$this->item->j2store_address_id."&tmpl=component",Text::_('J2STORE_EDIT'),array('class'=>'btn btn-outline-primary btn-sm','refresh'=>true,'id'=>'fancybox','width'=>700,'height'=>600));?>
+	            <?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=customer&task=editAddress&id=".$this->item->j2store_address_id."&tmpl=component",Text::_('J2STORE_EDIT'),['class'=>'btn btn-outline-primary btn-sm', 'refresh'=>true, 'id'=>'fancybox', 'width'=>700, 'height'=>600]);?>
                 <a class="btn btn-danger btn-sm" href="<?php echo Route::_('index.php?option=com_j2store&view=customer&task=delete&id='.$this->item->j2store_address_id);?>">
 		            <?php echo Text::_('J2STORE_DELETE');?>
                 </a>

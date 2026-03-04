@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 /*------------------------------------------------------------------------
 # com_j2store - J2Store
 # ------------------------------------------------------------------------
@@ -22,19 +24,19 @@ $order_link = @$this->order_link;
 $plugin_html = @$this->plugin_html;
 $app = Factory::getApplication();
 $paction = $app->input->getString('paction');
-$after_post_html = J2Store::plugin ()->eventWithHtml ( 'AfterPostPayment', array($this) );
+$after_post_html = J2Store::plugin ()->eventWithHtml ( 'AfterPostPayment', [$this] );
 ?>
 <div class="<?php echo $J2gridRow;?>">
 	<div class="<?php echo $J2gridCol;?>12">
 		<?php echo J2Store::modules()->loadposition('j2store-postpayment-top'); ?>
-		<h3><?php echo JText::_( "J2STORE_CHECKOUT_RESULTS" ); ?></h3>
+		<h3><?php echo Text::_( "J2STORE_CHECKOUT_RESULTS" ); ?></h3>
 
 		<?php echo $plugin_html; ?>
 
 		<?php if(!empty($order_link) && $paction != 'cancel'):?>
 			<div class="note">
-				<a href="<?php echo JRoute::_($order_link); ?>">
-					<?php echo JText::_( "J2STORE_VIEW_ORDER_HISTORY" ); ?>
+				<a href="<?php echo Route::_($order_link); ?>">
+					<?php echo Text::_( "J2STORE_VIEW_ORDER_HISTORY" ); ?>
 				</a>
 			</div>
 		<?php endif; ?>

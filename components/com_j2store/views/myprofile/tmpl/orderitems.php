@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Language\Language;
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -22,7 +25,7 @@ if(empty($order->customer_language) || $order->customer_language == '*' || $orde
 }else{
     $conf = Factory::getContainer()->get('config');
     $debug = $conf->get('debug_lang');
-    $language = JLanguage::getInstance($order->customer_language, $debug);
+    $language = Language::getInstance($order->customer_language, $debug);
     $language->load('com_j2store');
 }
 ?>
@@ -33,7 +36,7 @@ if(empty($order->customer_language) || $order->customer_language == '*' || $orde
         <tr>
             <th style="font-family: 'Arial';line-height: 1.35em;padding: 7px 9px 9px;border: 1px solid #ccc;"><?php echo $language->_('J2STORE_CART_LINE_ITEM'); ?></th>
             <th style="font-family: 'Arial';line-height: 1.35em;padding: 7px 9px 9px;border: 1px solid #ccc;"><?php echo $language->_('J2STORE_CART_LINE_ITEM_QUANTITY'); ?></th>
-            <?php if(isset($this->taxes) && count($this->taxes) && $this->params->get('show_item_tax', 0)): ?>
+            <?php if(isset($this->taxes) && (is_countable($this->taxes) ? count($this->taxes) : 0) && $this->params->get('show_item_tax', 0)): ?>
                 <?php $colspan = '3'; ?>
                 <th style="font-family: 'Arial';line-height: 1.35em;padding: 7px 9px 9px;border: 1px solid #ccc;"><?php echo $language->_('J2STORE_CART_LINE_ITEM_TAX'); ?></th>
             <?php endif; ?>
@@ -52,8 +55,8 @@ if(empty($order->customer_language) || $order->customer_language == '*' || $orde
                 <td style="font-family: 'Arial';line-height: 1.35em;padding: 7px 9px 9px;border: 1px solid #ccc;">
                     <?php if($this->params->get('show_thumb_email', 0) && !empty($thumb_image)): ?>
                         <span class="cart-thumb-image">
-								<?php if(JFile::exists(JPATH_SITE.'/'.$thumb_image)): ?>
-                                    <img src="<?php echo JUri::root(true). '/'.$thumb_image; ?>" >
+								<?php if(File::exists(JPATH_SITE.'/'.$thumb_image)): ?>
+                                    <img src="<?php echo Uri::root(true). '/'.$thumb_image; ?>" >
                                 <?php endif;?>
 							</span>
                     <?php endif; ?>
@@ -82,10 +85,10 @@ if(empty($order->customer_language) || $order->customer_language == '*' || $orde
                         <br>
                         <span class="label label-inverse"><?php echo $language->_($back_order_text);?></span>
                     <?php endif;?>
-                    <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitleInOrder', array($item, $this->order, $this->params));?>
+                    <?php echo J2Store::plugin()->eventWithHtml('AfterDisplayLineItemTitleInOrder', [$item, $this->order, $this->params]);?>
                 </td>
                 <td class="cart-line-quantity" style="font-family: 'Arial';line-height: 1.35em;padding: 7px 9px 9px;border: 1px solid #ccc;text-align: center"><?php echo $item->orderitem_quantity; ?></td>
-                <?php if(isset($this->taxes) && count($this->taxes) && $this->params->get('show_item_tax', 0)): ?>
+                <?php if(isset($this->taxes) && (is_countable($this->taxes) ? count($this->taxes) : 0) && $this->params->get('show_item_tax', 0)): ?>
                     <td style="font-family: 'Arial';line-height: 1.35em;padding: 7px 9px 9px;border: 1px solid #ccc;"><?php 	echo $currency->format($item->orderitem_tax);	?></td>
                 <?php endif; ?>
                 <td class="cart-line-subtotal" style="font-family: 'Arial';line-height: 1.35em;padding: 7px 9px 9px;border: 1px solid #ccc;text-align: right;">

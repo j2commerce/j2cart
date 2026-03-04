@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\HTML\Helpers\Sidebar;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -18,7 +19,7 @@ use Joomla\CMS\Router\Route;
 
 $platform = J2Store::platform();
 $platform->loadExtra('behavior.modal');
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 $this->params = J2Store::config();
 
 $info_class = $platform->getLabel('info');
@@ -32,7 +33,7 @@ HTMLHelper::_('bootstrap.tooltip', '[data-bs-toggle="tooltip"]', ['placement' =>
 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
 $wa->useScript('table.columns');
 
-$search = htmlspecialchars($this->state->search);
+$search = htmlspecialchars((string) $this->state->search);
 ?>
 <?php if(!empty( $sidebar )): ?>
     <div id="j2c-menu" class="mb-4">
@@ -45,12 +46,12 @@ $search = htmlspecialchars($this->state->search);
     <div class="btn-toolbar w-100 justify-content-end mb-3">
       <div class="filter-search-bar btn-group flex-grow-1 flex-lg-grow-0 mb-2 mb-lg-0">
           <div class="input-group w-100 me-lg-2">
-              <?php echo  J2Html::text('search',$search,array('id'=>'search' ,'class'=>'form-control j2store-product-filters','placeholder'=>Text::_('J2STORE_FILTER_SEARCH')));?>
+              <?php echo  J2Html::text('search',$search,['id'=>'search', 'class'=>'form-control j2store-product-filters', 'placeholder'=>Text::_('J2STORE_FILTER_SEARCH')]);?>
               <span class="filter-search-bar__label visually-hidden">
                   <label id="search-lbl" for="search"><?php echo Text::_('J2STORE_FILTER_SEARCH');?></label>
               </span>
-              <?php echo J2Html::buttontype('go','<span class="filter-search-bar__button-icon icon-search" aria-hidden="true"></span>' ,array('class'=>'btn btn-primary','onclick'=>'this.form.submit();'));?>
-              <?php echo J2Html::buttontype('reset',Text::_( 'JCLEAR' ),array('id'=>'reset-filter-search','class'=>'btn btn-primary',"onclick"=>"document.getElementById('search').value = ''; this.form.submit();")); ?>
+              <?php echo J2Html::buttontype('go','<span class="filter-search-bar__button-icon icon-search" aria-hidden="true"></span>' ,['class'=>'btn btn-primary', 'onclick'=>'this.form.submit();']);?>
+              <?php echo J2Html::buttontype('reset',Text::_( 'JCLEAR' ),['id'=>'reset-filter-search', 'class'=>'btn btn-primary', "onclick"=>"document.getElementById('search').value = ''; this.form.submit();"]); ?>
           </div>
       </div>
       <div class="ordering-select d-flex gap-2 ms-lg-2 flex-grow-1 flex-lg-grow-0">
@@ -60,7 +61,7 @@ $search = htmlspecialchars($this->state->search);
     <?php echo J2Html::hidden('option','com_j2store');?>
     <?php echo J2Html::hidden('view','shippingtroubles');?>
     <?php echo J2Html::hidden('layout','default_shipping_product');?>
-    <?php echo J2Html::hidden('task','browse',array('id'=>'task'));?>
+    <?php echo J2Html::hidden('task','browse',['id'=>'task']);?>
     <?php echo J2Html::hidden('boxchecked','0');?>
     <?php echo J2Html::hidden('filter_order',$this->state->filter_order);?>
     <?php echo J2Html::hidden('filter_order_Dir',$this->state->filter_order_Dir);?>
@@ -187,7 +188,7 @@ $search = htmlspecialchars($this->state->search);
                             $variants = $variant_model->product_id($product->j2store_product_id)
                                 ->is_master(0)
                                 ->getList();
-                            if(isset($variants) && count($variants)):
+                            if(isset($variants) && (is_countable($variants) ? count($variants) : 0)):
                                 ?>
 
                                     <?php

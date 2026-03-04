@@ -24,7 +24,7 @@ $platform->loadExtra('behavior.modal');
 $row_class = 'row';
 $col_class = 'col-md-';
 $product_type_class = 'badge bg-success';
-$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.htmlspecialchars(Text::_('JLIB_FORM_CONTAINS_INVALID_FIELDS')).'</div></div></joomla-alert>' ;
+$alert_html = '<joomla-alert type="danger" close-text="Close" dismiss="true" role="alert" style="animation-name: joomla-alert-fade-in;"><div class="alert-heading"><span class="error"></span><span class="visually-hidden">Error</span></div><div class="alert-wrapper"><div class="alert-message" >'.htmlspecialchars((string) Text::_('JLIB_FORM_CONTAINS_INVALID_FIELDS')).'</div></div></joomla-alert>' ;
 
 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
 $style = '.j2store-product-edit-form .input-group .form-check.form-switch .form-check-input{min-width:0;}';
@@ -77,19 +77,19 @@ $wa->addInlineStyle($style, [], []);
                     <div class="card-body">
                         <div class="form-grid">
                             <div class="control-group" id="j2store-product-enable">
-                                <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_TREAT_AS_PRODUCT'), 'enabled',array());?></div>
-                                <?php echo J2Html::radioBooleanList($this->form_prefix.'[enabled]', $this->item->enabled, array('id'=>'j2store-product-enabled-radio-group', 'class'=>'form-check form-check-inline','hide_label'=>true));?>
+                                <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_TREAT_AS_PRODUCT'), 'enabled',[]);?></div>
+                                <?php echo J2Html::radioBooleanList($this->form_prefix.'[enabled]', $this->item->enabled, ['id'=>'j2store-product-enabled-radio-group', 'class'=>'form-check form-check-inline', 'hide_label'=>true]);?>
                             </div>
                             <div class="control-group" id="j2store-product-type">
                                 <?php if(!empty($this->item->product_type)): ?>
-                                    <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TYPE'), 'product_type',array()); ?></div>
+                                    <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TYPE'), 'product_type',[]); ?></div>
                                     <div class="controls">
-                                        <span class="<?php echo $product_type_class;?>"><?php echo Text::_('J2STORE_PRODUCT_TYPE_'.strtoupper($this->item->product_type)) ?></span>
+                                        <span class="<?php echo $product_type_class;?>"><?php echo Text::_('J2STORE_PRODUCT_TYPE_'.strtoupper((string) $this->item->product_type)) ?></span>
                                     </div>
                                     <?php echo J2Html::hidden($this->form_prefix.'[product_type]', $this->item->product_type); ?>
                                 <?php else: ?>
-                                    <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TYPE'), 'product_type',array()); ?></div>
-                                    <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', $this->product_types); ?></div>
+                                    <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TYPE'), 'product_type',[]); ?></div>
+                                    <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', (string) $this->product_types); ?></div>
                                 <?php endif; ?>
                             </div>
                             <?php if(!$this->item->enabled): ?>
@@ -154,7 +154,7 @@ $wa->addInlineStyle($style, [], []);
 		<?php if($this->item->j2store_product_id && $this->item->enabled && $this->item->product_type): ?>
             <div class="card j2store-product-shortcodes">
                 <div class="card-header justify-content-between">
-                    <h3 class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_TYPE_'.strtoupper($this->item->product_type)); ?></h3>
+                    <h3 class="mb-0"><?php echo Text::_('J2STORE_PRODUCT_TYPE_'.strtoupper((string) $this->item->product_type)); ?></h3>
                 </div>
                 <div class="card-body">
 					<?php echo $this->loadTemplate($this->item->product_type); ?>

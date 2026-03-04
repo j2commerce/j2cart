@@ -1,4 +1,8 @@
 <?php
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Filesystem\Path;
 /*------------------------------------------------------------------------
 # com_j2store - J2Store
 # ------------------------------------------------------------------------
@@ -19,13 +23,13 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 <script type="text/javascript">
 	<!--
 	function j2storeGetPaymentForm(element, container) {
-		var url = '<?php echo JRoute::_('index.php'); ?>';
+		var url = '<?php echo Route::_('index.php'); ?>';
 		var data = 'option=com_j2store&view=checkout&task=getPaymentForm&tmpl=component&payment_element='+ element;
 		j2storeDoTask(url, container, document.adminForm, '', data);
 	}
 	//-->
 </script>
-<?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayShippingPayment',array($this->order)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayShippingPayment',[$this->order]); ?>
 
 <!-- SHIPPING METHOD -->
 <?php if($this->showShipping):?>
@@ -42,7 +46,7 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 <?php if($this->showPayment): ?>
 	<div id='onCheckoutPayment_wrapper'>
 		<h3>
-			<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>
+			<?php echo Text::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>
 		</h3>
 		<?php if ($this->plugins): ?>
 
@@ -52,29 +56,29 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 				$params= $platform->getRegistry($plugin->params);
 				$image = $params->get('display_image', '');
 				?>
-				<?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayPaymentMethod',array($plugin->element, $this->order)); ?>
+				<?php echo J2Store::plugin()->eventWithHtml('BeforeDisplayPaymentMethod',[$plugin->element, $this->order]); ?>
 				<label class="payment-plugin-image-label <?php echo $plugin->element; ?>" >
 					<input value="<?php echo $plugin->element; ?>" class="payment_plugin"
 					       name="payment_plugin" type="radio"
 					       onclick="j2storeGetPaymentForm('<?php echo $plugin->element; ?>', 'payment_form_div');"
 						<?php echo (!empty($plugin->checked)) ? "checked" : ""; ?>
-						   title="<?php echo JText::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>" />
+						   title="<?php echo Text::_('J2STORE_SELECT_A_PAYMENT_METHOD'); ?>" />
 
 					<?php if(!empty($image)): ?>
-						<img class="payment-plugin-image <?php echo $plugin->element; ?>" src="<?php echo JUri::root().JPath::clean($image); ?>" />
+						<img class="payment-plugin-image <?php echo $plugin->element; ?>" src="<?php echo Uri::root().Path::clean($image); ?>" />
 					<?php endif; ?>
 					<?php
 					$title = $params->get('display_name', '');
 					if(!empty($title)) {
-						echo JText::_($title);
+						echo Text::_($title);
 					} else {
-						echo JText::_($plugin->name );
+						echo Text::_($plugin->name );
 					}
 					?>
 				</label>
 
-				<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayPaymentMethod',array($plugin->element, $this->order)); ?>
-				<?php echo J2Store::plugin()->eventWithHtml('CheckoutShippingPayment', array($this->order)); ?>
+				<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayPaymentMethod',[$plugin->element, $this->order]); ?>
+				<?php echo J2Store::plugin()->eventWithHtml('CheckoutShippingPayment', [$this->order]); ?>
 
 			<?php endforeach; ?>
 		<?php endif; ?>
@@ -98,7 +102,7 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 $html =$this->storeProfile->get('store_payment_layout','') ;
 
 //first find all the checkout fields
-preg_match_all("^\[(.*?)\]^",$html,$checkoutFields, PREG_PATTERN_ORDER);
+preg_match_all("^\[(.*?)\]^",(string) $html,$checkoutFields, PREG_PATTERN_ORDER);
 
 $allFields = $this->fields;
 ?>
@@ -107,19 +111,19 @@ $allFields = $this->fields;
 	$onWhat='onchange'; if($oneExtraField->field_type=='radio') $onWhat='onclick';
 	//echo $this->fieldsClass->display($oneExtraField,@$this->address->$fieldName,$fieldName,false);
 	if(property_exists($this->address, $fieldName)) {
-        $placeholder =  (isset($oneExtraField->field_options['placeholder']) ? $oneExtraField->field_options['placeholder'] : "");
+        $placeholder =  ($oneExtraField->field_options['placeholder'] ?? "");
         $field_options = '';
         if($placeholder){
             $field_options .= ' placeholder="'.$placeholder.'" ';
         }
-		$html = str_replace('['.$fieldName.']',$this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null),$html);
+		$html = str_replace('['.$fieldName.']',$this->fieldsClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName, $fieldName,false, $field_options, $test = false, $allFields, $allValues = null),(string) $html);
 	}
 	?>
 <?php endforeach; ?>
 
 <?php
 //check for unprocessed fields. If the user forgot to add the fields to the checkout layout in store profile, we probably have some.
-$unprocessedFields = array();
+$unprocessedFields = [];
 foreach($this->fields as $fieldName => $oneExtraField) {
 	if(!in_array($fieldName, $checkoutFields[1])) {
 		$unprocessedFields[$fieldName] = $oneExtraField;
@@ -127,10 +131,10 @@ foreach($this->fields as $fieldName => $oneExtraField) {
 }
 
 //now we have unprocessed fields. remove any other square brackets found.
-preg_match_all("^\[(.*?)\]^",$html,$removeFields, PREG_PATTERN_ORDER);
+preg_match_all("^\[(.*?)\]^",(string) $html,$removeFields, PREG_PATTERN_ORDER);
 foreach($removeFields[1] as $fieldName) {
     if(!empty($fieldName)){
-        $html = str_replace('['.$fieldName.']', '', $html);
+        $html = str_replace('['.$fieldName.']', '', (string) $html);
     }
 }
 
@@ -148,7 +152,7 @@ foreach($removeFields[1] as $fieldName) {
 				$onWhat='onchange'; if($oneExtraField->field_type=='radio') $onWhat='onclick';
 				//echo $this->fieldsClass->display($oneExtraField,@$this->address->$fieldName,$fieldName,false);
 				if(property_exists($this->address, $fieldName)) {
-                    $placeholder =  (isset($oneExtraField->field_options['placeholder']) ? $oneExtraField->field_options['placeholder'] : "");
+                    $placeholder =  ($oneExtraField->field_options['placeholder'] ?? "");
                     $field_options = '';
                     if($placeholder){
                         $field_options .= ' placeholder="'.$placeholder.'" ';
@@ -166,7 +170,7 @@ foreach($removeFields[1] as $fieldName) {
 <?php if($this->params->get('show_customer_note', 1)): ?>
 	<div class="customer-note">
 		<h3>
-			<?php echo JText::_('J2STORE_CUSTOMER_NOTE'); ?>
+			<?php echo Text::_('J2STORE_CUSTOMER_NOTE'); ?>
 		</h3>
 		<textarea name="customer_note" rows="3" cols="40"></textarea>
 	</div>
@@ -178,18 +182,18 @@ foreach($removeFields[1] as $fieldName) {
 	<div id="checkbox_tos">
 		<?php if($this->params->get('terms_display_type', 'link') =='checkbox' ):?>
 			<input type="checkbox" class="required" name="tos_check"
-			       title="<?php echo JText::_('J2STORE_AGREE_TO_TERMS_VALIDATION'); ?>" />
+			       title="<?php echo Text::_('J2STORE_AGREE_TO_TERMS_VALIDATION'); ?>" />
 			<label for="tos_check" id="tos_check">
 
-				<?php echo JText::_('J2STORE_TERMS_AND_CONDITIONS_AGREE_TO'); ?>
+				<?php echo Text::_('J2STORE_TERMS_AND_CONDITIONS_AGREE_TO'); ?>
 
 				<?php if(!empty($tos)): ?>
                     <a data-fancybox data-src="#j2store-tos-modal" data-touch="false" href="javascript:;" >
-                        <?php echo JText::_('J2STORE_TERMS_AND_CONDITIONS'); ?>
+                        <?php echo Text::_('J2STORE_TERMS_AND_CONDITIONS'); ?>
                     </a>
 
 				<?php else: ?>
-					<?php echo JText::_('J2STORE_TERMS_AND_CONDITIONS'); ?>
+					<?php echo Text::_('J2STORE_TERMS_AND_CONDITIONS'); ?>
 				<?php endif; ?>
 
 			</label>
@@ -197,14 +201,14 @@ foreach($removeFields[1] as $fieldName) {
 
 		<?php else: ?>
 
-			<?php echo JText::_('J2STORE_TERMS_AND_CONDITION_PRETEXT'); ?>
+			<?php echo Text::_('J2STORE_TERMS_AND_CONDITION_PRETEXT'); ?>
 
 			<?php if(!empty($tos)): ?>
                 <a data-fancybox data-src="#j2store-tos-modal" data-touch="false" href="javascript:;" >
-                    <?php echo JText::_('J2STORE_TERMS_AND_CONDITIONS'); ?>
+                    <?php echo Text::_('J2STORE_TERMS_AND_CONDITIONS'); ?>
                 </a>
 			<?php else: ?>
-				<?php echo JText::_('J2STORE_TERMS_AND_CONDITIONS'); ?>
+				<?php echo Text::_('J2STORE_TERMS_AND_CONDITIONS'); ?>
 			<?php endif; ?>
 		<?php endif;?>
         <?php if(!empty($tos)): ?>
@@ -218,12 +222,12 @@ foreach($removeFields[1] as $fieldName) {
 <?php endif; ?>
 
 <?php /****** To get App term  html ********/?>
-<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayShippingPayment',array($this->order)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('AfterDisplayShippingPayment',[$this->order]); ?>
 
 <div class="buttons">
 	<div class="left">
 		<input type="button"
-		       value="<?php echo JText::_('J2STORE_CHECKOUT_CONTINUE'); ?>"
+		       value="<?php echo Text::_('J2STORE_CHECKOUT_CONTINUE'); ?>"
 		       id="button-payment-method" class="button btn btn-primary" />
 	</div>
 </div>

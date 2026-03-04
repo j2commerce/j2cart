@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -15,7 +17,7 @@ $options = $this->product->options;
       <div class="options" id="variable-options-<?php echo $this->product->j2store_product_id?>" >
         <?php foreach ($options as $option) { ?>
 
-        <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplaySingleProductOption', array($this->product, &$option)); ?>
+        <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplaySingleProductOption', [$this->product, &$option]); ?>
 
         <?php //var_dump($option); ?>
         <?php if ($option['type'] == 'select') { ?>
@@ -24,7 +26,7 @@ $options = $this->product->options;
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
           <select name="product_option[<?php echo $option['productoption_id']; ?>]"
          	 onChange="doAjaxPrice(
          	 			<?php echo $this->product->j2store_product_id?>,
@@ -36,7 +38,7 @@ $options = $this->product->options;
             <option <?php echo $checked; ?> value="<?php echo $option_value['product_optionvalue_id']; ?>"
             		<?php echo $option_value['product_optionvalue_attribs'];?>
 					>
-            	<?php echo stripslashes($this->escape(JText::_($option_value['optionvalue_name']))); ?>
+            	<?php echo stripslashes((string) $this->escape(Text::_($option_value['optionvalue_name']))); ?>
             </option>
             <?php } ?>
           </select>
@@ -50,7 +52,7 @@ $options = $this->product->options;
           <?php if ($option['required']) { ?>
           <span class="required">*</span>
           <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
+          <b><?php echo $this->escape(Text::_($option['option_name'])); ?>:</b><br>
           <?php foreach ($option['optionvalue'] as $option_value) { ?>
           	<?php $checked = ''; if($option_value['product_optionvalue_default']) $checked = 'checked="checked"'; ?>
           <input <?php echo $checked; ?> type="radio" name="product_option[<?php echo $option['productoption_id']; ?>]" autocomplete="off"
@@ -68,21 +70,21 @@ $options = $this->product->options;
           			!empty($option_value['optionvalue_image'])
 				):
           ?>
-				<img class="optionvalue-image-<?php echo $option_value['product_optionvalue_id']; ?>" src="<?php echo JUri::root(true).'/'.$option_value['optionvalue_image']; ?>"
+				<img class="optionvalue-image-<?php echo $option_value['product_optionvalue_id']; ?>" src="<?php echo Uri::root(true).'/'.$option_value['optionvalue_image']; ?>"
 						            <?php echo $option_value['product_optionvalue_attribs'];?>
 				 />
           <?php endif; ?>
           <label for="option-value-<?php echo $option_value['product_optionvalue_id']; ?>"
           	<?php echo $option_value['product_optionvalue_attribs'];?>
           >
-          <?php echo stripslashes($this->escape(JText::_($option_value['optionvalue_name']))); ?>
+          <?php echo stripslashes((string) $this->escape(Text::_($option_value['optionvalue_name']))); ?>
           </label>
           <br>
           <?php } ?>
         </div>
         <br>
         <?php } ?>
-    		<?php echo J2Store::plugin()->eventWithHtml('AfterDisplaySingleProductOption', array($this->product, $option)); ?>
-        <?php } ?>
+    		<?php echo J2Store::plugin()->eventWithHtml('AfterDisplaySingleProductOption', [$this->product, $option]); ?>
+<?php } ?>
       </div>
       <?php } ?>

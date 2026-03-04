@@ -25,14 +25,14 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
     $row_class = 'row-fluid';
     $col_class = 'span';
 }
-$script = <<<JS
+$script = <<<JS_WRAP
 if (typeof j2store === 'undefined') {
     var j2store = {};
 }
 if (typeof j2store.jQuery === 'undefined') {
     j2store.jQuery = window.jQuery; // Assigns the global jQuery reference to j2store.jQuery
 }
-(function($) {
+(function(\$) {
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('j2store-postconfig-apply').addEventListener('click', function(e) {
             e.preventDefault(); // Prevent default form submission
@@ -88,7 +88,7 @@ if (typeof j2store.jQuery === 'undefined') {
         });
     });
 })(window.jQuery);
-JS;
+JS_WRAP;
 
 $wa->addInlineScript($script, [], []);
 ?>

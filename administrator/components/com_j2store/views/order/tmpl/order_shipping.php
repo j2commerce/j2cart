@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -23,18 +25,18 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		<input type="hidden" value="<?php echo $this->address_type;?>" name="address_type" />
 		<div class="display_message" id="display_message"></div>
 		<div class="shipping-infos">
-			<?php if (isset($this->addresses) && count($this->addresses) > 0) : ?>
+			<?php if (isset($this->addresses) && (is_countable($this->addresses) ? count($this->addresses) : 0) > 0) : ?>
 				<input type="radio" name="address" value="existing" id="shipping-address-existing" checked="checked" />
-				<label for="shipping-address-existing"><?php echo JText::_('J2STORE_ADDRESS_EXISTING'); ?></label>
+				<label for="shipping-address-existing"><?php echo Text::_('J2STORE_ADDRESS_EXISTING'); ?></label>
 				 <select class="input-xxlarge" 	name="address_id" id="address_id" size="5" >
 				    <?php foreach ($this->addresses as $address) :  ?>
 				    <?php if ($address->j2store_address_id == $this->shipping_address_id) : ?>
 				    	<option value="<?php echo $address->j2store_address_id; ?>" selected="selected">
-				    		<?php echo $address->first_name; ?> 	<?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo JText::_($address->zone_name); ?>, <?php echo JText::_($address->country_name); ?>
+				    		<?php echo $address->first_name; ?> 	<?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo Text::_($address->zone_name); ?>, <?php echo Text::_($address->country_name); ?>
 				    	</option>
 				    <?php else: ?>
 				    	<option value="<?php echo $address->j2store_address_id; ?>">
-				    		<?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo JText::_($address->zone_name); ?>, <?php echo JText::_($address->country_name); ?>
+				    		<?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo Text::_($address->zone_name); ?>, <?php echo Text::_($address->country_name); ?>
 				    	</option>
 				    <?php endif; ?>
 				    <?php endforeach; ?>
@@ -45,12 +47,12 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		<div id="new-address">
 			<input name="validate_type" type="hidden" value="shipping" id="validate_type">
 			<input type="radio" name="address" value="new" id="shipping-address-new"  />
-			<label for="shipping-address-existing"><?php echo JText::_('J2STORE_ADDRESS_NEW'); ?></label>
+			<label for="shipping-address-existing"><?php echo Text::_('J2STORE_ADDRESS_NEW'); ?></label>
 			<div id="orderinfo-shipping-<?php echo $this->order->j2store_order_id;?>" style="display:none;">
 			<?php
 			$html = $this->storeProfile->get('store_billing_layout');
 
-			if(empty($html) || strlen($html) < 5) {
+			if(empty($html) || strlen((string) $html) < 5) {
 				//we dont have a profile set in the store profile. So use the default one.
 				$html = '<div class="'.$row_class.'">
 				<div class="'.$col_class.'6">[first_name] [last_name] [phone_1] [phone_2] [company] [tax_number]</div>
@@ -58,7 +60,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 				</div>';
 			}
 			//first find all the checkout fields
-			preg_match_all("^\[(.*?)\]^",$html,$checkoutFields, PREG_PATTERN_ORDER);
+			preg_match_all("^\[(.*?)\]^",(string) $html,$checkoutFields, PREG_PATTERN_ORDER);
 			$allFields = $this->fields;
 
 			?>
@@ -68,13 +70,13 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 						if(property_exists($this->address, $fieldName)):
 							if(($fieldName !='email')){ ?>
 						<?php $oneExtraField->display_label = 'yes';?>
-						 <?php $html = str_replace('['.$fieldName.']',$this->fieldClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName,$fieldName,false, $options = '', $test = false, $allFields, $allValues = null).'</br />',$html);
+						 <?php $html = str_replace('['.$fieldName.']',$this->fieldClass->getFormatedDisplay($oneExtraField,$this->address->$fieldName,$fieldName,false, $options = '', $test = false, $allFields, $allValues = null).'</br />',(string) $html);
 						}
 					?>
 				<?php endif;?>
 			  	<?php endforeach; ?>
 			 	<?php
-			 	 		$unprocessedFields = array();
+			 	 		$unprocessedFields = [];
 						  foreach($this->fields as $fieldName => $oneExtraField):
 			  			if(!in_array($fieldName, $checkoutFields[1])):
 			  				$unprocessedFields[$fieldName] = $oneExtraField;
@@ -83,9 +85,9 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 			  		endforeach;
 
 			   //now we have unprocessed fields. remove any other square brackets found.
-			  preg_match_all("^\[(.*?)\]^",$html,$removeFields, PREG_PATTERN_ORDER);
+			  preg_match_all("^\[(.*?)\]^",(string) $html,$removeFields, PREG_PATTERN_ORDER);
 			  foreach($removeFields[1] as $fieldName) {
-			  	$html = str_replace('['.$fieldName.']', '', $html);
+			  	$html = str_replace('['.$fieldName.']', '', (string) $html);
 			  }
 			  ?>
 
@@ -119,30 +121,30 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 			<?php
 
 			if(isset($this->orderinfo->j2store_orderinfo_id) && $this->orderinfo->j2store_orderinfo_id > 0 && !empty($this->orderinfo->shipping_country_id) /*&& !empty($this->orderinfo->shipping_zone_id)*/):?>
-				<strong><?php echo JText::_('J2STORE_SHIPPING_ADDRESS');?></strong>
-			<?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->order->order_id."&address_type=shipping&layout=address&tmpl=component",'',array('class'=>'fa fa-pencil','refresh'=>true,'id'=>'fancybox','width'=>700,'height'=>600));?>
+				<strong><?php echo Text::_('J2STORE_SHIPPING_ADDRESS');?></strong>
+			<?php echo J2StorePopup::popupAdvanced("index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$this->order->order_id."&address_type=shipping&layout=address&tmpl=component",'',['class'=>'fa fa-pencil', 'refresh'=>true, 'id'=>'fancybox', 'width'=>700, 'height'=>600]);?>
 				<br>
 				<br>
 				<?php echo '<strong>'.$this->orderinfo->shipping_first_name." ".$this->orderinfo->shipping_last_name."</strong><br>"; ?>
 					<?php echo $this->orderinfo->shipping_address_1;?>
 					<br>
 					<address>
-						<?php echo $this->orderinfo->shipping_address_2 ? $this->orderinfo->shipping_address_2 : "<br>";?>
+						<?php echo $this->orderinfo->shipping_address_2 ?: "<br>";?>
 							<?php echo $this->orderinfo->shipping_city;?><br>
 							<?php echo $this->orderinfo->shipping_zone_name ? $this->orderinfo->shipping_zone_name.'<br>' : "";?>
 							<?php echo !empty($this->orderinfo->shipping_zip) ? $this->orderinfo->shipping_zip.'<br>': '';?>
-							<?php echo $this->orderinfo->shipping_country_name." <br> ".JText::_('J2STORE_TELEPHONE').":";?>
+							<?php echo $this->orderinfo->shipping_country_name." <br> ".Text::_('J2STORE_TELEPHONE').":";?>
 							<?php echo $this->orderinfo->shipping_phone_1;
 							echo $this->orderinfo->shipping_phone_2 ? '<br> '.$this->orderinfo->shipping_phone_2 : "<br> ";
 							echo '<br> ';
 							echo '<a href="mailto:'.$this->order->user_email.'">'.$this->order->user_email.'</a>';
 							echo '<br> ';
-							echo $this->orderinfo->shipping_company ? JText::_('J2STORE_ADDRESS_COMPANY_NAME').':&nbsp;'.$this->orderinfo->shipping_company."</br>" : "";
-							echo $this->orderinfo->shipping_tax_number ? JText::_('J2STORE_ADDRESS_TAX_NUMBER').':&nbsp;'.$this->orderinfo->shipping_tax_number."</br>" : "";
+							echo $this->orderinfo->shipping_company ? Text::_('J2STORE_ADDRESS_COMPANY_NAME').':&nbsp;'.$this->orderinfo->shipping_company."</br>" : "";
+							echo $this->orderinfo->shipping_tax_number ? Text::_('J2STORE_ADDRESS_TAX_NUMBER').':&nbsp;'.$this->orderinfo->shipping_tax_number."</br>" : "";
 							?>
 						</address>
 							<?php echo J2Store::getSelectableBase()->getFormatedCustomFields($this->orderinfo, 'customfields', 'shipping'); ?>
-					<button id="change_address" class="btn btn-warning"><?php echo JText::_("J2STORE_CHOOSE_ALTERNATE_ADDRESS");?></button>
+					<button id="change_address" class="btn btn-warning"><?php echo Text::_("J2STORE_CHOOSE_ALTERNATE_ADDRESS");?></button>
 					<br>
 					<br>
 			<?php endif;?>
@@ -157,7 +159,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		$('#nextlayout').hide();
 		$('#saveAndNext').show();
 		$('#baddress-info').hide();
-		$('#display_message').after('<button id="close_address" class="btn btn-warning pull-right"><?php echo JText::_('J2STORE_CLOSE');?></button>');
+		$('#display_message').after('<button id="close_address" class="btn btn-warning pull-right"><?php echo Text::_('J2STORE_CLOSE');?></button>');
 	});
 
 })(j2store.jQuery);
@@ -181,7 +183,7 @@ $('#address #country_id').bind('change', function() {
 		url: 'index.php?option=com_j2store&view=orders&task=getCountry&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
-			$('#address #country_id').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#address #country_id').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('.wait').remove();
@@ -193,7 +195,7 @@ $('#address #country_id').bind('change', function() {
 				$('#shipping-postcode-required').hide();
 			}
 
-			html = '<option value=""><?php echo JText::_('J2STORE_SELECT_OPTION'); ?></option>';
+			html = '<option value=""><?php echo Text::_('J2STORE_SELECT_OPTION'); ?></option>';
 
 			if (json['zone'] != '') {
 
@@ -207,7 +209,7 @@ $('#address #country_id').bind('change', function() {
 	    			html += '>' + json['zone'][i]['zone_name'] + '</option>';
 				}
 			} else {
-				html += '<option value="0" selected="selected"><?php echo JText::_('J2STORE_CHECKOUT_NONE'); ?></option>';
+				html += '<option value="0" selected="selected"><?php echo Text::_('J2STORE_CHECKOUT_NONE'); ?></option>';
 			}
 
             /*$("#<?php echo $this->address_type;?>_zone_id").html(html);*/

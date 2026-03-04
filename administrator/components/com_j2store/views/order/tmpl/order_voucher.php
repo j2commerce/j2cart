@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -15,7 +16,7 @@ defined('_JEXEC') or die;
 	    ?>
 		<!--  <input type="hidden" name="oid" value="<?php echo $this->order->j2store_order_id;?>" />-->
 		<input type="text" name="voucher" value="<?php echo $voucher; ?>" />
-		<input type="button" onClick="applyVoucher()"value="<?php echo JText::_('J2STORE_APPLY_VOUCHER')?>" class="button btn btn-primary" />
+		<input type="button" onClick="applyVoucher()"value="<?php echo Text::_('J2STORE_APPLY_VOUCHER')?>" class="button btn btn-primary" />
 		<!-- <input type="hidden" name="option" value="com_j2store" />
          <input type="hidden" name="view" value="carts" />
          <input type="hidden" name="task" value="applyVoucher" />

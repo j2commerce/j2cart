@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\HTML\Helpers\Sidebar;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -21,7 +22,7 @@ $app = $platform->application();
 
 $row = $this->item;
 
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 
 Factory::getApplication()->getLanguage()->load('plg_j2store_' . $row->element, JPATH_ADMINISTRATOR, null, true);
 
@@ -36,13 +37,13 @@ PluginHelper::importPlugin('j2store');
     <div class="js-stools mt-4 mb-3">
         <div class="js-stools-container-bar">
             <div class="btn-toolbar gap-2 align-items-center">
-                <h2><?php echo Text::_('J2STORE_' . strtoupper($row->element)); ?></h2>
+                <h2><?php echo Text::_('J2STORE_' . strtoupper((string) $row->element)); ?></h2>
             </div>
         </div>
     </div>
     <?php
-        $results = array();
-        $results = $app->triggerEvent('onJ2StoreGetReportView', array($row));
+        $results = [];
+        $results = $app->triggerEvent('onJ2StoreGetReportView', [$row]);
         $html = '';
         foreach ($results as $result) {
             $html .= $result;

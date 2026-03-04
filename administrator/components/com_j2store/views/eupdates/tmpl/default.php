@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\HTML\Helpers\Sidebar;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -25,7 +26,7 @@ $updates = J2Store::fof()->getModel('EUpdates', 'J2StoreModel')->getUpdates();
 
 $update_link = J2Store::buildSiteLink('my-account/my-downloads', 'update');
 
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 J2Store::fof()->getModel('Updates', 'J2StoreModel')->refreshUpdateSite();
 //now get update
 $updateInfo = J2Store::fof()->getModel('Updates', 'J2StoreModel')->getUpdates();

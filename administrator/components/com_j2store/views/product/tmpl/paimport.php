@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -6,8 +9,8 @@
  */
 // No direct access
 defined('_JEXEC') or die;
- $app = JFactory::getApplication();
-JHtml::_('script', 'system/core.js', false, true);
+ $app = Factory::getApplication();
+HTMLHelper::_('script', 'system/core.js', false, true);
 //print_r($this->row);
 ?>
 <style>
@@ -16,29 +19,29 @@ nav, header, div.subhead {
 }
 </style>
 <div class="j2store">
-	<h3><?php echo JText::_( "J2STORE_PAI_IMPORT_PRODUCT_OPTIONS_FOR" ); ?>:<?php echo $this->row->product_name; ?></h3>
-	<p class="alert alert-info"><?php echo JText::_('J2STORE_PAIMPORT_SEARCH_HELP_TEXT'); ?></p>
+	<h3><?php echo Text::_( "J2STORE_PAI_IMPORT_PRODUCT_OPTIONS_FOR" ); ?>:<?php echo $this->row->product_name; ?></h3>
+	<p class="alert alert-info"><?php echo Text::_('J2STORE_PAIMPORT_SEARCH_HELP_TEXT'); ?></p>
 	<div class="row-fluid">
 		<form action="index.php" method="get" name="searchForm" id="searchForm" enctype="multipart/form-data">
 			<div class="">
 				<div class="span2">
-					<?php echo JText::_('J2STORE_SKU'); ?> <br>
+					<?php echo Text::_('J2STORE_SKU'); ?> <br>
 					<input type="text" name="filter_sku" value="<?php  echo $app->input->getString ( 'filter_sku', '' ); ?>" class="span12">
 
 				</div>
 				<div class="span1">
 				<br>
-				<?php echo JText::_('J2STORE_OR'); ?></div>
+				<?php echo Text::_('J2STORE_OR'); ?></div>
 				<div class="span2">
 
-					<?php echo JText::_('J2STORE_PRODUCT_ID'); ?> <br>
+					<?php echo Text::_('J2STORE_PRODUCT_ID'); ?> <br>
 					<input type="text" name="filter_pid" value="<?php  echo $app->input->getString ( 'filter_pid', '' ); ?>" class="span8">
 				</div>
 				<!--<input type="text" name="filter_search" value="<?php  echo $app->input->getString ( 'filter_search', '' ); ?>" > -->
 
 				<div class="span3">
 					<br>
-					<input type="submit" name="search_button" class="btn btn-success" value="<?php echo JText::_('J2STORE_PAIMPORT_FIND_PRODUCTS_TO_IMPORT')?>">
+					<input type="submit" name="search_button" class="btn btn-success" value="<?php echo Text::_('J2STORE_PAIMPORT_FIND_PRODUCTS_TO_IMPORT')?>">
 				</div>
 			</div>
 			<input type="hidden" name="option" value="com_j2store" />
@@ -50,30 +53,30 @@ nav, header, div.subhead {
 			<input type="hidden" name="tmpl" value="component" />
 		</form>
 	</div>
-<?php if(isset($this->products) && count($this->products)):?>
+<?php if(isset($this->products) && (is_countable($this->products) ? count($this->products) : 0)):?>
 	<form action="index.php" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
 
 		<div class="row-fluid">
 			<div>
 				<button class="btn btn-info btn-large pull-right"
 					onclick="document.getElementById('task').value='importattributes'; document.adminForm.submit(); ">
-					<?php echo JText::_('J2STORE_PAI_IMPORT_PRODUCT_OPTIONS'); ?>
+					<?php echo Text::_('J2STORE_PAI_IMPORT_PRODUCT_OPTIONS'); ?>
 				</button>
 				<br><br>
 			</div>
 			<br>
-			<div class="alert alert-block alert-info"><?php echo JText::_('J2STORE_PAI_IMPORT_PRODUCT_OPTIONS_HELP_TEXT');?></div>
+			<div class="alert alert-block alert-info"><?php echo Text::_('J2STORE_PAI_IMPORT_PRODUCT_OPTIONS_HELP_TEXT');?></div>
 			<table class="adminlist table table-striped">
 				<thead>
 					<tr>
 						<th style="width: 20px;">
 							<input type="checkbox"	name="checkall-toggle" value=""  />
 						</th>
-						<th style="text-align: left;"><?php echo JText::_('J2STORE_PRODUCT_ID'); ?>
+						<th style="text-align: left;"><?php echo Text::_('J2STORE_PRODUCT_ID'); ?>
 						</th>
-						<th style="text-align: left;"><?php echo JText::_('J2STORE_PRODUCT_NAME'); ?>
+						<th style="text-align: left;"><?php echo Text::_('J2STORE_PRODUCT_NAME'); ?>
 						</th>
-						<th style="text-align: left;"><?php echo JText::_( "J2STORE_PRODUCT_OPTIONS" ); ?>
+						<th style="text-align: left;"><?php echo Text::_( "J2STORE_PRODUCT_OPTIONS" ); ?>
 						</th>
 
 					</tr>
@@ -96,12 +99,12 @@ nav, header, div.subhead {
 						<td style="text-align: left;"><?php echo $item->product_name; ?>
 						</td>
 						<td style="text-align: left;">
-					 <?php if(count($attributes)) : ?>
+					 <?php if(is_countable($attributes) ? count($attributes) : 0) : ?>
 				 		<ol>
 					 	<?php foreach($attributes as $attribute) : ?>
 					 		<li><?php echo $this->escape($attribute['option_name']); ?></li>
-					 		<?php if(isset($attribute['optionvalue']) && !empty($attribute['optionvalue']) && count($attribute['optionvalue'])) : ?>
-					 				<strong> <?php echo JText::_('J2STORE_PAI_IMPORT_VALUES_FOR_THIS_OPTION'); ?></strong>
+					 		<?php if(isset($attribute['optionvalue']) && !empty($attribute['optionvalue']) && (is_countable($attribute['optionvalue']) ? count($attribute['optionvalue']) : 0)) : ?>
+					 				<strong> <?php echo Text::_('J2STORE_PAI_IMPORT_VALUES_FOR_THIS_OPTION'); ?></strong>
 					 				<ol>
 					 				<?php foreach ($attribute['optionvalue'] as $a_option) :
 					 				?>
@@ -142,9 +145,9 @@ nav, header, div.subhead {
 				value="<?php // echo $this->lists['order_Dir']; ?>" />
 		</div>
 	</form>
-	<?php else: ?>
+<?php else: ?>
 	<div class="alert alert-info">
-		<?php echo JText::_('J2STORE_PAIMPORT_NO_ITEMS_FOUND'); ?>
+		<?php echo Text::_('J2STORE_PAIMPORT_NO_ITEMS_FOUND'); ?>
 	</div>
 	<?php endif; ?>
 </div>

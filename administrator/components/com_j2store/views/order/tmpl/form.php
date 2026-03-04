@@ -30,7 +30,7 @@ $btn_small = 'btn-sm';
 $labels = ['success', 'info', 'primary', 'warning', 'danger', 'important'];
 $foundStatus = null;
 foreach ($labels as $label) {
-	if (strpos($this->item->orderstatus_cssclass, $label) !== false) {
+	if (str_contains((string) $this->item->orderstatus_cssclass, $label)) {
 		if($label == 'important'){
 			$foundStatus = 'danger';
 		} else {
@@ -99,8 +99,8 @@ $resend_email_url = Route::_( "index.php?option=com_j2store&view=orders&task=res
             </div>
             <div class="col-lg-4 sticky-lg-top max-content-height z-3 order-1 order-lg-2" style="top: 75px;">
                 <div class="order-action-buttons mb-4">
-	                <?php echo J2StorePopup::popuplink($print_order_url,'<span class="fas fa-solid fa-print me-2"></span>'.Text::_('J2STORE_PRINT_ORDER'), array('class'=>'btn btn-primary btn-sm mb-2 w-xs-100 w-sm-auto w-lg-100 w-xxl-auto'));?>
-	                <?php echo J2StorePopup::popupAdvanced($print_shipping_url,'<span class="fas fa-solid fa-print me-2"></span> '.Text::_('J2STORE_PRINT_SHIPPING_ADDRESS'), array('id'=>'btn btn-primary btn-sm mb-2 w-xs-100 w-sm-auto w-lg-100 w-xxl-auto'));?>
+	                <?php echo J2StorePopup::popuplink($print_order_url,'<span class="fas fa-solid fa-print me-2"></span>'.Text::_('J2STORE_PRINT_ORDER'), ['class'=>'btn btn-primary btn-sm mb-2 w-xs-100 w-sm-auto w-lg-100 w-xxl-auto']);?>
+	                <?php echo J2StorePopup::popupAdvanced($print_shipping_url,'<span class="fas fa-solid fa-print me-2"></span> '.Text::_('J2STORE_PRINT_SHIPPING_ADDRESS'), ['id'=>'btn btn-primary btn-sm mb-2 w-xs-100 w-sm-auto w-lg-100 w-xxl-auto']);?>
                     <a href="<?php echo $resend_email_url;?>" class="btn btn-primary btn-sm mb-2 w-xs-100 w-sm-auto w-lg-100 w-xxl-auto" ><?php echo '<span class="fas fa-solid fa-envelope me-2"></span> '.Text::_('J2STORE_RESEND_MAIL')?></a>
 	                <?php if($this->order->has_downloadable_item()): ?>
                         <button type="button" data-bs-toggle="collapse" data-bs-target="#collapseDownloads" aria-expanded="false" aria-controls="collapseDownloads" class="btn btn-dark btn-sm ms-2 mb-2">

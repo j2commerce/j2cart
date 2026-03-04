@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -14,7 +16,7 @@ jimport( 'joomla.html.html.jgrid' );
 <td><?php echo J2Store::product()->getVariantNamesByCSV($this->variant->variant_name); ?></td>
 <td><?php echo $this->variant->sku; ?></td>
 <td><?php echo J2store::currency()->format($this->variant->price); ?></td>
-<td><?php echo (isset($this->variant->shipping) && ($this->variant->shipping)) ? JText::_('J2STORE_YES') : JText::_('J2STORE_NO'); ?></td>
+<td><?php echo (isset($this->variant->shipping) && ($this->variant->shipping)) ? Text::_('J2STORE_YES') : Text::_('J2STORE_NO'); ?></td>
 <td><?php echo $this->variant->quantity;?></td>
 <td>
 <?php if( $this->variant->isdefault_variant):?>
@@ -30,11 +32,11 @@ jimport( 'joomla.html.html.jgrid' );
 </td>
 <td>
 <?php
-$base_path = rtrim(JUri::root(),'/').'/administrator';
+$base_path = rtrim((string) Uri::root(),'/').'/administrator';
 echo J2StorePopup::popup(
     $base_path."/index.php?option=com_j2store&view=products&task=setvariant&variant_id=".$this->variant->j2store_variant_id."&layout=variant_form&tmpl=component",
-		JText::_( "J2STORE_EDIT" ),
-		array('class'=>'btn btn-success')
+		Text::_( "J2STORE_EDIT" ),
+		['class'=>'btn btn-success']
 	);
 ?>
 </td>

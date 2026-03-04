@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -22,8 +24,8 @@ defined('_JEXEC') or die;
 
     <!--  Delete Options  for Billing Address -->
     <span class="pull-right">
-        <a class="btn btn-danger" href="<?php echo JRoute::_('index.php?option=com_j2store&view=customer&task=delete&id='.$this->item->j2store_address_id);?>">
-            <?php echo JText::_('J2STORE_DELETE');?>
+        <a class="btn btn-danger" href="<?php echo Route::_('index.php?option=com_j2store&view=customer&task=delete&id='.$this->item->j2store_address_id);?>">
+            <?php echo Text::_('J2STORE_DELETE');?>
         </a>
     </span>
 </div>

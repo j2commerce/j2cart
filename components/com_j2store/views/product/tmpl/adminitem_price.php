@@ -8,7 +8,7 @@
 // No direct access
 defined('_JEXEC') or die;
 ?>
-<?php echo J2Store::plugin()->eventWithHtml('BeforeRenderingProductPrice', array($this->product)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('BeforeRenderingProductPrice', [$this->product]); ?>
 
 <?php if($this->params->get('show_base_price', 1) || $this->params->get('show_price_field', 1)): ?>
 <div class="product-price-container">
@@ -34,4 +34,4 @@ defined('_JEXEC') or die;
 </div>
 <?php endif; ?>
 
-<?php echo J2Store::plugin()->eventWithHtml('AfterRenderingProductPrice', array($this->product)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('AfterRenderingProductPrice', [$this->product]); ?>

@@ -44,7 +44,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 
 <div class="main-card">
     <form class="form-validate" id="adminForm" name="adminForm" method="post" action="index.php">
-		<?php echo J2Html::input('hidden','option','com_j2store',array('id'=>'option'));?>
+		<?php echo J2Html::input('hidden','option','com_j2store',['id'=>'option']);?>
         <input type="hidden" value="orders" id="view" name="view" />
         <input type="hidden" value="createOrder" id="task" name="task" />
         <input type="hidden" value="<?php echo $this->layout;?>" id="layout" name="layout" />

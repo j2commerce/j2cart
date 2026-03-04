@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /*------------------------------------------------------------------------
 # com_j2store - J2Store
 # ------------------------------------------------------------------------
@@ -23,12 +24,12 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		</div>
 	<?php endif; ?>
 
-	<?php echo J2Store::plugin()->eventWithHtml('BeforeCheckoutConfirm', array($this)); ?>
+	<?php echo J2Store::plugin()->eventWithHtml('BeforeCheckoutConfirm', [$this]); ?>
 	
 	<?php if(isset($this->plugin_html)): ?>
 			<!--    PAYMENT METHOD   -->
 		<h3>
-			<?php echo JText::_("J2STORE_PAYMENT_METHOD"); ?>
+			<?php echo Text::_("J2STORE_PAYMENT_METHOD"); ?>
 		</h3>
 	
 		<div class="payment">
@@ -36,9 +37,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		</div>
 	<?php endif; ?>
 
-	<?php if(isset($this->free_redirect) && strlen($this->free_redirect) > 5): ?>
-	<form action="<?php echo J2Store::platform()->getCheckoutUrl(array('task' => 'confirmPayment')); ?>" method="post" >
-	<input type="submit" class="btn btn-primary" value="<?php echo JText::_('J2STORE_PLACE_ORDER'); ?>" />
+	<?php if(isset($this->free_redirect) && strlen((string) $this->free_redirect) > 5): ?>
+	<form action="<?php echo J2Store::platform()->getCheckoutUrl(['task' => 'confirmPayment']); ?>" method="post" >
+	<input type="submit" class="btn btn-primary" value="<?php echo Text::_('J2STORE_PLACE_ORDER'); ?>" />
 	
 	<input type="hidden" name="option" value="com_j2store" />
 	<input type="hidden" name="view" value="checkout" />
@@ -48,5 +49,5 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php else: ?>
 	<?php echo $this->error; ?>
 <?php endif; ?>
-<?php echo J2Store::plugin()->eventWithHtml('AfterCheckoutConfirm', array($this)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('AfterCheckoutConfirm', [$this]); ?>
 </div>

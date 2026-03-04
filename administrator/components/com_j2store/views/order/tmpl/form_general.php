@@ -17,6 +17,6 @@ $primary_button = 'btn btn-primary ';
 $secondary_button = 'btn btn-dark  ';
 $success_button = 'btn btn-success ';
 ?>
-<?php echo J2Store::plugin()->eventWithHtml('AdminOrderAfterGeneralInformation', array($this)); ?>
+<?php echo J2Store::plugin()->eventWithHtml('AdminOrderAfterGeneralInformation', [$this]); ?>
 
 <?php echo $this->loadTemplate('customer');?>

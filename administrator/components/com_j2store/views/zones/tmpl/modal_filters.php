@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Language\Text;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-24 Ramesh Elamathi / J2Store.org
@@ -21,27 +22,22 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		<table class="adminlist table table-striped table-condensed">
 			<tr>
 				<td>
-					<?php echo JText::_('J2STORE_COUNTRY');?>
+					<?php echo Text::_('J2STORE_COUNTRY');?>
 					<?php  echo J2Html::select()->clearState()
 							->type('genericlist')
 							->name('country_id')
 							->value($this->state->country_id)
-							->attribs(array('onchange'=>'this.form.submit();'))
+							->attribs(['onchange'=>'this.form.submit();'])
 							->setPlaceHolders(
-									array(''=>JText::_('J2STORE_SELECT_OPTION'))
+									[''=>Text::_('J2STORE_SELECT_OPTION')]
 							)
 							->hasOne('Countries')
-							->setRelations( array(
-									'fields' => array (
-											'key' => 'j2store_country_id',
-											'name' => array('country_name')
-									)
-							)
+							->setRelations( ['fields' => ['key' => 'j2store_country_id', 'name' => ['country_name']]]
 							)->getHtml();
 					?>
 				</td>
 				<td>
-					<input class="btn btn-success" type="button" value="<?php echo JText::_( 'J2STORE_IMPORT_COUNTRIES' );?>" onclick="if (document.adminForm.boxchecked.value==0){alert('Please first make a selection from the list');}else{jQuery('#view').attr('value','geozones');jQuery('#task').attr('value','importzone');this.form.submit();}" />
+					<input class="btn btn-success" type="button" value="<?php echo Text::_( 'J2STORE_IMPORT_COUNTRIES' );?>" onclick="if (document.adminForm.boxchecked.value==0){alert('Please first make a selection from the list');}else{jQuery('#view').attr('value','geozones');jQuery('#task').attr('value','importzone');this.form.submit();}" />
 				</td>
 				<td>
 					<?php echo $this->pagination->getLimitBox();?>

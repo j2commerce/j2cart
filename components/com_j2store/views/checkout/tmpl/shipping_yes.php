@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Filter\OutputFilter;
 /*------------------------------------------------------------------------
 # com_j2store - J2Store
 # ------------------------------------------------------------------------
@@ -11,11 +13,11 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$shipping_rates_text = JText::_('J2STORE_GETTING_SHIPPING_RATES');
+$shipping_rates_text = Text::_('J2STORE_GETTING_SHIPPING_RATES');
 $shipping_selected_text = '';
 ?>
-<?php if(count($this->rates)): ?>
-<h3><?php echo JText::_('J2STORE_CHECKOUT_SELECT_A_SHIPPING_METHOD');?></h3>
+<?php if(is_countable($this->rates) ? count($this->rates) : 0): ?>
+<h3><?php echo Text::_('J2STORE_CHECKOUT_SELECT_A_SHIPPING_METHOD');?></h3>
 <input type="hidden" id="shippingrequired" name="shippingrequired" value="1" />
 <?php
 
@@ -33,9 +35,9 @@ $shipping_selected_text = '';
 				$select_text = $rate['select_text'];
 			}
 
-	        $css_id = $rate['element']."_".JFilterOutput::stringURLSafe($rate['name']);
+	        $css_id = $rate['element']."_".OutputFilter::stringURLSafe($rate['name']);
 
-			$shipping_selected_text .= "<div class='shipping_element ".$css_id."_select_text' style='display:none;'>".JText::_ ( $select_text )."</div>"
+			$shipping_selected_text .= "<div class='shipping_element ".$css_id."_select_text' style='display:none;'>".Text::_ ( $select_text )."</div>"
             ?>
             <input id="shipping_<?php echo $css_id; ?>" name="shipping_plugin" rel="<?php echo $rate['name']; ?>" type="radio" value="<?php echo $rate['element'] ?>" onClick="j2storeSetShippingRate('<?php echo $rate['name']; ?>','<?php echo $rate['price']; ?>',<?php echo $rate['tax']; ?>,<?php echo $rate['extra']; ?>, '<?php echo $rate['code']; ?>', true, '<?php echo $rate['element'];?>', '<?php echo $css_id; ?>' );" <?php echo $checked; ?> />
             <label for="shipping_<?php echo $css_id; ?>" onClick="j2storeSetShippingRate('<?php echo $rate['name']; ?>','<?php echo $rate['price']; ?>',<?php echo $rate['tax']; ?>,<?php echo $rate['extra']; ?>, '<?php echo $rate['code']; ?>', true, '<?php echo $rate['element'];?>', '<?php echo $css_id; ?>' );"><?php echo $rate['name']; ?> ( <?php echo $this->currency->format( $rate['total']); ?> )</label><br>
@@ -44,7 +46,7 @@ $shipping_selected_text = '';
 ?>
 <?php endif;?>
 <?php $setval = false;?>
-<?php if(count($this->rates)==1 && ($this->rates['0']['name'] == $this->default_rate['name'])) $setval= true;?>
+<?php if((is_countable($this->rates) ? count($this->rates) : 0)==1 && ($this->rates['0']['name'] == $this->default_rate['name'])) $setval= true;?>
 <input type="hidden" name="shipping_price" id="shipping_price" value="<?php echo $setval ? $this->rates['0']['price'] : "";?>" />
 <input type="hidden" name="shipping_tax" id="shipping_tax" value="<?php echo $setval ? $this->rates['0']['tax'] : "";?>" />
 <input type="hidden" name="shipping_name" id="shipping_name" value="<?php echo $setval ? $this->rates['0']['name'] : "";?>" />
@@ -57,7 +59,7 @@ $shipping_selected_text = '';
 echo $shipping_selected_text;
 if (!empty($this->default_rate) ) :
 	$default_rate = $this->default_rate;
-    $default_css_id = $default_rate['element']."_".JFilterOutput::stringURLSafe($default_rate['name']);
+    $default_css_id = $default_rate['element']."_".OutputFilter::stringURLSafe($default_rate['name']);
 ?>
 <script type="text/javascript">
 (function($) {

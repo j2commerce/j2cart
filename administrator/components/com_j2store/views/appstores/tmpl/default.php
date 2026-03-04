@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\HTML\Helpers\Sidebar;
+use Joomla\CMS\Language\Text;
 /**
  * @package     J2Store
  * @author      Alagesan, J2Store <support@j2store.org>
@@ -9,7 +11,7 @@
 defined('_JEXEC') or die('Restricted access');
 $current_page = $this->state->get('current_page', 'popular');
 $page_url = 'index.php?option=com_j2store&view=appstores';
-$sidebar = JHtmlSidebar::render();
+$sidebar = Sidebar::render();
 $row_class = 'row';
 $col_class = 'col-md-';
 if (version_compare(JVERSION, '3.99.99', 'lt')) {
@@ -29,16 +31,16 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
             <?php if (version_compare(JVERSION, '3.99.99', 'lt')) : ?>
                 <ul class="nav nav-tabs">
                     <li class="<?php echo ($current_page == 'popular') ? 'active' : ''; ?>">
-                        <a href="<?php echo $page_url; ?>&page=popular"><?php echo JText::_('J2STORE_PLUGIN_POPULAR'); ?></a>
+                        <a href="<?php echo $page_url; ?>&page=popular"><?php echo Text::_('J2STORE_PLUGIN_POPULAR'); ?></a>
                     </li>
                     <li class="<?php echo ($current_page == 'free') ? 'active' : ''; ?>">
-                        <a href="<?php echo $page_url; ?>&page=free"><?php echo JText::_('J2STORE_PLUGIN_FREE'); ?></a>
+                        <a href="<?php echo $page_url; ?>&page=free"><?php echo Text::_('J2STORE_PLUGIN_FREE'); ?></a>
                     </li>
                     <li class="<?php echo ($current_page == 'installed') ? 'active' : ''; ?>">
-                        <a href="<?php echo $page_url; ?>&page=installed"><?php echo JText::_('J2STORE_PLUGIN_INSTALLED'); ?></a>
+                        <a href="<?php echo $page_url; ?>&page=installed"><?php echo Text::_('J2STORE_PLUGIN_INSTALLED'); ?></a>
                     </li>
                     <li class="<?php echo ($current_page == 'all') ? 'active' : ''; ?>">
-                        <a href="<?php echo $page_url; ?>&page=all"><?php echo JText::_('J2STORE_PLUGIN_ALL'); ?></a>
+                        <a href="<?php echo $page_url; ?>&page=all"><?php echo Text::_('J2STORE_PLUGIN_ALL'); ?></a>
                     </li>
                 </ul>
             <?php else: ?>
@@ -46,22 +48,22 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                     <li class="nav-item">
                         <a aria-current="page"
                            class="<?php echo ($current_page == 'popular') ? 'nav-link active' : 'nav-link'; ?>"
-                           href="<?php echo $page_url; ?>&page=popular"><?php echo JText::_('J2STORE_PLUGIN_POPULAR'); ?></a>
+                           href="<?php echo $page_url; ?>&page=popular"><?php echo Text::_('J2STORE_PLUGIN_POPULAR'); ?></a>
                     </li>
                     <li class="nav-item">
                         <a aria-current="page"
                            class="<?php echo ($current_page == 'free') ? 'nav-link active' : 'nav-link'; ?>"
-                           href="<?php echo $page_url; ?>&page=free"><?php echo JText::_('J2STORE_PLUGIN_FREE'); ?></a>
+                           href="<?php echo $page_url; ?>&page=free"><?php echo Text::_('J2STORE_PLUGIN_FREE'); ?></a>
                     </li>
                     <li class="nav-item">
                         <a aria-current="page"
                            class="<?php echo ($current_page == 'installed') ? 'nav-link active' : 'nav-link'; ?>"
-                           href="<?php echo $page_url; ?>&page=installed"><?php echo JText::_('J2STORE_PLUGIN_INSTALLED'); ?></a>
+                           href="<?php echo $page_url; ?>&page=installed"><?php echo Text::_('J2STORE_PLUGIN_INSTALLED'); ?></a>
                     </li>
                     <li class="nav-item">
                         <a aria-current="page"
                            class="<?php echo ($current_page == 'all') ? 'nav-link active' : 'nav-link'; ?>"
-                           href="<?php echo $page_url; ?>&page=all"><?php echo JText::_('J2STORE_PLUGIN_ALL'); ?></a>
+                           href="<?php echo $page_url; ?>&page=all"><?php echo Text::_('J2STORE_PLUGIN_ALL'); ?></a>
                     </li>
                 </ul>
             <?php endif; ?>

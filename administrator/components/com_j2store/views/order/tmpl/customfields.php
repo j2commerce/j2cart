@@ -22,19 +22,41 @@ if($type=='billing') {
 }
 $platform = J2Store::platform();
 $registry = $platform->getRegistry('{}');
-$fields = array();
-if(!empty($row->$field) && strlen($row->$field) > 0) {
+$fields = [];
+if(!empty($row->$field) && strlen((string) $row->$field) > 0) {
 	//$registry->loadString(stripslashes($row->$field), 'JSON');
-	$custom_fields = json_decode(str_replace('\/','/', $row->$field));
+	$custom_fields = json_decode(str_replace('\/','/', (string) $row->$field), null, 512, JSON_THROW_ON_ERROR);
 	if(is_object($custom_fields)){
         $custom_fields = $platform->fromObject($custom_fields,false);
     }
-	if(isset($custom_fields) && count($custom_fields)) {
-		foreach($custom_fields as $namekey=>$field) {
-			if(!property_exists($row, $type.'_'.$namekey) && !property_exists($row, 'user_'.$namekey) && $namekey !='country_id' && $namekey != 'zone_id' && $namekey != 'option' && $namekey !='task' && $namekey != 'view' && $namekey !='email' ) {
-				$fields[$namekey] = $field;
-			}
-		}
+	if(isset($custom_fields) && (is_countable($custom_fields) ? count($custom_fields) : 0)) {
+		foreach ($custom_fields as $namekey => $field) {
+      if (property_exists($row, $type.'_'.$namekey)) {
+          continue;
+      }
+      if (property_exists($row, 'user_'.$namekey)) {
+          continue;
+      }
+      if ($namekey == 'country_id') {
+          continue;
+      }
+      if ($namekey == 'zone_id') {
+          continue;
+      }
+      if ($namekey == 'option') {
+          continue;
+      }
+      if ($namekey == 'task') {
+          continue;
+      }
+      if ($namekey == 'view') {
+          continue;
+      }
+      if ($namekey == 'email') {
+          continue;
+      }
+      $fields[$namekey] = $field;
+  }
 
 	}
 }
@@ -62,7 +84,7 @@ if(!empty($row->$field) && strlen($row->$field) > 0) {
                         }
 
                     }elseif(is_string($field->value) && J2Store::utilities()->isJson(stripslashes($field->value))) {
-                        $json_values = json_decode(stripslashes($field->value));
+                        $json_values = json_decode(stripslashes($field->value), null, 512, JSON_THROW_ON_ERROR);
 
                         if(is_array($json_values)) {
                             foreach($json_values as $value){
@@ -73,7 +95,7 @@ if(!empty($row->$field) && strlen($row->$field) > 0) {
                         }
 
                     } else {
-                        echo Text::_(nl2br($field->value));
+                        echo Text::_(nl2br((string) $field->value));
                     }
                     ?>
                 </div>

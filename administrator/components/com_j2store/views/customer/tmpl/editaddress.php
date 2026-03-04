@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -24,12 +26,12 @@ $col_class = 'col-md-';
 </style>
 <div class="j2store">
     <form id="j2storeaddressForm" name="addressForm" method="post" action="<?php echo 'index.php'; ?>" >
-        <h3><?php echo JText::_('J2STORE_ADDRESS_EDIT');?></h3>
+        <h3><?php echo Text::_('J2STORE_ADDRESS_EDIT');?></h3>
         <div id="address">
             <div class="j2store-address-alert">
             </div>
             <div class="pull-right">
-                <input type="button" onclick="saveCustomer();" value="<?php echo JText::_('JAPPLY'); ?>"  class="button btn btn-success" />
+                <input type="button" onclick="saveCustomer();" value="<?php echo Text::_('JAPPLY'); ?>"  class="button btn btn-success" />
             </div>
             <?php
             //$html = $this->storeProfile->store_billing_layout;
@@ -62,7 +64,7 @@ $col_class = 'col-md-';
             //check for unprocessed fields.
             //If the user forgot to add the
             //fields to the checkout layout in store profile, we probably have some.
-            $unprocessedFields = array();
+            $unprocessedFields = [];
             foreach($this->fields as $fieldName => $oneExtraField):
                 if(!in_array($fieldName, $checkoutFields[1])):
                     $unprocessedFields[$fieldName] = $oneExtraField;
@@ -164,7 +166,7 @@ $col_class = 'col-md-';
                 url: 'index.php?option=com_j2store&view=orders&task=getCountry&country_id=' + this.value,
                 dataType: 'json',
                 beforeSend: function() {
-                    $('#address #country_id').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+                    $('#address #country_id').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
                 },
                 complete: function() {
                     $('.wait').remove();
@@ -176,7 +178,7 @@ $col_class = 'col-md-';
                         $('#shipping-postcode-required').hide();
                     }
 
-                    html = '<option value=""><?php echo JText::_('J2STORE_SELECT_OPTION'); ?></option>';
+                    html = '<option value=""><?php echo Text::_('J2STORE_SELECT_OPTION'); ?></option>';
 
                     if (json['zone'] != '') {
                         let default_zone_id = $('#address #zone_id_default_value').val();
@@ -188,7 +190,7 @@ $col_class = 'col-md-';
                             html += '>' + json['zone'][i]['zone_name'] + '</option>';
                         }
                     } else {
-                        html += '<option value="0" selected="selected"><?php echo JText::_('J2STORE_CHECKOUT_NONE'); ?></option>';
+                        html += '<option value="0" selected="selected"><?php echo Text::_('J2STORE_CHECKOUT_NONE'); ?></option>';
                     }
 
                     $("#address #zone_id").html(html);

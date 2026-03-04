@@ -23,24 +23,24 @@ use Joomla\CMS\Language\Text;
             </div>
             <div class="control-group">
                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_MANUFACTURER'), 'manufacturer'); ?></div>
-                <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', $this->manufacturers); ?></div>
+                <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', (string) $this->manufacturers); ?></div>
             </div>
 		    <?php if(J2Store::isPro()): ?>
                 <div class="control-group">
                     <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_VENDOR'), 'vendor'); ?></div>
-                    <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', $this->vendors); ?></div>
+                    <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', (string) $this->vendors); ?></div>
                 </div>
 		    <?php endif;?>
             <div class="control-group">
                 <div class="control-label"><?php echo J2Html::label(Text::_('J2STORE_PRODUCT_TAX_PROFILE'), 'tax_profile'); ?></div>
-                <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', $this->taxprofiles); ?></div>
+                <div class="controls"><?php echo str_replace('<select', '<select class="form-select"', (string) $this->taxprofiles); ?></div>
             </div>
             <div class="control-group">
                 <div class="control-label">
 				    <?php echo J2Html::label(Text::_('J2STORE_PRODUCT_CART_TEXT'), 'addtocart_text'); ?>
                 </div>
                 <div class="controls">
-				    <?php echo J2Html::text($this->form_prefix.'[addtocart_text]', Text::_($this->item->addtocart_text), array('class'=>'form-control')); ?>
+				    <?php echo J2Html::text($this->form_prefix.'[addtocart_text]', Text::_($this->item->addtocart_text), ['class'=>'form-control']); ?>
                 </div>
             </div>
             <div class="control-group">
@@ -48,7 +48,7 @@ use Joomla\CMS\Language\Text;
 				    <?php echo J2Html::label(Text::_('J2STORE_PRODUCT_CUSTOM_CSS_CLASS'), 'custom_css_class'); ?>
                 </div>
                 <div class="controls">
-				    <?php echo J2Html::text($this->form_prefix.'[params][product_css_class]', $this->item->params->get('product_css_class',''), array('class'=>'form-control')); ?>
+				    <?php echo J2Html::text($this->form_prefix.'[params][product_css_class]', $this->item->params->get('product_css_class',''), ['class'=>'form-control']); ?>
                 </div>
             </div>
         </div>

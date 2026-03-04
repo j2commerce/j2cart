@@ -1,4 +1,8 @@
 <?php
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Filesystem\Path;
 /**
  * @package J2Store
  * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
@@ -9,7 +13,7 @@
 // No direct access
 defined('_JEXEC') or die;
 $columns = $this->params->get('related_product_columns', 3);
-$total = count($this->cross_sells); $counter = 0;
+$total = is_countable($this->cross_sells) ? count($this->cross_sells) : 0; $counter = 0;
 // get j2Store Params to determine which bootstrap version we're using - Waseem Sadiq (waseem@bulletprooftemplates.com)
 $J2gridRow = ($this->params->get('bootstrap_version', 2) == 2) ? 'row-fluid' : 'row';
 $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
@@ -17,7 +21,7 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 
 <div class="<?php echo $J2gridRow; ?> product-crosssells-container">
 	<div class="<?php echo $J2gridCol; ?>12">
-		<h3><?php echo JText::_('J2STORE_RELATED_PRODUCTS_CROSS_SELLS'); ?></h3>
+		<h3><?php echo Text::_('J2STORE_RELATED_PRODUCTS_CROSS_SELLS'); ?></h3>
 
 				<?php foreach($this->cross_sells as $cross_sell_product):?>
 					
@@ -37,10 +41,10 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 	      					}
 
 	      				?>
-		   				<?php if(isset($thumb_image) &&  JFile::exists(JPATH::clean(JPATH_SITE.'/'.$thumb_image))):?>
+		   				<?php if(isset($thumb_image) &&  File::exists(JPATH::clean(JPATH_SITE.'/'.$thumb_image))):?>
 		   				<span class="cross-sell-product-image">
 		   					<a href="<?php echo $cross_sell_product->product_view_url; ?>">
-		   						<img alt="<?php echo $this->escape($cross_sell_product->product_name) ;?>" class="j2store-product-thumb-image-<?php echo $cross_sell_product->j2store_product_id; ?>"  src="<?php echo JUri::root().JPath::clean($thumb_image);?>" />
+		   						<img alt="<?php echo $this->escape($cross_sell_product->product_name) ;?>" class="j2store-product-thumb-image-<?php echo $cross_sell_product->j2store_product_id; ?>"  src="<?php echo Uri::root().Path::clean($thumb_image);?>" />
 		   					</a>
 		   				</span>
 					   	<?php endif; ?>

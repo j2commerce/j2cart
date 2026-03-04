@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Router\Route;
 /**
  * @package     Joomla.Component
  * @subpackage  J2Store
@@ -34,8 +35,8 @@ $product_type_class = 'badge bg-success';
 	<form class="form-horizontal form-validate" id="adminForm" 	name="adminForm" method="post" action="index.php">
 		<?php echo J2Html::hidden('option','com_j2store');?>
 		<?php echo J2Html::hidden('view','products');?>
-		<?php echo J2Html::hidden('task','',array('id'=>'task'));?>
-		<?php echo J2Html::hidden('product_id', $this->product_id,array('id'=>'product_id'));?>
+		<?php echo J2Html::hidden('task','',['id'=>'task']);?>
+		<?php echo J2Html::hidden('product_id', $this->product_id,['id'=>'product_id']);?>
 		<?php echo HTMLHelper::_( 'form.token' ); ?>
 	<div class="note">
         <fieldset class="options-form">
@@ -51,10 +52,10 @@ $product_type_class = 'badge bg-success';
                 <tbody>
                 <tr>
                     <td>
-				        <?php echo J2Html::text('product_file_display_name','',array("id"=>"download-total", 'class' =>'form-control')); ?>
+				        <?php echo J2Html::text('product_file_display_name','',["id"=>"download-total", 'class' =>'form-control']); ?>
                     </td>
                     <td>
-				        <?php echo J2Html::text('product_file_save_name', '',array('class'=>'form-control' ,'id'=>'savename')); ?>
+				        <?php echo J2Html::text('product_file_save_name', '',['class'=>'form-control', 'id'=>'savename']); ?>
                         <a data-fancybox data-src="#myFileModal" type="button" class="btn btn-info choose-file" ><?php echo Text::_('J2STORE_CHOOSE_FILE');?></a>
                     </td>
                     <td class="text-end">
@@ -88,7 +89,7 @@ $product_type_class = 'badge bg-success';
                 <?php foreach($this->productfiles as $counter => $singleFile):?>
                     <tr id="exist-file-tbody-<?php echo $singleFile->j2store_productfile_id;?>">
                         <td>
-                            <?php echo J2Html::text('product_files['.$counter.'][product_file_display_name]',$singleFile->product_file_display_name,array('class' =>'form-control')); ?>
+                            <?php echo J2Html::text('product_files['.$counter.'][product_file_display_name]',$singleFile->product_file_display_name,['class' =>'form-control']); ?>
                             <?php echo J2Html::hidden('product_files['.$counter.'][product_file_save_name]',$singleFile->product_file_save_name); ?>
                         </td>
                         <td><div class="form-text"><?php echo $singleFile->product_file_save_name;?></div></td>
@@ -147,7 +148,7 @@ $product_type_class = 'badge bg-success';
             };
             if(file_id){
                 $.ajax({
-                    url  : '<?php echo JRoute::_('index.php');?>',
+                    url  : '<?php echo Route::_('index.php');?>',
                 method:'post',
                 data: delete_productfile ,
                 beforeSend:function(){

@@ -19,8 +19,8 @@ $col_class = 'col-md-';
 <form class="form-horizontal form-validate" id="adminForm" name="adminForm" method="post" action="index.php">
 	<?php echo J2Html::hidden('option','com_j2store');?>
 	<?php echo J2Html::hidden('view','customer');?>
-	<?php echo J2Html::hidden('task','',array('id'=>'task'));?>
-	<?php echo J2Html::hidden('email',$this->item->email,array('id'=>'email'));?>
+	<?php echo J2Html::hidden('task','',['id'=>'task']);?>
+	<?php echo J2Html::hidden('email',$this->item->email,['id'=>'email']);?>
 	<!-- <input type="hidden" name="j2store_address_id" value="<?php // echo $this->item->email;?>" />-->
 	<?php echo JHTML::_( 'form.token' ); ?>
 	<div class="<?php echo $row_class ?>">

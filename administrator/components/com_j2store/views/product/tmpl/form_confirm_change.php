@@ -30,7 +30,7 @@ $wa->addInlineStyle($style, [], []);
             </div>
             <div class="message-footer d-flex justify-content-between">
                 <button type="button" id="closeTypeBtn" class="btn btn-primary-outline btn-sm" ><?php echo Text::_('J2STORE_CLOSE');?></button>
-                <?php J2Html::text('product_id', $this->item->j2store_product_id ,array('id'=>'product_id'));?>
+                <?php J2Html::text('product_id', $this->item->j2store_product_id ,['id'=>'product_id']);?>
                 <button type="button" id="changeTypeBtn" class="btn btn-primary btn-sm"><?php echo Text::_('J2STORE_CONTINUE');?></button>
             </div>
 

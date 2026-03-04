@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 /*
  * --------------------------------------------------------------------------------
    Weblogicx India  - J2Store
@@ -19,7 +22,7 @@ use Joomla\CMS\Factory;
 
 $platform = J2Store::platform();
 $action = $platform->getCheckoutUrl();
-$ajax_base_url = JRoute::_('index.php');
+$ajax_base_url = Route::_('index.php');
 $app = Factory::getApplication();
 $active_menu = $app->getMenu()->getActive();
 
@@ -35,41 +38,41 @@ $page_heading_text = $page_heading->get('page_heading','');
 <?php echo J2Store::modules()->loadposition('j2store-checkout-top'); ?>
 <div id="j2store-checkout" class="j2store checkout">
 <div id="j2store-checkout-content">
-  <h1><?php echo JText::_('J2STORE_CHECKOUT'); ?></h1>
+  <h1><?php echo Text::_('J2STORE_CHECKOUT'); ?></h1>
 
     <div id="checkout">
-      <div class="checkout-heading"><?php echo JText::_('J2STORE_CHECKOUT_OPTIONS'); ?></div>
+      <div class="checkout-heading"><?php echo Text::_('J2STORE_CHECKOUT_OPTIONS'); ?></div>
       <div class="checkout-content"></div>
     </div>
     <?php if (!$this->logged) { ?>
     <div id="billing-address">
-      <div class="checkout-heading"><span><?php echo JText::_('J2STORE_CHECKOUT_ACCOUNT'); ?></span></div>
+      <div class="checkout-heading"><span><?php echo Text::_('J2STORE_CHECKOUT_ACCOUNT'); ?></span></div>
       <div class="checkout-content"></div>
     </div>
     <?php } else { ?>
     <div id="billing-address">
-      <div class="checkout-heading"><span><?php echo JText::_('J2STORE_CHECKOUT_BILLING_ADDRESS'); ?></span></div>
+      <div class="checkout-heading"><span><?php echo Text::_('J2STORE_CHECKOUT_BILLING_ADDRESS'); ?></span></div>
       <div class="checkout-content"></div>
     </div>
     <?php } ?>
     <?php if ($this->showShipping) { ?>
     <div id="shipping-address">
-      <div class="checkout-heading"><?php echo JText::_('J2STORE_CHECKOUT_SHIPPING_ADDRESS'); ?></div>
+      <div class="checkout-heading"><?php echo Text::_('J2STORE_CHECKOUT_SHIPPING_ADDRESS'); ?></div>
       <div class="checkout-content"></div>
     </div>
     <?php } ?>
     <div id="shipping-payment-method">
       <div class="checkout-heading">
       <?php if ($this->showShipping) : ?>
-      <?php echo JText::_('J2STORE_CHECKOUT_SHIPPING_PAYMENT_METHOD'); ?>
+      <?php echo Text::_('J2STORE_CHECKOUT_SHIPPING_PAYMENT_METHOD'); ?>
       <?php else: ?>
-      <?php echo JText::_('J2STORE_CHECKOUT_PAYMENT_METHOD'); ?>
+      <?php echo Text::_('J2STORE_CHECKOUT_PAYMENT_METHOD'); ?>
       <?php endif;?>
       </div>
       <div class="checkout-content"></div>
     </div>
     <div id="confirm">
-      <div class="checkout-heading"><?php echo JText::_('J2STORE_CHECKOUT_CONFIRM');; ?></div>
+      <div class="checkout-heading"><?php echo Text::_('J2STORE_CHECKOUT_CONFIRM');; ?></div>
       <div class="checkout-content"></div>
     </div>
   </div>
@@ -99,9 +102,9 @@ query['view']='checkout';
 (function($) {
 $(document).on('change', '#checkout .checkout-content input[name=\'account\']', function() {
 	if ($(this).attr('value') == 'register') {
-		$('#billing-address .checkout-heading span').html('<?php echo JText::_('J2STORE_CHECKOUT_ACCOUNT'); ?>');
+		$('#billing-address .checkout-heading span').html('<?php echo Text::_('J2STORE_CHECKOUT_ACCOUNT'); ?>');
 	} else {
-		$('#billing-address .checkout-heading span').html('<?php echo JText::_('J2STORE_CHECKOUT_BILLING_ADDRESS'); ?>');
+		$('#billing-address .checkout-heading span').html('<?php echo Text::_('J2STORE_CHECKOUT_BILLING_ADDRESS'); ?>');
 	}
 });
 })(j2store.jQuery);
@@ -119,7 +122,7 @@ $(document).on('click', '.checkout-heading a', function() {
 (function($) {
 
 $(document).ready(function() {
-	$('#billing-address .checkout-heading span').html('<?php echo JText::_('J2STORE_CHECKOUT_BILLING_ADDRESS'); ?>');
+	$('#billing-address .checkout-heading span').html('<?php echo Text::_('J2STORE_CHECKOUT_BILLING_ADDRESS'); ?>');
 	$('#checkout').hide();
 	$.ajax({
 	url: '<?php echo $ajax_base_url; ?>',
@@ -199,7 +202,7 @@ $(document).on('click', '#button-account', function() {
 		dataType: 'html',
 		beforeSend: function() {
 			$('#button-account').attr('disabled', true);
-			$('#button-account').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#button-account').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('#button-account').attr('disabled', false);
@@ -216,7 +219,7 @@ $(document).on('click', '#button-account', function() {
 
 			$('.checkout-heading a').remove();
 
-			$('#checkout .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+			$('#checkout .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 		},
 		error: function(xhr, ajaxOptions, thrownError) {
 			//alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -245,7 +248,7 @@ $(document).on('click', '#button-login', function() {
 		dataType: 'json',
 		beforeSend: function() {
 			$('#button-login').attr('disabled', true);
-			$('#button-login').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#button-login').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('#button-login').attr('disabled', false);
@@ -281,7 +284,7 @@ $(document).on('click', '#button-register', function() {
 		dataType: 'json',
 		beforeSend: function() {
 			$('#button-register').attr('disabled', true);
-			$('#button-register').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#button-register').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('#button-register').attr('disabled', false);
@@ -338,8 +341,8 @@ $(document).on('click', '#button-register', function() {
 							$('#shipping-payment-method .checkout-heading a').remove();
 							//$('#payment-method .checkout-heading a').remove();
 
-							$('#shipping-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
-							$('#billing-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+							$('#shipping-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+							$('#billing-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 							$(window).scrollTop(200);
 							$.ajax({
 								url: '<?php echo $ajax_base_url; ?>',
@@ -379,7 +382,7 @@ $(document).on('click', '#button-register', function() {
 							$('#shipping-payment-method .checkout-heading a').remove();
 							//$('#payment-method .checkout-heading a').remove();
 
-							$('#billing-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+							$('#billing-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 						},
 						error: function(xhr, ajaxOptions, thrownError) {
 							//alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -405,7 +408,7 @@ $(document).on('click', '#button-register', function() {
 						//$('#payment-method .checkout-heading a').remove();
 						$('#shipping-payment-method .checkout-heading a').remove();
 
-						$('#billing-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+						$('#billing-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 						$(window).scrollTop(200);
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
@@ -423,7 +426,7 @@ $(document).on('click', '#button-register', function() {
 					success: function(html) {
 						$('#billing-address .checkout-content').html(html);
 
-						$('#billing-address .checkout-heading span').html('<?php echo JText::_('J2STORE_BILLING_ADDRESS'); ?>');
+						$('#billing-address .checkout-heading span').html('<?php echo Text::_('J2STORE_BILLING_ADDRESS'); ?>');
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						//alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -449,7 +452,7 @@ $(document).on('click', '#button-billing-address', function() {
 		dataType: 'json',
 		beforeSend: function() {
 			$('#button-billing-address').attr('disabled', true);
-			$('#button-billing-address').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#button-billing-address').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('#button-billing-address').attr('disabled', false);
@@ -493,7 +496,7 @@ $(document).on('click', '#button-billing-address', function() {
 						$('#shipping-payment-method .checkout-heading a').remove();
 						//$('#payment-method .checkout-heading a').remove();
 
-						$('#billing-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+						$('#billing-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						//alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -516,7 +519,7 @@ $(document).on('click', '#button-billing-address', function() {
 						$('#billing-address .checkout-heading a').remove();
 						$('#shipping-payment-method .checkout-heading a').remove();
 
-						$('#billing-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+						$('#billing-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 						$(window).scrollTop(200);
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
@@ -558,7 +561,7 @@ $(document).on('click', '#button-shipping-address', function() {
 		dataType: 'json',
 		beforeSend: function() {
 			$('#button-shipping-address').attr('disabled', true);
-			$('#button-shipping-address').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#button-shipping-address').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('#button-shipping-address').attr('disabled', false);
@@ -599,7 +602,7 @@ $(document).on('click', '#button-shipping-address', function() {
 						$('#shipping-payment-method .checkout-heading a').remove();
 						//$('#payment-method .checkout-heading a').remove();
 
-						$('#shipping-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+						$('#shipping-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 						$(window).scrollTop(200);
 						$.ajax({
 							url: '<?php echo $ajax_base_url; ?>',
@@ -653,7 +656,7 @@ $(document).on('click', '#button-guest', function() {
 		dataType: 'json',
 		beforeSend: function() {
 			$('#button-guest').attr('disabled', true);
-			$('#button-guest').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#button-guest').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('#button-guest').attr('disabled', false);
@@ -699,8 +702,8 @@ $(document).on('click', '#button-guest', function() {
 							$('#shipping-address .checkout-heading a').remove();
 							$('#shipping-payment-method .checkout-heading a').remove();
 
-							$('#billing-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
-							$('#shipping-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+							$('#billing-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+							$('#shipping-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 							$(window).scrollTop(200);
 							$.ajax({
 								url: '<?php echo $ajax_base_url; ?>',
@@ -740,7 +743,7 @@ $(document).on('click', '#button-guest', function() {
 							$('#shipping-payment-method .checkout-heading a').remove();
 							//$('#payment-method .checkout-heading a').remove();
 
-							$('#billing-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+							$('#billing-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 						},
 						error: function(xhr, ajaxOptions, thrownError) {
 							//alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
@@ -764,7 +767,7 @@ $(document).on('click', '#button-guest', function() {
 						$('#billing-address .checkout-heading a').remove();
 						$('#shipping-payment-method .checkout-heading a').remove();
 
-						$('#billing-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+						$('#billing-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 						$(window).scrollTop(200);
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
@@ -792,7 +795,7 @@ $(document).on('click', '#button-guest-shipping', function() {
 		dataType: 'json',
 		beforeSend: function() {
 			$('#button-guest-shipping').attr('disabled', true);
-			$('#button-guest-shipping').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#button-guest-shipping').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('#button-guest-shipping').attr('disabled', false);
@@ -832,7 +835,7 @@ $(document).on('click', '#button-guest-shipping', function() {
 						$('#shipping-address .checkout-heading a').remove();
 						$('#shipping-payment-method .checkout-heading a').remove();
 
-						$('#shipping-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+						$('#shipping-address .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 						$(window).scrollTop(200);
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
@@ -859,7 +862,7 @@ $(document).on('click', '#button-payment-method', function() {
 		dataType: 'json',
 		beforeSend: function() {
 			$('#button-payment-method').attr('disabled', true);
-			$('#button-payment-method').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#button-payment-method').after('<span class="wait">&nbsp;<img src="<?php echo Uri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 
@@ -906,7 +909,7 @@ $(document).on('click', '#button-payment-method', function() {
 
 						$('#shipping-payment-method .checkout-heading a').remove();
 
-						$('#shipping-payment-method .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
+						$('#shipping-payment-method .checkout-heading').append('<a><?php echo Text::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						//alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
