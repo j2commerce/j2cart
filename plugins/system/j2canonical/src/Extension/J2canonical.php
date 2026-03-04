@@ -36,6 +36,13 @@ final class J2canonical extends CMSPlugin implements SubscriberInterface
     protected static $j2_products = [];
 
     /**
+     * The resolved canonical URL for the current page
+     *
+     * @var   string
+     */
+    protected $canonical = '';
+
+    /**
      * Load plugin language files automatically
      *
      * @var    boolean
@@ -51,7 +58,6 @@ final class J2canonical extends CMSPlugin implements SubscriberInterface
     {
         return [
             'onBeforeCompileHead' => 'onBeforeCompileHead',
-            'onAfterRoute'        => 'onAfterRoute',
         ];
     }
 
@@ -62,106 +68,88 @@ final class J2canonical extends CMSPlugin implements SubscriberInterface
             return;
         }
 
-        $option = $app->input->get('option');
-        $view   = $app->input->get('view');
-        $task   = $app->input->get('task');
+        $option  = $app->input->get('option');
+        $view    = $app->input->get('view');
+        $task    = $app->input->get('task');
+        $item_id = $app->input->get('Itemid', 0);
 
-        if($option == 'com_j2store' && in_array($view, array('products','producttags'))  && $task == 'view' && $this->canonical) {
-            $doc = $app->getDocument();
-
-            foreach ( $doc->_links as $k => $array ) {
-                if ( $array['relation'] == 'canonical' ) {
-                    unset($doc->_links[$k]);
-                }
-            }
-            if(!empty($this->canonical)){
-                $doc->addHeadLink(htmlspecialchars($this->canonical), 'canonical');
-            }
-        }
-    }
-
-    public function onAfterRoute()
-    {
-        // Get the application object
-        $app = $this->getApplication();
-        if ($app->isClient('administrator')) {
+        if ($option !== 'com_j2store' || !in_array($view, array('products', 'producttags')) || $task !== 'view') {
             return;
         }
 
-        $fof_helper = \J2Store::fof();
-        $option = $app->input->get('option');
-        $view = $app->input->get('view');
-        $task = $app->input->get('task');
-        $item_id = $app->input->get('Itemid',0);
-
-        if($option == 'com_j2store' && in_array($view, array('products','producttags')) && $task == 'view' && $item_id) {
-
-            //get the product id
+        // Build the canonical URL
+        if ($item_id) {
+            $fof_helper    = \J2Store::fof();
             $j2_product_id = $app->input->getInt('id');
-            $menu = $app->getMenu();
-            //current menu item
-            $current_item = $menu->getItem( $item_id );
-            $menu_params = $current_item->getParams();
-            $canonical_menu = $menu_params->get('canonical_menu',0);
-            //canonical menu form current menu
+            $menu          = $app->getMenu();
+            $current_item  = $menu->getItem($item_id);
+            $menu_params   = $current_item->getParams();
+            $canonical_menu = $menu_params->get('canonical_menu', 0);
+
             $canonical_item = '';
-            if($canonical_menu > 0){
-                $canonical_item = $menu->getItem( $canonical_menu );
+            if ($canonical_menu > 0) {
+                $canonical_item = $menu->getItem($canonical_menu);
             }
 
-            //find the article id
-            $j2prod = $fof_helper->loadTable('Products','J2StoreTable');
+            $j2prod = $fof_helper->loadTable('Products', 'J2StoreTable');
             $j2prod->load($j2_product_id);
-            if($j2prod->j2store_product_id == $j2_product_id){
-                $url = '';
-                $current_url_canonical = $this->params->get('current_url_canonical',1);
-                if($view == 'products'){
-                    $cat_ids = $this->getProductCatId($j2prod->j2store_product_id);
-                    // for multi category
-                    if($cat_ids){
-                        $cat_ids = explode(',',$cat_ids);
-                    } else {
-                        $cat_ids = array(); // Empty array when $cat_ids is 0 or empty
-                    }
 
-                    if(empty($canonical_item) && $current_url_canonical){
-                        $url = 'index.php?option=com_j2store&view=products&task=view&id='.$j2prod->j2store_product_id.'&Itemid='.$current_item->id;
-                    }elseif (!empty($canonical_item)){
-                        if(isset($canonical_item->query['catid']) && !empty($canonical_item->query['catid'])){
-                            foreach ($cat_ids as $key=>$catid){
-                                if(in_array($catid,$canonical_item->query['catid'])){
-                                    $url = 'index.php?option=com_j2store&view=products&task=view&id='.$j2prod->j2store_product_id.'&Itemid='.$canonical_item->id;
+            if ($j2prod->j2store_product_id == $j2_product_id) {
+                $url = '';
+                $current_url_canonical = $this->params->get('current_url_canonical', 1);
+
+                if ($view == 'products') {
+                    $cat_ids = $this->getProductCatId($j2prod->j2store_product_id);
+                    $cat_ids = $cat_ids ? explode(',', $cat_ids) : array();
+
+                    if (empty($canonical_item) && $current_url_canonical) {
+                        $url = 'index.php?option=com_j2store&view=products&task=view&id=' . $j2prod->j2store_product_id . '&Itemid=' . $current_item->id;
+                    } elseif (!empty($canonical_item)) {
+                        if (isset($canonical_item->query['catid']) && !empty($canonical_item->query['catid'])) {
+                            foreach ($cat_ids as $catid) {
+                                if (in_array($catid, $canonical_item->query['catid'])) {
+                                    $url = 'index.php?option=com_j2store&view=products&task=view&id=' . $j2prod->j2store_product_id . '&Itemid=' . $canonical_item->id;
                                     break;
                                 }
                             }
                         }
-                        if (empty($url) && $current_url_canonical){
-                            $url = 'index.php?option=com_j2store&view=products&task=view&id='.$j2prod->j2store_product_id.'&Itemid='.$current_item->id;
+                        if (empty($url) && $current_url_canonical) {
+                            $url = 'index.php?option=com_j2store&view=products&task=view&id=' . $j2prod->j2store_product_id . '&Itemid=' . $current_item->id;
                         }
                     }
 
-                }elseif ($view == 'producttags'){
+                } elseif ($view == 'producttags') {
+                    $tag_list = $this->getProductTags($j2prod->product_source_id, $j2prod->product_source);
 
-                    $tag_list = $this->getProductTags($j2prod->product_source_id,$j2prod->product_source);
-
-                    if(empty($canonical_item) && $current_url_canonical){
-                        $url = 'index.php?option=com_j2store&view=producttags&task=view&id='.$j2prod->j2store_product_id.'&Itemid='.$current_item->id;
-                    }elseif (!empty($canonical_item)){
-                        if(isset($canonical_item->query['tag']) && !empty($canonical_item->query['tag'])){
-                            if(in_array($canonical_item->query['tag'],$tag_list)){
-                                $url = 'index.php?option=com_j2store&view=producttags&task=view&id='.$j2prod->j2store_product_id.'&Itemid='.$canonical_item->id;
+                    if (empty($canonical_item) && $current_url_canonical) {
+                        $url = 'index.php?option=com_j2store&view=producttags&task=view&id=' . $j2prod->j2store_product_id . '&Itemid=' . $current_item->id;
+                    } elseif (!empty($canonical_item)) {
+                        if (isset($canonical_item->query['tag']) && !empty($canonical_item->query['tag'])) {
+                            if (in_array($canonical_item->query['tag'], $tag_list)) {
+                                $url = 'index.php?option=com_j2store&view=producttags&task=view&id=' . $j2prod->j2store_product_id . '&Itemid=' . $canonical_item->id;
                             }
                         }
-                    }
-                    if (empty($url) && $current_url_canonical){
-                        $url = 'index.php?option=com_j2store&view=producttags&task=view&id='.$j2prod->j2store_product_id.'&Itemid='.$current_item->id;
+                        if (empty($url) && $current_url_canonical) {
+                            $url = 'index.php?option=com_j2store&view=producttags&task=view&id=' . $j2prod->j2store_product_id . '&Itemid=' . $current_item->id;
+                        }
                     }
                 }
 
-                if ( !empty($url) ) {
-                    $this->canonical = Route::_($url, true, Route::TLS_IGNORE, true); // automatically returns the full path
+                if (!empty($url)) {
+                    $this->canonical = Route::_($url, true, Route::TLS_IGNORE, true);
                 }
             }
+        }
+
+        // Apply canonical to document
+        if (!empty($this->canonical)) {
+            $doc = $app->getDocument();
+            foreach ($doc->_links as $k => $array) {
+                if ($array['relation'] == 'canonical') {
+                    unset($doc->_links[$k]);
+                }
+            }
+            $doc->addHeadLink(htmlspecialchars($this->canonical), 'canonical');
         }
     }
 
