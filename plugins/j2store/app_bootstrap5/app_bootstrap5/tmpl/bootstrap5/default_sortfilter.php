@@ -33,7 +33,7 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 		echo J2Html::select()->clearState()
 					->type('genericlist')
 					->name('sortby')
-					->attribs(array('class'=>'input','onchange'=>'jQuery(this.form).submit()','id'=>'j2store_sortby'))
+					->attribs(array('class'=>'input','onchange'=>'jQuery(this.form).submit()'))
 					->value($this->state->sortby)
 					->setPlaceHolders($this->filters['sorting'])->getHtml();
 			?>

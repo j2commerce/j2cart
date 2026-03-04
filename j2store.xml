@@ -2,7 +2,7 @@
 <extension type="component" method="upgrade">
 	<name>J2Store</name>
 	<author>Adam Melcher, Olivier Buisard, Ramesh Elamathi</author>
-	<creationDate>FEB 2026</creationDate>
+	<creationDate>MAR 2026</creationDate>
 	<copyright>Copyright (c) 2024 J2Commerce. All rights reserved.</copyright>
 	<authorEmail>support@j2commerce.com</authorEmail>
 	<authorUrl>https://j2commerce.com</authorUrl>

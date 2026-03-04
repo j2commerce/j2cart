@@ -172,37 +172,38 @@ class J2StorePlatform
         }
     }
 
-    public function addScript($asset, $uri ,$options = [], $attributes = [], $dependencies = [])
+    /**
+     * Resolve a URI to the format expected by the Joomla Web Asset Manager.
+     *
+     * When $relative is true, the URI is treated as a site-root-relative path
+     * (e.g. 'media/j2store/css/j2store.css') and returned as-is.
+     * When false, it is normalised to an absolute URL.
+     */
+    private function resolveUri(string $uri, bool $relative): string
     {
-        if (isset($options['relative']) && $options['relative']) {
-            $url = ltrim($uri, '/'); // relative path
-        } else {
-            $root = JURI::root();
-            // Check if $uri already contains the full root URL (e.g., http://example.com/)
-            if (strpos($uri, $root) === 0 || strpos($uri, 'http://') === 0 || strpos($uri, 'https://') === 0) {
-                $url = $uri; // already a full URL, use as-is
-            } else {
-                $url = $root . ltrim($uri, '/'); // prepend root
-            }
+        if ($relative) {
+            return ltrim($uri, '/');
         }
-        $wa = $this->application()->getDocument()->getWebAssetManager();
+
+        $root = Uri::root();
+        if (strpos($uri, $root) === 0 || strpos($uri, 'http://') === 0 || strpos($uri, 'https://') === 0) {
+            return $uri;
+        }
+
+        return $root . ltrim($uri, '/');
+    }
+
+    public function addScript($asset, $uri, $options = [], $attributes = [], $dependencies = [])
+    {
+        $url = $this->resolveUri($uri, !empty($options['relative']));
+        $wa  = $this->application()->getDocument()->getWebAssetManager();
         $wa->registerAndUseScript($asset, $url, $options, $attributes, $dependencies);
     }
 
-    public function addStyle($asset, $uri ,$options = [], $attributes = [], $dependencies = [])
+    public function addStyle($asset, $uri, $options = [], $attributes = [], $dependencies = [])
     {
-        if (isset($options['relative']) && $options['relative']) {
-            $url = ltrim($uri, '/'); // relative path
-        } else {
-            $root = JURI::root();
-            // Check if $uri already contains the full root URL (e.g., http://example.com/)
-            if (strpos($uri, $root) === 0 || strpos($uri, 'http://') === 0 || strpos($uri, 'https://') === 0) {
-                $url = $uri; // already a full URL, use as-is
-            } else {
-                $url = $root . ltrim($uri, '/'); // prepend root
-            }
-        }
-        $wa = $this->application()->getDocument()->getWebAssetManager();
+        $url = $this->resolveUri($uri, !empty($options['relative']));
+        $wa  = $this->application()->getDocument()->getWebAssetManager();
         $wa->registerAndUseStyle($asset, $url, $options, $attributes, $dependencies);
     }
 

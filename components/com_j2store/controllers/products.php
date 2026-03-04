@@ -166,7 +166,7 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
                 'base_path',
             ];
 
-            $pass_it_on = $this->input->getArray($_GET);
+            $pass_it_on = $app->input->getArray();
 
             // Remove excluded system parameters
             foreach($excluded_params as $param) {

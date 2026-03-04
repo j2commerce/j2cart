@@ -147,13 +147,14 @@ class J2StoreStrapper
         } else {
             J2Store::strapper()->addFontAwesome();
             // Add related CSS to the <head>
-            if ($app->getDocument()->getType() === 'html' && $j2storeparams->get('j2store_enable_css', 1)) {
+            $doc = $app->getDocument(); // can be null under cli/tasks contexts
+            if ($doc !== null && $doc->getType() === 'html' && $j2storeparams->get('j2store_enable_css', 1)) {
                 $template = self::getDefaultTemplate();
-                // j2store.css
-                if (file_exists(JPATH_SITE . '/templates/' . $template . '/css/j2store.css')){
-                    $platform->addStyle('j2store-css', 'templates/' . $template . '/css/j2store.css');
-                } elseif (file_exists(JPATH_SITE . '/media/templates/site/' . $template . '/css/j2store.css')) {
-                    $platform->addStyle('j2store-css', 'media/templates/site/' . $template . '/css/j2store.css');
+                // j2store.css — check media/templates/site/ first (Joomla 6+), then legacy /templates/ (Joomla 4/5)
+                if (file_exists(JPATH_SITE . '/media/templates/site/' . $template . '/css/j2store.css')) {
+                    $platform->addStyle('j2store-css', 'media/templates/site/' . $template . '/css/j2store.css', ['relative' => true, 'version' => 'auto']);
+                } elseif (file_exists(JPATH_SITE . '/templates/' . $template . '/css/j2store.css')) {
+                    $platform->addStyle('j2store-css', 'templates/' . $template . '/css/j2store.css', ['relative' => true, 'version' => 'auto']);
                 } else {
                     $platform->addStyle('j2store-css', 'j2store/j2store.css', ['relative' => true, 'version' => 'auto']);
                 }
@@ -390,14 +391,14 @@ class J2StoreStrapper
 
     public function addFontAwesome()
     {
-        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
         $config = J2Store::config();
 
         if ($config->get('load_fontawesome_ui', 1)) {
+            $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
             if ($wa->assetExists('style', 'fontawesome')) {
                 $wa->useStyle('fontawesome');
             } else {
-                $wa->registerAndUseStyle('fontawesome', 'j2store/font-awesome.min.css', ['relative' => true, 'version' => 'auto']);
+                J2Store::platform()->addStyle('fontawesome', 'j2store/font-awesome.min.css', ['relative' => true, 'version' => 'auto']);
             }
         }
     }
