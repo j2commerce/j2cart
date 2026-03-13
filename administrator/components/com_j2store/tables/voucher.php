@@ -9,6 +9,31 @@ defined('_JEXEC') or die;
 
 class J2storeTableVoucher extends F0FTable
 {
+    /**
+     * Override store method to ensure NULL values are stored in database
+     * instead of '0000-00-00 00:00:00'
+     *
+     * @param   boolean  $updateNulls  True to update fields even if they are null
+     *
+     * @return  boolean  True on success
+     */
+    public function store($updateNulls = false)
+    {
+        $db = $this->getDbo();
+        $nullDate = $db->getNullDate();
+
+        // Convert '0000-00-00 00:00:00' to null before storing
+        if (isset($this->valid_from) && ($this->valid_from === $nullDate || $this->valid_from === '0000-00-00 00:00:00' || empty($this->valid_from))) {
+            $this->valid_from = null;
+        }
+        if (isset($this->valid_to) && ($this->valid_to === $nullDate || $this->valid_to === '0000-00-00 00:00:00' || empty($this->valid_to))) {
+            $this->valid_to = null;
+        }
+
+        // Force update nulls to true so NULL values are actually stored
+        return parent::store(true);
+    }
+
 	/**
 	 * Copy (duplicate) one or more records
 	 *
