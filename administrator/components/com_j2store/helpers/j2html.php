@@ -925,26 +925,26 @@ class J2Html
             $config->saveOne ( 'queue_key', $queue_key );
         }
 
-        $html = "";
-        $html .= "<div class=\"alert alert-block alert-info\"><strong id=\"j2store_queue_key\">".$queue_key."</strong><a onclick=\"regenerateQueueKey()\" class=\"btn btn-primary btn-sm text-white ms-3\"><i class=\"fas fa-solid fa-redo me-2\"></i>".Text::_ ( "J2STORE_STORE_REGENERATE" )."</a>
-        <script>
-        function regenerateQueueKey(){
-            fetch('".$url."', {
-                method: 'GET',
-                cache: 'no-cache'
-            })
-            .then(response => response.json())
-            .then(json => {
-                if (json && json['queue_key']) {
-                    document.getElementById('j2store_queue_key').innerHTML = json['queue_key'];
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-        </script>
-        <input type=\"hidden\" name=\"".$name."\" value=\"".$queue_key."\"/>
+        $html = "<div class=\"alert alert-block alert-info\">
+            <strong id=\"j2store_queue_key\">" . $queue_key . "</strong><a onclick=\"regenerateQueueKey()\" class=\"btn btn-primary btn-sm text-white ms-3\"><i class=\"fas fa-solid fa-redo me-2\"></i>" . Text::_ ('J2STORE_STORE_REGENERATE') . "</a>
+            <script>
+            function regenerateQueueKey(){
+                fetch('" . $url. "', {
+                    method: 'GET',
+                    cache: 'no-cache'
+                })
+                .then(response => response.json())
+                .then(json => {
+                    if (json && json['queue_key']) {
+                        document.getElementById('j2store_queue_key').innerHTML = json['queue_key'];
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+            </script>
+            <input type=\"hidden\" name=\"" . $name . "\" value=\"" . $queue_key . "\"/>
         </div>";
         return  $html;
     }
@@ -1370,12 +1370,10 @@ class J2Html
         $wa->useScript('field.modal-fields');
 
         // Script to proxy the select modal function to the modal-fields.js file.
-        if ($allowSelect)
-        {
+        if ($allowSelect) {
             static $scriptSelect = null;
 
-            if (is_null($scriptSelect))
-            {
+            if (is_null($scriptSelect)) {
                 $scriptSelect = [];
             }
 
@@ -1399,8 +1397,7 @@ class J2Html
         // Setup variables for display.
         $linkArticles = 'index.php?option=com_content&amp;view=articles&amp;layout=modal&amp;tmpl=component&amp;' . Session::getFormToken() . '=1';
         $urlSelect = $linkArticles . '&amp;function=jSelectJ2Article_' . $id;
-        if ($value)
-        {
+        if ($value) {
             $db = Factory::getContainer()->get('DatabaseDriver');
 
             $query = $db->getQuery(true)
@@ -1410,12 +1407,9 @@ class J2Html
                 ->bind(':value', $value);
             $db->setQuery($query);
 
-            try
-            {
+            try {
                 $title = $db->loadResult();
-            }
-            catch (\RuntimeException $e)
-            {
+            } catch (\RuntimeException $e) {
                 Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
             }
         }
@@ -1425,8 +1419,7 @@ class J2Html
         $html = '<span class="input-group">';
         $html .= '<input class="form-control" id="' . $id . '_name" type="text" value="' . $title . '" readonly size="35">';
 
-        if ($allowSelect)
-        {
+        if ($allowSelect) {
             $html .= '<button'
                 . ' class="btn btn-primary' . ($value ? ' hidden' : '') . '"'
                 . ' id="' . $id . '_select"'
@@ -1436,9 +1429,9 @@ class J2Html
                 . '<span class="icon-file" aria-hidden="true"></span> ' . Text::_('JSELECT')
                 . '</button>';
         }
+
         // Clear article button
-        if ($allowClear)
-        {
+        if ($allowClear) {
             $html .= '<button'
                 . ' class="btn btn-secondary' . ($value ? '' : ' hidden') . '"'
                 . ' id="' . $id . '_clear"'
@@ -1450,9 +1443,9 @@ class J2Html
 
         $html .= '</span>';
         $modalTitle    = Text::_('COM_CONTENT_SELECT_AN_ARTICLE');
+
         // Select article modal
-        if ($allowSelect)
-        {
+        if ($allowSelect) {
             $html .= HTMLHelper::_(
                 'bootstrap.renderModal',
                 'ModalSelect' . $modalId,
