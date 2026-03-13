@@ -15,6 +15,44 @@ class J2StoreModelCoupons extends F0FModel {
 	protected function onBeforeSave(&$data, &$table) {
         $status = true ;
         $db = JFactory::getDbo();
+        $nullDate = $db->getNullDate();
+
+        // Convert empty date strings and '0000-00-00 00:00:00' to PHP null for database NULL storage
+        // Also convert valid dates to proper MySQL format
+        if (!isset($data['valid_from']) || empty(trim($data['valid_from'])) || trim($data['valid_from']) === $nullDate) {
+            $data['valid_from'] = null;
+            // Set the table property directly to ensure NULL is stored
+            $table->valid_from = null;
+        } else {
+            // Convert the date to MySQL format, handling timezone conversion
+            try {
+                $date = JFactory::getDate($data['valid_from']);
+                $data['valid_from'] = $date->toSql();
+                $table->valid_from = $data['valid_from'];
+            } catch (Exception $e) {
+                // If date conversion fails, set to null
+                $data['valid_from'] = null;
+                $table->valid_from = null;
+        }
+        }
+
+        if (!isset($data['valid_to']) || empty(trim($data['valid_to'])) || trim($data['valid_to']) === $nullDate) {
+            $data['valid_to'] = null;
+            // Set the table property directly to ensure NULL is stored
+            $table->valid_to = null;
+        } else {
+            // Convert the date to MySQL format, handling timezone conversion
+            try {
+                $date = JFactory::getDate($data['valid_to']);
+                $data['valid_to'] = $date->toSql();
+                $table->valid_to = $data['valid_to'];
+            } catch (Exception $e) {
+                // If date conversion fails, set to null
+                $data['valid_to'] = null;
+                $table->valid_to = null;
+            }
+        }
+
         $query = $db->getQuery(true)
             ->select($db->qn(array('coupon_code')))
             ->from($db->qn('#__j2store_coupons'))
@@ -32,15 +70,15 @@ class J2StoreModelCoupons extends F0FModel {
             $status = false;
         }
 
-        if( isset($data['valid_from']) && ($data['valid_from'] != '0000-00-00 00:00:00') && isset($data['valid_to']) && ($data['valid_to'] != '0000-00-00 00:00:00') && ($data['valid_from'] >= $data['valid_to'] )){
+        if( isset($data['valid_from']) && ($data['valid_from'] !== null) && isset($data['valid_to']) && ($data['valid_to'] !== null) && ($data['valid_from'] >= $data['valid_to'] )){
               $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
               $status = false;
         }
 
-        if( ($data['valid_to'] != '0000-00-00 00:00:00' && $data['valid_from'] == '0000-00-00 00:00:00' )){
-            $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
-            $status = false;
-        }
+//        if( ($data['valid_to'] !== $nullDate && $data['valid_from'] === $nullDate )){
+//            $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
+//            $status = false;
+//        }
 
 		if(isset($data['products']) && !empty($data['products'])){
             if(is_string($data['products'])){
@@ -83,6 +121,17 @@ class J2StoreModelCoupons extends F0FModel {
 
 	protected function onAfterGetItem(&$record)
 	{
+        $db = JFactory::getDbo();
+        $nullDate = $db->getNullDate();
+
+        // Convert null dates to empty strings so calendar fields show as empty
+        if (isset($record->valid_from) && ($record->valid_from === $nullDate || $record->valid_from === null)) {
+            $record->valid_from = '';
+        }
+        if (isset($record->valid_to) && ($record->valid_to === $nullDate || $record->valid_to === null)) {
+            $record->valid_to = '';
+        }
+
 		$record->product_category = explode(',',$record->product_category);
 		$record->brand_ids = explode(',',$record->brand_ids);
 		$record->user_group = explode(',',$record->user_group);

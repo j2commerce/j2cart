@@ -39,6 +39,56 @@ class J2StoreModelVouchers extends F0FModel {
 		return $status;
 	}
 
+    protected function onBeforeSave(&$data, &$table)
+    {
+        $status = true ;
+        $db = JFactory::getDbo();
+        $nullDate = $db->getNullDate();
+
+        // Convert empty date strings and '0000-00-00 00:00:00' to PHP null for database NULL storage
+        // Also convert valid dates to proper MySQL format
+        if (!isset($data['valid_from']) || empty(trim($data['valid_from'])) || trim($data['valid_from']) === $nullDate) {
+            $data['valid_from'] = null;
+            // Set the table property directly to ensure NULL is stored
+            $table->valid_from = null;
+        } else {
+            // Convert the date to MySQL format, handling timezone conversion
+            try {
+                $date = JFactory::getDate($data['valid_from']);
+                $data['valid_from'] = $date->toSql();
+                $table->valid_from = $data['valid_from'];
+            } catch (Exception $e) {
+                // If date conversion fails, set to null
+                $data['valid_from'] = null;
+                $table->valid_from = null;
+            }
+        }
+
+        if (!isset($data['valid_to']) || empty(trim($data['valid_to'])) || trim($data['valid_to']) === $nullDate) {
+            $data['valid_to'] = null;
+            // Set the table property directly to ensure NULL is stored
+            $table->valid_to = null;
+        } else {
+            // Convert the date to MySQL format, handling timezone conversion
+            try {
+                $date = JFactory::getDate($data['valid_to']);
+                $data['valid_to'] = $date->toSql();
+                $table->valid_to = $data['valid_to'];
+            } catch (Exception $e) {
+                // If date conversion fails, set to null
+                $data['valid_to'] = null;
+                $table->valid_to = null;
+            }
+        }
+
+        if( isset($data['valid_from']) && ($data['valid_from'] !== null) && isset($data['valid_to']) && ($data['valid_to'] !== null) && ($data['valid_from'] >= $data['valid_to'] )){
+            $this->setError(JText::_("J2STORE_VOUCHER_VALID_FORM_DATE_NEED_TO_GREATER_THAN_VOUCHER_VALID_TO_DATE"));
+            $status = false;
+        }
+
+        return $status;
+    }
+
 	public function get_voucher_history($voucher_id) {
 
 		if(!isset($this->history[$voucher_id])) {
