@@ -4,26 +4,38 @@
  * @subpackage  J2Store
  *
  * @copyright Copyright (C) 2014-24 Ramesh Elamathi / J2Store.org
- * @copyright Copyright (C) 2025 J2Commerce, LLC. All rights reserved.
+ * @copyright Copyright (C) 2024-26 J2Commerce, LLC. All rights reserved.
  * @license https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later
  * @website https://www.j2commerce.com
  */
 
-defined('_JEXEC') or die ();
+defined('_JEXEC') or die;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Form\Field\CalendarField;
+use Joomla\CMS\Form\Field\UserField;
+use Joomla\CMS\Form\FormHelper;
+use Joomla\CMS\HTML\Helpers\Select;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\LanguageHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\FileLayout;
 use Joomla\CMS\Object\CMSObject;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\User\UserFactory;
+use Joomla\Filesystem\Folder;
+use Joomla\Filesystem\Path;
+use Joomla\Registry\Registry;
 
 /**
  * J2Html class provides Form Inputs
  */
 class J2Html
 {
-
-    public static function label($text, $name = '', $options = array())
+    public static function label($text, $name = '', $options = [])
     {
         $options['class'] = isset($options['label_class']) ? $options['label_class'] : (isset($options['class']) ? $options['class'] : "");
         $options['for'] = isset($options['for']) ? $options['for'] : $name;
@@ -40,20 +52,18 @@ class J2Html
      * @param array $options
      * @return string
      */
-	public static function text($name, $value = null, $options = [])
-	{
-		// Check for 'integer' type and sanitize $value if needed
-		$fieldType = $options['field_type'] ?? '';
-		if ($fieldType === 'integer') {
-			$value = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|', '+', '-'], '', $value);
-		}
+    public static function text($name, $value = null, $options = [])
+    {
+        // Check for 'integer' type and sanitize $value if needed
+        $fieldType = $options['field_type'] ?? '';
+        if ($fieldType === 'integer') {
+            $value = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|', '+', '-'], '', $value);
+        }
 
-		return self::input('text', $name, $value, $options);
-	}
+        return self::input('text', $name, $value, $options);
+    }
 
-
-
-	/**
+    /**
      * Create a price input field.
      *
      * @param string $name
@@ -62,7 +72,7 @@ class J2Html
      * @param array $options
      * @return string
      */
-    public static function price($name, $value = null, $options = array())
+    public static function price($name, $value = null, $options = [])
     {
         $optionvalue = J2Store::platform()->toString($options);
         $symbol = J2Store::currency()->getSymbol();
@@ -76,10 +86,9 @@ class J2Html
         }
         $html .= '<input type="text" name="' . $name . '" value="' . $value . '"  ' . $optionvalue . '    />';
         $html .= '</div>';
-        J2Store::plugin()->event('PriceInput', array($name, $value, $options, &$html));
+        J2Store::plugin()->event('PriceInput', [$name, $value, $options, &$html]);
         return $html;
     }
-
 
     /**
      * Create a price input field with dynamic data
@@ -97,41 +106,18 @@ class J2Html
         }
         $html .= '<input type="text" name="' . $prefix . $name . '" value="' . $value . '"  ' . $optionvalue . '    />';
         $html .= '</div>';
-        J2Store::plugin()->event('PriceInputWithData', array($prefix, $primary_key, $name, $value, $options, &$html, $data));
+        J2Store::plugin()->event('PriceInputWithData', [$prefix, $primary_key, $name, $value, $options, &$html, $data]);
         return $html;
     }
 
-
-    /**
-     * Creates Checkbox list field
-     * @param string $value
-     * @param array $data
-     * @param array $options
-     * @result html with list of checkbox
-     */
-    /* public static function checkboxList($value,$data,$options=array()){
-        $html ='';
-        $html .= '<div class="controls">';
-        foreach($data as $key =>$value){
-            $options['id'] = isset($options['id']) ? $options['id'].'_'.$key : $key;
-            $optionvalue = self::attributes($options);
-            $html .= '<label class="control-label" for="j2store_input-'.$key.'">';
-            $html .='<input type="checkbox" '.$optionvalue.'  value="'.$value.'"     />';
-            $html .= $value;
-            $html .='</label>';
-        }
-        $html .='</div>';
-    return $html;
-    } */
-
     /**
      * Creates a single checkbox element
-     * @param stringe $name
+     * @param string $name
      * @param unknown_type $value
      * @param array $options
      * @result html
      */
-    public static function checkbox($name, $value = null, $options = array())
+    public static function checkbox($name, $value = null, $options = [])
     {
         return self::input('checkbox', $name, $value, $options);
     }
@@ -143,7 +129,7 @@ class J2Html
      * @param array $options
      * @return string
      */
-    public static function textarea($name, $value, $options = array())
+    public static function textarea($name, $value, $options = [])
     {
         return self::input('textarea', $name, $value, $options);
     }
@@ -152,9 +138,9 @@ class J2Html
      * Create a File Field
      * @param string $name
      * @param string $value
-     * @param arrat() $options
+     * @param array() $options
      */
-    public static function file($name, $value, $options = array())
+    public static function file($name, $value, $options = [])
     {
         return self::input('file', $name, $value, $options);
     }
@@ -166,31 +152,15 @@ class J2Html
      * @param array $options
      * @result options
      */
-    public static function email($name, $value, $options = array())
+    public static function email($name, $value, $options = [])
     {
         return self::input('email', $name, $value, $options);
     }
-
-    /**
-     * Create a select box field.
-     *
-     * @param string $type The type of the select field
-     * @param string $name
-     * @param array $list
-     * @param string $selected
-     * @param array $options
-     * @return string
-     */
-    /* public static function select($type, $name , $value, $id='', $options=array(), $relations=array(), $placeholder=array()){
-        return J2Select::select($type, $name, $value, $id='', $options, $relations, $placeholder);
-    } */
-
 
     public static function select()
     {
         return new J2Select();
     }
-
 
     /**
      * Creates a radio field
@@ -199,29 +169,29 @@ class J2Html
      * @param array $options
      * @result html
      */
-    public static function radio($name, $value, $options = array())
+    public static function radio($name, $value, $options = [])
     {
         return self::input('radio', $name, $value, $options);
     }
 
-	/**
-	 * Creates an inline radio field
-	 * @param string $name
-	 * @param string $value
-	 * @param array $options
-	 * @result html
-	 */
-	public static function inlineRadio($name, $value = '', $options = [])
-	{
-		$html = '';
-		$id = $options['id'] ?? $name;
+    /**
+     * Creates an inline radio field
+     * @param string $name
+     * @param string $value
+     * @param array $options
+     * @result html
+     */
+    public static function inlineRadio($name, $value = '', $options = [])
+    {
+        $html = '';
+        $id = $options['id'] ?? $name;
 
-		// Use HTMLHelper to generate the boolean list with localized labels for yes/no
-		$attribs = [];
-		$html .= HTMLHelper::_('select.booleanlist', $name, $attribs, $value, Text::_('JYES'), Text::_('JNO'), $id);
+        // Use HTMLHelper to generate the boolean list with localized labels for yes/no
+        $attribs = [];
+        $html .= HTMLHelper::_('select.booleanlist', $name, $attribs, $value, Text::_('JYES'), Text::_('JNO'), $id);
 
-		return $html;
-	}
+        return $html;
+    }
 
     /**
      * Creates a radio boolean  field
@@ -230,19 +200,17 @@ class J2Html
      * @param array $options
      * @result html
      */
-	public static function radioBooleanList($name, $value = '', $options = [])
-	{
-		$html = '';
-		$id = $options['id'] ?? $name;
+    public static function radioBooleanList($name, $value = '', $options = [])
+    {
+        $html = '';
+        $id = $options['id'] ?? $name;
 
-		// Use HTMLHelper to generate the boolean list with localized labels for yes/no
-		$attribs = [];
-		$html .= HTMLHelper::_('select.booleanlist', $name, $attribs, $value, Text::_('JYES'), Text::_('JNO'), $id);
+        // Use HTMLHelper to generate the boolean list with localized labels for yes/no
+        $attribs = [];
+        $html .= HTMLHelper::_('select.booleanlist', $name, $attribs, $value, Text::_('JYES'), Text::_('JNO'), $id);
 
-		return $html;
-	}
-
-
+        return $html;
+    }
 
     /**
      * Create a hidden field
@@ -250,7 +218,7 @@ class J2Html
      * @param string $value
      * @param array $options
      */
-    public static function hidden($name, $value, $options = array())
+    public static function hidden($name, $value, $options = [])
     {
         return self::input('hidden', $name, $value, $options);
     }
@@ -261,21 +229,21 @@ class J2Html
      * @param string $value
      * @param array $options
      */
-    public static function button($name, $value, $options = array())
+    public static function button($name, $value, $options = [])
     {
         return self::input('button', $name, $value, $options);
     }
 
-	/**
-	 * Create a button type field
-	 * @param string $name
-	 * @param string $value
-	 * @param array $options
-	 */
-	public static function buttontype($name, $value, $options = array())
-	{
-		return self::input('buttontype', $name, $value, $options);
-	}
+    /**
+     * Create a button type field
+     * @param string $name
+     * @param string $value
+     * @param array $options
+     */
+    public static function buttontype($name, $value, $options = [])
+    {
+        return self::input('buttontype', $name, $value, $options);
+    }
 
     /**
      * Creates Media field
@@ -284,176 +252,75 @@ class J2Html
      * @param string $value
      * @param array $options
      */
-    public static function media($name, $value = '', $options = array())
+    public static function media($name, $value = '', $options = [])
     {
         $platform = J2Store::platform();
-        $config = JFactory::getConfig();
+        $config = Factory::getApplication()->getConfig();
         $asset_id = $config->get('asset_id');
         //to overcome Permission access Issues to media
         //@front end
         if (J2Store::platform()->isClient('site')) {
-            $asset_id = JFactory::getConfig('com_content')->get('asset_id');
+            $asset_id = Factory::getApplication()->getConfig('com_content')->get('asset_id');
         }
 
         $id = isset($options['id']) ? $options['id'] : $name;
         $hide_class = isset($options['no_hide']) ? $options['no_hide'] : 'hide';
         $image_id = isset($options['image_id']) ? $options['image_id'] : 'img' . $id;
         $class = isset($options['class']) ? $options['class'] : '';
-        $empty_image = JUri::root() . 'media/j2store/images/common/no_image-100x100.jpg';
-        $image = JUri::root();
-        jimport('joomla.filesystem.file');
+        $empty_image = Uri::root() . 'media/j2store/images/common/no_image-100x100.jpg';
+        $image = Uri::root();
         $imgvalue = (isset($value) && !empty($value)) ? $value : 'media/j2store/images/common/no_image-100x100.jpg';
 
-        if ($value && file_exists(JPATH_ROOT . '/' . $value)) {
+        if ($value && is_file(JPATH_ROOT . '/' . $value)) {
             $folder = explode('/', $value);
-            $folder = array_diff_assoc($folder, explode('/', JComponentHelper::getParams('com_media')->get('image_path', 'images')));
+            $folder = array_diff_assoc($folder, explode('/', ComponentHelper::getParams('com_media')->get('image_path', 'images')));
             array_pop($folder);
             $folder = implode('/', $folder);
         } else {
             $folder = '';
         }
 
-
-        if (JFile::exists(JPATH_SITE . '/' . $imgvalue)) {
+        if (is_file(JPATH_SITE . '/' . $imgvalue)) {
             $image .= (isset($value) && !empty($value)) ? $imgvalue : $imgvalue;
         }
-        $route = JUri::root();
+        $route = Uri::root();
 
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $script = "
-	  function removeImage(element){
-	  		var ParentDiv = jQuery(element).closest('.input-group');
-	  		var InputBox = ParentDiv.find(':input') ;
-			var InputImage =ParentDiv.find('img');
+        $media = ComponentHelper::getParams('com_media');
+        $imagesExt  = $media->get('image_extensions') ;
+        $audiosExt  = $media->get('audio_extensions');
+        $videosExt  = $media->get('video_extensions');
+        $documentsExt = $media->get('doc_extensions');
+        $displayData = [
+            'asset' => 'com_j2store',
+            'authorId' => '281',
+            'folder' => $folder,
+            'link' => '',
+            'preview' => 'show',
+            'previewHeight' => '200',
+            'previewWidth' => '200',
+            'class' => $class,
+            'id' => 'imageModal_jform_image_' . $id,
+            'name' => $name,
+            'value' => $value,
+            'readonly' => false,
+            'disabled' => false,
+            'dataAttribute' => '',
+            'mediaTypes' => 0,
+            'mediaTypeNames' => [],
+            'imagesExt' => isset($imagesExt) && !empty($imagesExt) ? explode(',',$imagesExt) : [] ,
+            'audiosExt' =>  isset($audiosExt) && !empty($audiosExt) ? explode(',',$audiosExt) : [] ,
+            'videosExt' =>  isset($videosExt) && !empty($videosExt) ? explode(',',$videosExt) : [] ,
+            'documentsExt' =>  isset($documentsExt) && !empty($documentsExt) ? explode(',',$documentsExt) : [] ,
+            'imagesAllowedExt' => [],
+            'audiosAllowedExt' => [],
+            'videosAllowedExt' => [],
+            'documentsAllowedExt' => []
+        ];
+        $path = JPATH_SITE . '/layouts/joomla/form/field/media.php';
+        $media_render = self::getRenderer('joomla.form.field.media', $path);
+        $html = $media_render->render($displayData);
 
-			var no_preview ='JUri::root().media/j2store/images/common/no_image-100x100.jpg';
-
-			jQuery(InputBox).attr('value','');
-	  		jQuery(InputImage).attr('src','$empty_image') ;
-			jQuery('html, body').animate({
-				scrollTop: jQuery(ParentDiv).offset().top
-		     });
-		}
-	function previewImage(element,id){
-		var value='$route'+jQuery('#'+element.id).attr('value');
-		var ParentDiv = jQuery(element).closest('.input-group');
-		var inputBox = ParentDiv.find(':input') ;
-  		jQuery(inputBox).attr('');
-		var InputImage =ParentDiv.find('img') ;
-		jQuery(InputImage).attr('src',value);
-	}
-
-	function jInsertFieldValue(value, id) {
-	    var old_id = document.id(id).value;
-		if (old_id != id) {
-			var elem = document.id(id)
-			elem.value = value;
-			elem.fireEvent('change');
-			previewImage(elem,id);
-		}
-	}
-	";
-            $script_popup = "
-	window.addEvent('domready', function() {
-		SqueezeBox.initialize({});
-		SqueezeBox.assign($('a.modal-button'), {
-			parse: 'rel'
-		});
-	});";
-            $style = "
-		.j2store-media-slider-image-preview{
-			width:50px;
-
-		}";
-            $platform->addInlineStyle($style);
-            $platform->addInlineScript($script);
-            //JFactory::getDocument()->addStyleDeclaration($style);
-            //JFactory::getDocument()->addScriptDeclaration($script);
-        }
-
-
-        $version = substr(JVERSION, 0, 5);
-        if (version_compare(JVERSION, '3.9.9', 'ge')) {
-            $media = JComponentHelper::getParams('com_media');
-            $imagesExt  = $media->get('image_extensions') ;
-            $audiosExt  = $media->get('audio_extensions');
-            $videosExt  = $media->get('video_extensions');
-            $documentsExt = $media->get('doc_extensions');
-            $displayData = array(
-                'asset' => 'com_j2store',
-                'authorId' => '281',
-                'folder' => $folder,
-                'link' => '',
-                'preview' => 'show',
-                'previewHeight' => '200',
-                'previewWidth' => '200',
-                'class' => $class,
-                'id' => 'imageModal_jform_image_' . $id,
-                'name' => $name,
-                'value' => $value,
-                'readonly' => false,
-                'disabled' => false,
-                'dataAttribute' => '',
-                'mediaTypes' => 0,
-                'mediaTypeNames' => array(),
-                'imagesExt' => isset($imagesExt) && !empty($imagesExt) ? explode(',',$imagesExt) : array() ,
-                'audiosExt' =>  isset($audiosExt) && !empty($audiosExt) ? explode(',',$audiosExt) : array() ,
-                'videosExt' =>  isset($videosExt) && !empty($videosExt) ? explode(',',$videosExt) : array() ,
-                'documentsExt' =>  isset($documentsExt) && !empty($documentsExt) ? explode(',',$documentsExt) : array() ,
-                'imagesAllowedExt' => array(),
-                'audiosAllowedExt' => array(),
-                'videosAllowedExt' => array(),
-                'documentsAllowedExt' => array()
-            );
-            $path = JPATH_SITE . '/layouts/joomla/form/field/media.php';
-            $media_render = self::getRenderer('joomla.form.field.media', $path);
-            $html = $media_render->render($displayData);
-        } elseif (version_compare($version, '3.5.0', 'ge') && version_compare($version, '3.6.3', 'lt')) {
-            $html = '<div class="form-inline">';
-            $html .= '<div data-preview-height="200" data-preview-width="200" data-preview-container=".field-media-preview" data-preview="false" data-button-save-selected=".button-save-selected" data-button-clear=".button-clear" data-button-cancel=".button-cancel" data-button-select=".button-select" data-input=".field-media-input" data-modal-height="400px" data-modal-width="100%" data-modal=".modal" data-url="index.php?option=com_media&amp;view=images&amp;tmpl=component&amp;asset=' . $asset_id . '&amp;author=' . JFactory::getUser()->id . '&amp;fieldid={field-media-id}&amp;folder=" data-basepath="' . JURI::root() . '" class="field-media-wrapper">';
-            $html .= '<div class="modal fade j2store-media-model-popup ' . $hide_class . '" tabindex="-1" id="imageModal_jform_image_' . $id . '" >';
-            $html .= '<div class="modal-header">';
-            $html .= '	<button data-dismiss="modal" class="close" type="button">×</button>';
-            $html .= '	<h3>Change Image</h3>';
-            $html .= '</div>';
-            $html .= '<div class="modal-body">';
-            $html .= '</div>';
-            $html .= '<div class="modal-footer">';
-            $html .= '<button data-dismiss="modal" class="btn">';
-            $html .= Text::_('J2STORE_CANCEL');
-            $html .= '</button></div>';
-            $html .= '</div>';
-            $html .= '<div class="input-group">';
-            $html .= '<img class="j2store-media-slider-image-preview"  id="' . $image_id . '"	src="' . $image . '" alt="" />';
-            $html .= '<input onchange="previewImage(this,jform_image_' . $id . ')" image_id="' . $image_id . '" id="jform_image_' . $id . '" class="input-small hasTooltip field-media-input ' . $class . '" value="' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '" type="text" readonly="readonly"   name="' . $name . '" /> ';
-            $html .= '<span class="input-group-btn">';
-            $html .= '<a id="media-browse" style="display:inline;position:relative;" class="btn btn-success button-select" >';
-            $html .= Text::_('J2STORE_IMAGE_SELECT');
-            $html .= '</a>';
-            $html .= '<a id="media-cancel" class="btn hasTooltip btn-inverse" onclick="removeImage(this)"   title=""><i class="icon-remove"></i></a>';
-            $html .= '</span>';
-            $html .= '</div>';
-            $html .= '</div>';
-            $html .= '</div>';
-        } else {
-            $platform->addInlineScript($script_popup);
-            //JFactory::getDocument()->addScriptDeclaration($script_popup);
-            $html = '';
-            $html = '<div class="form-inline">';
-            $html .= '<div class="input-group">';
-            $html .= '<img class="j2store-media-slider-image-preview"  id="' . $image_id . '"	src="' . $image . '" alt="" />';
-            $html .= '<input onchange="previewImage(this,jform_image_' . $id . ')" image_id="' . $image_id . '" id="jform_image_' . $id . '" class="input-mini ' . $class . '" value="' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '" type="text" readonly="readonly"   name="' . $name . '" /> ';
-            $html .= '<span class="input-group-btn">';
-            $html .= '<a id="media-browse" style="display:inline;position:relative;" class="modal btn btn-success" rel="{handler:\'iframe\', size: {x: 800, y: 500}}" href="index.php?option=com_media&view=images&tmpl=component&asset=' . $asset_id . '&author=' . JFactory::getUser()->id . '&fieldid=jform_image_' . $id . '&folder=' . $folder . '" title="' . Text::_('PLG_J2STORE_EXTRAIMAGES_SELECT') . '">';
-            $html .= Text::_('J2STORE_IMAGE_SELECT');
-            $html .= '</a>';
-            $html .= '<a id="media-cancel" class="btn hasTooltip btn-inverse" onclick="removeImage(this)"   title=""><i class="icon-remove"></i></a>';
-            $html .= '</span>';
-            $html .= '</div>';
-            $html .= '</div>';
-        }
-
-        J2Store::plugin()->event('MediaField', array(&$html, $name, $value, $options));
+        J2Store::plugin()->event('MediaField', [&$html, $name, $value, $options]);
         return $html;
     }
 
@@ -462,7 +329,7 @@ class J2Html
         if (empty($layoutId)) {
             $layoutId = 'default';
         }
-        $renderer = new \Joomla\CMS\Layout\FileLayout($layoutId, $basePath = null, $options = array('component' => 'com_j2store'));
+        $renderer = new FileLayout($layoutId, $basePath = null, $options = ['component' => 'com_j2store']);
         $renderer->setDebug(false);
         $layoutPaths = $renderer->getDefaultIncludePaths();
         if ($layoutPaths) {
@@ -471,17 +338,56 @@ class J2Html
         return $renderer;
     }
 
-    public static function calendar($name, $value, $options = array())
+    public static function calendar($name, $value, $options = [])
     {
         $id = isset($options['id']) ? $options['id'] : self::clean($name);
         $format = (isset($options['format']) && !empty($options['format'])) ? $options['format'] : '%d-%m-%Y';
-        $nullDate = JFactory::getDbo()->getNullDate();
+        $nullDate = Factory::getContainer()->get('DatabaseDriver')->getNullDate();
         if ($value == $nullDate || empty($value)) {
             $value = $nullDate;
         }
-        return JHtml::_('calendar', $value, $name, $id, $format, $options);
+        return HTMLHelper::_('calendar', $value, $name, $id, $format, $options);
     }
 
+    public static function calendarfield($name, $value, $options = [])
+    {
+        $id = isset($options['id']) ? $options['id'] : self::clean($name);
+
+        $db = Factory::getContainer()->get('DatabaseDriver');
+
+        if ($value == $db->getNullDate() || empty($value)) {
+            $value = '';
+        }
+
+        // Build the <field> XML element for the calendar field.
+        $xmlStr = '<field type="calendar"'
+            . ' name="'   . htmlspecialchars($name,   ENT_QUOTES) . '"'
+            . ' id="'     . htmlspecialchars($id,     ENT_QUOTES) . '"';
+
+        $skip = ['id'];
+        foreach ($options as $attr => $val) {
+            if (in_array($attr, $skip, true) || $val === '' || $val === null) {
+                continue;
+            }
+            $xmlStr .= ' ' . htmlspecialchars($attr, ENT_QUOTES) . '="' . htmlspecialchars((string) $val, ENT_QUOTES) . '"';
+        }
+
+        $xmlStr .= ' />';
+
+        $xml = simplexml_load_string($xmlStr);
+
+        if ($xml === false) {
+            // Fallback to HTMLHelper if XML building fails.
+            $format = (isset($options['format']) && !empty($options['format'])) ? $options['format'] : '%d-%m-%Y';
+            return HTMLHelper::calendar($value, $name, $id, $format, $options);
+        }
+
+        $field = new CalendarField();
+        $field->setDatabase($db);
+        $field->setup($xml, $value);
+
+        return $field->input;
+    }
 
     /**
      * @param $href
@@ -489,9 +395,8 @@ class J2Html
      * @param array $options
      * @return string
      */
-    public static function link($href, $text, $options = array())
+    public static function link($href, $text, $options = [])
     {
-
         $href = isset($href) && !empty($href) ? $href : 'javascript:void(0)';
         $icon = isset($options['icon']) && !empty($options['icon']) ? '<i class="' . $options['icon'] . '"></i>' : '';
         $class = isset($options['class']) && !empty($options['class']) ? $options['class'] : '';
@@ -515,10 +420,9 @@ class J2Html
      * @param array $options
      * @return string
      */
-    public static function input($type, $name, $value = null, $options = array())
+    public static function input($type, $name, $value = null, $options = [])
     {
         //will implode all the options value and return as element attributes
-        //$optionvalue = self::attributes($options);
         $optionvalue = J2Store::platform()->toString($options);
 
         //assign the html
@@ -528,38 +432,314 @@ class J2Html
 
             // return text input
             case 'text':
-                $html .= '<input type="text" name="' . $name . '" value="' . $value . '"  ' . $optionvalue . '    />';
+                // Prepare display data for the layout
+                $displayData = array(
+                    'name' => $name,
+                    'id' => isset($options['id']) ? $options['id'] : self::clean($name),
+                    'value' => $value,
+                    'class' => isset($options['class']) ? $options['class'] : '',
+                    'hint' => isset($options['placeholder']) ? $options['placeholder'] : '',
+                    'required' => isset($options['required']) ? (bool)$options['required'] : false,
+                    'disabled' => isset($options['disabled']) ? (bool)$options['disabled'] : false,
+                    'readonly' => isset($options['readonly']) ? (bool)$options['readonly'] : false,
+                    'size' => isset($options['size']) ? $options['size'] : '',
+                    'maxLength' => isset($options['maxlength']) ? 'maxlength="' . $options['maxlength'] . '"' : '',
+                    'pattern' => isset($options['pattern']) ? $options['pattern'] : '',
+                    'autocomplete' => isset($options['autocomplete']) ? $options['autocomplete'] : '',
+                    'autofocus' => isset($options['autofocus']) ? (bool)$options['autofocus'] : false,
+                    'spellcheck' => isset($options['spellcheck']) ? (bool)$options['spellcheck'] : true,
+                    'onchange' => isset($options['onchange']) ? $options['onchange'] : '',
+                    'onclick' => isset($options['onclick']) ? $options['onclick'] : '',
+                    'description' => isset($options['description']) ? $options['description'] : '',
+                    'addonBefore' => isset($options['addonBefore']) ? $options['addonBefore'] : '',
+                    'addonAfter' => isset($options['addonAfter']) ? $options['addonAfter'] : '',
+                    'charcounter' => isset($options['charcounter']) ? (bool)$options['charcounter'] : false,
+                    'dataAttribute' => '',
+                    'dataAttributes' => array(),
+                    'options' => array(), // For datalist support
+                    'inputmode' => isset($options['inputmode']) ? 'inputmode="' . $options['inputmode'] . '"' : '',
+                    'validationtext' => isset($options['validationtext']) ? $options['validationtext'] : '',
+                    'dirname' => '',
+                    'hidden' => false,
+                    'multiple' => false,
+                    'hasValue' => !empty($value),
+                );
+
+                // Use the Joomla layout renderer
+                $path = JPATH_SITE . '/layouts/joomla/form/field/text.php';
+                $renderer = self::getRenderer('joomla.form.field.text', $path);
+                $html .= $renderer->render($displayData);
                 break;
 
             //return email input
             case 'email':
-                $html .= '<input type="email" name="' . $name . '"  value="' . $value . '"  ' . $optionvalue . '    />';
+                // Prepare display data for the email layout
+                $displayData = array(
+                    'name' => $name,
+                    'id' => isset($options['id']) ? $options['id'] : self::clean($name),
+                    'value' => $value,
+                    'class' => isset($options['class']) ? $options['class'] : '',
+                    'hint' => isset($options['placeholder']) ? $options['placeholder'] : '',
+                    'required' => isset($options['required']) ? (bool)$options['required'] : false,
+                    'disabled' => isset($options['disabled']) ? (bool)$options['disabled'] : false,
+                    'readonly' => isset($options['readonly']) ? (bool)$options['readonly'] : false,
+                    'size' => isset($options['size']) ? $options['size'] : '',
+                    'maxLength' => isset($options['maxlength']) ? $options['maxlength'] : '',
+                    'autofocus' => isset($options['autofocus']) ? (bool)$options['autofocus'] : false,
+                    'spellcheck' => false,
+                    'onchange' => isset($options['onchange']) ? $options['onchange'] : '',
+                    'onclick' => isset($options['onclick']) ? $options['onclick'] : '',
+                    'description' => isset($options['description']) ? $options['description'] : '',
+                    'autocomplete' => isset($options['autocomplete']) ? $options['autocomplete'] : '',
+                    'multiple' => isset($options['multiple']) ? (bool)$options['multiple'] : false,
+                    'dataAttribute' => '',
+                    'dataAttributes' => array(),
+                    'hidden' => false,
+                    'pattern' => '',
+                    'validate' => 'email',
+                    'repeat' => false,
+                    'group' => '',
+                    'label' => isset($options['label']) ? $options['label'] : '',
+                    'labelclass' => isset($options['labelclass']) ? $options['labelclass'] : '',
+                    'hasValue' => !empty($value),
+                    'options' => array(),
+                    'inputType' => 'email',
+                    'accept' => '',
+                    'checkedOptions' => array(),
+                );
+
+                // Use the Joomla email layout renderer
+                $path = JPATH_SITE . '/layouts/joomla/form/field/email.php';
+                $renderer = self::getRenderer('joomla.form.field.email', $path);
+                $html .= $renderer->render($displayData);
                 break;
 
             //return password input
             case 'password':
-                $html .= '<input type="password"  name="' . $name . '" ' . $optionvalue . '  value="' . $value . '"     />';
+                // Prepare display data for the password layout
+                $displayData = array(
+                    'name' => $name,
+                    'id' => isset($options['id']) ? $options['id'] : self::clean($name),
+                    'value' => $value,
+                    'class' => isset($options['class']) ? $options['class'] : '',
+                    'hint' => isset($options['placeholder']) ? $options['placeholder'] : '',
+                    'required' => isset($options['required']) ? (bool)$options['required'] : false,
+                    'disabled' => isset($options['disabled']) ? (bool)$options['disabled'] : false,
+                    'readonly' => isset($options['readonly']) ? (bool)$options['readonly'] : false,
+                    'size' => isset($options['size']) ? $options['size'] : '',
+                    'maxLength' => isset($options['maxlength']) ? $options['maxlength'] : '',
+                    'minLength' => isset($options['minlength']) ? $options['minlength'] : '',
+                    'autofocus' => isset($options['autofocus']) ? (bool)$options['autofocus'] : false,
+                    'spellcheck' => false,
+                    'onchange' => isset($options['onchange']) ? $options['onchange'] : '',
+                    'onclick' => isset($options['onclick']) ? $options['onclick'] : '',
+                    'description' => isset($options['description']) ? $options['description'] : '',
+                    'autocomplete' => isset($options['autocomplete']) ? $options['autocomplete'] : '',
+                    'meter' => isset($options['meter']) ? (bool)$options['meter'] : false,
+                    'forcePassword' => isset($options['forcePassword']) ? (bool)$options['forcePassword'] : false,
+                    'lock' => isset($options['lock']) ? (bool)$options['lock'] : false,
+                    'rules' => isset($options['rules']) ? (bool)$options['rules'] : false,
+                    'dataAttribute' => '',
+                    'dataAttributes' => array(),
+                    'hidden' => false,
+                    'pattern' => '',
+                    'validate' => '',
+                    'repeat' => false,
+                    'group' => '',
+                    'label' => isset($options['label']) ? $options['label'] : '',
+                    'labelclass' => isset($options['labelclass']) ? $options['labelclass'] : '',
+                    'hasValue' => !empty($value),
+                    'options' => array(),
+                    'inputType' => 'password',
+                    'accept' => '',
+                    'checkedOptions' => array(),
+                    'multiple' => false,
+                );
+
+                // Use the Joomla password layout renderer
+                $path = JPATH_SITE . '/layouts/joomla/form/field/password.php';
+                $renderer = self::getRenderer('joomla.form.field.password', $path);
+                $html .= $renderer->render($displayData);
                 break;
 
             //return textarea input element
             case 'textarea':
-                $html .= '<textarea ' . $optionvalue . ' name="' . $name . '"  value="' . $value . '"     >' . $value . '</textarea>';
+                // Prepare display data for the textarea layout
+                $displayData = array(
+                    'name' => $name,
+                    'id' => isset($options['id']) ? $options['id'] : self::clean($name),
+                    'value' => $value,
+                    'class' => isset($options['class']) ? $options['class'] : '',
+                    'hint' => isset($options['placeholder']) ? $options['placeholder'] : '',
+                    'required' => isset($options['required']) ? (bool)$options['required'] : false,
+                    'disabled' => isset($options['disabled']) ? (bool)$options['disabled'] : false,
+                    'readonly' => isset($options['readonly']) ? (bool)$options['readonly'] : false,
+                    'rows' => isset($options['rows']) ? 'rows="' . $options['rows'] . '"' : '',
+                    'columns' => isset($options['cols']) ? 'cols="' . $options['cols'] . '"' : '',
+                    'maxlength' => isset($options['maxlength']) ? 'maxlength="' . $options['maxlength'] . '"' : '',
+                    'autofocus' => isset($options['autofocus']) ? (bool)$options['autofocus'] : false,
+                    'spellcheck' => isset($options['spellcheck']) ? (bool)$options['spellcheck'] : true,
+                    'onchange' => isset($options['onchange']) ? $options['onchange'] : '',
+                    'onclick' => isset($options['onclick']) ? $options['onclick'] : '',
+                    'description' => isset($options['description']) ? $options['description'] : '',
+                    'autocomplete' => isset($options['autocomplete']) ? $options['autocomplete'] : '',
+                    'charcounter' => isset($options['charcounter']) ? (bool)$options['charcounter'] : false,
+                    'dataAttribute' => '',
+                    'dataAttributes' => array(),
+                    'hidden' => false,
+                    'pattern' => '',
+                    'validate' => '',
+                    'repeat' => false,
+                    'group' => '',
+                    'label' => isset($options['label']) ? $options['label'] : '',
+                    'labelclass' => isset($options['labelclass']) ? $options['labelclass'] : '',
+                    'hasValue' => !empty($value),
+                    'options' => array(),
+                    'inputType' => 'textarea',
+                    'accept' => '',
+                    'checkedOptions' => array(),
+                    'multiple' => false,
+                    'size' => '',
+                );
+
+                // Use the Joomla textarea layout renderer
+                $path = JPATH_SITE . '/layouts/joomla/form/field/textarea.php';
+                $renderer = self::getRenderer('joomla.form.field.textarea', $path);
+                $html .= $renderer->render($displayData);
                 break;
 
             //return file input element
             case 'file':
-                $html .= '<input type="file" name="' . $name . '" ' . $optionvalue . '  value="' . $value . '"     />';
+                // Prepare display data for the file layout
+                $displayData = array(
+                    'name' => $name,
+                    'id' => isset($options['id']) ? $options['id'] : self::clean($name),
+                    'value' => $value,
+                    'class' => isset($options['class']) ? $options['class'] : '',
+                    'hint' => isset($options['placeholder']) ? $options['placeholder'] : '',
+                    'required' => isset($options['required']) ? (bool)$options['required'] : false,
+                    'disabled' => isset($options['disabled']) ? (bool)$options['disabled'] : false,
+                    'readonly' => false,
+                    'size' => isset($options['size']) ? $options['size'] : '',
+                    'autofocus' => isset($options['autofocus']) ? (bool)$options['autofocus'] : false,
+                    'onchange' => isset($options['onchange']) ? $options['onchange'] : '',
+                    'onclick' => isset($options['onclick']) ? $options['onclick'] : '',
+                    'description' => isset($options['description']) ? $options['description'] : '',
+                    'accept' => isset($options['accept']) ? $options['accept'] : '',
+                    'multiple' => isset($options['multiple']) ? (bool)$options['multiple'] : false,
+                    'dataAttribute' => '',
+                    'dataAttributes' => array(),
+                    'hidden' => false,
+                    'pattern' => '',
+                    'validate' => '',
+                    'repeat' => false,
+                    'group' => '',
+                    'label' => isset($options['label']) ? $options['label'] : '',
+                    'labelclass' => isset($options['labelclass']) ? $options['labelclass'] : '',
+                    'hasValue' => !empty($value),
+                    'options' => array(),
+                    'inputType' => 'file',
+                    'checkedOptions' => array(),
+                    'spellcheck' => false,
+                    'autocomplete' => '',
+                );
+
+                // Use the Joomla file layout renderer
+                $path = JPATH_SITE . '/layouts/joomla/form/field/file.php';
+                $renderer = self::getRenderer('joomla.form.field.file', $path);
+                $html .= $renderer->render($displayData);
                 break;
 
             //return radio input element
             case 'radio':
-                $id = isset($options['id']) && !empty($options['id']) ? $options['id'] : '';
-                $html .= J2Html::booleanlist($name, $options, $value, $yes = 'JYES', $no = 'JNO', $id);
+                // Prepare options for the switcher layout (Yes/No boolean)
+                $yesText = isset($options['yes']) ? $options['yes'] : 'JYES';
+                $noText = isset($options['no']) ? $options['no'] : 'JNO';
+
+                $radioOptions = array(
+                    (object)array('value' => '0', 'text' => Text::_($noText)),
+                    (object)array('value' => '1', 'text' => Text::_($yesText))
+                );
+
+                // Prepare display data for the layout
+                $displayData = array(
+                    'name' => $name,
+                    'id' => isset($options['id']) && !empty($options['id']) ? $options['id'] : self::clean($name),
+                    'value' => (string)$value,
+                    'class' => isset($options['class']) ? $options['class'] : '',
+                    'label' => isset($options['label']) ? $options['label'] : '',
+                    'labelclass' => isset($options['labelclass']) ? $options['labelclass'] : '',
+                    'description' => isset($options['description']) ? $options['description'] : '',
+                    'required' => isset($options['required']) ? (bool)$options['required'] : false,
+                    'disabled' => isset($options['disabled']) ? (bool)$options['disabled'] : false,
+                    'readonly' => isset($options['readonly']) ? (bool)$options['readonly'] : false,
+                    'autofocus' => isset($options['autofocus']) ? (bool)$options['autofocus'] : false,
+                    'onchange' => isset($options['onchange']) ? $options['onchange'] : '',
+                    'onclick' => isset($options['onclick']) ? $options['onclick'] : '',
+                    'dataAttribute' => '',
+                    'dataAttributes' => array(),
+                    'options' => $radioOptions,
+                    'hidden' => false,
+                    'multiple' => false,
+                    'autocomplete' => '',
+                    'hint' => '',
+                    'pattern' => '',
+                    'size' => '',
+                    'spellcheck' => false,
+                    'validate' => '',
+                    'repeat' => false,
+                    'group' => '',
+                );
+
+                // Use the Joomla switcher layout renderer
+                $path = JPATH_SITE . '/layouts/joomla/form/field/radio/switcher.php';
+                $renderer = self::getRenderer('joomla.form.field.radio.switcher', $path);
+                $html .= $renderer->render($displayData);
                 break;
 
             //return checkbox element
             case 'checkbox':
-                $html .= '<input type="checkbox" ' . $optionvalue . '  value="' . $value . '"     />';
+                // Prepare display data for the checkbox layout
+                $displayData = array(
+                    'name' => $name,
+                    'id' => isset($options['id']) ? $options['id'] : self::clean($name),
+                    'value' => isset($options['value']) ? $options['value'] : '1',
+                    'class' => isset($options['class']) ? $options['class'] : '',
+                    'hint' => isset($options['placeholder']) ? $options['placeholder'] : '',
+                    'required' => isset($options['required']) ? (bool)$options['required'] : false,
+                    'disabled' => isset($options['disabled']) ? (bool)$options['disabled'] : false,
+                    'readonly' => isset($options['readonly']) ? (bool)$options['readonly'] : false,
+                    'autofocus' => isset($options['autofocus']) ? (bool)$options['autofocus'] : false,
+                    'onchange' => isset($options['onchange']) ? $options['onchange'] : '',
+                    'onclick' => isset($options['onclick']) ? $options['onclick'] : '',
+                    'description' => isset($options['description']) ? $options['description'] : '',
+                    'checked' => isset($options['checked']) ? (bool)$options['checked'] : ($value == '1' || $value == 'on'),
+                    'dataAttribute' => '',
+                    'dataAttributes' => array(),
+                    'hidden' => false,
+                    'pattern' => '',
+                    'validate' => '',
+                    'repeat' => false,
+                    'group' => '',
+                    'label' => isset($options['label']) ? $options['label'] : '',
+                    'labelclass' => isset($options['labelclass']) ? $options['labelclass'] : '',
+                    'hasValue' => !empty($value),
+                    'options' => array(),
+                    'inputType' => 'checkbox',
+                    'accept' => '',
+                    'checkedOptions' => array(),
+                    'multiple' => false,
+                    'spellcheck' => false,
+                    'autocomplete' => '',
+                    'size' => '',
+                    'field' => null,
+                    'validationtext' => isset($options['validationtext']) ? $options['validationtext'] : '',
+                );
+
+                // Use the Joomla checkbox layout renderer
+                $path = JPATH_SITE . '/layouts/joomla/form/field/checkbox.php';
+                $renderer = self::getRenderer('joomla.form.field.checkbox', $path);
+                $html .= $renderer->render($displayData);
                 break;
 
             case 'editor':
@@ -573,13 +753,13 @@ class J2Html
                 $html .= '  />';
                 break;
 
-	        case 'buttontype':
-		        $html .= '<button type="button" name="' . $name . '"  ' . $optionvalue;
-		        if (isset($options['onclick']) && !empty($options['onclick'])) {
-			        $html .= '   onclick ="' . $options['onclick'] . '"';
-		        }
-		        $html .= '>' . $value . '</button>';
-		        break;
+            case 'buttontype':
+                $html .= '<button type="button" name="' . $name . '"  ' . $optionvalue;
+                if (isset($options['onclick']) && !empty($options['onclick'])) {
+                    $html .= '   onclick ="' . $options['onclick'] . '"';
+                }
+                $html .= '>' . $value . '</button>';
+                break;
 
             case 'submit':
                 $html .= '<input type="submit" name="' . $name . '"  ' . $optionvalue . 'value ="' . $value . '" />';
@@ -590,41 +770,71 @@ class J2Html
                 break;
 
             case 'number' :
-                $html .= '<input type="number" name="' . $name . '" value="' . $value . '" ' . $optionvalue . ' />';
+                // Prepare display data for the number layout
+                $displayData = array(
+                    'name' => $name,
+                    'id' => isset($options['id']) ? $options['id'] : self::clean($name),
+                    'value' => $value,
+                    'class' => isset($options['class']) ? $options['class'] : '',
+                    'hint' => isset($options['placeholder']) ? $options['placeholder'] : '',
+                    'required' => isset($options['required']) ? (bool)$options['required'] : false,
+                    'disabled' => isset($options['disabled']) ? (bool)$options['disabled'] : false,
+                    'readonly' => isset($options['readonly']) ? (bool)$options['readonly'] : false,
+                    'autofocus' => isset($options['autofocus']) ? (bool)$options['autofocus'] : false,
+                    'onchange' => isset($options['onchange']) ? $options['onchange'] : '',
+                    'onclick' => isset($options['onclick']) ? $options['onclick'] : '',
+                    'description' => isset($options['description']) ? $options['description'] : '',
+                    'min' => isset($options['min']) ? $options['min'] : null,
+                    'max' => isset($options['max']) ? $options['max'] : null,
+                    'step' => isset($options['step']) ? $options['step'] : '',
+                    'autocomplete' => isset($options['autocomplete']) ? $options['autocomplete'] : '',
+                    'spellcheck' => false,
+                    'dataAttribute' => '',
+                    'dataAttributes' => array(),
+                    'hidden' => false,
+                    'multiple' => false,
+                    'pattern' => '',
+                    'validate' => '',
+                    'repeat' => false,
+                    'group' => '',
+                    'label' => isset($options['label']) ? $options['label'] : '',
+                    'labelclass' => isset($options['labelclass']) ? $options['labelclass'] : '',
+                    'hasValue' => !empty($value),
+                    'options' => array(),
+                    'inputType' => 'number',
+                    'accept' => '',
+                    'checkedOptions' => array(),
+                );
+
+                // Use the Joomla number layout renderer
+                $path = JPATH_SITE . '/layouts/joomla/form/field/number.php';
+                $renderer = self::getRenderer('joomla.form.field.number', $path);
+                $html .= $renderer->render($displayData);
                 break;
-
-
         }
 
         return $html;
     }
 
-    public static function user($name, $value,$options = array())
+    public static function user($name, $value,$options = [])
     {
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            $user_field = new \Joomla\CMS\Form\Field\UserField();
-        } else {
-            $user_field = new JFormFieldUser();
-            $element = new SimpleXMLElement('<field name="'.$name.'" value="'.$value.'"/>');
-            $user_field->setup($element,$value);
-        }
+        $user_field = new UserField();
         $user_field->setValue($value);
         $layout = 'joomla.form.field.user';
-	$data = array('name' => $name);
-	if(isset($options['required']) && !empty($options['required'])) {
-	$data['required'] = $options['required'];
-	}
+        $data = ['name' => $name];
+        if(isset($options['required']) && !empty($options['required'])) {
+            $data['required'] = $options['required'];
+        }
         return $user_field->render($layout, $data);
     }
 
-    public static function generic_list($name, $value, $options){
-
+    public static function generic_list($name, $value, $options)
+    {
         $platform = J2Store::platform();
         $platform->loadExtra('behavior.multiselect');
 
-        // echo "<pre>";print_r($options);
         $id = isset($options['id']) && $options['id'] ? $options['id'] : $name;
-        $placeholders = array();
+        $placeholders = [];
         if(isset($options['options']) && !empty($options['options'])){
             $placeholders = $options['options'];
             unset($options['options']);
@@ -638,42 +848,33 @@ class J2Html
             $required = true;
         }
 
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            return self::select()->clearState()
-                ->idTag($id)
-                ->type('genericlist')
-                ->name($name)
-                ->value($value)
-                ->attribs($options)
-                ->setPlaceholders($placeholders)
-                ->getHtml();
-        }else{
-            $displayData = array(
-                'class' => '',
-                'name' => $name,
-                'value' => $value  ,
-                'options' =>$placeholders ,
-                'autofocus' => '',
-                'onchange' => '',
-                'dataAttribute' => '',
-                'readonly' => '',
-                'disabled' => false,
-                'hint' => '',
-                'required' => $required,
-                'id' => '',
-                'multiple'=> $multiple
-            );
-            $path = JPATH_SITE . '/layouts/joomla/form/field/list-fancy-select.php';
-            $media_render = self::getRenderer('joomla.form.field.list-fancy-select', $path);
-            return $media_render->render($displayData);
-        }
+        $displayData = [
+            'class' => '',
+            'name' => $name,
+            'value' => $value  ,
+            'options' =>$placeholders ,
+            'autofocus' => '',
+            'onchange' => '',
+            'dataAttribute' => '',
+            'readonly' => '',
+            'disabled' => false,
+            'hint' => '',
+            'required' => $required,
+            'id' => '',
+            'multiple'=> $multiple
+        ];
+        $path = JPATH_SITE . '/layouts/joomla/form/field/list-fancy-select.php';
+        $media_render = self::getRenderer('joomla.form.field.list-fancy-select', $path);
+
+        return $media_render->render($displayData);
     }
+
     public static function country($name, $value, $options)
     {
         $country_id = isset($options['id']) && $options['id'] ? $options['id'] : 'country_id';
         $zone_id = isset($options['zone_id']) && $options['zone_id'] ? $options['zone_id'] : 'zone_id';
         $zone_value = isset($options['zone_value']) && $options['zone_value'] ? $options['zone_value'] : '';
-        $attr = array("onchange" => "changeZone('$country_id',this.value,'$zone_id',$zone_value)", 'id' => $country_id, 'class' => 'form-select');
+        $attr = ["onchange" => "changeZone('$country_id',this.value,'$zone_id',$zone_value)", 'id' => $country_id, 'class' => 'form-select'];
         return self::select()->clearState()
             ->idTag($country_id)
             ->type('genericlist')
@@ -724,32 +925,32 @@ class J2Html
             $config->saveOne ( 'queue_key', $queue_key );
         }
 
-        $html = '';
-        $html .= '<div class="alert alert-block alert-info"><strong id="j2store_queue_key">'.$queue_key.'</strong><a onclick="regenerateQueueKey()" class="btn btn-primary btn-sm text-white ms-3"><span class="fas fa-solid fa-redo me-2" aria-hidden="true"></span>'.Text::_ ( 'J2STORE_STORE_REGENERATE' ).'</a>
-		<script>
-		function regenerateQueueKey(){
-			(function($){
-				$.ajax({
-					url : "'.$url.'",
-					type : \'get\',
-					cache : false,
-					dataType : \'json\',
-					success : function(json) {
-						if (json != null && json[\'queue_key\']) {
-							$("#j2store_queue_key").html(json["queue_key"]);
-						}
-					}
-
-				});
-			})(jQuery);
-		}
-		</script>
-		<input type="hidden" name="'.$name.'" value="'.$queue_key.'"/>
-		</div>';
+        $html = "";
+        $html .= "<div class=\"alert alert-block alert-info\"><strong id=\"j2store_queue_key\">".$queue_key."</strong><a onclick=\"regenerateQueueKey()\" class=\"btn btn-primary btn-sm text-white ms-3\"><i class=\"fas fa-solid fa-redo me-2\"></i>".Text::_ ( "J2STORE_STORE_REGENERATE" )."</a>
+        <script>
+        function regenerateQueueKey(){
+            fetch('".$url."', {
+                method: 'GET',
+                cache: 'no-cache'
+            })
+            .then(response => response.json())
+            .then(json => {
+                if (json && json['queue_key']) {
+                    document.getElementById('j2store_queue_key').innerHTML = json['queue_key'];
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        </script>
+        <input type=\"hidden\" name=\"".$name."\" value=\"".$queue_key."\"/>
+        </div>";
         return  $html;
     }
 
-    public static function cronLastHit($name,$value,$options){
+    public static function cronLastHit($name,$value,$options)
+    {
         $cron_hit = J2Store::config ()->get('cron_last_trigger','');
         if(empty( $cron_hit )){
             $note = Text::_('J2STORE_STORE_CRON_LAST_TRIGGER_NOT_FOUND');
@@ -765,22 +966,24 @@ class J2Html
         return  $html;
     }
 
-    public static function customLink($name,$value,$options){
+    public static function customLink($name,$value,$options)
+    {
         $id = isset($options['id']) && $options['id'] ? $options['id'] : $name;
         $text = isset($options['text']) && $options['text'] ? $options['text'] : '';
         return '<a class="btn btn-primary btn-sm" id="'.$id.'" href="#">'.Text::_($text).'</a>';
     }
 
-    public static function menuItems($name,$value,$options){
+    public static function menuItems($name,$value,$options)
+    {
         $platform = J2Store::platform();
         $items = $platform->getMenuLinks();
 
-        $groups = array();
+        $groups = [];
         // Build the groups arrays.
         foreach ($items as $menu)
         {
             // Initialize the group.
-            $groups[$menu->title] = array();
+            $groups[$menu->title] = [];
 
             // Build the options array.
             foreach ($menu->links as $link)
@@ -796,54 +999,38 @@ class J2Html
                 {
                     $lang = '';
                 }
-                if(version_compare(JVERSION,'3.99.99','lt')){
-                    $groups[$menu->title][] = JHtml::_('select.option',
-                        $link->value, $levelPrefix . $link->text . $lang,
-                        'value',
-                        'text',
-                        in_array($link->type, array())
-                    );
-                }else{
-                    $groups[$menu->title][] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',
-                        $link->value, $levelPrefix . $link->text . $lang,
-                        'value',
-                        'text',
-                        \in_array($link->type, array())
-                    );
-                }
 
+                $groups[$menu->title][] = HTMLHelper::_('select.option',
+                    $link->value, $levelPrefix . $link->text . $lang,
+                    'value',
+                    'text',
+                    \in_array($link->type, array())
+                );
             }
         }
         $id = isset($options['id']) && $options['id'] ? $options['id'] : $name;
         if(isset($options['id'])){
             unset($options['id']);
         }
-        if(version_compare(JVERSION,'3.99.99','lt')){
-            $html = JHtml::_(
-                'select.groupedlist', $groups, $name,
-                array(
-                    'list.attr' => implode(' ',$options), 'id' => $id, 'list.select' => $value, 'group.items' => null, 'option.key.toHtml' => false,
-                    'option.text.toHtml' => false,
-                )
-            );
-        }else {
-	        $attr = [
-		        'id'        => $id,
-		        'list.select' => $value,
-		        'option.key.toHtml' => false,
-                    'option.text.toHtml' => false,
-		        'group.items' => null,
-		        'list.attr' => [
-			        implode(' ',$options),
-			        'class' => 'form-select'
-		        ]
-	        ];
-	        $html = HTMLHelper::_('select.groupedlist', $groups, $name, $attr);
-        }
-         return $html;
+
+        $attr = [
+            'id'        => $id,
+            'list.select' => $value,
+            'option.key.toHtml' => false,
+            'option.text.toHtml' => false,
+            'group.items' => null,
+            'list.attr' => [
+                implode(' ',$options),
+                'class' => 'form-select'
+            ]
+        ];
+        $html = HTMLHelper::_('select.groupedlist', $groups, $name, $attr);
+
+        return $html;
     }
 
-    public static function inputFieldSql($name,$value,$options){
+    public static function inputFieldSql($name,$value,$options)
+    {
         $id = isset($options['id']) && $options['id'] ? $options['id'] : $name;
         $unset_values = array(
             'id','key_field','value_field','has_one'
@@ -873,68 +1060,68 @@ class J2Html
             )->getHtml();
     }
 
-    public static function custom($type, $name, $value, $options = array())
+    public static function custom($type, $name, $value, $options = [])
     {
-        if($type == 'radiolist'){
-            $arr = array();
+        if($type === 'radiolist'){
+            $arr = [];
             if(isset($options['options']) && !empty($options['options'])){
                 foreach ($options['options'] as $option_key => $option_value){
-                    $arr[] = JHtml::_('select.option', $option_key,$option_value);
+                    $arr[] = HTMLHelper::_('select.option', $option_key,$option_value);
                 }
                 unset($options['options']);
             }
             $id = isset($options['id']) && $options['id'] ? $options['id'] : $name;
             $html = J2Html::radiolist($arr, $name, $options, 'value', 'text', $value, $id);
 
-        }elseif ($type == 'list') {
+        }elseif ($type === 'list') {
             $html = self::generic_list($name, $value,$options);
-        }elseif ($type == 'user') {
+        }elseif ($type === 'user') {
             $html = self::user($name, $value,$options);
-        }elseif ($type == 'queuekey') {
+        }elseif ($type === 'queuekey') {
             $html = self::queueKey($name, $value,$options);
-        }elseif ($type == 'cronlasthit') {
+        }elseif ($type === 'cronlasthit') {
             $html = self::cronLastHit($name, $value,$options);
-        }elseif ($type == 'customlink') {
+        }elseif ($type === 'customlink') {
             $html = self::customLink($name, $value,$options);
-        } elseif ($type == 'country') {
+        } elseif ($type === 'country') {
             $html = self::country($name, $value, $options);
-        } elseif ($type == 'zone') {
+        } elseif ($type === 'zone') {
             $html = self::zone($name, $value, $options);
-        }elseif ($type == 'fieldsql') {
+        }elseif ($type === 'fieldsql') {
             $html = self::inputFieldSql($name, $value, $options);
-        }elseif ($type == 'menuitem') {
+        }elseif ($type === 'menuitem') {
             $html = self::menuItems($name, $value, $options);
-        } elseif ($type == 'modal_article') {
+        } elseif ($type === 'modal_article') {
             $html = self::article($name, $value, $options);
-        } elseif ($type == 'enabled') {
+        } elseif ($type === 'enabled') {
             $id = isset($options['id']) && !empty($options['id']) ? $options['id'] : $name;
-            $html = JHtmlSelect::booleanlist($name, $attr = array(), $value, $yes = 'JYES', $no = 'JNO', $id);
-        }elseif ($type == 'editor') {
+            $html = Select::booleanlist($name, $attr = [], $value, $yes = 'JYES', $no = 'JNO', $id);
+        }elseif ($type === 'editor') {
 
-	        $id = isset($options['id']) && !empty($options['id']) ? $options['id'] : $name;
-	        $width = isset($options['width']) && !empty($options['width']) ? $options['width'] : '100%';
-	        $height = isset($options['height']) && !empty($options['height']) ? $options['height'] : '500';
-	        $cols = isset($options['cols']) && !empty($options['cols']) ? (int)$options['cols'] : false;
-	        $rows = isset($options['rows']) && !empty($options['rows']) ? (int)$options['rows'] : false;
-	        $editor_type = isset($options['editor']) && !empty($options['editor']) ? $options['editor'] : '';
-	        $editor_content = isset($options['content']) && !empty($options['content']) ? $options['content'] : '';
+            $id = isset($options['id']) && !empty($options['id']) ? $options['id'] : $name;
+            $width = isset($options['width']) && !empty($options['width']) ? $options['width'] : '100%';
+            $height = isset($options['height']) && !empty($options['height']) ? $options['height'] : '500';
+            $cols = isset($options['cols']) && !empty($options['cols']) ? (int)$options['cols'] : false;
+            $rows = isset($options['rows']) && !empty($options['rows']) ? (int)$options['rows'] : false;
+            $editor_type = isset($options['editor']) && !empty($options['editor']) ? $options['editor'] : '';
+            $editor_content = isset($options['content']) && !empty($options['content']) ? $options['content'] : '';
 
-	        if ($editor_content == 'from_file' && !empty($value)) {
-		        $content = self::getSource($value);
-		        $value = $content->source;
-	        }
+            if ($editor_content === 'from_file' && !empty($value)) {
+                $content = self::getSource($value);
+                $value = $content->source;
+            }
 
             if ($editor_type) {
                 $editor = Editor::getInstance($editor_type);
-			} else {
+            } else {
                 $config = Factory::getApplication()->getConfig();
-	            $defaultEditor = $config->get('editor');
-	            $editor = Editor::getInstance($defaultEditor);
-			}
+                $defaultEditor = $config->get('editor');
+                $editor = Editor::getInstance($defaultEditor);
+            }
 
-	        $buttons = isset($options['buttons']) ? $options['buttons'] : false; // Default to true (enable all buttons)
-	        $html = $editor->display($name, $value, $width, $height, $cols, $rows, false, $id, null, $buttons, $options);
-        } elseif ($type == 'filelist'){
+            $buttons = isset($options['buttons']) ? $options['buttons'] : false; // Default to true (enable all buttons)
+            $html = $editor->display($name, $value, $width, $height, $cols, $rows, false, $id, null, $buttons, $options);
+        } elseif ($type === 'filelist'){
             $file_options = array(
                 'options' => array(
                     '' => Text::_('J2STORE_CHOOSE')
@@ -947,8 +1134,8 @@ class J2Html
                 $path = JPATH_ROOT . '/' . $path;
             }
 
-            $path = JPath::clean($path);
-            $files = JFolder::files($path, $fileFilter);
+            $path = Path::clean($path);
+            $files = Folder::files($path, $fileFilter);
             if (is_array($files))
             {
                 foreach ($files as $file)
@@ -958,27 +1145,31 @@ class J2Html
             }
 
             $html = self::generic_list($name, $value,$file_options);
-        } elseif ($type == 'calendar') {
+        } elseif ($type === 'calendar') {
             $html = self::calendar($name, $value, $options);
-        } elseif ($type == 'coupondiscounttypes') {
+        } elseif ($type === 'calendarfield') {
+            $html = self::calendarfield($name, $value, $options);
+        } elseif ($type === 'coupondiscounttypes') {
             $html = self::couponDiscountTypes($name, $value, $options);
-        }elseif ($type == 'couponproducts') {
+        }elseif ($type === 'couponproducts') {
             $html = self::couponProduct($name, $value, $options);
-        }elseif ($type == 'duallistbox') {
+        }elseif ($type === 'duallistbox') {
             $html = self::duallistbox($name, $value, $options);
-        }elseif ($type == 'usergroup') {
+        }elseif ($type === 'usergroup') {
             $html = self::userGroup($name, $value,$options);
         } else {
             $html = self::input('text', $name, $value, $options);
         }
         return $html;
     }
-    public static  function userGroup($name, $value,$options){
 
+    public static function userGroup($name, $value,$options)
+    {
         $platform = J2Store::platform();
         $platform->loadExtra('behavior.multiselect');
 
-        $db    = JFactory::getDbo();
+        $db = Factory::getContainer()->get('DatabaseDriver');
+
         $query = $db->getQuery(true);
         $query->select('a.id AS value, a.title AS text');
         $query->from('#__usergroups AS a');
@@ -991,82 +1182,66 @@ class J2Html
         $user_group = $db->loadObjectList();
 
         $id = isset($options['id']) && $options['id'] ? $options['id'] : $name;
-        $placeholders = array();
+        $placeholders = [];
         if(isset($user_group) && !empty($user_group)){
             $placeholders = $user_group;
         }
 
-//        $multiple = false;
-//        if(isset($options['multiple']) && !empty($options['multiple'])){
-//            $multiple = true;
-//        }
-//        $required = false ;
-//        if(isset($options['required']) && !empty($options['required'])){
-//            $required = true;
-//        }
+        $displayData = array(
+            'class' => '',
+            'name' => $name,
+            'value' => $value  ,
+            'options' =>$placeholders ,
+            'autofocus' => '',
+            'onchange' => '',
+            'dataAttribute' => '',
+            'readonly' => '',
+            'disabled' => false,
+            'hint' => '',
+            'required' => false,
+            'id' => '',
+            'multiple'=> true
+        );
+        $path = JPATH_SITE . '/layouts/joomla/form/field/list-fancy-select.php';
+        $media_render = self::getRenderer('joomla.form.field.list-fancy-select', $path);
 
-        if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            return self::select()->clearState()
-                ->idTag($id)
-                ->type('genericlist')
-                ->name($name)
-                ->value($value)
-                ->attribs($options)
-                ->setPlaceholders($placeholders)
-                ->getHtml();
-        }else{
-            $displayData = array(
-                'class' => '',
-                'name' => $name,
-                'value' => $value  ,
-                'options' =>$placeholders ,
-                'autofocus' => '',
-                'onchange' => '',
-                'dataAttribute' => '',
-                'readonly' => '',
-                'disabled' => false,
-                'hint' => '',
-                'required' => false,
-                'id' => '',
-                'multiple'=> true
-            );
-            $path = JPATH_SITE . '/layouts/joomla/form/field/list-fancy-select.php';
-            $media_render = self::getRenderer('joomla.form.field.list-fancy-select', $path);
-            return $media_render->render($displayData);
-        }
+        return $media_render->render($displayData);
     }
-    protected static function getSource($filename) {
-        $app = JFactory::getApplication ();
-        $item = new stdClass ();
+
+    protected static function getSource($filename)
+    {
+        $app = Factory::getApplication();
+        $item = new \stdClass();
 
         if ($filename) {
-            $filePath = JPath::clean ( JPATH_ADMINISTRATOR.'/components/com_j2store/views/emailtemplate/tpls/'.$filename);
-            if (file_exists ( $filePath )) {
+            $filePath = Path::clean(JPATH_ADMINISTRATOR.'/components/com_j2store/views/emailtemplate/tpls/'.$filename);
+            if (file_exists($filePath)) {
                 $item->filename = $filename;
-                $item->source = file_get_contents ( $filePath );
+                $item->source = file_get_contents($filePath);
             } else {
-                $app->enqueueMessage ( Text::_ ( 'J2STORE_EMAILTEMPLATE_ERROR_SOURCE_FILE_NOT_FOUND' ), 'error' );
+                $app->enqueueMessage(Text::_('J2STORE_EMAILTEMPLATE_ERROR_SOURCE_FILE_NOT_FOUND'), 'error');
             }
         }
         return $item;
     }
-    public static  function duallistbox($name, $value, $options){
 
+    public static function duallistbox($name, $value, $options)
+    {
         $platform = J2Store::platform();
-        JFormHelper::loadFieldClass('list');
+        FormHelper::loadFieldClass('list');
         $json = self::getOptions($name, $value, $options);
         $json = json_encode($json,JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-        JHtml::_('script', 'media/j2store/js/dual-list-box.js', false, false);
-        JHtml::_('stylesheet', 'media/j2store/css/dual-list-box.css', false, false);
+        HTMLHelper::_('script', 'media/j2store/js/dual-list-box.js', false, false);
+        HTMLHelper::_('stylesheet', 'media/j2store/css/dual-list-box.css', false, false);
         $selected = json_encode($value);
-        $input_id = !empty($options->id) ? $options->id : 'duallistbox-input';
+        $input_id = !empty($options['id']) ? $options['id'] : 'duallistbox-input';
         $html ='<div id="dual-list-box" class="row-fluid">';
         $html .='<select id='.$input_id.' multiple="multiple"
-					size ="10"  name='.$name.'[]'.'
-					>
+                    size ="10"  name='.$name.'[]'.'
+                    >
                     </select>';
         $html .='<script type="text/javascript">
-	   var optionList = document.getElementById(\''.$input_id.'\').options;
+        var optionList = document.getElementById(\''.$input_id.'\').options;
               var options = '.$json.'
               var selected = '. $selected .'
               options.forEach(option => {
@@ -1074,18 +1249,19 @@ class J2Html
                   optionList.add(new Option(option.title, option.id, option.selected));
                }
              });
-		(function($){
+        (function($){
         var values = '. $selected .';
         if ( values != null ){
         $.each(values.split(","), function(i,e){
         $("#' . $input_id . ' option[value=\'" + e + "\']").attr("selected", true);
         });
         }
-		var dualListObj =  $(\'#'.$input_id.'\').bootstrapDualListbox();
-		})(j2store.jQuery)
-		</script></div>';
+        var dualListObj =  $(\'#'.$input_id.'\').bootstrapDualListbox();
+        })(j2store.jQuery)
+        </script></div>';
         return $html;
     }
+
     public static function getOptions($name, $value, $options)
     {
         $source_file      = empty($options['source_file']) ? '' : (string) $options['source_file'];
@@ -1095,121 +1271,103 @@ class J2Html
         $source_value     = empty($options['source_value']) ? '*' : (string) $options['source_value'];
         $source_translate = empty($options['source_translate']) ? 'true' : (string) $options['source_translate'];
         $source_translate = in_array(strtolower($source_translate), array('true','yes','1','on')) ? true : false;
-        $source_format	  = empty($options['source_format']) ? '' : (string) $options['source_format'];
+        $source_format    = empty($options['source_format']) ? '' : (string) $options['source_format'];
 
-        //echo $source_method;
-        $option = array();
+        $source_data = [];
+
+        // Maybe we have to load a file?
+        if (!empty($source_file))
         {
-            // Maybe we have to load a file?
-            if (!empty($source_file))
+            $source_file = F0FTemplateUtils::parsePath($source_file, true);
+
+            if (F0FPlatform::getInstance()->getIntegrationObject('filesystem')->fileExists($source_file))
             {
-                $source_file = F0FTemplateUtils::parsePath($source_file, true);
-
-                if (F0FPlatform::getInstance()->getIntegrationObject('filesystem')->fileExists($source_file))
-                {
-                    include_once $source_file;
-                }
-            }
-            // Make sure the class exists
-            if (class_exists($source_class, true))
-            {				// ...and so does the option
-                if (in_array($source_method, get_class_methods($source_class)))
-                {
-                    // Get the data from the class
-                    if ($source_format == 'optionsobject')
-                    {
-                        $option = array_merge($option, $source_class::$source_method());
-                    }
-                    else
-                    {
-                        // Get the data from the class
-                        $source_data = $source_class::$source_method();
-
-                    }
-                }
+                include_once $source_file;
             }
         }
-        //$group_options[] = array();
-        //to avoid jquery error
-        foreach($source_data as $cat){
-            //$group_options[$cat->title] =($cat->title);
-            $source_data[] =Text ::_ ( strtoupper( $cat->title));
+
+        // Make sure the class exists and the method is callable
+        if (class_exists($source_class, true))
+        {
+            if (in_array($source_method, get_class_methods($source_class)))
+            {
+                $source_data = $source_class::$source_method();
+            }
         }
 
+        // Translate titles without mutating the array during iteration
+        $result = [];
+        foreach ($source_data as $cat)
+        {
+            $cat->title = Text::_(strtoupper($cat->title));
+            $result[] = $cat;
+        }
 
-        return $source_data ;
-      //  return $source_data;
+        return $result;
     }
 
-    public static function couponProduct($name, $value, $options){
+    public static function couponProduct($name, $value, $options)
+    {
         $html ='';
         $fieldId = isset($options['id']) ? $options['id'] : 'jform_product_list';
         $html =J2StorePopup::popup("index.php?option=com_j2store&view=coupons&task=setProducts&layout=products&tmpl=component&function=jSelectProduct&field=".$fieldId, Text::_( "J2STORE_SET_PRODUCTS" ), array('width'=>800 ,'height'=>400 ,'class'=>'btn btn-success'));
         return $html ;
     }
 
-    public  static function couponDiscountTypes($name, $value, $options) {
-        $model = F0FModel::getTmpInstance ( 'Coupons', 'J2StoreModel' );
+    public  static function couponDiscountTypes($name, $value, $options)
+    {
+        $model = J2Store::fof()->getModel( 'Coupons', 'J2StoreModel' );
         $list = $model->getCouponDiscountTypes ();
         $attr = array ();
         // Get the field options.
         // Initialize some field attributes.
-        $attr['class'] = !empty($options->class) ? $options->class : 'form-select';
+        $attr['class'] = !empty($options['class']) ? $options['class'] : 'form-select';
         // Initialize JavaScript field attributes.
-        $attr ['onchange'] = isset ( $options->onchange ) ? $options->onchange : '';
-        $attr ['id'] = isset ( $options->id ) ? $options->id : '';
+        $attr['onchange'] = isset($options['onchange']) ? $options['onchange'] : '';
+        $attr['id'] = isset($options['id']) ? $options['id'] : '';
 
         // generate country filter list
         return J2Html::select ()->clearState ()->type ( 'genericlist' )->name ( $name )->attribs ( $attr )->value ( $value )->setPlaceHolders ( $list )->getHtml ();
     }
-    public static function getEditor($editor=''){
+
+    public static function getEditor($editor='')
+    {
         if(empty($editor)){
-            if(version_compare(JVERSION,'3.99.99','lt')){
-                $config = JFactory::getConfig();
-                $editor = $config->get('editor',null);
-            }elseif(version_compare(JVERSION,'3.99.99','ge')){
-                $editor = JFactory::getApplication()->get('editor');
-            }
+            $editor = Factory::getApplication()->get('editor');
             if(empty($editor)) $editor = null;
         }
-        $my_editor = JEditor::getInstance($editor);
-        //$my_editor = JFactory::getEditor($editor);
+        $my_editor = Editor::getInstance($editor);
         $my_editor->initialise();
+
         return $my_editor;
     }
 
-	// Kept to avoid b/c breaks;
-	public static function artical($name, $value, $options)
-	{
-		return self::article($name, $value, $options);
-	}
+    // Kept to avoid b/c breaks;
+    public static function artical($name, $value, $options)
+    {
+        return self::article($name, $value, $options);
+    }
 
     public static function article($name, $value, $options)
-	{
+    {
         $platform = J2Store::platform();
         //
         $allowClear     = true;
         $allowSelect    = true;
-        $languages = JLanguageHelper::getContentLanguages(array(0, 1), false);
+        $languages = LanguageHelper::getContentLanguages(array(0, 1), false);
         $app = $platform->application();
         // Load language
-        JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
+        Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
 
         // The active article id field.
         $value = (int) $value ?: '';
         $id = isset($options['id']) && !empty($options['id']) ? $options['id']: $name;
         $required = (int)isset($options['required']) && !empty($options['required']) ? $options['required']: false;
         $modalId = 'Article_' . $id;
-        $document = JFactory::getDocument();
-        if(version_compare(JVERSION,'3.99.99','lt')){
-            $platform->loadExtra('jquery.framework');
-            $platform->loadExtra('behavior.modal','a.modal');
-            JHtml::_('script', 'system/modal-fields.js', array('version' => 'auto', 'relative' => true));
-        }else{
-            $wa = \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager();
-            // Add the modal field script to the document head.
-            $wa->useScript('field.modal-fields');
-        }
+
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        // Add the modal field script to the document head.
+        $wa->useScript('field.modal-fields');
 
         // Script to proxy the select modal function to the modal-fields.js file.
         if ($allowSelect)
@@ -1218,61 +1376,33 @@ class J2Html
 
             if (is_null($scriptSelect))
             {
-                $scriptSelect = array();
+                $scriptSelect = [];
             }
 
-            if (!isset($scriptSelect[$id]))
-            {
-                if(version_compare(JVERSION,'3.99.99','lt')){
-                    $document->addScriptDeclaration("window.jSelectJ2Article_" . $id . " = function (id, title, catid, object, url, language) {
-
-                    document.getElementById(\"" . $id . "_id\").value = id;
-					document.getElementById(\"" . $id . "_name\").value = title;
-					jQuery(\"#".$id."_clear\").removeClass(\"hidden\");
-				SqueezeBox.close();
-					jQuery('body').removeClass('modal-open');
-jQuery('.modal-backdrop').remove();
-				}");
-                }else{
-                    $wa->addInlineScript("
-				window.jSelectJ2Article_" . $id . " = function (id, title, catid, object, url, language) {
-					window.processModalSelect('Article', '" . $id . "', id, title, catid, object, url, language);
-					jQuery('body').removeClass('modal-open');
-                    jQuery('.modal-backdrop').remove();
-				}",
-                        [],
-                        ['type' => 'module']
-                    );
-                }
-
+            if (!isset($scriptSelect[$id])) {
+                $wa->addInlineScript("
+                    window.jSelectJ2Article_" . $id . " = function (id, title, catid, object, url, language) {
+                        window.processModalSelect('Article', '" . $id . "', id, title, catid, object, url, language);
+                        jQuery('body').removeClass('modal-open');
+                        jQuery('.modal-backdrop').remove();
+                    }",
+                    [],
+                    ['type' => 'module']
+                );
 
                 Text::script('JGLOBAL_ASSOCIATIONS_PROPAGATE_FAILED');
 
                 $scriptSelect[$id] = true;
             }
         }
-        if ($allowClear && version_compare(JVERSION,'3.99.99','lt'))
-        {
-            $scriptClear = true;
-            $script = array();
-            $script[] = '	function jClearArticle(id) {';
-            $script[] = '		document.getElementById(id + "_id").value = "";';
-            $script[] = '		document.getElementById(id + "_name").value = "' . htmlspecialchars(Text::_('COM_CONTENT_SELECT_AN_ARTICLE', true), ENT_COMPAT, 'UTF-8') . '";';
-            $script[] = '		jQuery("#"+id + "_clear").addClass("hidden");';
-            $script[] = '		if (document.getElementById(id + "_edit")) {';
-            $script[] = '			jQuery("#"+id + "_edit").addClass("hidden");';
-            $script[] = '		}';
-            $script[] = '		return false;';
-            $script[] = '	}';
-            $platform->addInlineScript(implode("\n", $script));
-            //$document->addScriptDeclaration(implode("\n", $script));
-        }
+
         // Setup variables for display.
-        $linkArticles = 'index.php?option=com_content&amp;view=articles&amp;layout=modal&amp;tmpl=component&amp;' . JSession::getFormToken() . '=1';
+        $linkArticles = 'index.php?option=com_content&amp;view=articles&amp;layout=modal&amp;tmpl=component&amp;' . Session::getFormToken() . '=1';
         $urlSelect = $linkArticles . '&amp;function=jSelectJ2Article_' . $id;
         if ($value)
         {
-            $db    = JFactory::getDbo();
+            $db = Factory::getContainer()->get('DatabaseDriver');
+
             $query = $db->getQuery(true)
                 ->select($db->quoteName('title'))
                 ->from($db->quoteName('#__content'))
@@ -1286,7 +1416,7 @@ jQuery('.modal-backdrop').remove();
             }
             catch (\RuntimeException $e)
             {
-                JFactory::getApplication()->enqueueMessage($e->getMessage(), 'error');
+                Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
             }
         }
 
@@ -1294,46 +1424,36 @@ jQuery('.modal-backdrop').remove();
 
         $html = '<span class="input-group">';
         $html .= '<input class="form-control" id="' . $id . '_name" type="text" value="' . $title . '" readonly size="35">';
-// Select article button
+
         if ($allowSelect)
         {
-            if(version_compare(JVERSION,'3.99.99','lt')){
-                $html .= '<a class="modal btn hasTooltip" title="' . JHtml::tooltipText('COM_CONTENT_CHANGE_ARTICLE') . '"  href="' . $urlSelect . '" rel="{handler: \'iframe\', size: {x: 800, y: 450}}"><i class="icon-file"></i> ' . Text::_('JSELECT') . '</a>';
-            }else{
-                $html .= '<button'
-                    . ' class="btn btn-primary' . ($value ? ' hidden' : '') . '"'
-                    . ' id="' . $id . '_select"'
-                    . ' data-bs-toggle="modal"'
-                    . ' type="button"'
-                    . ' data-bs-target="#ModalSelect' . $modalId . '">'
-                    . '<span class="icon-file" aria-hidden="true"></span> ' . Text::_('JSELECT')
-                    . '</button>';
-            }
+            $html .= '<button'
+                . ' class="btn btn-primary' . ($value ? ' hidden' : '') . '"'
+                . ' id="' . $id . '_select"'
+                . ' data-bs-toggle="modal"'
+                . ' type="button"'
+                . ' data-bs-target="#ModalSelect' . $modalId . '">'
+                . '<span class="icon-file" aria-hidden="true"></span> ' . Text::_('JSELECT')
+                . '</button>';
         }
-// Clear article button
+        // Clear article button
         if ($allowClear)
         {
-            if(version_compare(JVERSION,'3.99.99','lt')){
-                $html .= '<button id="' . $id . '_clear" class="btn' . ($value ? '' : ' hidden') . '" onclick="return jClearArticle(\'' . $id . '\')"><span class="icon-remove"></span> ' . Text::_('JCLEAR') . '</button>';
-            }else{
-                $html .= '<button'
-                    . ' class="btn btn-secondary' . ($value ? '' : ' hidden') . '"'
-                    . ' id="' . $id . '_clear"'
-                    . ' type="button"'
-                    . ' onclick="window.processModalParent(\'' . $id . '\'); return false;">'
-                    . '<span class="icon-times" aria-hidden="true"></span> ' . Text::_('JCLEAR')
-                    . '</button>';
-            }
-
-
+            $html .= '<button'
+                . ' class="btn btn-secondary' . ($value ? '' : ' hidden') . '"'
+                . ' id="' . $id . '_clear"'
+                . ' type="button"'
+                . ' onclick="window.processModalParent(\'' . $id . '\'); return false;">'
+                . '<span class="icon-times" aria-hidden="true"></span> ' . Text::_('JCLEAR')
+                . '</button>';
         }
 
         $html .= '</span>';
         $modalTitle    = Text::_('COM_CONTENT_SELECT_AN_ARTICLE');
         // Select article modal
-        if ($allowSelect && version_compare(JVERSION,'3.99.99','gt'))
+        if ($allowSelect)
         {
-            $html .= \Joomla\CMS\HTML\HTMLHelper::_(
+            $html .= HTMLHelper::_(
                 'bootstrap.renderModal',
                 'ModalSelect' . $modalId,
                 array(
@@ -1349,14 +1469,10 @@ jQuery('.modal-backdrop').remove();
             );
         }
 
-
         $class = $required ? ' class="required modal-value"' : '';
-        if(version_compare(JVERSION,'3.99.99','lt')){
-            $html .= '<input type="hidden" id="' . $id . '_id"' . $class . ' name="' . $name . '" value="' . $value . '" />';
-        }else{
-            $html .= '<input type="hidden" id="' . $id . '_id" ' . $class . ' data-required="' . (int) $required . '" name="' . $name
-                . '" data-text="' . htmlspecialchars(Text::_('COM_CONTENT_SELECT_AN_ARTICLE'), ENT_COMPAT, 'UTF-8') . '" value="' . $value . '">';
-        }
+
+        $html .= '<input type="hidden" id="' . $id . '_id" ' . $class . ' data-required="' . (int) $required . '" name="' . $name
+            . '" data-text="' . htmlspecialchars(Text::_('COM_CONTENT_SELECT_AN_ARTICLE'), ENT_COMPAT, 'UTF-8') . '" value="' . $value . '">';
 
         return $html;
     }
@@ -1364,7 +1480,7 @@ jQuery('.modal-backdrop').remove();
     public static function getOrderStatusHtml($id)
     {
         $html = '';
-        $item = F0FModel::getTmpInstance('OrderStatuses', 'J2StoreModel')->getItem($id);
+        $item = J2Store::fof()->getModel('OrderStatuses', 'J2StoreModel')->getItem($id);
         if ($id) {
             $html .= '<label class="label badge ' . $item->orderstatus_cssclass . '">' . Text::_($item->orderstatus_name) . '</label>';
         }
@@ -1373,8 +1489,8 @@ jQuery('.modal-backdrop').remove();
 
     public static function getUserNameById($id)
     {
-        $html = '';
-        $user = JFactory::getUser($id);
+        $userFactory = Factory::getContainer()->get(UserFactory::class);
+        $user = $userFactory->loadUserById($id);
         return $user->name;
     }
 
@@ -1386,7 +1502,7 @@ jQuery('.modal-backdrop').remove();
      */
     public static function attributes($attributes)
     {
-        $html = array();
+        $html = [];
 
         // For numeric keys we will assume that the key and the value are the same
         // as this will convert HTML attributes such as "required" to a correct
@@ -1412,18 +1528,15 @@ jQuery('.modal-backdrop').remove();
         if (is_numeric($key)) $key = $value;
 
         if (!is_null($value))
-
             return $key . '="' . ($value) . '"';
+
+        return null;
     }
 
-
-    public static function booleanlist($name, $attribs = array(), $selected = null, $yes = 'JYES', $no = 'JNO', $id = false)
+    public static function booleanlist($name, $attribs = [], $selected = null, $yes = 'JYES', $no = 'JNO', $id = false)
     {
-        $arr = array(JHtml::_('select.option', '0', Text::_($no)), JHtml::_('select.option', '1', Text::_($yes)));
-
-        return J2Html::radiolist($arr, $name, $attribs, 'value', 'text', (int)$selected, $id);
+        return Select::booleanlist($name, $attribs, $selected, $yes, $no, $id);
     }
-
 
     public static function clean($string)
     {
@@ -1432,7 +1545,6 @@ jQuery('.modal-backdrop').remove();
 
         return preg_replace('/-+/', '-', $string); // Replaces multiple hyphens with single one.
     }
-
 
     /**
      * Generates an HTML radio list.
@@ -1450,62 +1562,57 @@ jQuery('.modal-backdrop').remove();
      *
      * @since   1.5
      */
-    public static function radiolist($data, $name, $attribs = null, $optKey = 'value', $optText = 'text', $selected = null, $idtag = false,
-                                     $translate = false)
+    public static function radiolist($data, $name, $attribs = null, $optKey = 'value', $optText = 'text', $selected = null, $idtag = false, $translate = false)
     {
         reset($data);
 
-        $id = isset($attribs['id']) && !empty($attribs['id']) ? $attribs['id'] : '';
-        $class = isset($attribs['class']) && !empty($attribs['class']) ? $attribs['class'] : '';
-
-
+        $id = '';
+        $class = '';
         if (is_array($attribs)) {
+            $id    = isset($attribs['id'])    && !empty($attribs['id'])    ? $attribs['id']    : '';
+            $class = isset($attribs['class']) && !empty($attribs['class']) ? $attribs['class'] : '';
             $attribs = J2Store::platform()->toString($attribs);
         }
 
         $id_text = $idtag ? $idtag : self::clean($name);
 
-            $html = '<div class="'.$class.' radio">';
-            foreach ($data as $obj) {
-                $k = $obj->$optKey;
-                $t = $translate ? Text::_($obj->$optText) : $obj->$optText;
-                $id = (isset($obj->id) ? $obj->id : null);
+        $html = '<div class="'.$class.' radio">';
+        foreach ($data as $obj) {
+            $k = $obj->$optKey;
+            $t = $translate ? Text::_($obj->$optText) : $obj->$optText;
+            $extra = '';
+            $id    = (isset($obj->id) && $obj->id) ? $obj->id : $id_text . $k;
 
-                $extra = '';
-                $id .= $id ? $obj->id : $id_text . $k;
+            if (is_array($selected)) {
+                foreach ($selected as $val) {
+                    $k2 = is_object($val) ? $val->$optKey : $val;
 
-                if (is_array($selected)) {
-                    foreach ($selected as $val) {
-                        $k2 = is_object($val) ? $val->$optKey : $val;
-
-                        if ($k == $k2) {
-                            $extra .= ' selected="selected" ';
-                            break;
-                        }
+                    if ($k == $k2) {
+                        $extra .= ' selected="selected" ';
+                        break;
                     }
-                } else {
-                    $extra .= ((string)$k == (string)$selected ? ' checked="checked" ' : '');
-
                 }
-                $input_class = ($class == 'btn-group' ? ' class="btn-check" ' : '');
-                $label_class = ($class == 'btn-group' ? 'btn btn-outline-success' : 'radio');
+            } else {
+                $extra .= ((string)$k == (string)$selected ? ' checked="checked" ' : '');
 
-                $html .= "\n\t\n\t" . '<input type="radio"  '.$input_class.'  name="' . $name . '" id="' . $id . '"  value="' . $k . '" ' . $extra
-                    . $attribs . ' />' ;
-                $html .= "\n\t" . '<label class="'. $label_class.'"  for="' . $id . '" id="' . $id . '-lbl" >'. $t;
-                $html .= "\n\t" . '</label>';
             }
+            $input_class = ($class === 'btn-group' ? ' class="btn-check" ' : '');
+            $label_class = ($class === 'btn-group' ? 'btn btn-outline-success' : 'radio');
 
-            $html .= "\n";
-            $html .= '</div>';
-            $html .= "\n";
+            $html .= "\n\t\n\t" . '<input type="radio"  '.$input_class.'  name="' . $name . '" id="' . $id . '"  value="' . $k . '" ' . $extra
+                . $attribs . ' />' ;
+            $html .= "\n\t" . '<label class="'. $label_class.'"  for="' . $id . '" id="' . $id . '-lbl" >'. $t;
+            $html .= "\n\t" . '</label>';
+        }
+
+        $html .= "\n";
+        $html .= '</div>';
+        $html .= "\n";
 
         return $html;
     }
 
-
-    public static function checkboxlist($data, $name, $attribs = null, $optKey = 'value', $optText = 'text', $selected = null, $idtag = false,
-                                        $translate = false)
+    public static function checkboxlist($data, $name, $attribs = null, $optKey = 'value', $optText = 'text', $selected = null, $idtag = false, $translate = false)
     {
         reset($data);
 
@@ -1551,49 +1658,48 @@ jQuery('.modal-backdrop').remove();
         return $html;
     }
 
-	public static function checkboxswitch($data, $name, $attribs = null, $optKey = 'value', $optText = 'text', $selected = null, $idtag = false,
-	                                    $translate = false)
-	{
-		reset($data);
+    public static function checkboxswitch($data, $name, $attribs = null, $optKey = 'value', $optText = 'text', $selected = null, $idtag = false, $translate = false)
+    {
+        reset($data);
 
-		if (is_array($attribs)) {
-			$attribs = J2Store::platform()->toString($attribs);
-		}
+        if (is_array($attribs)) {
+            $attribs = J2Store::platform()->toString($attribs);
+        }
 
-		$id_text = $idtag ? $idtag : $name;
+        $id_text = $idtag ? $idtag : $name;
 
-		$html = '<div class="form-check form-switch">';
+        $html = '<div class="form-check form-switch">';
 
-		foreach ($data as $obj) {
-			$k = $obj->$optKey;
-			$t = $translate ? Text::_($obj->$optText) : $obj->$optText;
-			$id = (isset($obj->id) ? $obj->id : null);
+        foreach ($data as $obj) {
+            $k = $obj->$optKey;
+            $t = $translate ? Text::_($obj->$optText) : $obj->$optText;
+            $id = (isset($obj->id) ? $obj->id : null);
 
-			$extra = '';
-			$id = $id ? $obj->id : $id_text . $k;
+            $extra = '';
+            $id = $id ? $obj->id : $id_text . $k;
 
-			if (is_array($selected)) {
-				foreach ($selected as $val) {
-					$k2 = is_object($val) ? $val->$optKey : $val;
+            if (is_array($selected)) {
+                foreach ($selected as $val) {
+                    $k2 = is_object($val) ? $val->$optKey : $val;
 
-					if ($k == $k2) {
-						$extra .= ' selected="selected" ';
-						break;
-					}
-				}
-			} else {
-				$extra .= ((string)$k == (string)$selected ? ' checked="checked" ' : '');
-			}
+                    if ($k == $k2) {
+                        $extra .= ' selected="selected" ';
+                        break;
+                    }
+                }
+            } else {
+                $extra .= ((string)$k == (string)$selected ? ' checked="checked" ' : '');
+            }
 
-			$html .= '<input type="checkbox" name="' . $name . '" id="' . $id . '" value="' . $k . '" ' . $extra. $attribs . ' >';
-			$html .= '<label for="' . $id . '" id="' . $id . '-lbl" class="form-check-label">';
-			$html .= $t;
-			$html .= '</label>';
-		}
-		$html .= '</div>';
+            $html .= '<input type="checkbox" name="' . $name . '" id="' . $id . '" value="' . $k . '" ' . $extra. $attribs . ' >';
+            $html .= '<label for="' . $id . '" id="' . $id . '-lbl" class="form-check-label">';
+            $html .= $t;
+            $html .= '</label>';
+        }
+        $html .= '</div>';
 
-		return $html;
-	}
+        return $html;
+    }
 
     /**
      * Method to return PRO feature notice
@@ -1615,17 +1721,17 @@ jQuery('.modal-backdrop').remove();
     public static function list_custom($type, $name, $field, $item)
     {
         $html = '';
-        if ($type == 'couponexpiretext') {
+        if ($type === 'couponexpiretext') {
             $html = self::couponExpireText($item);
-        } elseif ($type == 'fieldsql') {
+        } elseif ($type === 'fieldsql') {
             $html = self::fieldSQL($name, $field, $item);
-        } elseif ($type == 'corefieldtypes') {
+        } elseif ($type === 'corefieldtypes') {
             $html = self::fieldCore($name, $field, $item);
-        }elseif ($type == 'receivertypes') {
+        }elseif ($type === 'receivertypes') {
             $html = self::receiverTypes($item);
-        } elseif ($type == 'orderstatuslist'){
+        } elseif ($type === 'orderstatuslist'){
             $html = self::orderStatusList($item);
-        } elseif ($type == 'shipping_link'){
+        } elseif ($type === 'shipping_link'){
             $html = self::shippingLink($item,$field);
         }
         return $html;
@@ -1633,19 +1739,15 @@ jQuery('.modal-backdrop').remove();
 
     public static function couponExpireText($item)
     {
-        if (version_compare(JVERSION, '3.99.99', 'ge')) {
-            $info_class = 'badge bg-info';
-            $warning_class = 'badge bg-warning';
-            $success_class = 'badge bg-success';
-        }else if (version_compare(JVERSION, '3.99.99', 'lt')) {
-            $info_class = 'label label-info';
-            $warning_class = 'label label-warning';
-            $success_class = 'label label-success';
-           }
-        if (!isset($item->valid_from) || !isset($item->valid_to)) {
-            return '';
-        }
+        $info_class = 'badge bg-info';
+        $warning_class = 'badge bg-warning';
+        $success_class = 'badge bg-success';
         $diff = self::getExpiryDate($item->valid_from, $item->valid_to);
+
+        if ($diff === null) {
+            return ''; // Never expires
+        }
+
         $style = 'style="padding:5px"';
         if ($diff->format("%R%a") == 0) {
             $text = Text::sprintf('COM_J2STORE_COUPON_WILL_EXPIRE_TODAY', $diff->format("%a") . ' day (s) ');
@@ -1662,6 +1764,10 @@ jQuery('.modal-backdrop').remove();
 
     protected static function getExpiryDate($valid_from, $valid_to)
     {
+        if (empty($valid_to) || $valid_to == '0000-00-00 00:00:00') {
+            return null;
+        }
+
         $start = date("Y-m-d");
         $today = date_create($start);
         //assign the coupon offer start date
@@ -1670,52 +1776,39 @@ jQuery('.modal-backdrop').remove();
         return date_diff($today, $date2);
     }
 
-/*    public static function fieldSQL($name, $field, $item)
+    public static function fieldSQL($name, $field, $item)
     {
         $html = '';
         $query = isset($field['query']) && !empty($field['query']) ? $field['query'] : '';
-        if (!empty($field['key_field']) && !empty($query) && !empty( $item->$name) ) {
-            $query .= ' WHERE ' . $field['key_field'] . ' = ' . $item->$name ;
+
+        // Verify that the query includes a SELECT clause
+        if (!str_contains(strtoupper($query), 'SELECT')) {
+            $query = 'SELECT * FROM ' . $query;
         }
+
+        if (!empty($field['key_field']) && !empty($query) && !empty($item->$name)) {
+            // Get the database instance
+            $db = Factory::getContainer()->get('DatabaseDriver');
+
+            // Properly escape column and value
+            $query .= ' WHERE ' . $db->quoteName($field['key_field']) . ' = ' . $db->quote($item->$name);
+        }
+
         if (!empty($query)) {
-            $field_data = JFactory::getDbo()->setQuery($query)->loadObject();
-            $value_field = $field['value_field'] ?? '';
-            $html = $field_data->$value_field ?? '';
+            try {
+                $db = Factory::getContainer()->get('DatabaseDriver');
+                $field_data = $db->setQuery($query)->loadObject();
+                $value_field = $field['value_field'] ?? '';
+                $html = $field_data->$value_field ?? '';
+            } catch (Exception $e) {
+                // Log or handle the error as needed
+                Factory::getApplication()->enqueueMessage('Error executing query: ' . $e->getMessage(), 'error');
+            }
         }
+
         return $html;
-    }*/
-	public static function fieldSQL($name, $field, $item)
-	{
-		$html = '';
-		$query = isset($field['query']) && !empty($field['query']) ? $field['query'] : '';
+    }
 
-		// Verify that the query includes a SELECT clause
-		if (!str_contains(strtoupper($query), 'SELECT')) {
-			$query = 'SELECT * FROM ' . $query;
-		}
-
-		if (!empty($field['key_field']) && !empty($query) && !empty($item->$name)) {
-			// Get the database instance
-				$db = Factory::getContainer()->get('DatabaseDriver');
-
-			// Properly escape column and value
-			$query .= ' WHERE ' . $db->quoteName($field['key_field']) . ' = ' . $db->quote($item->$name);
-		}
-
-		if (!empty($query)) {
-			try {
-					$db = Factory::getContainer()->get('DatabaseDriver');
-				$field_data = $db->setQuery($query)->loadObject();
-				$value_field = $field['value_field'] ?? '';
-				$html = $field_data->$value_field ?? '';
-			} catch (Exception $e) {
-				// Log or handle the error as needed
-				Factory::getApplication()->enqueueMessage('Error executing query: ' . $e->getMessage(), 'error');
-			}
-		}
-
-		return $html;
-	}
     public static function receiverTypes($item)
     {
         $html ='';
@@ -1730,24 +1823,27 @@ jQuery('.modal-backdrop').remove();
         $html .= $list[$item->receiver_type];
         return $html;
     }
+
     public static function orderStatusList($item)
     {
         $success_class = 'label badge label-success text-bg-success';
         $html ='';
-        if($item->orderstatus_id != '*'){
-            $orderstatus = F0FTable::getAnInstance('Orderstatus', 'J2StoreTable');
+        if($item->orderstatus_id !== '*'){
+            $orderstatus = J2Store::fof()->loadTable('Orderstatus', 'J2StoreTable');
             $orderstatus->load($item->orderstatus_id);
             $html = '<label class="label badge">' . Text::_($orderstatus->orderstatus_name);
             if (isset($orderstatus->orderstatus_cssclass) && $orderstatus->orderstatus_cssclass) {
                 $html = '<label class="label badge ' . $orderstatus->orderstatus_cssclass . '">' . Text::_($orderstatus->orderstatus_name);
             }
         }else{
-            $html ='<label class="'.$success_class.'">'.Text::_('J2STORE_ALL');
+            $html ='<label class="'.$success_class.'">'.Text::_('JALL');
         }
         $html .='</label>';
         return $html;
     }
-    public static function shippingLink($item,$field){
+
+    public static function shippingLink($item,$field)
+    {
         $url = '';
         if(empty($item) || !isset($field['label'])){
             return $url;
@@ -1773,91 +1869,91 @@ jQuery('.modal-backdrop').remove();
         return $html;
     }
 
-	public static function calculateDaysFromStartDate($customer_start_date)
-	{
-		$startDate = new DateTime($customer_start_date);
-		$currentDate = new DateTime();
-		$interval = $startDate->diff($currentDate);
-		return $interval->days;
-	}
-	public static function getCustomerStartDate($orders)
-	{
-		if (!empty($orders) && isset($orders[0]->created_on)) {
-			return $orders[0]->created_on;
-		}
-		return null;
-	}
-	public static function getGrossCustomerSales($orders)
-	{
-		$total = 0;
-		foreach ($orders as $order) {
-			// Check if orderstatus_cssclass is set and does not contain 'danger', 'important', or 'warning'
-			if (isset($order->orderstatus_cssclass) &&
-				!str_contains($order->orderstatus_cssclass, 'danger') &&
-				!str_contains($order->orderstatus_cssclass, 'important') &&
-				!str_contains($order->orderstatus_cssclass, 'warning'))
-			{
-				$total += (float) $order->order_total;
-			}
-		}
-		return $total;
-	}
-	public static function getSumCustomerOrders($orders)
-	{
-		foreach ($orders as $order) {
-			// Ensure orderstatus_cssclass is set and does not contain 'danger', 'important', or 'warning'
-			if (isset($order->orderstatus_cssclass) &&
-				!str_contains($order->orderstatus_cssclass, 'danger') &&
-				!str_contains($order->orderstatus_cssclass, 'important') &&
-				!str_contains($order->orderstatus_cssclass, 'warning'))
-			{
-				$count++;
-			}
-		}
-		return $count;
-	}
-	public static function countUserOrders($userId)
-	{
-		$db = Factory::getContainer()->get('DatabaseDriver');
-		$query = $db->getQuery(true)
-			->select('COUNT(*)')
-			->from($db->quoteName('#__j2store_orders'))
-			->where($db->quoteName('user_id') . ' = ' . (int) $userId);
-		$db->setQuery($query);
-		$count = $db->loadResult();
-		return $count;
-	}
+    public static function calculateDaysFromStartDate($customer_start_date)
+    {
+        $startDate = new DateTime($customer_start_date);
+        $currentDate = new DateTime();
+        $interval = $startDate->diff($currentDate);
+        return $interval->days;
+    }
 
-	public static function getUserOrders($user_id)
-	{
-		$db = Factory::getContainer()->get('DatabaseDriver');
-		$query = $db->getQuery(true)
-			->select('*')
-			->from($db->quoteName('#__j2store_orders'))
-			->where($db->quoteName('user_id') . ' = ' . (int) $user_id);
-		$db->setQuery($query);
-		$orders = $db->loadObjectList();
-		return $orders;
-	}
+    public static function getCustomerStartDate($orders)
+    {
+        if (!empty($orders) && isset($orders[0]->created_on)) {
+            return $orders[0]->created_on;
+        }
+        return null;
+    }
 
+    public static function getGrossCustomerSales($orders)
+    {
+        $total = 0;
+        foreach ($orders as $order) {
+            // Check if orderstatus_cssclass is set and does not contain 'danger', 'important', or 'warning'
+            if (isset($order->orderstatus_cssclass) &&
+                !str_contains($order->orderstatus_cssclass, 'danger') &&
+                !str_contains($order->orderstatus_cssclass, 'important') &&
+                !str_contains($order->orderstatus_cssclass, 'warning'))
+            {
+                $total += (float) $order->order_total;
+            }
+        }
+        return $total;
+    }
+
+    public static function getSumCustomerOrders($orders)
+    {
+        $count = 0;
+        foreach ($orders as $order) {
+            // Ensure orderstatus_cssclass is set and does not contain 'danger', 'important', or 'warning'
+            if (isset($order->orderstatus_cssclass) &&
+                !str_contains($order->orderstatus_cssclass, 'danger') &&
+                !str_contains($order->orderstatus_cssclass, 'important') &&
+                !str_contains($order->orderstatus_cssclass, 'warning'))
+            {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    public static function countUserOrders($userId)
+    {
+        $db = Factory::getContainer()->get('DatabaseDriver');
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__j2store_orders'))
+            ->where($db->quoteName('user_id') . ' = ' . (int) $userId);
+        $db->setQuery($query);
+        $count = $db->loadResult();
+        return $count;
+    }
+
+    public static function getUserOrders($user_id)
+    {
+        $db = Factory::getContainer()->get('DatabaseDriver');
+        $query = $db->getQuery(true)
+            ->select('*')
+            ->from($db->quoteName('#__j2store_orders'))
+            ->where($db->quoteName('user_id') . ' = ' . (int) $user_id);
+        $db->setQuery($query);
+        $orders = $db->loadObjectList();
+        return $orders;
+    }
 }
 
 class J2Select extends CMSObject
 {
-
     protected $state;
-
     protected $options;
 
     public function __construct($properties = null)
     {
-
         if (!is_object($this->state)) {
             $this->state = new CMSObject();
         }
-        $this->options = array();
+        $this->options = [];
         parent::__construct($properties);
-
     }
 
     /**
@@ -1902,7 +1998,6 @@ class J2Select extends CMSObject
         return $this;
     }
 
-
     /**
      * Method to set model state variables
      *
@@ -1935,37 +2030,20 @@ class J2Select extends CMSObject
         return $this;
     }
 
-    /*
-    * Method to return a select list. Allows mapping table relations
-    * Example for relations
-    * array (
-            'hasone' => array (
-                    'Vendors' => array (
-                            'fields' => array (
-                                    'key'=>'j2store_vendor_id',
-                                    'name'=>array('company')
-                            )
-                    )
-            )
-    );
-    *
-    */
-
     public function getHtml()
     {
-
         $html = '';
 
         $state = $this->getState();
 
         $value = isset($state->value) ? $state->value : '';
-        $attribs = isset($state->attribs) ? $state->attribs : array();
+        $attribs = isset($state->attribs) ? $state->attribs : [];
 
-        $placeholder = isset($state->placeholder) ? $state->placeholder : array();
+        $placeholder = isset($state->placeholder) ? $state->placeholder : [];
 
         if (isset($state->hasOne)) {
             $modelName = $state->hasOne;
-            $model = F0FModel::getTmpInstance($modelName, 'J2StoreModel');
+            $model = J2Store::fof()->getModel($modelName, 'J2StoreModel');
 
             //check relations
             if (isset($state->primaryKey) && isset($state->displayName)) {
@@ -1994,22 +2072,18 @@ class J2Select extends CMSObject
                     } else {
                         $text = Text::_($item->$displayName);
                     }
-                    $this->options[] = JHtml::_('select.option', $item->$primary_key, $text);
+                    $this->options[] = HTMLHelper::_('select.option', $item->$primary_key, $text);
                 }
             }
-
         }
-
 
         $idTag = isset($state->idTag) ? $state->idTag : 'j2store_' . F0FInflector::underscore($state->name);
 
-        return JHtml::_('select.' . $state->type, $this->options, $state->name, $attribs, 'value', 'text', $value, $idTag);
+        return HTMLHelper::_('select.' . $state->type, $this->options, $state->name, $attribs, 'value', 'text', $value, $idTag);
     }
 
-
-    public function setRelations($relations = array())
+    public function setRelations($relations = [])
     {
-
         $state = $this->getState();
 
         if (is_array($relations) && isset($relations['fields']) && count($relations['fields'])) {
@@ -2018,22 +2092,21 @@ class J2Select extends CMSObject
         }
         $this->setState('primaryKey', $primary_key);
         $this->setState('displayName', $displayName);
+
         return $this;
     }
 
-    public function setPlaceholders($placeholders = array())
+    public function setPlaceholders($placeholders = [])
     {
-
         //placeholder
         if (is_array($placeholders) && count($placeholders)) {
             foreach ($placeholders as $k => $v) {
-                $this->options[] = JHtml::_('select.option', $k, $v);
+                $this->options[] = HTMLHelper::_('select.option', $k, $v);
             }
         } else {
-            $this->options[] = JHtml::_('select.option', '', Text::_('J2STORE_SELECT_OPTION'));
+            $this->options[] = HTMLHelper::_('select.option', '', Text::_('J2STORE_SELECT_OPTION'));
         }
 
         return $this;
     }
-
 }
