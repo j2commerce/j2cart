@@ -89,17 +89,17 @@ class J2StoreControllerVouchers extends F0FController
                 ),
                 'valid_from' => array(
                     'label' => 'J2STORE_PR_VALIDFROM',
-                    'type' => 'calendar',
+                    'type' => 'calendarfield',
                     'name' => 'valid_from',
                     'value' => $voucher_table->valid_from,
-                    'options' => array('class'=> 'input','format' => '%Y-%m-%d %H:%M:%S')
+                    'options' => array('format' => '%Y-%m-%d %H:%M:%S', 'filter' => 'user_utc', 'showtime' => 'true', 'translateformat' => 'true')
                 ),
                 'valid_to' => array(
                     'label' => 'J2STORE_PR_VALIDTO',
-                    'type' => 'calendar',
+                    'type' => 'calendarfield',
                     'name' => 'valid_to',
                     'value' => $voucher_table->valid_to,
-                    'options' => array('class'=> 'input','format' => '%Y-%m-%d %H:%M:%S')
+                    'options' => array('format' => '%Y-%m-%d %H:%M:%S', 'filter' => 'user_utc', 'showtime' => 'true', 'translateformat' => 'true')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
@@ -209,7 +209,7 @@ class J2StoreControllerVouchers extends F0FController
 	 */
 	public function send(){
 		$app = JFactory::getApplication();
-		$cids = $app->input->get('cid',array(),'');		
+		$cids = $app->input->get('cid',array(),'');
 		if(count($cids)) {
 			$model = $this->getModel('Vouchers');
 			if($model->sendVouchers($cids) === false) {
@@ -219,20 +219,20 @@ class J2StoreControllerVouchers extends F0FController
 				$msg = JText::_('J2STORE_VOUCHERS_SENDING_SUCCESSFUL');
 				$msgType = 'message';
 			}
-		}	
+		}
 		$this->setRedirect('index.php?option=com_j2store&view=vouchers' ,$msg, $msgType);
 	}
-	
+
 	public function history() {
-		
+
 		$app = JFactory::getApplication();
 		$cid = $app->input->get('cid', array(), 'array');
 		//take the first one
 		$id = isset($cid[0]) ? $cid[0] : 0;
 		if($id > 0) {
-			
+
 			$view = $this->getThisView();
-			
+
 			if ($model = $this->getThisModel())
 			{
 				// Push the model into the view (as default)
@@ -247,6 +247,6 @@ class J2StoreControllerVouchers extends F0FController
 		}
 		$view->setLayout('history');
 		$view->display();
-		
+
 	}
 }
