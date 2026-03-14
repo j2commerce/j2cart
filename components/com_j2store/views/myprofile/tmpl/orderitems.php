@@ -51,7 +51,7 @@ if(empty($order->customer_language) || $order->customer_language == '*' || $orde
                 <td style="font-family: 'Arial';line-height: 1.35em;padding: 7px 9px 9px;border: 1px solid #ccc;">
                     <?php if($this->params->get('show_thumb_email', 0) && $thumb_url): ?>
                         <span class="cart-thumb-image">
-                            <img src="<?php echo $thumb_url; ?>">
+                            <img src="<?php echo $thumb_url; ?>" />
                         </span>
                     <?php endif; ?>
 

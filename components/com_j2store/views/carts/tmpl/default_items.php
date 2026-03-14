@@ -36,7 +36,7 @@ $image = J2Store::image();
 
 						<?php if($this->params->get('show_thumb_cart', 1) && $thumb_url): ?>
 							<span class="cart-thumb-image">
-								<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo $thumb_url; ?>" >
+								<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo $thumb_url; ?>" />
 							</span>
 						<?php endif; ?>
 						<span class="cart-product-name">

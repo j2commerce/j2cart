@@ -140,7 +140,7 @@ $params = J2Store::config();
 					<td>
 						<?php if($params->get('show_thumb_cart', 1) && $thumb_url): ?>
 							<span class="cart-thumb-image">
-								<img style="float: left;" width="120" src="<?php echo $thumb_url; ?>" >
+								<img style="float: left;" width="120" src="<?php echo $thumb_url; ?>" />
 							</span>
 						<?php endif; ?>
 						<span class="cart-product-name">
