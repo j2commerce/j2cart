@@ -21,8 +21,8 @@ class J2StoreControllerCoupons extends F0FController
 
     public function onBeforeApplySave(&$data){
         if(is_array($data)){
-            $data['valid_from'] = isset($data['valid_from']) && !empty($data['valid_from']) ? $data['valid_from']:'0000-00-00 00:00:00';
-            $data['valid_to'] = isset($data['valid_to']) && !empty($data['valid_to']) ? $data['valid_to']:'0000-00-00 00:00:00';
+            $data['valid_from'] = isset($data['valid_from']) && !empty($data['valid_from']) ? $data['valid_from']:null;
+            $data['valid_to'] = isset($data['valid_to']) && !empty($data['valid_to']) ? $data['valid_to']:null;
             $data['value'] = isset($data['value']) && !empty($data['value']) && $data['value'] > 0  ? $data['value'] : 0 ;
         }
         return true;
@@ -92,7 +92,7 @@ class J2StoreControllerCoupons extends F0FController
                     'desc' => 'J2STORE_COUPON_FREE_SHIPPING_HELP_TEXT',
                     'value' => $coupon_table->free_shipping,
                     'default' => '0',
-                    'options' => array('option' => array( 0 => JText::_('J2STORE_NO'), 1 => JText::_('J2STORE_YES')))
+                    'options' => array('option' => array( 0 => JText::_('JNO'), 1 => JText::_('JYES')))
                 ),
                 'value' => array(
                     'label' => 'J2STORE_COUPON_VALUE',
@@ -108,33 +108,22 @@ class J2StoreControllerCoupons extends F0FController
                     'source_class'=> 'J2StoreModelCoupons',
                     'source_file'=>'admin://components/com_j2store/models/coupons.php',
                     'value' => $coupon_table->value_type,
-                    'options' => array('id' => 'disount_type','class' => 'input-xlarge')
+                    'options' => array('id' => 'disount_type','class' => 'form-select')
                 ),
                 'valid_from' => array(
                     'label' => 'J2STORE_COUPON_VALID_FROM',
-                    'type' => 'calendar',
+                    'type' => 'calendarfield',
                     'name' => 'valid_from',
                     'value' => $coupon_table->valid_from,
-                    'singleheader' => 'true',
-                    'options' => array('class' => 'input-xlarge',
-                        'showtime' => 'true',
-                        'timeformat' => '24',
-                        'todaybutton' => true,
-                        'translateformat' => 'true',
-                        'format' => '%Y-%m-%d %H:%M:%S')
-                 ),
+                    'options' => array('format' => '%Y-%m-%d %H:%M:%S', 'filter' => 'user_utc', 'showtime' => 'true', 'translateformat' => 'true')
+                ),
 
                 'valid_to' => array(
                     'label' => 'J2STORE_COUPON_VALID_TO',
-                    'type' => 'calendar',
+                    'type' => 'calendarfield',
                     'name' => 'valid_to',
                     'value' => $coupon_table->valid_to,
-                    'options' => array('class' => 'input-xlarge',
-                        'showtime' => 'true',
-                        'timeformat' => '24',
-                        'todaybutton' => true,
-                        'translateformat' => 'true',
-                        'format' => '%Y-%m-%d %H:%M:%S')
+                    'options' => array('format' => '%Y-%m-%d %H:%M:%S', 'filter' => 'user_utc', 'showtime' => 'true', 'translateformat' => 'true')
                 ),
             ),
         );
@@ -301,10 +290,14 @@ class J2StoreControllerCoupons extends F0FController
             ),
             'valid_from' => array(
                 'sortable' => 'true',
+                'type' => 'userdate',
+                'format' => 'DATE_FORMAT_LC6',
                 'label' => 'J2STORE_COUPON_VALID_FROM'
             ),
             'valid_to' => array(
                 'sortable' => 'true',
+                'type' => 'userdate',
+                'format' => 'DATE_FORMAT_LC6',
                 'label' => 'J2STORE_COUPON_VALID_TO'
             ),
             'expire_date' => array(

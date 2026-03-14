@@ -11,6 +11,7 @@ $platform->loadExtra('behavior.modal');
 $platform->loadExtra('behavior.formvalidator');
 //JHtml::_('bootstrap.tooltip');
 $platform->loadExtra('bootstrap.modal');
+$image = J2Store::image();
 
 $key = 0;
 $route = JURI::root(true)."/index.php";
@@ -64,14 +65,15 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 					<?php
 					$item->params = $platform->getRegistry($item->orderitem_params);
 					$thumb_image = $item->params->get('thumb_image', '');
+                    $thumb_url = $image->getImageUrl($thumb_image);
 					$checked = JHTML::_('grid.id', $i, $item->j2store_orderitem_id );
 					?>
 					<tr>
 						<td><?php echo $checked; ?></td>
 						<td>
-							<?php if($this->params->get('show_thumb_cart', 1) && !empty($thumb_image)): ?>
+							<?php if($this->params->get('show_thumb_cart', 1) && $thumb_url): ?>
 								<span class="cart-thumb-image">
-									<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo JUri::root().$thumb_image; ?>" />
+									<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo $thumb_url; ?>" />
 								</span>
 							<?php endif; ?>
 							<span class="cart-product-name">

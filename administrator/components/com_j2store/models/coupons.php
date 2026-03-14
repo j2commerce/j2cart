@@ -15,6 +15,45 @@ class J2StoreModelCoupons extends F0FModel {
 	protected function onBeforeSave(&$data, &$table) {
         $status = true ;
         $db = JFactory::getDbo();
+        $nullDate = $db->getNullDate();
+
+        // Determine user timezone offset – mirrors CalendarField's USER_UTC filter logic.
+        // The calendar widget displays stored UTC dates in the user's timezone and submits
+        // values in user-local time, so we must convert back to UTC before storing.
+        $app    = JFactory::getApplication();
+        $offset = $app->getIdentity()->getParam('timezone', $app->get('offset'));
+
+        // Convert valid_from: user-timezone input → UTC for storage
+        if (!isset($data['valid_from']) || empty(trim($data['valid_from'])) || trim($data['valid_from']) === $nullDate) {
+            $data['valid_from'] = null;
+            $table->valid_from  = null;
+        } else {
+            try {
+                // Treat the submitted value as user-local time and store as UTC
+                $date = JFactory::getDate($data['valid_from'], $offset);
+                $data['valid_from'] = $date->toSql();
+                $table->valid_from  = $data['valid_from'];
+            } catch (Exception $e) {
+                $data['valid_from'] = null;
+                $table->valid_from  = null;
+            }
+        }
+
+        // Convert valid_to: user-timezone input → UTC for storage
+        if (!isset($data['valid_to']) || empty(trim($data['valid_to'])) || trim($data['valid_to']) === $nullDate) {
+            $data['valid_to'] = null;
+            $table->valid_to  = null;
+        } else {
+            try {
+                $date = JFactory::getDate($data['valid_to'], $offset);
+                $data['valid_to'] = $date->toSql();
+                $table->valid_to  = $data['valid_to'];
+            } catch (Exception $e) {
+                $data['valid_to'] = null;
+                $table->valid_to  = null;
+            }
+        }
+
         $query = $db->getQuery(true)
             ->select($db->qn(array('coupon_code')))
             ->from($db->qn('#__j2store_coupons'))
@@ -32,15 +71,15 @@ class J2StoreModelCoupons extends F0FModel {
             $status = false;
         }
 
-        if( isset($data['valid_from']) && ($data['valid_from'] != '0000-00-00 00:00:00') && isset($data['valid_to']) && ($data['valid_to'] != '0000-00-00 00:00:00') && ($data['valid_from'] >= $data['valid_to'] )){
+        if( isset($data['valid_from']) && ($data['valid_from'] !== null) && isset($data['valid_to']) && ($data['valid_to'] !== null) && ($data['valid_from'] >= $data['valid_to'] )){
               $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
               $status = false;
         }
 
-        if( ($data['valid_to'] != '0000-00-00 00:00:00' && $data['valid_from'] == '0000-00-00 00:00:00' )){
-            $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
-            $status = false;
-        }
+//        if( ($data['valid_to'] !== $nullDate && $data['valid_from'] === $nullDate )){
+//            $this->setError(JText::_("J2STORE_COUPON_VALID_FORM_DATE_NEED_TO_GREATER_THAN_COUPON_VALID_TO_DATE"));
+//            $status = false;
+//        }
 
 		if(isset($data['products']) && !empty($data['products'])){
             if(is_string($data['products'])){
@@ -83,6 +122,17 @@ class J2StoreModelCoupons extends F0FModel {
 
 	protected function onAfterGetItem(&$record)
 	{
+        $db = JFactory::getDbo();
+        $nullDate = $db->getNullDate();
+
+        // Convert null dates to empty strings so calendar fields show as empty
+        if (isset($record->valid_from) && ($record->valid_from === $nullDate || $record->valid_from === null)) {
+            $record->valid_from = '';
+        }
+        if (isset($record->valid_to) && ($record->valid_to === $nullDate || $record->valid_to === null)) {
+            $record->valid_to = '';
+        }
+
 		$record->product_category = explode(',',$record->product_category);
 		$record->brand_ids = explode(',',$record->brand_ids);
 		$record->user_group = explode(',',$record->user_group);
@@ -366,19 +416,26 @@ class J2StoreModelCoupons extends F0FModel {
 	 * Ensure coupon date is valid or throw exception
 	 */
 	private function validate_expiry_date() {
-		$db = JFactory::getDbo();
+		$db       = JFactory::getDbo();
 		$nullDate = $db->getNullDate();
-		$tz = JFactory::getConfig()->get('offset');
-		$now = JFactory::getDate('now', $tz)->toSql(true);
-		$valid_from = JFactory::getDate($this->coupon->valid_from, $tz)->toSql(true);
-		$valid_to = JFactory::getDate($this->coupon->valid_to, $tz)->toSql(true);
-		if(
-		($this->coupon->valid_from == $nullDate || $valid_from <= $now) &&
-		 ($this->coupon->valid_to == $nullDate || $valid_to >= $now)
-		){
+
+		// Dates are stored in UTC (converted on save via USER_UTC logic).
+		// Compare everything in UTC so the check is timezone-independent.
+		$now = JFactory::getDate('now')->toSql();
+
+		$valid_from = $this->coupon->valid_from;
+		$valid_to   = $this->coupon->valid_to;
+
+		$from_ok = empty($valid_from) || $valid_from === null || $valid_from === $nullDate
+			|| JFactory::getDate($valid_from)->toSql() <= $now;
+
+		$to_ok = empty($valid_to) || $valid_to === null || $valid_to === $nullDate
+			|| JFactory::getDate($valid_to)->toSql() >= $now;
+
+		if ($from_ok && $to_ok) {
 			return true;
-		}else {
-			throw new Exception( JText::_('J2STORE_COUPON_EXPIRED'));
+		} else {
+			throw new Exception(JText::_('J2STORE_COUPON_EXPIRED'));
 		}
 	}
 

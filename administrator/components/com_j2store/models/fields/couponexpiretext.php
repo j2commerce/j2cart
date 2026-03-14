@@ -20,6 +20,11 @@ class JFormFieldCouponExpireText extends F0FFormFieldText
 	{
 		$html = array();
 		$diff = $this->getExpiryDate($this->item->valid_from,$this->item->valid_to);
+
+        if ($diff === null) {
+            return ''; // Never expires
+        }
+
 		$style='style="padding:5px"';
 		if($diff->format("%R%a")==0)
 		{
@@ -39,6 +44,10 @@ class JFormFieldCouponExpireText extends F0FFormFieldText
 
 	public function getExpiryDate($valid_from,$valid_to)
 	{
+        if (empty($valid_to) || $valid_to == '0000-00-00 00:00:00') {
+            return null;
+        }
+
 		$start=date("Y-m-d");
 		$today=date_create($start);
 		//assign the coupon offer start date

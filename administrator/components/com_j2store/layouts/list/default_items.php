@@ -67,7 +67,7 @@ $cols_count = 0;
                                     <?php echo HTMLHelper::_('grid.id', $i, $item->$name) ?>
                                 <?php endif; ?>
                             </td>
-                        <?php elseif (isset($field['type']) && in_array($field['type'], array('couponexpiretext', 'fieldsql','corefieldtypes','receivertypes','orderstatuslist','shipping_link'))): ?>
+                        <?php elseif (isset($field['type']) && in_array($field['type'], array('couponexpiretext', 'fieldsql','corefieldtypes','receivertypes','orderstatuslist','shipping_link','userdate'))): ?>
                             <td<?php echo $class;?>><?php echo J2Html::list_custom($field['type'], $name, $field, $item); ?></td>
                         <?php elseif (isset($field['show_link']) && $field['show_link'] == 'true' && isset($field['url_id']) && isset($field['url'])): ?>
                             <?php $url_id = $field['url_id']; ?>

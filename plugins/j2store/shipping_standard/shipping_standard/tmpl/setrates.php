@@ -39,6 +39,7 @@ $baseLink = $this->baseLink;
 							  				   ->type('genericlist')
 											   ->name('jform[geozone_id]')
 											   ->value()
+                                                ->attribs(['class' => 'form-select'])
 											   ->hasOne('Geozones')
 											   ->setRelations(array('fields' => array ('key' => 'j2store_geozone_id','name' => array('geozone_name'))))
 	            							   ->getHtml();?>
@@ -99,6 +100,7 @@ $baseLink = $this->baseLink;
 	           		<?php echo J2html::hidden('standardrates['.$item->j2store_shippingrate_id.'][j2store_shippingrate_id]',$item->j2store_shippingrate_id); ?>
            			<?php echo J2Html::select()->clearState()->type('genericlist')->name('standardrates['.$item->j2store_shippingrate_id.'][geozone_id]')
 												->value($item->geozone_id)
+                        ->attribs(['class' => 'form-select'])
 												->hasOne('Geozones')
 												->setRelations(array('fields' => array ('key' => 'j2store_geozone_id','name' => array('geozone_name'))))
            										->getHtml();?>

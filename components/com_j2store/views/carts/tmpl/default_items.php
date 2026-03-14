@@ -7,6 +7,7 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 $platform = J2Store::platform();
+$image = J2Store::image();
 ?>
 <table class="j2store-cart-table table table-bordered">
 <thead>
@@ -27,14 +28,15 @@ $platform = J2Store::platform();
 				<?php
 					$item->params = $platform->getRegistry($item->orderitem_params);
 					$thumb_image = $item->params->get('thumb_image', '');
+                    $thumb_url = $image->getImageUrl($thumb_image);
 					$back_order_text = $item->params->get('back_order_item', '');
 				?>
 				<tr>
 					<td>
 
-						<?php if($this->params->get('show_thumb_cart', 1) && !empty($thumb_image)): ?>
+						<?php if($this->params->get('show_thumb_cart', 1) && $thumb_url): ?>
 							<span class="cart-thumb-image">
-								<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo $thumb_image; ?>" >
+								<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo $thumb_url; ?>" />
 							</span>
 						<?php endif; ?>
 						<span class="cart-product-name">

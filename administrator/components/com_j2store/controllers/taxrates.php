@@ -58,7 +58,7 @@ class J2StoreControllerTaxrates extends F0FController
                     'type' => 'fieldsql',
                     'name' => 'geozone_id',
                     'value' => $taxrate_table->geozone_id,
-                    'options' => array('required' => 'true', 'id' => 'j2store_geozone_id', 'key_field' => 'j2store_geozone_id', 'value_field' => 'geozone_name', 'has_one' => 'geozone')
+                    'options' => array('class' => 'form-select', 'required' => 'true', 'id' => 'j2store_geozone_id', 'key_field' => 'j2store_geozone_id', 'value_field' => 'geozone_name', 'has_one' => 'geozone')
                 ),
                 'enabled' => array(
                     'label' => 'J2STORE_ENABLED',
