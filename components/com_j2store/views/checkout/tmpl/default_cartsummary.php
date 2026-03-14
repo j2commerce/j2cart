@@ -12,6 +12,7 @@ $items = $this->order->getItems();
 $this->taxes = $order->getOrderTaxrates();
 $this->shipping = $order->getOrderShippingRate();
 $currency = J2Store::currency();
+$image = J2Store::image();
 $colspan = '2';
 
 ?>
@@ -34,13 +35,14 @@ $colspan = '2';
 				<?php
 					$item->params = $platform->getRegistry($item->orderitem_params);
 					$thumb_image = $item->params->get('thumb_image', '');
+                    $thumb_url = $image->getImageUrl($thumb_image);
                     $back_order_text = $item->params->get('back_order_item', '');
 				?>
 				<tr>
 					<td>
-						<?php if($this->params->get('show_thumb_cart', 1) && !empty($thumb_image) && JFile::exists(JPATH_SITE.JPath::clean('/'.$thumb_image))): ?>
+						<?php if($this->params->get('show_thumb_cart', 1) && $thumb_url): ?>
 							<span class="cart-thumb-image">
-								<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo JURI::root(true).JPath::clean('/'.$thumb_image); ?>" >
+								<img alt="<?php echo $item->orderitem_name; ?>" src="<?php echo $thumb_url; ?>" >
 							</span>
 						<?php endif; ?>
 						<span class="cart-product-name">
