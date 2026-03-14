@@ -9,6 +9,7 @@ defined ( '_JEXEC' ) or die ();
 
 $items = $order->getItems();
 $currency = J2Store::currency();
+$image = J2Store::image();
 $params = J2Store::config();
 ?>
 <style>
@@ -133,14 +134,13 @@ $params = J2Store::config();
 					$registry->loadString($item->orderitem_params);
 					$item->params = $registry;
 					$thumb_image = $item->params->get('thumb_image', '');
+                    $thumb_url = $image->getImageUrl($thumb_image);
 				?>
 				<tr valign="top">
 					<td>
-						<?php if($params->get('show_thumb_cart', 1) && !empty($thumb_image)): ?>
+						<?php if($params->get('show_thumb_cart', 1) && $thumb_url): ?>
 							<span class="cart-thumb-image">
-								<?php if(file_exists(JPATH_SITE.'/'.$thumb_image)): ?>
-								<img style="float: left;" width="120" src="<?php echo JUri::root(true).'/'.$thumb_image; ?>" >
-								<?php endif;?>
+								<img style="float: left;" width="120" src="<?php echo $thumb_url; ?>" >
 							</span>
 						<?php endif; ?>
 						<span class="cart-product-name">
