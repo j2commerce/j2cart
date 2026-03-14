@@ -422,6 +422,92 @@ class J2Html
      */
     public static function input($type, $name, $value = null, $options = [])
     {
+        if (Factory::getApplication()->isClient('administrator')) {
+            return self::inputAdmin($type, $name, $value, $options);
+        }
+
+        return self::inputSite($type, $name, $value, $options);
+    }
+
+    /**
+     * Simple raw-HTML input renderer — used on the frontend (site).
+     */
+    public static function inputSite($type, $name, $value = null, $options = [])
+    {
+        $optionvalue = J2Store::platform()->toString($options);
+
+        $html = '';
+        switch ($type) {
+
+            case 'text':
+                $html .= '<input type="text" name="' . $name . '" value="' . $value . '"  ' . $optionvalue . '    />';
+                break;
+
+            case 'email':
+                $html .= '<input type="email" name="' . $name . '"  value="' . $value . '"  ' . $optionvalue . '    />';
+                break;
+
+            case 'password':
+                $html .= '<input type="password"  name="' . $name . '" ' . $optionvalue . '  value="' . $value . '"     />';
+                break;
+
+            case 'textarea':
+                $html .= '<textarea ' . $optionvalue . ' name="' . $name . '"  value="' . $value . '"     >' . $value . '</textarea>';
+                break;
+
+            case 'file':
+                $html .= '<input type="file" name="' . $name . '" ' . $optionvalue . '  value="' . $value . '"     />';
+                break;
+
+            case 'radio':
+                $id = isset($options['id']) && !empty($options['id']) ? $options['id'] : '';
+                $html .= J2Html::booleanlist($name, $options, $value, $yes = 'JYES', $no = 'JNO', $id);
+                break;
+
+            case 'checkbox':
+                $html .= '<input type="checkbox" ' . $optionvalue . '  value="' . $value . '"     />';
+                break;
+
+            case 'editor':
+                break;
+
+            case 'button':
+                $html .= '<input type="button" name="' . $name . '"  ' . $optionvalue . '    value ="' . $value . '"';
+                if (isset($options['onclick']) && !empty($options['onclick'])) {
+                    $html .= '   onclick ="' . $options['onclick'] . '"';
+                }
+                $html .= '  />';
+                break;
+
+            case 'buttontype':
+                $html .= '<button type="button" name="' . $name . '"  ' . $optionvalue;
+                if (isset($options['onclick']) && !empty($options['onclick'])) {
+                    $html .= '   onclick ="' . $options['onclick'] . '"';
+                }
+                $html .= '>' . $value . '</button>';
+                break;
+
+            case 'submit':
+                $html .= '<input type="submit" name="' . $name . '"  ' . $optionvalue . 'value ="' . $value . '" />';
+                break;
+
+            case 'hidden':
+                $html .= '<input type="hidden" name="' . $name . '" ' . $optionvalue . ' value ="' . $value . '" />';
+                break;
+
+            case 'number':
+                $html .= '<input type="number" name="' . $name . '" value="' . $value . '" ' . $optionvalue . ' />';
+                break;
+        }
+
+        return $html;
+    }
+
+    /**
+     * Layout-renderer input — used on the backend (administrator).
+     */
+    public static function inputAdmin($type, $name, $value = null, $options = [])
+    {
         //will implode all the options value and return as element attributes
         $optionvalue = J2Store::platform()->toString($options);
 
@@ -973,6 +1059,14 @@ class J2Html
         return '<a class="btn btn-primary btn-sm" id="'.$id.'" href="#">'.Text::_($text).'</a>';
     }
 
+    public static function enabled($name, $value, $options = [])
+    {
+        if (!isset($options['id']) || empty($options['id'])) {
+            $options['id'] = $name;
+        }
+        return self::input('radio', $name, $value, $options);
+    }
+
     public static function menuItems($name,$value,$options)
     {
         $platform = J2Store::platform();
@@ -980,23 +1074,18 @@ class J2Html
 
         $groups = [];
         // Build the groups arrays.
-        foreach ($items as $menu)
-        {
+        foreach ($items as $menu) {
             // Initialize the group.
             $groups[$menu->title] = [];
 
             // Build the options array.
-            foreach ($menu->links as $link)
-            {
+            foreach ($menu->links as $link) {
                 $levelPrefix = str_repeat('- ', max(0, $link->level - 1));
 
                 // Displays language code if not set to All
-                if ($link->language !== '*')
-                {
+                if ($link->language !== '*') {
                     $lang = ' (' . $link->language . ')';
-                }
-                else
-                {
+                } else {
                     $lang = '';
                 }
 
@@ -1014,7 +1103,7 @@ class J2Html
         }
 
         $attr = [
-            'id'        => $id,
+            'id' => $id,
             'list.select' => $value,
             'option.key.toHtml' => false,
             'option.text.toHtml' => false,
@@ -1094,8 +1183,7 @@ class J2Html
         } elseif ($type === 'modal_article') {
             $html = self::article($name, $value, $options);
         } elseif ($type === 'enabled') {
-            $id = isset($options['id']) && !empty($options['id']) ? $options['id'] : $name;
-            $html = Select::booleanlist($name, $attr = [], $value, $yes = 'JYES', $no = 'JNO', $id);
+            $html = self::enabled($name, $value, $options);
         }elseif ($type === 'editor') {
 
             $id = isset($options['id']) && !empty($options['id']) ? $options['id'] : $name;
@@ -1720,14 +1808,54 @@ class J2Html
             $html = self::fieldSQL($name, $field, $item);
         } elseif ($type === 'corefieldtypes') {
             $html = self::fieldCore($name, $field, $item);
-        }elseif ($type === 'receivertypes') {
+        } elseif ($type === 'receivertypes') {
             $html = self::receiverTypes($item);
-        } elseif ($type === 'orderstatuslist'){
+        } elseif ($type === 'orderstatuslist') {
             $html = self::orderStatusList($item);
-        } elseif ($type === 'shipping_link'){
-            $html = self::shippingLink($item,$field);
+        } elseif ($type === 'shipping_link') {
+            $html = self::shippingLink($item, $field);
+        } elseif ($type === 'userdate') {
+            $format = isset($field['format']) && !empty($field['format']) ? Text::_($field['format']) : 'Y-m-d H:i:s';
+            $value  = isset($item->$name) ? $item->$name : '';
+            $html   = self::formatUserDate($value, $format);
         }
         return $html;
+    }
+
+    /**
+     * Format a UTC date string using the current user's timezone, matching the
+     * 'user_utc' filter applied in the edit form's calendar fields.
+     *
+     * @param   string  $value   Raw UTC date value from the database.
+     * @param   string  $format  PHP date() format string (default 'Y-m-d H:i:s').
+     *
+     * @return  string  Formatted date in the user's local timezone, or empty string for null dates.
+     */
+    public static function formatUserDate($value, $format = 'Y-m-d H:i:s')
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        try {
+            $nullDate = Factory::getContainer()->get('DatabaseDriver')->getNullDate();
+            if ($value === $nullDate || $value === '0000-00-00 00:00:00' || $value === '0000-00-00') {
+                return '';
+            }
+
+            $app  = Factory::getApplication();
+            $user = $app->getIdentity();
+            $tz   = $user->getParam('timezone', $app->getConfig()->get('offset'));
+            $date = Factory::getDate($value, 'UTC');
+
+            if (!empty($tz)) {
+                $date->setTimezone(new \DateTimeZone($tz));
+            }
+
+            return $date->format($format, true, false);
+        } catch (\Exception $e) {
+            return $value;
+        }
     }
 
     public static function couponExpireText($item)
