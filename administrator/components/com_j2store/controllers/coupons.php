@@ -108,7 +108,7 @@ class J2StoreControllerCoupons extends F0FController
                     'source_class'=> 'J2StoreModelCoupons',
                     'source_file'=>'admin://components/com_j2store/models/coupons.php',
                     'value' => $coupon_table->value_type,
-                    'options' => array('id' => 'disount_type','class' => 'input-xlarge')
+                    'options' => array('id' => 'disount_type','class' => 'form-select')
                 ),
                 'valid_from' => array(
                     'label' => 'J2STORE_COUPON_VALID_FROM',
@@ -290,10 +290,14 @@ class J2StoreControllerCoupons extends F0FController
             ),
             'valid_from' => array(
                 'sortable' => 'true',
+                'type' => 'userdate',
+                'format' => 'DATE_FORMAT_LC6',
                 'label' => 'J2STORE_COUPON_VALID_FROM'
             ),
             'valid_to' => array(
                 'sortable' => 'true',
+                'type' => 'userdate',
+                'format' => 'DATE_FORMAT_LC6',
                 'label' => 'J2STORE_COUPON_VALID_TO'
             ),
             'expire_date' => array(
