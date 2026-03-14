@@ -11,6 +11,7 @@ $order = $this->order;
 $platform = J2Store::platform();
 $items = $this->order->getItems();
 $currency = J2Store::currency();
+$image = J2Store::image();
 $this->taxes = $order->getOrderTaxrates();
 $colspan = '2';
 if(empty($order->customer_language) || $order->customer_language == '*' || $order->customer_language == ''){
@@ -43,16 +44,15 @@ if(empty($order->customer_language) || $order->customer_language == '*' || $orde
             <?php
             $item->params = $platform->getRegistry($item->orderitem_params);
             $thumb_image = $item->params->get('thumb_image', '');
+            $thumb_url = $image->getImageUrl($thumb_image);
             $back_order_text = $item->params->get('back_order_item', '');
             ?>
             <tr valign="top">
                 <td style="font-family: 'Arial';line-height: 1.35em;padding: 7px 9px 9px;border: 1px solid #ccc;">
-                    <?php if($this->params->get('show_thumb_email', 0) && !empty($thumb_image)): ?>
+                    <?php if($this->params->get('show_thumb_email', 0) && $thumb_url): ?>
                         <span class="cart-thumb-image">
-								<?php if(JFile::exists(JPATH_SITE.'/'.$thumb_image)): ?>
-                                    <img src="<?php echo JUri::root(true). '/'.$thumb_image; ?>" >
-                                <?php endif;?>
-							</span>
+                            <img src="<?php echo $thumb_url; ?>">
+                        </span>
                     <?php endif; ?>
 
                     <?php echo $this->order->get_formatted_lineitem_name($item,$this->email_receiver);?>
