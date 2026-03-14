@@ -71,26 +71,26 @@ class J2StoreControllerConfigurations extends F0FController
             'fields' => array(
                 'j2store_enable_css' => array(
                     'label' => 'J2STORE_CONF_J2STORE_ENABLE_CSS_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'j2store_enable_css',
                     'value' => isset($vars->item->j2store_enable_css) && !is_null($vars->item->j2store_enable_css) ? $vars->item->j2store_enable_css : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_J2STORE_ENABLE_CSS_DESC'
                 ),
                 'load_fontawesome_ui' => array(
                     'label' => 'J2STORE_CONF_LOAD_FONTAWESOME_UI_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'load_fontawesome_ui',
                     'value' => isset($vars->item->load_fontawesome_ui) && !is_null($vars->item->load_fontawesome_ui) ? $vars->item->load_fontawesome_ui : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_LOAD_FONTAWESOME_UI_DESC'
                 ),
                 'load_fancybox' => array(
                     'label' => 'J2STORE_CONF_LOAD_FANCYBOX_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'load_fancybox',
                     'value' => isset($vars->item->load_fancybox) && !is_null($vars->item->load_fancybox) ? $vars->item->load_fancybox : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_LOAD_FANCYBOX_DESC'
                 ),
                 'load_jquery_ui' => array(
@@ -115,26 +115,26 @@ class J2StoreControllerConfigurations extends F0FController
                 ),
                 'jquery_ui_localisation' => array(
                     'label' => 'J2STORE_CONF_JQUERY_UI_LOCALISATION_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'jquery_ui_localisation',
                     'value' => isset($vars->item->jquery_ui_localisation) && !is_null($vars->item->jquery_ui_localisation) ? $vars->item->jquery_ui_localisation : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_JQUERY_UI_LOCALISATION_DESC'
                 ),
                 'load_bootstrap' => array(
                     'label' => 'J2STORE_CONF_LOAD_BOOTSTRAP_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'load_bootstrap',
                     'value' => isset($vars->item->load_bootstrap) && !is_null($vars->item->load_bootstrap) ? $vars->item->load_bootstrap : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_LOAD_BOOTSTRAP_DESC'
                 ),
                 'load_minimal_bootstrap' => array(
                     'label' => 'J2STORE_CONF_LOAD_MINIMAL_BOOTSTRAP_SUPPORT',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'load_minimal_bootstrap',
                     'value' => isset($vars->item->load_minimal_bootstrap) && !is_null($vars->item->load_minimal_bootstrap) ? $vars->item->load_minimal_bootstrap : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_LOAD_MINIMAL_BOOTSTRAP_SUPPORT_DESC'
                 ),
                 'bootstrap_version' => array(
@@ -287,10 +287,10 @@ class J2StoreControllerConfigurations extends F0FController
                 ),
                 'config_currency_auto' => array(
                     'label' => 'J2STORE_STORE_CURRENCY_AUTO_UPDATE_CURRENCY',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'config_currency_auto',
                     'value' => isset($vars->item->config_currency_auto) && !is_null($vars->item->config_currency_auto) ? $vars->item->config_currency_auto : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES')))
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES')))
                 ),
                 'config_weight_class_id' => array(
                     'label' => 'J2STORE_STORE_CONFIG_WEIGHT',
@@ -315,74 +315,74 @@ class J2StoreControllerConfigurations extends F0FController
             'fields' => array(
                 'catalog_mode' => array(
                     'label' => 'J2STORE_CONF_CATALOG_MODE_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'catalog_mode',
                     'value' => isset($vars->item->catalog_mode) && !is_null($vars->item->catalog_mode) ? $vars->item->catalog_mode : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_CATALOG_MODE_DESC'
                 ),
                 'show_sku' => array(
                     'label' => 'J2STORE_CONF_SHOW_SKU_FIELD_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_sku',
                     'value' => isset($vars->item->show_sku) && !is_null($vars->item->show_sku) ? $vars->item->show_sku : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_SKU_FIELD_DESC'
                 ),
                 'show_manufacturer' => array(
                     'label' => 'J2STORE_CONF_SHOW_SHOW_MANUFACTURER_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_manufacturer',
                     'value' => isset($vars->item->show_manufacturer) && !is_null($vars->item->show_manufacturer) ? $vars->item->show_manufacturer : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_SHOW_MANUFACTURER_DESC'
                 ),
                 'show_qty_field' => array(
                     'label' => 'J2STORE_CONF_SHOW_QTY_FIELD_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_qty_field',
                     'value' => isset($vars->item->show_qty_field) && !is_null($vars->item->show_qty_field) ? $vars->item->show_qty_field : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_QTY_FIELD_DESC'
                 ),
                 'show_price_field' => array(
                     'label' => 'J2STORE_CONF_SHOW_PRICE_FIELD_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_price_field',
                     'value' => isset($vars->item->show_price_field) && !is_null($vars->item->show_price_field) ? $vars->item->show_price_field : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_PRICE_FIELD_DESC'
                 ),
                 'show_base_price' => array(
                     'label' => 'J2STORE_CONF_SHOW_BASE_PRICE_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_base_price',
                     'value' => isset($vars->item->show_base_price) && !is_null($vars->item->show_base_price) ? $vars->item->show_base_price : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_BASE_PRICE_DESC'
                 ),
                 'product_option_price' => array(
                     'label' => 'J2STORE_CONF_PRODUCT_OPTIONS_PRICE_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'product_option_price',
                     'value' => isset($vars->item->product_option_price) && !is_null($vars->item->product_option_price) ? $vars->item->product_option_price : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
+                    'options' => array('options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
                     'desc' => 'J2STORE_CONF_PRODUCT_OPTIONS_PRICE_DESC'
                 ),
                 'product_option_price_prefix' => array(
                     'label' => 'J2STORE_CONF_PRODUCT_OPTIONS_PRICE_PREFIX_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'product_option_price_prefix',
                     'value' => isset($vars->item->product_option_price_prefix) && !is_null($vars->item->product_option_price_prefix) ? $vars->item->product_option_price_prefix : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
+                    'options' => array('options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
                     'desc' => 'J2STORE_CONF_PRODUCT_OPTIONS_PRICE_PREFIX_DESC'
                 ),
                 'image_for_product_options' => array(
                     'label' => 'J2STORE_CONF_SHOW_IMAGE_FOR_PRODUCT_OPTIONS_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'image_for_product_options',
                     'value' => isset($vars->item->image_for_product_options) && !is_null($vars->item->image_for_product_options) ? $vars->item->image_for_product_options : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
+                    'options' => array('options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
                     'desc' => 'J2STORE_CONF_SHOW_IMAGE_FOR_PRODUCT_OPTIONS_DESC'
                 ),
                 'related_product_columns' => array(
@@ -403,18 +403,18 @@ class J2StoreControllerConfigurations extends F0FController
             'fields' => array(
                 'enable_inventory' => array(
                     'label' => 'J2STORE_CONF_ENABLE_INVENTORY_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'enable_inventory',
                     'value' => isset($vars->item->enable_inventory) && !is_null($vars->item->enable_inventory) ? $vars->item->enable_inventory : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_ENABLE_INVENTORY_DESC'
                 ),
                 'cancel_order' => array(
                     'label' => 'J2STORE_CONF_INVENTORY_CANCEL_ORDER_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'cancel_order',
                     'value' => isset($vars->item->cancel_order) && !is_null($vars->item->cancel_order) ? $vars->item->cancel_order : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_INVENTORY_CANCEL_ORDER_DESC'
                 ),
                 'hold_stock' => array(
@@ -499,10 +499,10 @@ class J2StoreControllerConfigurations extends F0FController
                 ),
                 'display_price_with_tax_info' => array(
                     'label' => 'J2STORE_CONF_DISPLAY_PRICE_WITH_TAX_INFO_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'display_price_with_tax_info',
                     'value' => isset($vars->item->display_price_with_tax_info) && !is_null($vars->item->display_price_with_tax_info) ? $vars->item->display_price_with_tax_info : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_DISPLAY_PRICE_WITH_TAX_INFO_DESC'
                 ),
                 'checkout_price_display_options' => array(
@@ -523,18 +523,18 @@ class J2StoreControllerConfigurations extends F0FController
             'fields' => array(
                 'enable_coupon' => array(
                     'label' => 'J2STORE_CONF_ENABLE_COUPON_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'enable_coupon',
                     'value' => isset($vars->item->enable_coupon) && !is_null($vars->item->enable_coupon) ? $vars->item->enable_coupon : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_ENABLE_COUPON_DESC'
                 ),
                 'enable_voucher' => array(
                     'label' => 'J2STORE_CONF_ENABLE_VOUCHER_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'enable_voucher',
                     'value' => isset($vars->item->enable_voucher) && !is_null($vars->item->enable_voucher) ? $vars->item->enable_voucher : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_ENABLE_VOUCHER_DESC'
                 ),
             )
@@ -625,90 +625,90 @@ class J2StoreControllerConfigurations extends F0FController
                 ),
                 'show_thumb_cart' => array(
                     'label' => 'J2STORE_CONF_SHOW_THUMB_CART_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_thumb_cart',
                     'value' => isset($vars->item->show_thumb_cart) && !is_null($vars->item->show_thumb_cart) ? $vars->item->show_thumb_cart : 0,
-                    'options' => array('class' => 'radio-list', 'options' => array(0 => Text::_('JHIDE'), 3 => Text::_('JSHOW'))),
+                    'options' => array( 'options' => array(0 => Text::_('JHIDE'), 3 => Text::_('JSHOW'))),
                     'desc' => 'J2STORE_CONF_SHOW_THUMB_CART_DESC'
                 ),
                 'show_item_tax' => array(
                     'label' => 'J2STORE_CONF_SHOW_ITEM_TAX_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_item_tax',
                     'value' => isset($vars->item->show_item_tax) && !is_null($vars->item->show_item_tax) ? $vars->item->show_item_tax : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_ITEM_TAX_DESC'
                 ),
                 'show_shipping_address' => array(
                     'label' => 'J2STORE_CONF_SHOW_SHIPPING_ADDRESS_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_shipping_address',
                     'value' => isset($vars->item->show_shipping_address) && !is_null($vars->item->show_shipping_address) ? $vars->item->show_shipping_address : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_SHIPPING_ADDRESS_DESC'
                 ),
                 'show_login_form' => array(
                     'label' => 'J2STORE_CONF_SHOW_LOGIN_FORM_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_login_form',
                     'value' => isset($vars->item->show_login_form) && !is_null($vars->item->show_login_form) ? $vars->item->show_login_form : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_LOGIN_FORM_DESC'
                 ),
                 'allow_registration' => array(
                     'label' => 'J2STORE_CONF_ALLOW_REGISTRATION_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'allow_registration',
                     'value' => isset($vars->item->allow_registration) && !is_null($vars->item->allow_registration) ? $vars->item->allow_registration : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_ALLOW_REGISTRATION_DESC'
                 ),
                 'allow_password_validation' => array(
                     'label' => 'J2STORE_CONF_ALLOW_PASSWORD_VALIDATION_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'allow_password_validation',
                     'value' => isset($vars->item->allow_password_validation) && !is_null($vars->item->allow_password_validation) ? $vars->item->allow_password_validation : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_ALLOW_PASSWORD_VALIDATION_DESC'
                 ),
                 'allow_guest_checkout' => array(
                     'label' => 'J2STORE_CONF_ALLOW_GUEST_CHECKOUT_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'allow_guest_checkout',
                     'value' => isset($vars->item->allow_guest_checkout) && !is_null($vars->item->allow_guest_checkout) ? $vars->item->allow_guest_checkout : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_ALLOW_GUEST_CHECKOUT_DESC'
                 ),
                 'show_customer_note' => array(
                     'label' => 'J2STORE_CONF_SHOW_CUSTOMER_NOTE_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_customer_note',
                     'value' => isset($vars->item->show_customer_note) && !is_null($vars->item->show_customer_note) ? $vars->item->show_customer_note : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_CUSTOMER_NOTE_DESC'
                 ),
                 'show_tax_calculator' => array(
                     'label' => 'J2STORE_CONF_SHOW_TAX_CALCULATOR_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_tax_calculator',
                     'value' => isset($vars->item->show_tax_calculator) && !is_null($vars->item->show_tax_calculator) ? $vars->item->show_tax_calculator : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_TAX_CALCULATOR_DESC'
                 ),
                 'show_clear_cart_button' => array(
                     'label' => 'J2STORE_CONF_SHOW_CLEAR_CART_BUTTON_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_clear_cart_button',
                     'value' => isset($vars->item->show_clear_cart_button) && !is_null($vars->item->show_clear_cart_button) ? $vars->item->show_clear_cart_button : 0,
-                    'options' => array('class' => 'radio-list', 'options' => array(0 => Text::_('JHIDE'), 3 => Text::_('JSHOW'))),
+                    'options' => array( 'options' => array(0 => Text::_('JHIDE'), 3 => Text::_('JSHOW'))),
                     'desc' => 'J2STORE_CONF_SHOW_CLEAR_CART_BUTTON_DESC'
                 ),
                 'postalcode_required' => array(
                     'label' => 'J2STORE_CONF_MAKE_POSTALCODE_REQUIRED_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'postalcode_required',
                     'value' => isset($vars->item->postalcode_required) && !is_null($vars->item->postalcode_required) ? $vars->item->postalcode_required : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_MAKE_POSTALCODE_REQUIRED_DESC'
                 ),
                 'clear_cart' => array(
@@ -730,26 +730,26 @@ class J2StoreControllerConfigurations extends F0FController
                 ),
                 'shipping_mandatory' => array(
                     'label' => 'J2STORE_CONF_SHIPPING_MANDATORY_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'shipping_mandatory',
                     'value' => isset($vars->item->shipping_mandatory) && !is_null($vars->item->shipping_mandatory) ? $vars->item->shipping_mandatory : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHIPPING_MANDATORY_DESC'
                 ),
                 'auto_apply_shipping_rate' => array(
                     'label' => 'J2STORE_CONF_J2STORE_AUTO_APPLY_SHIPPING',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'auto_apply_shipping_rate',
                     'value' => isset($vars->item->auto_apply_shipping_rate) && !is_null($vars->item->auto_apply_shipping_rate) ? $vars->item->auto_apply_shipping_rate : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_J2STORE_AUTO_APPLY_SHIPPING_DESC'
                 ),
                 'hide_shipping_until_address_selection' => array(
                     'label' => 'J2STORE_CONF_AUTO_CALCULATE_SHIPPING_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'hide_shipping_until_address_selection',
                     'value' => isset($vars->item->hide_shipping_until_address_selection) && !is_null($vars->item->hide_shipping_until_address_selection) ? $vars->item->hide_shipping_until_address_selection : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_AUTO_CALCULATE_SHIPPING_DESC'
                 ),
                 'clear_outdated_cart_data_term' => array(
@@ -819,10 +819,10 @@ class J2StoreControllerConfigurations extends F0FController
                 ),
                 'show_postpayment_orderlink' => array(
                     'label' => 'J2STORE_CONF_SHOW_POSTPAYMENT_ORDERLINK_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_postpayment_orderlink',
                     'value' => isset($vars->item->show_postpayment_orderlink) && !is_null($vars->item->show_postpayment_orderlink) ? $vars->item->show_postpayment_orderlink : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_POSTPAYMENT_ORDERLINK_DESC'
                 ),
                 'download_area' => array(
@@ -843,33 +843,33 @@ class J2StoreControllerConfigurations extends F0FController
                 ),
                 'show_thumb_email' => array(
                     'label' => 'J2STORE_CONF_SHOW_THUMB_EMAIL_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_thumb_email',
                     'value' => isset($vars->item->show_thumb_email) && !is_null($vars->item->show_thumb_email) ? $vars->item->show_thumb_email : 0,
-                    'options' => array('class' => 'radio-list', 'options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
+                    'options' => array( 'options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
                     'desc' => 'J2STORE_CONF_SHOW_THUMB_EMAIL_DESC'
                 ),
                 'show_logout_myprofile' => array(
                     'label' => 'J2STORE_CONF_SHOW_LOGOUT_MYPROFILE_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_logout_myprofile',
                     'value' => isset($vars->item->show_logout_myprofile) && !is_null($vars->item->show_logout_myprofile) ? $vars->item->show_logout_myprofile : 0,
-                    'options' => array('class' => 'radio-list', 'options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
+                    'options' => array( 'options' => array(0 => Text::_('JHIDE'), 1 => Text::_('JSHOW'))),
                     'desc' => 'J2STORE_CONF_SHOW_LOGOUT_MYPROFILE_DESC'
                 ),
                 'backend_voucher_to_shipping' => array(
                     'label' => 'J2STORE_BACKEND_VOUCHER_TO_SHIPPING_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'backend_voucher_to_shipping',
                     'value' => isset($vars->item->backend_voucher_to_shipping) && !is_null($vars->item->backend_voucher_to_shipping) ? $vars->item->backend_voucher_to_shipping : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES')))
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES')))
                 ),
                 'export_column_per_product_option' => array(
                     'label' => 'J2STORE_CONF_EXPORT_PRODUCT_OPTIONS_PER_COLUMN_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'export_column_per_product_option',
                     'value' => isset($vars->item->export_column_per_product_option) && !is_null($vars->item->export_column_per_product_option) ? $vars->item->export_column_per_product_option : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_EXPORT_PRODUCT_OPTIONS_PER_COLUMN_DESC'
                 ),
             )
@@ -916,10 +916,10 @@ class J2StoreControllerConfigurations extends F0FController
             'fields' => array(
                 'show_terms' => array(
                     'label' => 'J2STORE_CONF_SHOW_TERMS_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'show_terms',
                     'value' => isset($vars->item->show_terms) && !is_null($vars->item->show_terms) ? $vars->item->show_terms : 1,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_SHOW_TERMS_DESC'
                 ),
                 'terms_display_type' => array(
@@ -940,18 +940,18 @@ class J2StoreControllerConfigurations extends F0FController
                 ),
                 'prepare_content' => array(
                     'label' => 'J2STORE_CONF_PREPARE_CONTENT_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'prepare_content',
                     'value' => isset($vars->item->prepare_content) && !is_null($vars->item->prepare_content) ? $vars->item->prepare_content : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_PREPARE_CONTENT_DESC'
                 ),
                 'enable_falang_support' => array(
                     'label' => 'J2STORE_CONF_ENABLE_FALANG_SUPPORT_LABEL',
-                    'type' => 'radiolist',
+                    'type' => 'radio',
                     'name' => 'enable_falang_support',
                     'value' => isset($vars->item->enable_falang_support) && !is_null($vars->item->enable_falang_support) ? $vars->item->enable_falang_support : 0,
-                    'options' => array('class' => 'radio-list','options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
+                    'options' => array('options' => array(0 => Text::_('JNO'), 1 => Text::_('JYES'))),
                     'desc' => 'J2STORE_CONF_ENABLE_FALANG_SUPPORT_DESC'
                 ),
             )
