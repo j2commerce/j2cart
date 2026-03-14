@@ -12,6 +12,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 $platform = J2Store::platform();
+$image = J2Store::image();
 $app = $platform->application();
 require_once(JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2store.php');
 J2Store::utilities()->nocache();
@@ -56,7 +57,7 @@ $title = $params->get('cart_module_title', '');
 						</div>
 						<div class="pull-right">
 							<a href="<?php echo J2Store::platform()->getCartUrl();?>">
-								<?php echo JText::_('J2STORE_VIEW_CART');?>								
+								<?php echo JText::_('J2STORE_VIEW_CART');?>
 							</a>
 						</div>
 					</div>
@@ -65,14 +66,15 @@ $title = $params->get('cart_module_title', '');
 								<?php foreach($advanced_list as $item):
 										$item->params = $platform->getRegistry($item->orderitem_params);
 										$thumb_image = $item->params->get('thumb_image', '');
+                                        $thumb_url = $image->getImageUrl($thumb_image);
 										$product = J2Store::product()->setId($item->product_id)->getProduct();
 									?>
 									<li class="cartitems">
 										<div class="item-info">
 
-											<?php if($params->get('show_thumbimage') && !empty($thumb_image)):?>
+											<?php if($params->get('show_thumbimage') && $thumb_url):?>
 													<span class="cart-thumb-image">
-														<img  alt="<?php echo $item->orderitem_name; ?>" src="<?php echo JUri::root(true).'/'.$thumb_image; ?>" />
+														<img  alt="<?php echo $item->orderitem_name; ?>" src="<?php echo $thumb_url; ?>" />
 													</span>
 											<?php endif;?>
 
@@ -87,7 +89,7 @@ $title = $params->get('cart_module_title', '');
 												<span class="cart-item-qty"> <?php echo $item->orderitem_quantity; ?> </span> x
 											<?php endif;?>
 											<?php echo $currency->format($order->get_formatted_lineitem_price($item, $params->get('checkout_price_display_options', 1))); ?>
-											<p class="j2store-product-name"> 
+											<p class="j2store-product-name">
 												<strong><?php echo $item->orderitem_name;?></strong>
 											</p>
 											<br>
@@ -105,7 +107,7 @@ $title = $params->get('cart_module_title', '');
 									</li>
 								<?php endforeach;?>
 							</ul>
-						
+
 						<?php if( $params->get('enable_checkout') ||  $params->get('enable_view_cart') ):?>
 							<div class="j2store-cart-nav">
 								<?php if($params->get('enable_checkout')):?>
