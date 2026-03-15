@@ -26,6 +26,7 @@ use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\User\UserFactory;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\Path;
 use Joomla\Registry\Registry;
@@ -902,12 +903,17 @@ class J2Html
         return $html;
     }
 
-    public static function user($name, $value,$options = [])
+    public static function user($name, $value, $options = [])
     {
         $user_field = new UserField();
         $user_field->setValue($value);
         $layout = 'joomla.form.field.user';
-        $data = ['name' => $name];
+        // Derive a safe HTML id from the field name when not explicitly provided.
+        // e.g. "jform[user_id]" → "jform_user_id"
+        $id = isset($options['id']) && $options['id']
+            ? $options['id']
+            : trim(preg_replace('/_+/', '_', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $name)), '_');
+        $data = ['name' => $name, 'id' => $id];
         if(isset($options['required']) && !empty($options['required'])) {
             $data['required'] = $options['required'];
         }
@@ -1364,29 +1370,24 @@ class J2Html
         $source_data = [];
 
         // Maybe we have to load a file?
-        if (!empty($source_file))
-        {
+        if (!empty($source_file)) {
             $source_file = F0FTemplateUtils::parsePath($source_file, true);
 
-            if (F0FPlatform::getInstance()->getIntegrationObject('filesystem')->fileExists($source_file))
-            {
+            if (F0FPlatform::getInstance()->getIntegrationObject('filesystem')->fileExists($source_file)) {
                 include_once $source_file;
             }
         }
 
         // Make sure the class exists and the method is callable
-        if (class_exists($source_class, true))
-        {
-            if (in_array($source_method, get_class_methods($source_class)))
-            {
+        if (class_exists($source_class, true)) {
+            if (in_array($source_method, get_class_methods($source_class))) {
                 $source_data = $source_class::$source_method();
             }
         }
 
         // Translate titles without mutating the array during iteration
         $result = [];
-        foreach ($source_data as $cat)
-        {
+        foreach ($source_data as $cat) {
             $cat->title = Text::_(strtoupper($cat->title));
             $result[] = $cat;
         }
@@ -1492,7 +1493,7 @@ class J2Html
                 ->select($db->quoteName('title'))
                 ->from($db->quoteName('#__content'))
                 ->where($db->quoteName('id') . ' = :value')
-                ->bind(':value', $value);
+                ->bind(':value', $value, ParameterType::INTEGER);
             $db->setQuery($query);
 
             try {
@@ -1563,7 +1564,7 @@ class J2Html
         $html = '';
         $item = J2Store::fof()->getModel('OrderStatuses', 'J2StoreModel')->getItem($id);
         if ($id) {
-            $html .= '<label class="label badge ' . $item->orderstatus_cssclass . '">' . Text::_($item->orderstatus_name) . '</label>';
+            $html .= '<span class="label badge ' . $item->orderstatus_cssclass . '">' . Text::_($item->orderstatus_name) . '</span>';
         }
         return $html;
     }
@@ -1589,11 +1590,10 @@ class J2Html
         // as this will convert HTML attributes such as "required" to a correct
         // form like required="required" instead of using incorrect numerics.
         foreach ((array)$attributes as $key => $value) {
-
             $element = self::attributeElement($key, $value);
-
             if (!is_null($element)) $html[] = $element;
         }
+
         return count($html) > 0 ? ' ' . implode(' ', $html) : '';
     }
 
@@ -2038,15 +2038,17 @@ class J2Html
         return $count;
     }
 
-    public static function countUserOrders($userId)
+    public static function countUserOrders($user_id)
     {
         $db = Factory::getContainer()->get('DatabaseDriver');
         $query = $db->getQuery(true)
             ->select('COUNT(*)')
             ->from($db->quoteName('#__j2store_orders'))
-            ->where($db->quoteName('user_id') . ' = ' . (int) $userId);
+            ->where($db->quoteName('user_id') . ' = :user_id')
+            ->bind(':user_id', $user_id, ParameterType::INTEGER);
         $db->setQuery($query);
         $count = $db->loadResult();
+
         return $count;
     }
 
@@ -2056,9 +2058,11 @@ class J2Html
         $query = $db->getQuery(true)
             ->select('*')
             ->from($db->quoteName('#__j2store_orders'))
-            ->where($db->quoteName('user_id') . ' = ' . (int) $user_id);
+            ->where($db->quoteName('user_id') . ' = :user_id')
+            ->bind(':user_id', $user_id, ParameterType::INTEGER);
         $db->setQuery($query);
         $orders = $db->loadObjectList();
+
         return $orders;
     }
 }
