@@ -13,28 +13,30 @@ $platform = J2Store::platform();
 		<h3>
 			<?php echo JText::_('J2STORE_ENTER_SHIPPING_DETAILS'); ?>
 		</h3>
-		<table>
-			<tbody>
-				<tr>
-					<td><?php echo JText::_("J2STORE_SHIPPING_NAME");?></td>
-					<td><input type="text" name="shipping_name" value="<?php echo $this->shipping_name;?>"></td>
-				</tr>
-				<tr>
-					<td><?php echo JText::_("J2STORE_SHIPPING_PRICE");?></td>
-					<td><input name="shipping_price" type="number" value="<?php  echo $this->shipping_price;?>" /></td>
-				</tr>
-                <tr>
-                    <td><?php echo JText::_("J2STORE_SHIPPING_PRICE_TAX");?></td>
-                    <td><input name="shipping_tax" type="number" value="<?php  echo $this->shipping_tax;?>" /></td>
-                </tr>
-				<tr>
-					<td><?php echo JText::_("J2STORE_SHIPPING_TRACKING_ID");?></td>
-					<td>
-						<textarea rows="3" cols="6" name="shipping_tracking_id"><?php echo $this->shipping_tracking_id; ?></textarea>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+        <div class="control-group">
+            <div><?php echo J2Html::label(JText::_('J2STORE_SHIPPING_NAME'),'shipping_name', array('class'=>'control-label'));?></div>
+            <div class="controls">
+                <?php echo J2Html::text('shipping_name', $this->shipping_name); ?>
+            </div>
+        </div>
+        <div class="control-group">
+            <div><?php echo J2Html::label(JText::_('J2STORE_SHIPPING_PRICE'),'shipping_price', array('class'=>'control-label'));?></div>
+            <div class="controls">
+                <?php echo J2Html::input('number', 'shipping_price', $this->shipping_price); ?>
+            </div>
+        </div>
+        <div class="control-group">
+            <div><?php echo J2Html::label(JText::_('J2STORE_SHIPPING_PRICE_TAX'),'shipping_tax', array('class'=>'control-label'));?></div>
+            <div class="controls">
+                <?php echo J2Html::input('number', 'shipping_tax', $this->shipping_tax); ?>
+            </div>
+        </div>
+        <div class="control-group">
+            <div><?php echo J2Html::label(JText::_('J2STORE_SHIPPING_TRACKING_ID'),'shipping_tracking_id', array('class'=>'control-label'));?></div>
+            <div class="controls">
+                <?php echo J2Html::input('textarea', 'shipping_tracking_id', $this->shipping_tracking_id); ?>
+            </div>
+        </div>
 	</div>
 </div>
 <div id='onCheckoutPayment_wrapper'>

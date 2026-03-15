@@ -17,7 +17,7 @@ $platform->loadExtra('behavior.modal');
 
 $search = htmlspecialchars($this->state->search);
 
-HTMLHelper::_('bootstrap.collapse', '[data-bs-toggle="collapse"]');
+HTMLHelper::_('bootstrap.collapse');
 
 $this->product_types[0] = Text::_('J2STORE_PRODUCT_TYPE');
 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();

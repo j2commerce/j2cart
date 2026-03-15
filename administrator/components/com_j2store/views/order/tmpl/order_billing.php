@@ -11,17 +11,14 @@ $platform->loadExtra('behavior.modal','a.modal');
 $platform->loadExtra('behavior.formvalidator');
 //JHTML::_('behavior.modal', 'a.modal');
 $this->address_type='billing';
+$hasAddresses = isset($this->addresses) && count($this->addresses) > 0;
 $row_class = 'row';
 $col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-}
 ?>
-
 <div class="<?php echo $row_class ?>">
 	<div class="<?php echo $col_class ?>8 " style="<?php echo (isset($this->orderinfo->j2store_orderinfo_id) && !empty($this->orderinfo->j2store_orderinfo_id)) ? 'display:none;':'';?>" id="select_billing_address">
-		<input name="save_shipping" type="checkbox" checked="checked" /><?php echo JText::_('J2STORE_SAME_AS_SHIPPING');?>
+		<?php echo J2Html::checkbox('save_shipping', '1', ['id' => 'save_shipping']); ?>
+		<?php echo J2Html::label(JText::_('J2STORE_SAME_AS_SHIPPING'), 'save_shipping'); ?>
 		<input type="hidden" value="<?php echo $this->address_type;?>" name="address_type" />
 		<div class="display_message" id="display_message"></div>
 		<div class="billing-infos ">
@@ -40,28 +37,33 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 				    	</option>
 				    <?php endif; ?>
 				    <?php endforeach; ?>
-				  </select>				  
+				  </select>
 				<?php endif;?>
 		</div>
 
 		<div id="new-address">
-			<input name="validate_type" type="hidden" value="billing" id="validate_type">			
-			<input type="radio" name="address" value="new" id="billing-address-new"  />
-			<label for="billing-address-existing"><?php echo JText::_('J2STORE_ADDRESS_NEW'); ?></label>
-			<div id="orderinfo-billing-<?php echo $this->order->j2store_order_id;?>" style="display:none;">
+			<input name="validate_type" type="hidden" value="billing" id="validate_type">
+			<?php if ($hasAddresses) : ?>
+				<input type="radio" name="address" value="new" id="billing-address-new"  />
+				<label for="billing-address-new"><?php echo JText::_('J2STORE_ADDRESS_NEW'); ?></label>
+			<?php else : ?>
+				<?php // No saved addresses (guest order) – pre-select "new" silently so the form submits correctly ?>
+				<input type="hidden" name="address" value="new">
+			<?php endif; ?>
+			<div id="orderinfo-billing-<?php echo $this->order->j2store_order_id;?>"<?php echo $hasAddresses ? ' style="display:none;"' : ''; ?>>
 				<?php
 				$html = $this->storeProfile->get('store_billing_layout');
 				if(empty($html) || strlen($html) < 5) {
 				//we dont have a profile set in the store profile. So use the default one.
-				
+
 				$html = '<div class="'.$row_class.'">
 		<div class="'.$col_class.'6">[first_name] [last_name] [phone_1] [phone_2] [company] [tax_number]</div>
 		<div class="'.$col_class.'6">[address_1] [address_2] [city] [zip] [country_id] [zone_id]</div>
 		</div>';
 			}
 			//first find all the checkout fields
-			preg_match_all("^\[(.*?)\]^",$html,$checkoutFields, PREG_PATTERN_ORDER);			
-			$allFields = $this->fields;			
+			preg_match_all("^\[(.*?)\]^",$html,$checkoutFields, PREG_PATTERN_ORDER);
+			$allFields = $this->fields;
 			?>
 			  	<?php foreach ($this->fields as $fieldName => $oneExtraField):?>
 				<?php $onWhat='onchange'; if($oneExtraField->field_type=='radio') $onWhat='onclick';?>
@@ -84,7 +86,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 
 			  			endif;
 			  		endforeach;
-			  		
+
 			   //now we have unprocessed fields. remove any other square brackets found.
 			  preg_match_all("^\[(.*?)\]^",$html,$removeFields, PREG_PATTERN_ORDER);
 			  foreach($removeFields[1] as $fieldName) {
@@ -100,12 +102,12 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 				  		<?php $uhtml = '';?>
 				 		<?php foreach ($unprocessedFields as $fieldName => $oneExtraField): ?>
 							<?php $onWhat='onchange'; if($oneExtraField->field_type=='radio') $onWhat='onclick';?>
-							
-								<?php 	
+
+								<?php
 								//print_r($this->billing_orderinfo);
 								if(property_exists($this->address, $fieldName)): ?>
 									<?php
-									
+
 										$oneExtraField->display_label = 'yes';
 										if(($fieldName !='email')){
 
@@ -151,7 +153,9 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 						</address>
 							<?php echo J2Store::getSelectableBase()->getFormatedCustomFields($this->orderinfo, 'customfields', 'billing'); ?>
 				<br>
+				<?php if ($hasAddresses) : ?>
 				<button id="change_address" class="btn btn-warning"><?php echo JText::_("J2STORE_CHOOSE_ALTERNATE_ADDRESS");?></button>
+			<?php endif; ?>
 				<br>
 				<br>
 			<?php endif;?>
@@ -163,12 +167,19 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 	$('#change_address').on('click',function(e){
 		e.preventDefault();
 		$('#select_billing_address').show();
-		$('#nextlayout').hide();
-		$('#saveAndNext').show();
+		// Guests have no #address_id select; route them through #nextlayout
+		// (new-address validation flow) rather than #saveAndNext (existing-address flow).
+		if ($('#address_id').length) {
+			$('#nextlayout').hide();
+			$('#saveAndNext').show();
+		} else {
+			$('#nextlayout').show();
+			$('#saveAndNext').hide();
+		}
 		$('#baddress-info').hide();
 		$('#display_message').after('<button id="close_address" class="btn btn-warning pull-right"><?php echo JText::_('J2STORE_CLOSE');?></button>');
 	});
-	
+
 })(j2store.jQuery);
 
 (function($) {
@@ -236,5 +247,15 @@ $('#country_id').bind('change', function() {
 	}
 })(j2store.jQuery);
 
+<?php if (!$hasAddresses) : ?>
+(function ($) {
+	// Guest order: the new-address form is already visible.
+	// Buttons are rendered AFTER this sub-template in order.php, so defer until DOM ready.
+	$(function () {
+		$('#nextlayout').show();
+		$('#saveAndNext').hide();
+	});
+})(j2store.jQuery);
+<?php endif; ?>
 
 </script>

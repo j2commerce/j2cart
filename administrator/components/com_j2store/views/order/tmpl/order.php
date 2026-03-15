@@ -29,11 +29,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 	<?php if(J2Store::isPro() != 1): ?>
 	<?php echo J2Html::pro(); ?>
 <?php else: ?>
-<div class="alert alert-warning alert-block">
-	<strong><?php echo JText::_('J2STORE_ORDER_CREATION_BETA_NOTIFICATION')?></strong>
-</div>
-<div class="message-div <?php echo $col_class ?>12">
-</div>
+<div class="message-div <?php echo $col_class ?>12"></div>
 <div class="<?php echo $row_class ?>">
 	<form class="form-horizontal form-validate" id="adminForm" name="adminForm" method="post" action="index.php">
 		<?php echo J2Html::input('hidden','option','com_j2store',array('id'=>'option'));?>
@@ -200,7 +196,11 @@ function nextlayout(layout){
 
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
-						//alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+						// AJAX validation could not complete (network error, non-JSON response, etc.).
+						// Fall back to a direct form submission so server-side validation runs.
+						$('#task').attr('value','saveAdminOrder');
+						$('#next_layout').attr('value',layout);
+						$('#adminForm').submit();
 					}
 				});
 			}else{

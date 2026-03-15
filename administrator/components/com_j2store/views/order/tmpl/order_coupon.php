@@ -13,13 +13,13 @@ defined('_JEXEC') or die;
 	    <?php
 		$coupon = F0FModel::getTmpInstance ( 'Coupons', 'J2StoreModel' )->get_coupon();
 	    ?>
-		<input type="text" name="coupon" value="<?php echo $coupon; ?>" />
+		<input type="text" name="coupon" value="<?php echo $coupon; ?>" class="form-control" />
 		<input type="button" onClick="applyCoupon()" value="<?php echo JText::_('J2STORE_APPLY_COUPON')?>" class="button btn btn-primary" />
-  
-	    </div> 
+
+	    </div>
     <?php endif; ?>
      <script type="text/javascript">
-    function applyCoupon(){	
+    function applyCoupon(){
     	(function($){
     		/* $('#task').attr('value','displayAdminProduct');
     		$('#view').attr('value','products'); */
@@ -27,30 +27,30 @@ defined('_JEXEC') or die;
     		var data1 = {
     				option: 'com_j2store',
     				view: 'carts',
-    				task: 'applyCoupon',				
+    				task: 'applyCoupon',
     			};
     		$.each( post_data, function( key, value ) {
-    			
+
     			 if (!(value['name'] in data1) ){
-    				 data1[value['name']] = value['value'];	
+    				 data1[value['name']] = value['value'];
     			}
-    			
+
     		});
     		console.log(data1);
     		$.ajax({
     			type : 'post',
     			url :  'index.php',
-    			data : data1,		
+    			data : data1,
     			dataType: 'json',
-    			success : function(json) {	
-    				
+    			success : function(json) {
+
     				if(json['error']){
-    					//$('.j2store-remove').after('<span>'+json['error']+'</span>');			
+    					//$('.j2store-remove').after('<span>'+json['error']+'</span>');
     				}
     				if(json['success']){
-    					 window.location = json['redirect']; 
+    					 window.location = json['redirect'];
     				}
-    						
+
     			},
     		 error: function(xhr, ajaxOptions, thrownError) {
                  //alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);

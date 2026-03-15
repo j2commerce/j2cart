@@ -115,7 +115,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 						<td><?php echo J2Html::hidden($this->form_prefix.'[orderitem]['.$item->j2store_orderitem_id.'][j2store_orderitem_id]', $item->j2store_orderitem_id);?>
 							<?php echo J2Html::hidden($this->form_prefix.'[orderitem]['.$item->j2store_orderitem_id.'][cartitem_id]', $item->cartitem_id);?>
 							<?php echo J2Html::hidden($this->form_prefix.'[orderitem]['.$item->j2store_orderitem_id.'][cart_id]', $item->cart_id);?>
-							<input class="input-mini" min="0"
+							<input class="form-control input-mini" min="0"
 							name="<?php echo $this->form_prefix.'[orderitem]['.$item->j2store_orderitem_id.'][orderitem_quantity]';?>"
 							type="number" value="<?php echo $item->orderitem_quantity; ?>" />
 							<!--
