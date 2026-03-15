@@ -13,7 +13,6 @@ $platform = J2Store::platform();
 ?>
 <?php if(count($items)):?>
 <h3><?php echo JText::_('J2STORE_ORDER_SUMMARY')?></h3>
-	<div class="alert alert-danger"><?php echo JText::_ ( 'J2STORE_ORDER_EDIT_SUMMARY_TAX_WARRING_MESSAGE' );?></div>
 	<?php echo J2Store::plugin ()->eventWithHtml ( 'BeforeAdminOrderSummery', array(&$order,&$items) );?>
 	<table class="j2store-cart-table table table-bordered">
 		<thead>
@@ -150,7 +149,7 @@ $platform = J2Store::platform();
 			<!-- shipping tax -->
 			<?php foreach ( $this->order->get_fees() as $fee ) :?>
 			<tr>
-				<td colspan="<?php echo $colmspan;?>"><?php echo JText::_($fee->name); ?><a class="j2store-remove remove-icon" href="javascript:void(0)" onClick="removeFee('<?php echo $fee->j2store_orderfee_id;?>')">X</a>
+				<td colspan="<?php echo $colmspan;?>"><?php echo JText::_($fee->name); ?><a class="j2store-remove remove-icon btn btn-sm btn-danger ms-2" href="javascript:void(0)" onClick="removeFee('<?php echo $fee->j2store_orderfee_id;?>')">X</a>
 				</td>
 				<td><?php echo $this->currency->format($this->order->get_formatted_fees($fee, $this->params->get('checkout_price_display_options', 1)), $this->order->currency_code, $this->order->currency_value); ?>
 				</td>
@@ -172,10 +171,10 @@ $platform = J2Store::platform();
 						<td colspan="<?php echo $colmspan;?>">
 						<?php if($discount->discount_type == 'coupon'):?>
 							<?php echo JText::sprintf('J2STORE_COUPON_TITLE', $discount->discount_title); ?>
-							<a class="j2store-remove remove-icon" href="javascript:void(0)" onClick="removeCoupon()">X</a>
+							<a class="j2store-remove remove-icon btn btn-sm btn-danger ms-2" href="javascript:void(0)" onClick="removeCoupon()">X</a>
 						<?php elseif($discount->discount_type == 'voucher'):?>
 							<?php echo JText::sprintf('J2STORE_VOUCHER_TITLE', $discount->discount_title); ?>
-							<a class="j2store-remove remove-icon" href="javascript:void(0)" onClick="removeVouchers()">X</a>
+							<a class="j2store-remove remove-icon btn btn-sm btn-danger ms-2" href="javascript:void(0)" onClick="removeVouchers()">X</a>
 						<?php else:?>
 							<?php echo JText::sprintf('J2STORE_DISCOUNT_TITLE', $discount->discount_title); ?>
 						<?php endif;?>
@@ -220,33 +219,35 @@ $platform = J2Store::platform();
 			<tr class="add_fee_con">
 
 				<td colspan="<?php echo $colmspan+1;?>">
-					<input type="text" name="fee_name" id="fee_name" value="" placeholder="Fee Name">
-					<input type="text" name="fee_amount" id="fee_amount" value="" placeholder="Fee Amount">
-					<?php
-					echo J2Html::select()->clearState()
-						->type('genericlist')
-						->name('fee_tax_class_id')
-						->value('')
-						->setPlaceHolders(array(''=>JText::_('J2STORE_NOT_TAXABLE')))
-						->hasOne('Taxprofiles')
-						->setRelations(
-							array (
-								'fields' => array (
-
-									'key'=>'j2store_taxprofile_id',
-									'name'=>'taxprofile_name'
-								)
-							)
-						)->getHtml();
-					?>
-					<input type="button" id="add_additional_fee" onclick="addAdditionalFee()" class="btn btn-warning" value="<?php echo JText::_('J2STORE_ADD_ADDITIONAL_FEE');?>"/>
-				</td>
+                    <div class="input-group">
+                        <input type="text" name="fee_name" id="fee_name" value="" placeholder="Fee Name" class="form-control me-2 rounded-0">
+                        <input type="text" name="fee_amount" id="fee_amount" value="" placeholder="Fee Amount" class="form-control me-2">
+                        <?php
+                        echo J2Html::select()->clearState()
+                            ->type('genericlist')
+                            ->name('fee_tax_class_id')
+                            ->value('')
+                            ->attribs(array('class'=>'form-select me-2'))
+                            ->setPlaceHolders(array(''=>JText::_('J2STORE_NOT_TAXABLE')))
+                            ->hasOne('Taxprofiles')
+                            ->setRelations(
+                                array (
+                                    'fields' => array (
+                                        'key'=>'j2store_taxprofile_id',
+                                        'name'=>'taxprofile_name'
+                                    )
+                                )
+                            )->getHtml();
+                        ?>
+                        <input type="button" id="add_additional_fee" onclick="addAdditionalFee()" class="btn btn-warning rounded-1 me-2" value="<?php echo JText::_('J2STORE_ADD_ADDITIONAL_FEE');?>"/>
+                    </div>
+                </td>
 			</tr>
 			<tr>
 				<td colspan="<?php echo $colmspan+1;?>" >
-					<span class="pull-right">
-						<button id="calculate_tax" class="btn btn-warning"><?php echo JText::_('J2STORE_CALCULATE_TAX');?></button>
-					</span>
+                    <div class="alert alert-warning overflow-hidden"><?php echo JText::_ ( 'J2STORE_ORDER_EDIT_SUMMARY_TAX_WARRING_MESSAGE' );?>
+                        <button id="calculate_tax" class="btn btn-warning pull-right"><?php echo JText::_('J2STORE_CALCULATE_TAX');?></button>
+                    </div>
 				</td>
 			</tr>
 		</tfoot>
@@ -254,7 +255,7 @@ $platform = J2Store::platform();
 
 <?php else :?>
 <span class="cart-no-items">
-				<?php echo JText::_('J2STORE_CART_NO_ITEMS'); ?>
+    <?php echo JText::_('J2STORE_CART_NO_ITEMS'); ?>
 </span>
 <?php endif;?>
 <script type="text/javascript">
