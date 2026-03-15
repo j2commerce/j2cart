@@ -12,7 +12,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 
-HTMLHelper::_('bootstrap.collapse', '[data-bs-toggle="collapse"]');
+HTMLHelper::_('bootstrap.collapse');
 $row_class = 'row';
 $col_class = 'col-md-';
 if (version_compare(JVERSION, '3.99.99', 'lt')) {
