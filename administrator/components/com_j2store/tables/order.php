@@ -3050,52 +3050,57 @@ class J2StoreTableOrder extends F0FTable
 		$tz = JFactory::getConfig()->get('offset');
         $data['created_on'] = JFactory::getDate($created_date, $tz)->toSql(true);
         $data['ip_address'] = $_SERVER['REMOTE_ADDR'];
-		if(!isset($data['user_id']) || empty($data['user_id'])){
-			$result =array('msg'  => JText::_('J2STORE_REQUIRED_USER') , 'msgType' => 'warning');
-			return $result;
-		}else{
-			if(empty($this->j2store_order_id)){
-				$this->customer_language = empty($this->customer_language) ? $lang->getTag() : $this->customer_language ;
-				$this->order_state_id =  empty($this->order_state_id) ? $data['order_state_id'] : $this->order_state_id;
-				$this->user_id = $data['user_id'];
-				$user =  JFactory::getUser($this->user_id);
-				$this->user_email =$user->email;
-				$this->customer_group = implode(',', JAccess::getAuthorisedViewLevels($user->id, false));
 
-				$this->currency_id = $currency->getId();
-				$this->currency_code = $currency->getCode();
-				$this->currency_value = $currency->getValue($currency->getCode());
-				$this->is_including_tax = $config->get('config_including_tax', 0);
-				$this->customer_note = $data['customer_note'];
-				$this->created_on = $data['created_on'];
-			}else{
-				$this->is_update = true;
-				$user =  JFactory::getUser($this->user_id);
-				$this->user_email = $user->email;
-				$this->bind($data);
+		if(empty($this->j2store_order_id)){
+			// New order: user_id = 0 means a guest order; a registered user is not required
+			$this->customer_language = empty($this->customer_language) ? $lang->getTag() : $this->customer_language;
+			$this->order_state_id    = empty($this->order_state_id) ? $data['order_state_id'] : $this->order_state_id;
+			$this->user_id           = isset($data['user_id']) ? (int) $data['user_id'] : 0;
+			$user                    = JFactory::getUser($this->user_id); // guest user when user_id = 0
+			$this->user_email        = $user->email;  // '' for guests
+			// For guest orders let the admin supply the email directly
+			if (empty($this->user_email) && !empty($data['user_email'])) {
+				$this->user_email = trim($data['user_email']);
 			}
-
-			//trigger on before save
-            $order_obj = $this->get_order_obj();
-			J2Store::plugin()->event('BeforeSaveOrder', array(&$order_obj));
-			if($this->store()){
-				if(!isset($this->order_id) || empty($this->order_id) || !isset($this->is_update) || $this->is_update != 1) {
-					$this->order_id = time().$this->j2store_order_id;
-					//generate invoice number
-					$this->generateInvoiceNumber();
-					//generate a unique hash
-					$this->token = JApplicationHelper::getHash($this->order_id);
-					//save again so that the unique order id is saved.
-					$this->store();
-				}
-				if(isset($data['update_history']) && $data['update_history'] == 1){
-					$note = JText::_('J2STORE_BACKEND_ORDER_CREATED_BY_ADMIN');
-					$this->add_history($note);
-				}
-			}else{
-				$result=array('msg' => JText::_('J2STORE_ORDER_SAVE_ERROR') ,'msgType' => 'warning');
+			$this->customer_group    = implode(',', JAccess::getAuthorisedViewLevels($this->user_id, false));
+			$this->currency_id       = $currency->getId();
+			$this->currency_code     = $currency->getCode();
+			$this->currency_value    = $currency->getValue($currency->getCode());
+			$this->is_including_tax  = $config->get('config_including_tax', 0);
+			$this->customer_note     = $data['customer_note'];
+			$this->created_on        = $data['created_on'];
+		}else{
+			// Existing order update: user_id is optional (guest orders have user_id = 0)
+			$this->is_update = true;
+			$this->bind($data);
+			// Refresh user_email only when a registered user is assigned
+			if(!empty($this->user_id)){
+				$user             = JFactory::getUser($this->user_id);
+				$this->user_email = $user->email;
 			}
 		}
+
+		//trigger on before save
+		$order_obj = $this->get_order_obj();
+		J2Store::plugin()->event('BeforeSaveOrder', array(&$order_obj));
+		if($this->store()){
+			if(!isset($this->order_id) || empty($this->order_id) || !isset($this->is_update) || $this->is_update != 1) {
+				$this->order_id = time().$this->j2store_order_id;
+				//generate invoice number
+				$this->generateInvoiceNumber();
+				//generate a unique hash
+				$this->token = JApplicationHelper::getHash($this->order_id);
+				//save again so that the unique order id is saved.
+				$this->store();
+			}
+			if(isset($data['update_history']) && $data['update_history'] == 1){
+				$note = JText::_('J2STORE_BACKEND_ORDER_CREATED_BY_ADMIN');
+				$this->add_history($note);
+			}
+		}else{
+			$result = array('msg' => JText::_('J2STORE_ORDER_SAVE_ERROR'), 'msgType' => 'warning');
+		}
+
 		return $result;
 	}
 	//save order info
@@ -3150,6 +3155,17 @@ class J2StoreTableOrder extends F0FTable
 			$data['email'] = $this->user_email;
 			$data['user_id'] = $this->user_id;
 
+			// Server-side required-field validation — the same logic used by the
+			// AJAX validate_address endpoint.  This is the authoritative guard:
+			// it runs regardless of how the form was submitted (JS enabled/disabled,
+			// guest bypass, direct POST, etc.).
+			$selectableBase = J2Store::getSelectableBase();
+			$validation = $selectableBase->validate($data, $address_type, 'address');
+			if (!empty($validation['error'])) {
+				$firstError = reset($validation['error']);
+				return array('msg' => $firstError, 'msgType' => 'warning');
+			}
+
 			$address   = F0FModel::getTmpInstance('Addresses','J2StoreModel');
 			$address_id = $address->addAddress($address_type,$data);
 
@@ -3171,6 +3187,16 @@ class J2StoreTableOrder extends F0FTable
 					$values[$k] = $value;
 				}
 				$orderinfo->bind($values);
+				// Mirror the same-as-shipping logic from the existing-address branch:
+				// when save_shipping is checked, copy the billing address to shipping too.
+				if (isset($data['save_shipping']) && $data['save_shipping']) {
+					$shipping_values = array();
+					foreach ($input as $k => $value) {
+						$sk = ($k == 'j2store_address_id') ? 'shipping_address_id' : 'shipping_' . $k;
+						$shipping_values[$sk] = $value;
+					}
+					$orderinfo->bind($shipping_values);
+				}
 				if(!$orderinfo->store()){
 					$result =array('msg' => JText::_('J2STORE_ORDERINFO_ERROR_IN_SAVING') ,'msgType'=>'warning');
 				}
