@@ -10,6 +10,7 @@ $order = $this->order;
 $platform = J2Store::platform();
 $items = $this->order->getItems();
 $currency = J2Store::currency();
+$image = J2Store::image();
 
 ?>
 	<h3><?php echo JText::_('J2STORE_ORDER_SUMMARY')?></h3>
@@ -27,15 +28,14 @@ $currency = J2Store::currency();
 				<?php
 					$item->params = $platform->getRegistry($item->orderitem_params);
 					$thumb_image = $item->params->get('thumb_image', '');
+                    $thumb_url = $image->getImageUrl($thumb_image);
                     $back_order_text = $item->params->get('back_order_item', '');
 				?>
 				<tr>
 					<td>
-						<?php if($this->params->get('show_thumb_cart', 1) && !empty($thumb_image)): ?>
+						<?php if($this->params->get('show_thumb_cart', 1) && $thumb_url): ?>
 							<span class="cart-thumb-image">
-								<?php if(JFile::exists(JPATH_SITE.'/'.$thumb_image)): ?>
-									<img src="<?php echo JUri::root(true). '/'.$thumb_image; ?>" >
-								<?php endif;?>
+                                <img src="<?php echo $thumb_url; ?>" />
 							</span>
 						<?php endif; ?>
 
