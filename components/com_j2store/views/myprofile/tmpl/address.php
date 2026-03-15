@@ -162,7 +162,7 @@ if(empty($user->id)){
 			form.find("#task").attr('value','saveAddress');
 			var data = form.serializeArray();
 			$.ajax({
-				url : 'index.php',
+				url : '<?php echo JUri::root(); ?>index.php',
 				type: 'post',
 				data :data,
 				dataType: 'json',
@@ -217,7 +217,7 @@ if(empty($user->id)){
 $('#address select[name=\'country_id\']').bind('change', function() {
 	if (this.value == '') return;
 	$.ajax({
-		url: 'index.php?option=com_j2store&view=myprofile&task=getCountry&country_id=' + this.value,
+		url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=myprofile&task=getCountry&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
 			$('#address select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');

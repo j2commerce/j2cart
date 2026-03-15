@@ -91,7 +91,7 @@ j2store.jQuery('input[name=\'next\']').bind('click', function() {
 	 $(document).on('click', '#button-quote', function() {
 		 var values = $('#shipping-estimate-form').serializeArray();
 		 $.ajax({
-				url:'<?php echo JRoute::_('index.php'); ?>',
+				url:'<?php echo JUri::root(); ?>index.php',
 				type: 'get',
 				data: values,
 				dataType: 'json',
@@ -125,7 +125,7 @@ j2store.jQuery('input[name=\'next\']').bind('click', function() {
 (function($) {
 $('#shipping-estimate-form select[name=\'country_id\']').bind('change', function() {
 	$.ajax({
-		url:'<?php echo JRoute::_('index.php'); ?>',
+		url:'<?php echo JUri::root(); ?>index.php',
 		type: 'get',
 		data: 'option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
 		dataType: 'json',

@@ -11,7 +11,6 @@ $options = $this->product->options;
 $product_id = $this->product->j2store_product_id;
 $product_helper = J2Store::product();
 $platform = J2Store::platform();
-$ajax_url = JRoute::_('index.php',false);
 ?>
 <?php if ($options) { ?>
 
@@ -216,7 +215,7 @@ $ajax_url = JRoute::_('index.php',false);
 
         <?php if ($option['type'] == 'date') { ?>
           <!-- date -->
-         <?php $element_date = 'j2store_date_' . $option ['productoption_id']; ?> 
+         <?php $element_date = 'j2store_date_' . $option ['productoption_id']; ?>
 	<div id="option-<?php echo $option['productoption_id']; ?>"
 		class="option">
           <?php if ($option['required']) { ?>
@@ -286,7 +285,7 @@ $('#product-option-<?php echo $option['productoption_id']; ?>').on('click', func
 		if ($('#form-upload input[name=\'file\']').val() != '' && $('#form-upload input[name=\'file\']').val() != undefined) {
 			clearInterval(timer);
 			$.ajax({
-				url: '<?php echo $ajax_url;?>?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
+				url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
 				type: 'post',
 				dataType: 'json',
 				data: new FormData($('#form-upload')[0]),

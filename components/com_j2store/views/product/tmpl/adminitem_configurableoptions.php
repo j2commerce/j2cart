@@ -15,9 +15,9 @@ $platform = J2Store::platform();
 
       <div class="options">
         <?php foreach ($options as $option) { ?>
-        
+
         <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplaySingleProductOption', array($this->product, &$option)); ?>
-        
+
         <?php //var_dump($option); ?>
         <?php if ($option['type'] == 'select' && isset($option['optionvalue']) && !empty($option['optionvalue'])) { ?>
         <!-- select -->
@@ -141,7 +141,7 @@ $platform = J2Store::platform();
 				    doAjaxFilter(checkbox_value, product_id, po_id, '#option-'+po_id+' input:checkbox');
 				});
 			})(j2store.jQuery);
-		
+
 		</script>
 
         <?php } ?>
@@ -213,7 +213,7 @@ $platform = J2Store::platform();
         </div>
         <br>
         <script type="text/javascript">
-   		   <?php echo J2StoreStrapper::getDatePickerScript($element_date, $option ['option_params']); ?>     
+   		   <?php echo J2StoreStrapper::getDatePickerScript($element_date, $option ['option_params']); ?>
         </script>
         <?php } ?>
 
@@ -249,7 +249,7 @@ $platform = J2Store::platform();
         (function($) {
           $(document).ready(function(){
             var loc = JSON.parse('<?php echo $localisation;?>');
-            $('.j2store_time').timepicker({timeFormat: 'HH:mm', loc});            
+            $('.j2store_time').timepicker({timeFormat: 'HH:mm', loc});
           });
         })(j2store.jQuery);
         </script>
@@ -259,7 +259,7 @@ $platform = J2Store::platform();
 
         	<div id="ChildOptions<?php echo $option['productoption_id']; ?>"></div>
 
-        <?php } ?>        	
+        <?php } ?>
       </div>
       <?php } ?>
 
@@ -279,7 +279,7 @@ $('#product-option-<?php echo $option['productoption_id']; ?>').on('click', func
 		if ($('#form-upload input[name=\'file\']').val() != '' && $('#form-upload input[name=\'file\']').val() != undefined) {
 			clearInterval(timer);
 			$.ajax({
-				url: 'index.php?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
+				url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
 				type: 'post',
 				dataType: 'json',
 				data: new FormData($('#form-upload')[0]),

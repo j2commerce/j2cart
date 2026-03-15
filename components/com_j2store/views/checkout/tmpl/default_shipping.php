@@ -24,16 +24,16 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 			$this->address_id = $address->j2store_address_id;
 		} ?>
      <?php if ($address->j2store_address_id == $this->address_id) : ?>
-    	<option value="<?php echo $address->j2store_address_id; ?>" selected="selected">    	
+    	<option value="<?php echo $address->j2store_address_id; ?>" selected="selected">
     		<?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo JText::_($address->zone_name); ?>, <?php echo JText::_($address->country_name); ?>
     	</option>
-  
+
     <?php else: ?>
     	<option value="<?php echo $address->j2store_address_id; ?>">
     		<?php echo $address->first_name; ?> <?php echo $address->last_name; ?>, <?php echo $address->address_1; ?>, <?php echo $address->city; ?>, <?php echo $address->zip; ?>, <?php echo JText::_($address->zone_name); ?>, <?php echo JText::_($address->country_name); ?>
     	</option>
     <?php endif; ?>
-    
+
     <?php endforeach; ?>
   </select>
 </div>
@@ -148,7 +148,7 @@ $(document).on('change', '#shipping-address input[name=\'shipping_address\']', f
 $('#shipping-address select[name=\'country_id\']').bind('change', function() {
 	if (this.value == '') return;
 	$.ajax({
-		url: 'index.php?option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
+		url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
 			$('#shipping-address select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');

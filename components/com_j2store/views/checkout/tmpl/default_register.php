@@ -155,12 +155,12 @@ $html = $html.$phtml;
   <div class="<?php echo $J2gridRow; ?>">
   <div class="<?php echo $J2gridCol; ?>12 shipping-make-same" style="clear: both; padding-top: 15px;">
 	  <input type="checkbox" name="shipping_address" value="1" id="shipping" checked="checked" />
-	  <label for="shipping"><?php echo JText::_('J2STORE_MAKE_SHIPPING_SAME'); ?></label>	  
+	  <label for="shipping"><?php echo JText::_('J2STORE_MAKE_SHIPPING_SAME'); ?></label>
   </div>
   </div> <!-- end of row-fluid -->
   <br>
   <?php } ?>
-  
+
 <?php echo J2Store::plugin()->eventWithHtml('CheckoutRegister', array($this)); ?>
 <div class="buttons">
   <div class="left">
@@ -178,7 +178,7 @@ $html = $html.$phtml;
 $('#billing-address select[name=\'country_id\']').bind('change', function() {
 	if (this.value == '') return;
 	$.ajax({
-		url: 'index.php?option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
+		url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
 			$('#billing-address select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
