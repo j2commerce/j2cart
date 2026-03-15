@@ -184,7 +184,7 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
                 'productfilter_ids',
                 'min_price',
                 'max_price',
-                'sort_by',
+                'sortby',
                 'pricefrom',
                 'priceto',
             ];

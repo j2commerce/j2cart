@@ -403,50 +403,41 @@ class J2StoreControllerCarts extends F0FController
 
 	public function getCountry()
     {
-        $session = JFactory::getSession();
-        $set = $session->get('j2store_country_zone',array(),'j2store');
         $app = JFactory::getApplication();
         $country_id = $app->input->getInt('country_id');
-        if (!isset($set[$country_id])) {
+        $country_info = F0FModel::getTmpInstance('Countries', 'J2StoreModel')->getItem($country_id);
+        $json = array();
+        if ($country_info) {
+            $model = F0FModel::getTmpInstance('Zones', 'J2StoreModel')
+                ->enabled(1)
+                ->country_id($country_id);
 
-            $country_info = F0FModel::getTmpInstance('Countries', 'J2StoreModel')->getItem($country_id);
-            $json = array();
-            if ($country_info) {
-
-                $db = JFactory::getDbo();
-                $query = $db->getQuery(true);
-                $query->select('a.*')->from('#__j2store_zones AS a');
-                $query->where('a.enabled=1')
-                    ->order('a.zone_name ASC');
-                $query->where('a.country_id='.$db->q($country_id));
-                $db->setQuery($query);
-                try {
-                    $zones = $db->loadObjectList();
-                } catch (Exception $e) {
-                    $zones = array();
-                }
+            $model->setState('filter_order', 'zone_name');
+            $model->setState('filter_order_Dir', 'ASC');
+            try {
+                $zones = $model->getList();
+            } catch (Exception $e) {
+                $zones = array();
             }
 
             foreach ($zones as &$zone) {
                 $zone->zone_name = JText::_($zone->zone_name);
             }
+
             if (isset($zones) && is_array($zones)) {
                 $json = array(
                     'country_id' => $country_info->j2store_country_id,
-                    'name' => $country_info->country_name,
+                    'name'       => $country_info->country_name,
                     'iso_code_2' => $country_info->country_isocode_2,
                     'iso_code_3' => $country_info->country_isocode_3,
-                    'zone' => $zones
+                    'zone'       => $zones
                 );
             }
-
-            $set[$country_id] = $json;
-            $session->set('j2store_country_zone',$set,'j2store');
         }
 
-		echo json_encode($set[$country_id]);
-		$app->close();
-	}
+        echo json_encode($json);
+        $app->close();
+    }
 
 	/**
 	 * Method to check file upload
