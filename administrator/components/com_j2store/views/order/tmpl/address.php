@@ -27,7 +27,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		<div class="j2store-address-alert">
 		</div>
 		 <div class="pull-right">
-			 <input type="submit" onclick="jQuery('#task').attr('value','saveOrderinfo');" value="<?php echo JText::_('JAPPLY'); ?>"  class="button btn btn-success" />
+			 <input type="submit" onclick="j2storeApplyAddress(); return false;" value="<?php echo JText::_('JAPPLY'); ?>"  class="button btn btn-success" />
 	  	</div>
 	<?php
 	//$html = $this->storeProfile->store_billing_layout;
@@ -157,4 +157,85 @@ $('#address #country_id').bind('change', function() {
 		$('#address #country_id').trigger('change');
 	}
 })(j2store.jQuery);
+
+function j2storeApplyAddress() {
+	(function ($) {
+		var $form       = $('#j2storeaddressForm');
+		var addressType = $form.find('[name="address_type"]').val();
+		var prefix      = addressType + '_';
+
+		// Build the payload for validate_address, stripping the address-type
+		// prefix so the server-side validate() can match field names.
+		var ajaxData = {
+			option       : 'com_j2store',
+			view         : 'orders',
+			task         : 'validate_address',
+			order_id     : $form.find('[name="order_id"]').val(),
+			validate_type: addressType,
+			admin_display_error: 1
+		};
+		// System / control fields that must never be forwarded to validate_address.
+		var systemFields = ['option', 'view', 'task', 'address_type', 'order_id',
+		                    'j2store_orderinfo_id', 'validate_type'];
+
+		$form.find(':input[name]').each(function () {
+			var name = $(this).attr('name');
+			if (!name) return;
+			if (name.indexOf(prefix) === 0) {
+				// Standard address field rendered with the address-type prefix –
+				// strip it so validate() can match against the bare field_namekey.
+				ajaxData[name.substring(prefix.length)] = $(this).val();
+			} else if (systemFields.indexOf(name) < 0) {
+				// Unprocessed custom field rendered WITHOUT a prefix (processCustomFields
+				// reads them this way too).  Pass the value as-is; validate() expects the
+				// bare field_namekey and this already is it.
+				ajaxData[name] = $(this).val();
+			}
+		});
+
+		$.ajax({
+			url     : 'index.php',
+			type    : 'post',
+			cache   : false,
+			data    : ajaxData,
+			dataType: 'json',
+			beforeSend: function () {
+				$form.find('.j2error').remove();
+			},
+			success: function (json) {
+				// email is intentionally not rendered in this popup – remove it from
+				// the error map so it never blocks saving or shows a confusing message.
+				if (json['error']) {
+					delete json['error']['email'];
+					if (Object.keys(json['error']).length === 0) {
+						json['success'] = 1;
+						delete json['error'];
+					}
+				}
+				if (json['success']) {
+					// Validation passed – submit the real save task.
+					$('#task').val('saveOrderinfo');
+					$form[0].submit();
+				} else if (json['error']) {
+					$.each(json['error'], function (key, value) {
+						if (value) {
+							// Field IDs in the popup use the prefixed name (billing_first_name).
+							var $field = $('#address #' + prefix + key);
+							if ($field.length) {
+								$field.after('<br class="j2error" /><span class="j2error" style="color:red;">' + value + '</span>');
+							} else {
+								$('.j2store-address-alert').append('<div class="j2error" style="color:red;">' + value + '</div>');
+							}
+						}
+					});
+				}
+			},
+			error: function () {
+				// AJAX failed – fall back to direct submit; server-side validation runs.
+				$('#task').val('saveOrderinfo');
+				$form[0].submit();
+			}
+		});
+	})(j2store.jQuery);
+}
 </script>
