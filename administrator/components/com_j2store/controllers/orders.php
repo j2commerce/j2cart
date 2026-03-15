@@ -262,16 +262,54 @@ class J2StoreControllerOrders extends F0FController
 		$orderinfo = F0FTable::getAnInstance('Orderinfo','J2StoreTable');
 		$orderinfo->load(array('order_id'=>$order_id));
 
-		//$orderinfo->bind($data);
-		$msg =JText::_('J2STORE_ORDERINFO_SAVED_SUCCESSFULLY');
-		$msgType='message';
+		$url = "index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$order_id."&address_type=".$address_type."&layout=address&tmpl=component";
+
+		// The popup renders fields with prefixed names (billing_first_name, etc.).
+		// validate() expects unprefixed names, so strip the prefix into a plain PHP
+		// array.  Do NOT use (array) on the JObject returned by removePrefix() –
+		// JObject has a private $_errors property that PHP encodes as a null-byte-
+		// prefixed key (\0JObject\0_errors) in the cast result, which then propagates
+		// into validate() → toObject() and throws "Cannot access property starting
+		// with \0".
+		// System POST keys that must not be treated as address field values.
+		$systemKeys = array('option', 'view', 'task', 'address_type', 'order_id',
+		                    'j2store_orderinfo_id', 'return');
+		$prefix     = $address_type . '_';
+		$prefixLen  = strlen($prefix);
+		$unprefixed = array();
+		foreach ($data as $k => $v) {
+			if (strpos($k, $prefix) === 0) {
+				// Standard address field with address-type prefix – strip it.
+				$unprefixed[substr($k, $prefixLen)] = $v;
+			} elseif (!in_array($k, $systemKeys)) {
+				// Unprocessed custom field posted WITHOUT a prefix (processCustomFields
+				// also reads them this way).  Pass through as-is so validate() matches
+				// against the bare field_namekey.
+				$unprefixed[$k] = $v;
+			}
+		}
+		$selectableBase = J2Store::getSelectableBase();
+		// Supply the email from the order so the required-field check passes for
+		// registered users.  For guest orders with no email the field is still
+		// omitted intentionally (it is not rendered in the popup), so we remove any
+		// email error unconditionally after validation.
+		$unprefixed['email'] = $order->user_email;
+		$validation = $selectableBase->validate($unprefixed, $address_type, 'address');
+		unset($validation['error']['email']); // not shown / editable in this popup
+		if (!empty($validation['error'])) {
+			$firstError = reset($validation['error']);
+			$this->setRedirect($url, $firstError, 'warning');
+			return;
+		}
+
+		$msg = JText::_('J2STORE_ORDERINFO_SAVED_SUCCESSFULLY');
+		$msgType = 'message';
 		$data['all_'.$address_type]= $order->processCustomFields($address_type, $data);
 		if(!$orderinfo->save($data)){
-			$msg =JText::_('J2STORE_ORDERINFO_SAVED_SUCCESSFULLY');
-			$msgType='warning';
+			$msg = JText::_('J2STORE_ORDERINFO_ERROR_IN_SAVING');
+			$msgType = 'warning';
 		}
-		$url = "index.php?option=com_j2store&view=orders&task=setOrderinfo&order_id=".$order_id."&address_type=".$address_type."&layout=address&tmpl=component";
-		$this->setRedirect($url, $msg,$msgType);
+		$this->setRedirect($url, $msg, $msgType);
 
 	}
 
@@ -457,7 +495,9 @@ class J2StoreControllerOrders extends F0FController
 			case 'billing':
 				$orderinfo = $order->getOrderInformation();
 				$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
-				$addresses = $address_model->user_id($order->user_id)->getList();
+				// user_id = 0 is treated as "no filter" by F0F (empty(0) === true),
+				// which would return every address in the database.
+				$addresses = $order->user_id ? $address_model->user_id($order->user_id)->getList() : array();
 				$billing_processed = $this->removePrefix((array)$orderinfo,'billing');
 				$view->assign('orderinfo',$orderinfo);
 				if($order->user_id) {
@@ -478,7 +518,9 @@ class J2StoreControllerOrders extends F0FController
 				$this->checkBillingInfo ( $order );
 				$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
                 $address_model->clearState();
-				$addresses = $address_model->user_id($order->user_id)->getList();
+				// user_id = 0 is treated as "no filter" by F0F (empty(0) === true),
+				// which would return every address in the database.
+				$addresses = $order->user_id ? $address_model->user_id($order->user_id)->getList() : array();
 				$shipping_processed = $this->removePrefix((array)$orderinfo,'shipping');
 				$view->assign('orderinfo',$orderinfo);
 				$view->assign('addresses',$addresses);
@@ -616,18 +658,20 @@ class J2StoreControllerOrders extends F0FController
 
 					$session->set('shipping_values',$values,'j2store');
 				}
-				$shipping_tracking_id = $app->input->getString('shipping_tracking_id','');
-
-				if(isset($shipping_tracking_id)){
-					$ordershipping = F0FTable::getAnInstance('Ordershipping', 'J2StoreTable');
-					if($ordershipping->load(array('order_id'=>$order->order_id))){
-						$ordershipping->ordershipping_tracking_id = $shipping_tracking_id;
-						$ordershipping->store();
-					}
-
-				}
 				$order->orderpayment_type = $app->input->getString('payment_plugin','');
+				// getAdminTotals() calls setAdminOrderShippingRate() which creates or
+				// updates the ordershipping row from the session values above.
+				// The tracking ID must be saved AFTER this call so the row is guaranteed
+				// to exist (on a first save the row did not exist yet, causing the old
+				// early-save attempt to silently drop the value).
 				$order->getAdminTotals();
+
+				$shipping_tracking_id = $app->input->getString('shipping_tracking_id', '');
+				$ordershipping = F0FTable::getAnInstance('Ordershipping', 'J2StoreTable');
+				if ($ordershipping->load(array('order_id' => $order->order_id))) {
+					$ordershipping->ordershipping_tracking_id = $shipping_tracking_id;
+					$ordershipping->store();
+				}
 				break;
 			case 'items':
 				$order->getAdminTotals();
