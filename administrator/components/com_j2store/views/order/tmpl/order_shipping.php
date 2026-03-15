@@ -11,19 +11,16 @@ $platform->loadExtra('behavior.modal','a.modal');
 $platform->loadExtra('behavior.formvalidator');
 //JHTML::_('behavior.modal', 'a.modal');
 $this->address_type='shipping';
+$hasAddresses = isset($this->addresses) && count($this->addresses) > 0;
 $row_class = 'row';
 $col_class = 'col-md-';
-if (version_compare(JVERSION, '3.99.99', 'lt')) {
-    $row_class = 'row-fluid';
-    $col_class = 'span';
-}
 ?>
 <div class="<?php echo $row_class ?>">
-	<div class="<?php echo $col_class ?>8" style="<?php echo (isset($this->orderinfo->j2store_orderinfo_id) && !empty($this->orderinfo->j2store_orderinfo_id) && !empty($this->orderinfo->shipping_country_id) /*&& !empty($this->orderinfo->shipping_zone_id)*/) ?'display:none;':'';?>" id="select_shipping_address">
+	<div class="<?php echo $col_class ?>8" style="<?php echo (isset($this->orderinfo->j2store_orderinfo_id) && !empty($this->orderinfo->j2store_orderinfo_id) && !empty($this->orderinfo->shipping_country_id)) ?'display:none;':'';?>" id="select_shipping_address">
 		<input type="hidden" value="<?php echo $this->address_type;?>" name="address_type" />
 		<div class="display_message" id="display_message"></div>
 		<div class="shipping-infos">
-			<?php if (isset($this->addresses) && count($this->addresses) > 0) : ?>
+			<?php if ($hasAddresses) : ?>
 				<input type="radio" name="address" value="existing" id="shipping-address-existing" checked="checked" />
 				<label for="shipping-address-existing"><?php echo JText::_('J2STORE_ADDRESS_EXISTING'); ?></label>
 				 <select class="input-xxlarge" 	name="address_id" id="address_id" size="5" >
@@ -39,14 +36,19 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 				    <?php endif; ?>
 				    <?php endforeach; ?>
 				  </select>
-				<?php endif;?>
+			<?php endif;?>
 		</div>
 
 		<div id="new-address">
 			<input name="validate_type" type="hidden" value="shipping" id="validate_type">
-			<input type="radio" name="address" value="new" id="shipping-address-new"  />
-			<label for="shipping-address-existing"><?php echo JText::_('J2STORE_ADDRESS_NEW'); ?></label>
-			<div id="orderinfo-shipping-<?php echo $this->order->j2store_order_id;?>" style="display:none;">
+			<?php if ($hasAddresses) : ?>
+				<input type="radio" name="address" value="new" id="shipping-address-new"  />
+				<label for="shipping-address-new"><?php echo JText::_('J2STORE_ADDRESS_NEW'); ?></label>
+			<?php else : ?>
+				<?php // No saved addresses (guest order) – pre-select "new" silently ?>
+				<input type="hidden" name="address" value="new">
+			<?php endif; ?>
+			<div id="orderinfo-shipping-<?php echo $this->order->j2store_order_id;?>"<?php echo $hasAddresses ? ' style="display:none;"' : ''; ?>>
 			<?php
 			$html = $this->storeProfile->get('store_billing_layout');
 
@@ -113,7 +115,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 			</div>
 
 		</div>
-	</div>	
+	</div>
 		<div class="<?php echo $col_class ?>4">
 		<div id="baddress-info">
 			<?php
@@ -142,7 +144,9 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 							?>
 						</address>
 							<?php echo J2Store::getSelectableBase()->getFormatedCustomFields($this->orderinfo, 'customfields', 'shipping'); ?>
+				<?php if ($hasAddresses) : ?>
 					<button id="change_address" class="btn btn-warning"><?php echo JText::_("J2STORE_CHOOSE_ALTERNATE_ADDRESS");?></button>
+				<?php endif; ?>
 					<br>
 					<br>
 			<?php endif;?>
@@ -154,8 +158,15 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 	$('#change_address').on('click',function(e){
 		e.preventDefault();
 		$('#select_shipping_address').show();
-		$('#nextlayout').hide();
-		$('#saveAndNext').show();
+		// Guests have no #address_id select; route them through #nextlayout
+		// (new-address validation flow) rather than #saveAndNext (existing-address flow).
+		if ($('#address_id').length) {
+			$('#nextlayout').hide();
+			$('#saveAndNext').show();
+		} else {
+			$('#nextlayout').show();
+			$('#saveAndNext').hide();
+		}
 		$('#baddress-info').hide();
 		$('#display_message').after('<button id="close_address" class="btn btn-warning pull-right"><?php echo JText::_('J2STORE_CLOSE');?></button>');
 	});
@@ -175,13 +186,13 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		$('.j2error').remove();
 	});
 
-$('#address #country_id').bind('change', function() {
+$('#country_id').bind('change', function() {
 	if (this.value == '') return;
 	$.ajax({
 		url: 'index.php?option=com_j2store&view=orders&task=getCountry&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
-			$('#address #country_id').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
+			$('#country_id').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 		},
 		complete: function() {
 			$('.wait').remove();
@@ -221,8 +232,19 @@ $('#address #country_id').bind('change', function() {
 })(j2store.jQuery);
 
 (function($) {
-	if($('#address #country_id').length > 0) {
-		$('#address #country_id').trigger('change');
+	if($('#country_id').length > 0) {
+		$('#country_id').trigger('change');
 	}
 })(j2store.jQuery);
+
+<?php if (!$hasAddresses) : ?>
+(function ($) {
+	// Guest order: the new-address form is already visible.
+	// Buttons are rendered AFTER this sub-template in order.php, so defer until DOM ready.
+	$(function () {
+		$('#nextlayout').show();
+		$('#saveAndNext').hide();
+	});
+})(j2store.jQuery);
+<?php endif; ?>
 </script>
