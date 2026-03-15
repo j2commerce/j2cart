@@ -5,7 +5,6 @@
  * @license GNU GPL v3 or later
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
-$ajax_base_url = JRoute::_('index.php');
 ?>
 <div id="j2store-checkout" class="j2store checkout">
 	<div id="j2store-checkout-content">
@@ -30,7 +29,7 @@ $ajax_base_url = JRoute::_('index.php');
 	(function ($) {
 		$(document).ready(function () {
 			$.ajax({
-				url: '<?php echo $ajax_base_url; ?>',
+				url: '<?php echo JUri::root(); ?>index.php',
 				type: 'post',
 				cache: false,
 				data: 'option=com_j2store&view=checkouts&task=shipping_payment_method',
@@ -60,7 +59,7 @@ $ajax_base_url = JRoute::_('index.php');
 	(function($) {
 		$(document).on('click', '#button-payment-method', function() {
 			$.ajax({
-				url: '<?php echo $ajax_base_url; ?>',
+				url: '<?php echo JUri::root(); ?>index.php',
 				type: 'post',
 				cache: false,
 				data: $('#shipping-payment-method input[type=\'text\'], #shipping-payment-method input[type=\'hidden\'], #shipping-payment-method input[type=\'radio\']:checked, #shipping-payment-method input[type=\'checkbox\']:checked, #shipping-payment-method textarea, #shipping-payment-method select'),
@@ -100,7 +99,7 @@ $ajax_base_url = JRoute::_('index.php');
 
 					} else {
 						$.ajax({
-							url: '<?php echo $ajax_base_url; ?>',
+							url: '<?php echo JUri::root(); ?>index.php',
 							type: 'post',
 							cache: false,
 							data: 'option=com_j2store&view=checkouts&task=confirm',

@@ -11,16 +11,15 @@
 
 
 defined('_JEXEC') or die('Restricted access');
-$ajax_url = JRoute::_('index.php');
-$ajax_loader = JUri::root (true).'/media/j2store/images/loader.gif';
+$ajax_loader = JUri::root(true) . '/media/j2store/images/loader.gif';
 ?>
 
 <form action="<?php echo JRoute::_( "index.php?option=com_j2store&view=checkout" ); ?>" method="post" name="money_form" id="money_form" enctype="multipart/form-data">
 
     <div class="note note-<?php echo $vars->orderpayment_type; ?>">
 
-         <?php 
-         	$image = $this->params->get('display_image', '');         	 
+         <?php
+         	$image = $this->params->get('display_image', '');
          ?>
          <?php if(!empty($image)): ?>
          	<span class="j2store-payment-image">
@@ -57,7 +56,7 @@ $ajax_loader = JUri::root (true).'/media/j2store/images/loader.gif';
 			var values = form.serializeArray();
 			//submit the form using ajax
 			var jqXHR =	$.ajax({
-				url: '<?php echo $ajax_url; ?>',
+				url: '<?php echo JUri::root(); ?>index.php',
 				type: 'post',
 				data: values,
 				dataType: 'json',

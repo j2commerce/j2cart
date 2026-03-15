@@ -24,7 +24,7 @@ class JFormFieldTlschecks extends JFormFieldList {
     public function getInput() {
         //
         $cron_key = J2Store::config ()->get ( 'queue_key','' );
-        $url = trim(JURI::root(),'/').'/index.php?option=com_j2store&view=crons&command=paypal_tls_check&cron_secret='.$cron_key;
+        $url = JUri::root() . 'index.php?option=com_j2store&view=crons&command=paypal_tls_check&cron_secret='.$cron_key;
         $html = "<a id='check_credensial' onclick='checkTLS()' class='btn btn-primary'>".JText::_('J2STORE_PAYPAL_TLS_CREDENTIALS_CHECK')."</a>";
         $html .= "<script>function checkTLS(){
         (function($) {

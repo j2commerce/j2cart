@@ -157,7 +157,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 		$('#billing-address select[name=\'country_id\']').bind('change', function() {
 			if (this.value == '') return;
 			$.ajax({
-				url: 'index.php?option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
+				url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
 				dataType: 'json',
 				beforeSend: function() {
 					$('#billing-address select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');

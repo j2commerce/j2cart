@@ -15,9 +15,9 @@ $product_id = $this->product->j2store_product_id;
 
       <div class="options">
         <?php foreach ($options as $option) { ?>
-        
+
         <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplaySingleProductOption', array($this->product, &$option)); ?>
-        
+
         <?php //var_dump($option); ?>
         <?php if ($option['type'] == 'select' && isset($option['optionvalue']) && !empty($option['optionvalue'])) { ?>
         <!-- select -->
@@ -141,7 +141,7 @@ $product_id = $this->product->j2store_product_id;
 				    doAjaxFilter(checkbox_value, product_id, po_id, '#option-'+po_id+' input:checkbox');
 				});
 			})(j2store.jQuery);
-		
+
 		</script>
 
         <?php } ?>
@@ -210,7 +210,7 @@ $product_id = $this->product->j2store_product_id;
           <input type="text" name="product_option[<?php echo $option['productoption_id']; ?>]" value="<?php echo $option['optionvalue']; ?>" class="<?php echo $element_date; ?>" />
         </div>
         <br>
-   		<?php J2StoreStrapper::addDatePicker($element_date, $option ['option_params']); ?>     
+   		<?php J2StoreStrapper::addDatePicker($element_date, $option ['option_params']); ?>
         <?php } ?>
 
 
@@ -225,7 +225,7 @@ $product_id = $this->product->j2store_product_id;
           <input type="text" name="product_option[<?php echo $option['productoption_id']; ?>]" value="<?php echo $option['optionvalue']; ?>" class="<?php echo $element_datetime; ?>" />
         </div>
         <br>
-        <?php J2StoreStrapper::addDateTimePicker($element_datetime, $option ['option_params']); ?>                 
+        <?php J2StoreStrapper::addDateTimePicker($element_datetime, $option ['option_params']); ?>
         <?php } ?>
 
         <?php if ($option['type'] == 'time') { ?>
@@ -239,7 +239,7 @@ $product_id = $this->product->j2store_product_id;
         </div>
         <br>
         <?php } ?>
-        
+
         <?php echo J2Store::plugin()->eventWithHtml('AfterDisplaySingleProductOption', array($this->product, $option)); ?>
 
         	<div id="ChildOptions<?php echo $option['productoption_id']; ?>"></div>
@@ -265,7 +265,7 @@ $('#product-option-<?php echo $option['productoption_id']; ?>').on('click', func
 		if ($('#form-upload input[name=\'file\']').val() != '') {
 			clearInterval(timer);
 			$.ajax({
-				url: 'index.php?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
+				url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
 				type: 'post',
 				dataType: 'json',
 				data: new FormData($('#form-upload')[0]),

@@ -25,7 +25,7 @@ class JFormFieldCredensial extends JFormFieldList {
         //
         $cron_key = J2Store::config ()->get ( 'queue_key','' );
         $mode = implode(',',(array)$this->element['mode']);
-        $url = trim(JURI::root(),'/').'/index.php?option=com_j2store&view=crons&command=paypal_api_check&cron_secret='.$cron_key.'&mode='.$mode;
+        $url = JUri::root() . 'index.php?option=com_j2store&view=crons&command=paypal_api_check&cron_secret='.$cron_key.'&mode='.$mode;
         $html = "<a id='check_credensial_".$mode."' onclick='checkPaypalCredensial".$mode."()' class='btn btn-primary'>".JText::_('J2STORE_PAYPAL_CREDENTIALS_CHECK')."</a>";
         $html .= "<script>function checkPaypalCredensial".$mode."(){
         (function($) {
