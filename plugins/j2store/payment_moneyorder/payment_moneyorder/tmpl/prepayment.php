@@ -11,6 +11,7 @@
 
 
 defined('_JEXEC') or die('Restricted access');
+$ajax_base_url = JRoute::_('index.php');
 $ajax_loader = JUri::root(true) . '/media/j2store/images/loader.gif';
 ?>
 
@@ -56,7 +57,7 @@ $ajax_loader = JUri::root(true) . '/media/j2store/images/loader.gif';
 			var values = form.serializeArray();
 			//submit the form using ajax
 			var jqXHR =	$.ajax({
-				url: '<?php echo JUri::root(); ?>index.php',
+				url: '<?php echo $ajax_base_url; ?>',
 				type: 'post',
 				data: values,
 				dataType: 'json',
