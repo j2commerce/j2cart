@@ -10,6 +10,7 @@ defined('_JEXEC') or die;
 $platform = J2Store::platform();
 $options = $this->product->options;
 $product_id = $this->product->j2store_product_id;
+$ajax_base_url = JRoute::_('index.php');
 ?>
 <?php if ($options) { ?>
 
@@ -268,7 +269,7 @@ $('#product-option-<?php echo $option['productoption_id']; ?>').on('click', func
 		if ($('#form-upload input[name=\'file\']').val() != '') {
 			clearInterval(timer);
 			$.ajax({
-				url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
+				url: '<?php echo $ajax_base_url;?>?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
 				type: 'post',
 				dataType: 'json',
 				data: new FormData($('#form-upload')[0]),
