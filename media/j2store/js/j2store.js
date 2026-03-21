@@ -405,7 +405,7 @@ function doAjaxFilter(pov_id, product_id, po_id, id) {
 					data : values,
 					dataType : 'json',
 					beforeSend: function() {
-						$('#option-' + po_id).append('<span class="wait">&nbsp;<img src="'+j2storeURL+'/media/j2store/images/loader.gif" alt="" /></span>');
+						$('#option-' + po_id).append('<span class="wait">&nbsp;<img src="'+j2storeURL+'media/j2store/images/loader.gif" alt="" /></span>');
 					},
 					complete: function() {
 						$('.wait').remove();
