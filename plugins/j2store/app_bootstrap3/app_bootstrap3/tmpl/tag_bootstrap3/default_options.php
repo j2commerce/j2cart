@@ -11,6 +11,7 @@ $platform = J2Store::platform();
 $options = isset($this->product->options) && !empty($this->product->options) ? $this->product->options: array();
 $product_id = $this->product->j2store_product_id;
 $product_helper = J2Store::product();
+$ajax_base_url = JRoute::_('index.php');
 ?>
 <?php if ($options) { ?>
 
@@ -281,7 +282,7 @@ $('#product-option-<?php echo $option['productoption_id']; ?>').on('click', func
 		if ($('#form-upload input[name=\'file\']').val() != '') {
 			clearInterval(timer);
 			$.ajax({
-				url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
+				url: '<?php echo $ajax_base_url;?>?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
 				type: 'post',
 				dataType: 'json',
 				data: new FormData($('#form-upload')[0]),
