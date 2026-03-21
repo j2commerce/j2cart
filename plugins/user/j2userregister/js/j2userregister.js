@@ -16,7 +16,7 @@ if(typeof(j2storeURL) == 'undefined') {
             data: 'option=com_j2store&view=carts&task=getCountry&country_id=' + this.value,
             dataType: 'json',
             beforeSend: function() {
-                $('#billing-new #country_id').after('<span class=\"wait\">&nbsp;<img src="/media/j2store/images/loader.gif\" alt=\"\" /></span>');
+                $('#billing-new #country_id').after('<span class=\"wait\">&nbsp;<img src="'+j2storeURL+'media/j2store/images/loader.gif\" alt=\"\" /></span>');
             },
             complete: function() {
                 $('.wait').remove();
