@@ -11,6 +11,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+$ajax_base_url = JRoute::_('index.php');
 ?>
 
 <?php if($this->params->get('show_tax_calculator', 1) && isset($this->shipping_methods) && count($this->shipping_methods)): ?>
@@ -58,7 +59,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			form.find("input[type='hidden'][name='task']").val('shippingUpdate');
 
 			$.ajax({
-				url: '<?php echo JUri::root(); ?>index.php?option=com_j2store&view=carts&task=shippingUpdate',
+				url: '<?php echo $ajax_base_url;?>?option=com_j2store&view=carts&task=shippingUpdate',
 				type: 'get',
 				data: $('#j2store-cart-shipping-form input[type=\'hidden\'], #j2store-cart-shipping-form input[type=\'radio\']:checked'),
 				dataType: 'json',

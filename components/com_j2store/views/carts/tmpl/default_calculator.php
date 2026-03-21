@@ -12,6 +12,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+$ajax_base_url = JRoute::_('index.php');
 ?>
 <div id="j2store-cart-modules">
 <?php if($this->params->get('show_tax_calculator', 1)): ?>
@@ -91,12 +92,12 @@ j2store.jQuery('input[name=\'next\']').bind('click', function() {
 	 $(document).on('click', '#button-quote', function() {
 		 var values = $('#shipping-estimate-form').serializeArray();
 		 $.ajax({
-				url:'<?php echo JUri::root(); ?>index.php',
+				url:'<?php echo $ajax_base_url;?>',
 				type: 'get',
 				data: values,
 				dataType: 'json',
 				beforeSend: function() {
-					$('#button-quote').after('<span class="wait">&nbsp;<img src="media/j2store/images/loader.gif" alt="" /></span>');
+					$('#button-quote').after('<span class="wait">&nbsp;<img src="<?php echo JUri::root(true); ?>/media/j2store/images/loader.gif" alt="" /></span>');
 				},
 				complete: function() {
 					$('.wait').remove();

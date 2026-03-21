@@ -142,7 +142,7 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
                     address_id: id
                 };
                 $.ajax({
-                    url : '<?php echo JUri::root(); ?>index.php',
+                    url : '<?php echo JRoute::_('index.php');?>',
                     type: 'post',
                     data :data,
                     dataType: 'json',
