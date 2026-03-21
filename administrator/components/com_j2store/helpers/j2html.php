@@ -474,7 +474,7 @@ class J2Html
                 break;
 
             case 'button':
-                $html .= '<input type="button" name="' . $name . '"  ' . $optionvalue . '    value ="' . $escapedValue . '"';
+                $html .= '<input type="button" name="' . $name . '"  ' . $optionvalue . '    value ="' . $value . '"';
                 if (isset($options['onclick']) && !empty($options['onclick'])) {
                     $html .= '   onclick ="' . $options['onclick'] . '"';
                 }
@@ -486,11 +486,11 @@ class J2Html
                 if (isset($options['onclick']) && !empty($options['onclick'])) {
                     $html .= '   onclick ="' . $options['onclick'] . '"';
                 }
-                $html .= '>' . $escapedValue . '</button>';
+                $html .= '>' . $value . '</button>';
                 break;
 
             case 'submit':
-                $html .= '<input type="submit" name="' . $name . '"  ' . $optionvalue . 'value ="' . $escapedValue . '" />';
+                $html .= '<input type="submit" name="' . $name . '"  ' . $optionvalue . 'value ="' . $value . '" />';
                 break;
 
             case 'hidden':
@@ -834,7 +834,7 @@ class J2Html
                 break;
 
             case 'button':
-                $html .= '<input type="button" name="' . $name . '"  ' . $optionvalue . '    value ="' . htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8') . '"';
+                $html .= '<input type="button" name="' . $name . '"  ' . $optionvalue . '    value ="' . $value . '"';
                 if (isset($options['onclick']) && !empty($options['onclick'])) {
                     $html .= '   onclick ="' . $options['onclick'] . '"';
                 }
@@ -846,11 +846,11 @@ class J2Html
                 if (isset($options['onclick']) && !empty($options['onclick'])) {
                     $html .= '   onclick ="' . $options['onclick'] . '"';
                 }
-                $html .= '>' . htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8') . '</button>';
+                $html .= '>' . $value . '</button>';
                 break;
 
             case 'submit':
-                $html .= '<input type="submit" name="' . $name . '"  ' . $optionvalue . 'value ="' . htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8') . '" />';
+                $html .= '<input type="submit" name="' . $name . '"  ' . $optionvalue . 'value ="' . $value . '" />';
                 break;
 
             case 'hidden':
