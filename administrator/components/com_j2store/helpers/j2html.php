@@ -436,28 +436,29 @@ class J2Html
     public static function inputSite($type, $name, $value = null, $options = [])
     {
         $optionvalue = J2Store::platform()->toString($options);
+        $escapedValue = htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 
         $html = '';
         switch ($type) {
 
             case 'text':
-                $html .= '<input type="text" name="' . $name . '" value="' . $value . '"  ' . $optionvalue . '    />';
+                $html .= '<input type="text" name="' . $name . '" value="' . $escapedValue . '"  ' . $optionvalue . '    />';
                 break;
 
             case 'email':
-                $html .= '<input type="email" name="' . $name . '"  value="' . $value . '"  ' . $optionvalue . '    />';
+                $html .= '<input type="email" name="' . $name . '"  value="' . $escapedValue . '"  ' . $optionvalue . '    />';
                 break;
 
             case 'password':
-                $html .= '<input type="password"  name="' . $name . '" ' . $optionvalue . '  value="' . $value . '"     />';
+                $html .= '<input type="password"  name="' . $name . '" ' . $optionvalue . '  value="' . $escapedValue . '"     />';
                 break;
 
             case 'textarea':
-                $html .= '<textarea ' . $optionvalue . ' name="' . $name . '"  value="' . $value . '"     >' . $value . '</textarea>';
+                $html .= '<textarea ' . $optionvalue . ' name="' . $name . '">' . $escapedValue . '</textarea>';
                 break;
 
             case 'file':
-                $html .= '<input type="file" name="' . $name . '" ' . $optionvalue . '  value="' . $value . '"     />';
+                $html .= '<input type="file" name="' . $name . '" ' . $optionvalue . '  value="' . $escapedValue . '"     />';
                 break;
 
             case 'radio':
@@ -466,7 +467,7 @@ class J2Html
                 break;
 
             case 'checkbox':
-                $html .= '<input type="checkbox" ' . $optionvalue . '  value="' . $value . '"     />';
+                $html .= '<input type="checkbox" ' . $optionvalue . '  value="' . $escapedValue . '"     />';
                 break;
 
             case 'editor':
@@ -493,11 +494,11 @@ class J2Html
                 break;
 
             case 'hidden':
-                $html .= '<input type="hidden" name="' . $name . '" ' . $optionvalue . ' value ="' . $value . '" />';
+                $html .= '<input type="hidden" name="' . $name . '" ' . $optionvalue . ' value ="' . $escapedValue . '" />';
                 break;
 
             case 'number':
-                $html .= '<input type="number" name="' . $name . '" value="' . $value . '" ' . $optionvalue . ' />';
+                $html .= '<input type="number" name="' . $name . '" value="' . $escapedValue . '" ' . $optionvalue . ' />';
                 break;
         }
 
@@ -853,7 +854,27 @@ class J2Html
                 break;
 
             case 'hidden':
-                $html .= '<input type="hidden" name="' . $name . '" ' . $optionvalue . ' value ="' . $value . '" />';
+                $displayData = array(
+                    'name'           => $name,
+                    'id'             => isset($options['id']) ? $options['id'] : self::clean($name),
+                    'value'          => $value,
+                    'class'          => isset($options['class']) ? $options['class'] : '',
+                    'disabled'       => isset($options['disabled']) ? (bool) $options['disabled'] : false,
+                    'onchange'       => isset($options['onchange']) ? $options['onchange'] : '',
+                    'dataAttribute'  => '',
+                    'dataAttributes' => array(),
+                    'description'    => isset($options['description']) ? $options['description'] : '',
+                    'autofocus'      => false,
+                    'readonly'       => false,
+                    'required'       => false,
+                    'multiple'       => false,
+                    'hidden'         => true,
+                    'hasValue'       => ($value !== null && $value !== ''),
+                );
+
+                $path = JPATH_SITE . '/layouts/joomla/form/field/hidden.php';
+                $renderer = self::getRenderer('joomla.form.field.hidden', $path);
+                $html .= $renderer->render($displayData);
                 break;
 
             case 'number' :

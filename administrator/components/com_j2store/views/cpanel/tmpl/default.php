@@ -48,6 +48,13 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                 <?php echo J2Store::help()->info_j2commerce(); ?>
                             </div>
                         </div>
+                        <?php if (version_compare(JVERSION, '5.0.0', 'ge') && version_compare(JVERSION, '6.0.0', 'lt')) : ?>
+                        <div class="<?php echo $row_class;?>">
+                            <div class="<?php echo $col_class;?>12">
+                                <?php echo J2Store::help()->info_movetoj6(); ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                         <div class="<?php echo $row_class;?>">
                             <div class="<?php echo $col_class;?>12">
                                 <?php echo J2Store::help()->alert(

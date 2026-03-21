@@ -16,6 +16,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 $platform = J2Store::platform();
 $action = $platform->getCheckoutUrl();
+$ajax_base_url = JRoute::_('index.php');
 $app = JFactory::getApplication();
 $active_menu = $app->getMenu()->getActive();
 
@@ -118,7 +119,7 @@ $(document).ready(function() {
 	$('#billing-address .checkout-heading span').html('<?php echo JText::_('J2STORE_CHECKOUT_BILLING_ADDRESS'); ?>');
 	$('#checkout').hide();
 	$.ajax({
-	url: '<?php echo JUri::root(); ?>index.php',
+	url: '<?php echo $ajax_base_url; ?>',
 	type: 'post',
 	cache: false,
 	data: 'option=com_j2store&view=checkout&task=guest',
@@ -144,7 +145,7 @@ $(document).ready(function() {
 (function($) {
 $(document).ready(function() {
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: 'option=com_j2store&view=checkout&task=login',
@@ -164,7 +165,7 @@ $(document).ready(function() {
 (function($) {
 $(document).ready(function() {
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: 'option=com_j2store&view=checkout&task=billing_address',
@@ -188,7 +189,7 @@ $(document).ready(function() {
 $(document).on('click', '#button-account', function() {
 		var task = $('input[name=\'account\']:checked').attr('value');
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: 'option=com_j2store&view=checkout&task='+task,
@@ -234,7 +235,7 @@ function loginKeyPress(e)
 (function($) {
 $(document).on('click', '#button-login', function() {
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: $('#checkout #login :input'),
@@ -270,7 +271,7 @@ $(document).on('click', '#button-login', function() {
 (function($) {
 $(document).on('click', '#button-register', function() {
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: $('#billing-address input[type=\'text\'], #billing-address input[type=\'password\'], #billing-address input[type=\'checkbox\']:checked, #billing-address input[type=\'radio\']:checked, #billing-address input[type=\'hidden\'], #billing-address select, #billing-address textarea'),
@@ -308,7 +309,7 @@ $(document).on('click', '#button-register', function() {
 
 				if (json['error']['confirm']) {
 					$('#billing-address input[name=\'confirm\']').after('<span class="j2error">' + json['error']['confirm'] + '</span>');
-				}				
+				}
 
 			} else {
 				<?php if ($this->showShipping) { ?>
@@ -316,7 +317,7 @@ $(document).on('click', '#button-register', function() {
 
 				if (shipping_address) {
 					$.ajax({
-						url: '<?php echo JUri::root(); ?>index.php',
+						url: '<?php echo $ajax_base_url; ?>',
 						type: 'post',
 						cache: false,
 						data: 'option=com_j2store&view=checkout&task=shipping_payment_method',
@@ -338,7 +339,7 @@ $(document).on('click', '#button-register', function() {
 							$('#billing-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 							$(window).scrollTop(200);
 							$.ajax({
-								url: '<?php echo JUri::root(); ?>index.php',
+								url: '<?php echo $ajax_base_url; ?>',
 								type: 'post',
 								data: 'option=com_j2store&view=checkout&task=shipping_address',
 								dataType: 'html',
@@ -357,7 +358,7 @@ $(document).on('click', '#button-register', function() {
 					});
 				} else {
 					$.ajax({
-						url: '<?php echo JUri::root(); ?>index.php',
+						url: '<?php echo $ajax_base_url; ?>',
 						type: 'post',
 						cache: false,
 						data: 'option=com_j2store&view=checkout&task=shipping_address',
@@ -384,7 +385,7 @@ $(document).on('click', '#button-register', function() {
 				}
 				<?php } else { ?>
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=shipping_payment_method',
@@ -411,7 +412,7 @@ $(document).on('click', '#button-register', function() {
 				<?php } ?>
 
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=billing_address',
@@ -438,7 +439,7 @@ $(document).on('click', '#button-register', function() {
 (function($) {
 $(document).on('click', '#button-billing-address', function() {
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: $('#billing-address input[type=\'text\'], #billing-address input[type=\'password\'], #billing-address input[type=\'checkbox\']:checked, #billing-address input[type=\'radio\']:checked, #billing-address input[type=\'hidden\'], #billing-address select, #billing-address textarea'),
@@ -472,7 +473,7 @@ $(document).on('click', '#button-billing-address', function() {
 			} else {
 				<?php if ($this->showShipping) { ?>
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=shipping_address',
@@ -497,7 +498,7 @@ $(document).on('click', '#button-billing-address', function() {
 				});
 				<?php } else { ?>
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=shipping_payment_method',
@@ -522,7 +523,7 @@ $(document).on('click', '#button-billing-address', function() {
 				<?php } ?>
 
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=billing_address',
@@ -547,7 +548,7 @@ $(document).on('click', '#button-billing-address', function() {
 (function($) {
 $(document).on('click', '#button-shipping-address', function() {
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: $('#shipping-address input[type=\'text\'], #shipping-address input[type=\'hidden\'], #shipping-address input[type=\'password\'], #shipping-address input[type=\'checkbox\']:checked, #shipping-address input[type=\'radio\']:checked, #shipping-address select, #shipping-address textarea'),
@@ -579,7 +580,7 @@ $(document).on('click', '#button-shipping-address', function() {
 
 			} else {
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=shipping_payment_method',
@@ -598,7 +599,7 @@ $(document).on('click', '#button-shipping-address', function() {
 						$('#shipping-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 						$(window).scrollTop(200);
 						$.ajax({
-							url: '<?php echo JUri::root(); ?>index.php',
+							url: '<?php echo $ajax_base_url; ?>',
 							type: 'post',
 							cache: false,
 							data: 'option=com_j2store&view=checkout&task=shipping_address',
@@ -617,7 +618,7 @@ $(document).on('click', '#button-shipping-address', function() {
 				});
 
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=billing_address',
@@ -642,7 +643,7 @@ $(document).on('click', '#button-shipping-address', function() {
 (function($) {
 $(document).on('click', '#button-guest', function() {
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: $('#billing-address input[type=\'text\'], #billing-address input[type=\'checkbox\']:checked, #billing-address input[type=\'radio\']:checked, #billing-address input[type=\'hidden\'], #billing-address select, #billing-address textarea'),
@@ -671,15 +672,15 @@ $(document).on('click', '#button-guest', function() {
 					if (value) {
 						$('#billing-address #'+key).after('<br class="j2error" /><span class="j2error">' + value + '</span>');
 					}
-				});				
-				
+				});
+
 			} else {
 				<?php if ($this->showShipping) { ?>
 				var shipping_address = $('#billing-address input[name=\'shipping_address\']:checked').attr('value');
 
 				if (shipping_address) {
 					$.ajax({
-						url: '<?php echo JUri::root(); ?>index.php',
+						url: '<?php echo $ajax_base_url; ?>',
 						type: 'post',
 						cache: false,
 						data: 'option=com_j2store&view=checkout&task=shipping_payment_method',
@@ -699,7 +700,7 @@ $(document).on('click', '#button-guest', function() {
 							$('#shipping-address .checkout-heading').append('<a><?php echo JText::_('J2STORE_CHECKOUT_MODIFY'); ?></a>');
 							$(window).scrollTop(200);
 							$.ajax({
-								url: '<?php echo JUri::root(); ?>index.php',
+								url: '<?php echo $ajax_base_url; ?>',
 								type: 'post',
 								cache: false,
 								data: 'option=com_j2store&view=checkout&task=guest_shipping',
@@ -718,7 +719,7 @@ $(document).on('click', '#button-guest', function() {
 					});
 				} else {
 					$.ajax({
-						url: '<?php echo JUri::root(); ?>index.php',
+						url: '<?php echo $ajax_base_url; ?>',
 						type: 'post',
 						cache: false,
 						data: 'option=com_j2store&view=checkout&task=guest_shipping',
@@ -745,7 +746,7 @@ $(document).on('click', '#button-guest', function() {
 				}
 				<?php } else { ?>
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=shipping_payment_method',
@@ -781,7 +782,7 @@ $(document).on('click', '#button-guest', function() {
 (function($) {
 $(document).on('click', '#button-guest-shipping', function() {
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: $('#shipping-address input[type=\'text\'], #shipping-address input[type=\'checkbox\']:checked, #shipping-address input[type=\'radio\']:checked, #shipping-address input[type=\'hidden\'], #shipping-address select, #shipping-address textarea'),
@@ -813,7 +814,7 @@ $(document).on('click', '#button-guest-shipping', function() {
 				});
 			} else {
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=shipping_payment_method',
@@ -848,7 +849,7 @@ $(document).on('click', '#button-guest-shipping', function() {
 (function($) {
 $(document).on('click', '#button-payment-method', function() {
 	$.ajax({
-		url: '<?php echo JUri::root(); ?>index.php',
+		url: '<?php echo $ajax_base_url; ?>',
 		type: 'post',
 		cache: false,
 		data: $('#shipping-payment-method input[type=\'text\'], #shipping-payment-method input[type=\'hidden\'], #shipping-payment-method input[type=\'radio\']:checked, #shipping-payment-method input[type=\'checkbox\']:checked, #shipping-payment-method textarea, #shipping-payment-method select'),
@@ -888,7 +889,7 @@ $(document).on('click', '#button-payment-method', function() {
 
 			} else {
 				$.ajax({
-					url: '<?php echo JUri::root(); ?>index.php',
+					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
 					data: 'option=com_j2store&view=checkout&task=confirm',

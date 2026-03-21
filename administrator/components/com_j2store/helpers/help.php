@@ -77,6 +77,32 @@ class J2Help {
 		return $html;
 	}
 
+    public function info_movetoj6()
+    {
+        $html = '';
+
+        $type = 'j2commerce_movetoj6';
+
+        // Check if this alert to be shown.
+        $params = J2Store::config();
+        if ($params->get($type, 0)) {
+            return $html;
+        }
+
+        $url = Route::_ ('index.php?option=com_j2store&view=cpanels&task=notifications&message_type=' . $type . '&' . Session::getFormToken() . '=1');
+
+        $html .= '<div class="user-notifications alert alert-info ' . $type . '" role="alert">';
+        $html .= '<p>';
+        $html .= '<span class="fas fa-solid fa-info-circle flex-shrink-0 me-2" aria-hidden="true"></span>';
+        $html .= Text::_('J2STORE_MOVE_TO_JOOMLA6_HELP_TEXT');
+        $html .= '</p>';
+        //$html .= '<a class="btn btn-sm btn-dark text-light text-nowrap me-3" href="' . $url . '">' . Text::_('J2STORE_GOT_IT_AND_HIDE') . '</a>';
+        $html .= '<a href="https://www.j2commerce.com/update-j2commerce-4-to-joomla-6" class="btn btn-sm btn-primary text-light text-nowrap me-3" title="'.Text::_('J2STORE_VISIT_J2COMMERCE').'" target="_blank"><span class="fas fa-solid fa-external-link-alt fa-arrow-up-right-from-square me-2"></span>'.Text::_('J2STORE_FIND_OUT_MORE').'</a>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
 	public function info_j2commerce()
 	{
 	    $html = '';
@@ -93,7 +119,7 @@ class J2Help {
 
         $html .= '<div class="user-notifications alert alert-info ' . $type . '" role="alert">';
 	    $html .= '<p>';
-        $html .= '<span class="fas fa-solid fa-info-circle flex-shrink-0 me-2" area-hidden="true"></span>';
+        $html .= '<span class="fas fa-solid fa-info-circle flex-shrink-0 me-2" aria-hidden="true"></span>';
 	    $html .= Text::_('J2STORE_TAKEOVER_INFO');
 	    $html .= '</p>';
 	    $html .= '<a class="btn btn-sm btn-dark text-light text-nowrap me-3" href="' . $url . '">' . Text::_('J2STORE_GOT_IT_AND_HIDE') . '</a>';

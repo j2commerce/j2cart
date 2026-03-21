@@ -391,7 +391,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                     variant_id: variant_id
                 };
                 $.ajax({
-                    url: '<?php echo JUri::root(); ?>',
+                    url: '<?php echo JRoute::_('index.php');?>',
                     data: delete_var_data,
                     beforeSend: function () {
                         $("#deleteVariant-" + variant_id).attr('value', '<?php echo JText::_('J2STORE_DELETING')?>');
