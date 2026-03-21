@@ -449,7 +449,7 @@ function listVariableItemTask(id,isDefault,product_id){
  */
 function setExpandAll(){
 	(function($) {
-		$('.j2store-product-variants .panel-collapse:not(".show")').collapse('show');
+		$('.j2store-product-variants .panel-collapse:not(.show)').collapse('show');
 	})(j2store.jQuery);
 }
 
