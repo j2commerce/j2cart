@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" group="finder" method="upgrade">
-    <name>Smart Search - J2Store</name>
+    <name>Smart Search - J2 Store</name>
     <version>4.1.0</version>
     <creationDate>JAN 2026</creationDate>
     <author>J2Commerce</author>
     <authorEmail>support@j2commerce.com</authorEmail>
     <authorUrl>https://www.j2commerce.com</authorUrl>
-    <copyright>Copyright (c) 2024–2026 J2Commerce. All rights reserved.</copyright>
-    <license>https://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or later</license>
+    <copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+    <copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
+    <license>GNU General Public License v3 or later versions</license>
     <description>PLG_FINDER_J2STORE_DESCRIPTION</description>
     <namespace path="src">Joomla\Plugin\Finder\J2Store</namespace>
     <files>

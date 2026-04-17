@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<extension version="2.5" type="plugin" group="user" method="upgrade">
-	<name>J2Store User Register</name>
-	<author>Alagesan</author>
-	<creationDate>MARCH 2017</creationDate>
-	<copyright>Copyright 2017 Flycart Technologies LLP</copyright>
-	<license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later</license>
-	<authorEmail>support@j2store.org</authorEmail>
-	<authorUrl>https://www.j2store.org</authorUrl>
-	<version>1.2</version>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="user" method="upgrade">
+	<name>User - Register for J2 Store</name>
+	<author>J2Commerce</author>
+	<creationDate>APR 2026</creationDate>
+	<copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+	<copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
+	<license>GNU General Public License v3 or later versions</license>
+	<authorEmail>support@j2commerce.com</authorEmail>
+	<authorUrl>https://www.j2commerce.com</authorUrl>
+	<version>4.0.0</version>
 	<description>J2Store Profile on Joomla user registration</description>
 
 	<files>

@@ -5,7 +5,7 @@ form_folder="$current_dir/j2store4"
 echo "ZIP folder $form_folder"
 compress_folder="com_j2store_pro"
 copy_folder(){
-  move_dir=("administrator" "components" "fof" "language" "media" "modules" "plugins" "com_j2store.xml" "LICENSE" "README.md" "script.j2store.php")
+  move_dir=("administrator" "components" "lib_fof" "language" "media" "modules" "plugins" "com_j2store.xml" "LICENSE" "README.md" "script.j2store.php")
   pack_compress_folder="$current_dir/$compress_folder"
   if [ -d "$pack_compress_folder" ]
   then
@@ -24,7 +24,7 @@ copy_folder(){
   fi
 }
 zip_folder(){
-  move_dir=( "components" "fof" "language" "media" "modules" "plugins" "com_j2store.xml" "LICENSE" "README.md" "script.j2store.php")
+  move_dir=( "components" "lib_fof" "language" "media" "modules" "plugins" "com_j2store.xml" "LICENSE" "README.md" "script.j2store.php")
    rm "$compress_folder".zip
   if [ -d "$pack_compress_folder" ]
     then

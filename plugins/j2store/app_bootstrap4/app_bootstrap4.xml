@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" group="j2store" method="upgrade">
-<name>Product View - Bootstrap 4</name>
+<name>J2 Store Product View - Bootstrap 4</name>
 <author>J2Commerce</author>
 <creationDate>JAN 2025</creationDate>
-<copyright>(C) 2021 J2Store</copyright>
-<copyright>(C) 2025 J2Commerce, LLC</copyright>
+<copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+<copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
 <license>GNU General Public License v3 or later versions</license>
 <authorEmail>support@j2commerce.com</authorEmail>
 <authorUrl>https://www.j2commerce.com</authorUrl>

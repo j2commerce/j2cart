@@ -1,12 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" group="system" method="upgrade">
-  <name>System - J2Store</name>
-  <creationDate>Jan 2012</creationDate>
+  <name>System - J2 Store</name>
+  <creationDate>APR 2026</creationDate>
   <author>J2Commerce</author>
-  <authorEmail>support@j2commerce.org</authorEmail>
-  <authorUrl>https://www.j2commerce.org</authorUrl>
-  <copyright>2025 J2Commerce, LLC</copyright>
-  <license>GNU General Public License v3 or later</license>
+  <authorEmail>support@j2commerce.com</authorEmail>
+  <authorUrl>https://www.j2commerce.com</authorUrl>
+  <copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+  <copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
+  <license>GNU General Public License v3 or later versions</license>
   <version>4.0.11</version>
   <description>System plugin that loads the required Javascript and other files required for J2Store.</description>
   <files>

@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <extension type="plugin" group="installer" method="upgrade">
-    <name>J2Store Installer</name>
-    <author>Alagesan</author>
-    <creationDate>AUG 2023</creationDate>
-    <copyright>(C) 2023 J2Store</copyright>
-    <license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later</license>
-    <authorEmail>support@j2store.org</authorEmail>
-    <authorUrl>www.j2store.org</authorUrl>
-    <version>1.0.0</version>
+    <name>Installer - J2 Store</name>
+    <author>J2Commerce</author>
+    <creationDate>APR 2026</creationDate>
+    <copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+    <copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
+    <license>GNU General Public License v3 or later versions</license>
+    <authorEmail>support@j2commerce.com</authorEmail>
+    <authorUrl>https://www.j2commerce.com</authorUrl>
+    <version>4.0.0</version>
     <description>J2Store Installer</description>
 
     <files>

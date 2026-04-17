@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<extension version="3.0" type="plugin" group="j2store" method="upgrade">
-	<name>Flexible Variable</name>
-	<author>Alagesan</author>
-	<creationDate>JAN 2018</creationDate>
-	<copyright>(C) 2018 Cartrabbit International Pte Ltd</copyright>
-	<license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later</license>
-	<authorEmail>support@j2store.org</authorEmail>
-	<authorUrl>www.j2store.org</authorUrl>
-	<version>1.0.0</version>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="j2store" method="upgrade">
+	<name>J2 Store Flexible Variable</name>
+	<author>J2Commerce</author>
+	<creationDate>APR 2026</creationDate>
+	<copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+	<copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
+	<license>GNU General Public License v3 or later versions</license>
+	<authorEmail>support@j2commerce.com</authorEmail>
+	<authorUrl>https://www.j2commerce.com</authorUrl>
+	<version>4.0.0</version>
 	<description>This app used to setup flexible variable product for J2Store</description>
 	<files>
 		<filename plugin="app_flexivariable">app_flexivariable.php</filename>
