@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<extension version="3.1" type="plugin" method="upgrade" group="search">
-	<name>Search - J2Store </name>
-	<creationDate>September 2015</creationDate>
-	<author>Gokila Priya</author>
-	<copyright>Copyright (c) 2011 - 2016 Weblogicx India Private Ltd. All rights reserved.</copyright>
-	<authorEmail>support@j2store.org</authorEmail>
-	<authorUrl>http://j2store.org</authorUrl>
-	<license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later</license>
-	<version>1.0</version>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" method="upgrade" group="search">
+	<name>Search - J2 Store</name>
+	<creationDate>APR 2026</creationDate>
+	<author>J2Commerce</author>
+	<copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+	<copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
+	<authorEmail>support@j2commerce.com</authorEmail>
+	<authorUrl>https://www.j2commerce.com</authorUrl>
+	<license>GNU General Public License v3 or later versions</license>
+	<version>4.0.0</version>
 	<description>PLG_SEARCH_J2STORE_DESCRIPTION</description>
 	<files>
 		<filename plugin="j2store">j2store.php</filename>

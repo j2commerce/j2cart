@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="3.1" client="administrator" method="upgrade" position ="menu">
-	<name>J2Store Administrator Menu</name>
-	<creationDate>June 2015</creationDate>
-	<copyright>Copyright (c) 2011 - 2016 Weblogicx India Private Ltd. All rights reserved.</copyright>
-	<copyright>Copyright (C) 2025 J2Commerce LLC. All rights reserved.</copyright>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" client="administrator" method="upgrade" position ="menu">
+	<name>J2 Store Administrator Menu</name>
+	<author>J2Commerce</author>
+	<creationDate>APR 2026</creationDate>
+	<copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+	<copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
 	<authorEmail>support@j2commerce.com</authorEmail>
 	<authorUrl>https://www.j2commerce.com</authorUrl>
-	<license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later</license>
-	<version>4.0</version>
+	<license>GNU General Public License v3 or later versions</license>
+	<version>4.0.0</version>
 	<description>J2STORE_MODULE_MENU_XML_DESCRIPTION</description>
 	<files>
 		<filename module="mod_j2store_menu">mod_j2store_menu.php</filename>

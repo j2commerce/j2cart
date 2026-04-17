@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="3.0" type="plugin" method="upgrade" group="content">
-	<name>Content - J2Store</name>
+<extension type="plugin" method="upgrade" group="content">
+	<name>Content - J2 Store</name>
 	<author>J2Commerce</author>
 	<creationDate>FEB 2026</creationDate>
     <copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>

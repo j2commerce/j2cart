@@ -1,18 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<extension
-	type="module"
-	version="2.5"
-	method="upgrade"
-	position ="j2store-module-position-3"
-	client="administrator">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" method="upgrade" client="administrator" position ="j2store-module-position-3">
 	<name>J2 Store Chart</name>
-	<creationDate>Jan 2015</creationDate>
-	<author>Gokila PriyaBose</author>
-	<copyright>Copyright (c) 2014 - 2019 Weblogicx India Private Ltd. All rights reserved.</copyright>
-	<authorEmail>support@j2store.org</authorEmail>
-	<authorUrl>http://j2store.org</authorUrl>
-	<license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPLv3 or later</license>
-	<version>1.0</version>
+	<creationDate>APR 2026</creationDate>
+	<author>J2Commerce</author>
+	<copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+	<copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
+	<authorEmail>support@j2commerce.com</authorEmail>
+	<authorUrl>https://www.j2commerce.com</authorUrl>
+	<license>GNU General Public License v3 or later versions</license>
+	<version>4.0.0</version>
 	<description>
 	 <![CDATA[<p>J2 Store Chart
 	 <p> Please contact to us for more info <a href="mailto:support@j2store.org">support@j2store.org</a></p>

@@ -1,12 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<extension version="2.5" type="plugin" group="j2store" method="upgrade">
-		<name>SagePay Form</name>
-		<version>3.13</version>
-		<creationDate>MARCH 2022</creationDate>
-		<author>J2Store</author>
-		<authorEmail>support@j2store.org</authorEmail>
-		<authorUrl>https://www.j2store.org</authorUrl>
-		<copyright>2022 Weblogicx India Private Limited</copyright>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="j2store" method="upgrade">
+		<name>SagePay Form for J2 Store</name>
+		<version>4.0.0</version>
+		<creationDate>APR 2026</creationDate>
+		<author>J2Commerce</author>
+		<authorEmail>support@j2commerce.com</authorEmail>
+		<authorUrl>https://www.j2commerce.com</authorUrl>
+		<copyright>(C) 2014-2024 J2Store Weblogicx India</copyright>
+		<copyright>(C) 2024-2026 J2Commerce, LLC</copyright>
 		<license>GNU General Public License v3 or later versions</license>
 		<description>J2STORE_SAGEPAYFORM_PLUGINDESC</description>
 		<files>
