@@ -371,7 +371,7 @@ class Com_J2storeInstallerScript extends InstallerScript
             $db = Factory::getDbo();
 
             try {
-                $db->setQuery("ALTER TABLE `#__j2store_variants` DROP `campaign_variant_id`"); // Useless?
+                $db->setQuery("ALTER TABLE `#__j2store_variants` DROP `campaign_variant_id`"); // TODO keep?
                 $db->execute();
                 $this->_log('_runPostflight() – Step 7: dropped campaign_variant_id column');
             } catch (\Exception $e) {
@@ -1342,6 +1342,7 @@ class Com_J2storeInstallerScript extends InstallerScript
         }
 
         // Add a unique index on variant_id in productquantities (ALTER IGNORE removed in recent MySQL)
+        // TODO keep?
         $db->setQuery('SHOW INDEX FROM `#__j2store_productquantities`');
         $product_qty_index = $db->loadObjectList();
         $add_index         = true;
