@@ -19,7 +19,7 @@ class PlgInstallerJ2Store extends CMSPlugin
 {
     public function onInstallerBeforePackageDownload(&$url, &$headers)
     {
-        if (preg_match('/j2commerce.com\//', $url) == false) {
+        if (preg_match('/j2commerce\.com\/j2store\//', $url) == false) {
             return false;
         }
 
