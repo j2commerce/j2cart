@@ -674,7 +674,7 @@ class J2Product extends CMSObject
 		}
 		$this->reset_tax_text();
 		//if no tax profile id found, just return the price.
-		if(!$product->taxprofile_id) {
+		if(empty($product->taxprofile_id) || !isset($product->taxprofile_id)) {
 			$text =  $currency->format($price);
 		} else {
 
