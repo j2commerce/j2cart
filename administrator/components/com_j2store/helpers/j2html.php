@@ -1226,16 +1226,40 @@ class J2Html
                 $value = $content->source;
             }
 
+            $editorParams = new Registry($options);
+
             if ($editor_type) {
-                $editor = Editor::getInstance($editor_type);
+                $editor = Editor::getInstance($editor_type, $editorParams);
             } else {
-                $config = Factory::getApplication()->getConfig();
-                $defaultEditor = $config->get('editor');
-                $editor = Editor::getInstance($defaultEditor);
+                $app = Factory::getApplication();
+                $defaultEditor = $app->get('editor');
+                if (empty($defaultEditor)) {
+                    $defaultEditor = $app->getConfig()->get('editor');
+                }
+                $editor = Editor::getInstance($defaultEditor, $editorParams);
+            }
+
+            // Initialize the editor before using it
+            if ($editor) {
+                $editor->initialise();
+            } else {
+                // Return empty string if no editor is available
+                return '';
             }
 
             $buttons = isset($options['buttons']) ? $options['buttons'] : false; // Default to true (enable all buttons)
-            $html = $editor->display($name, $value, $width, $height, $cols, $rows, false, $id, null, $buttons, $options);
+
+            try {
+                $html = $editor->display($name, $value, $width, $height, $cols, $rows, false, $id, null, $buttons, $editorParams->toArray());
+            } catch (\Throwable $e) {
+                Factory::getApplication()->enqueueMessage('Editor failed to load. Falling back to plain textarea. Error: ' . $e->getMessage(), 'warning');
+
+                $safeValue = htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+                $safeName = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
+                $safeId = htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8');
+                $textareaRows = (int) ($rows ?: 20);
+                $html = '<textarea name="' . $safeName . '" id="' . $safeId . '" rows="' . $textareaRows . '" class="form-control">' . $safeValue . '</textarea>';
+            }
         } elseif ($type === 'filelist'){
             $file_options = array(
                 'options' => array(
@@ -1446,7 +1470,7 @@ class J2Html
             $editor = Factory::getApplication()->get('editor');
             if(empty($editor)) $editor = null;
         }
-        $my_editor = Editor::getInstance($editor);
+        $my_editor = Editor::getInstance($editor, new Registry());
         $my_editor->initialise();
 
         return $my_editor;
