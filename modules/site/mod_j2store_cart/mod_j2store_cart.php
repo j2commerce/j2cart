@@ -36,7 +36,7 @@ if(typeof(j2store) == 'undefined') {
 }
 if(typeof(j2store.jQuery) == 'undefined') {
 	j2store.jQuery = jQuery.noConflict();
-}		
+}
 (function($) {
 	$(document).bind('after_adding_to_cart', function(element,data, type){
 
@@ -78,7 +78,9 @@ if (strpos($layout, 'detailcartonhover') !== false)
 {
 	$advanced_list = modJ2StoreCartHelper::getAdavcedItems();
 	$order = modJ2StoreCartHelper::getOrder ();
-	$model = F0FModel::getTmpInstance('Carts','J2StoreModel');
+	// Use J2Store::fof()->getModel() to ensure J2Store model include path is registered
+	// before instantiation, matching the fix applied in helper.php for the Orders model.
+	$model = J2Store::fof()->getModel('Carts','J2StoreModel');
 	$checkout_url = $model->getCheckoutUrl();
 }
 

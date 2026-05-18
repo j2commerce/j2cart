@@ -115,21 +115,21 @@ $search = htmlspecialchars($this->state->search);
                                             <a href="<?php echo $product_data->product_edit_url;?>" title="<?php echo $product_data->product_name;?>"><?php echo $product_data->product_name;?></a>
                                         </div>
                                         <div class="small text-capitalize"><?php echo Text::_('J2STORE_PRODUCT_TYPE')?>:<b class="ms-2 text-capitalize"><?php echo $product_data->product_type; ?></b></div>
-	                                    <?php if($product_data->product_type !='variable' || $product_data->product_type !='flexivariable' || $product_data->product_type !='advancedvariable'):?>
+                                        <?php if($product_data->product_type !='variable' && $product_data->product_type !='flexivariable' && $product_data->product_type !='advancedvariable'):?>
                                             <div class="small text-capitalize"><?php echo Text::_('J2STORE_PRODUCT_SKU')?>:<b class="ms-2 text-capitalize"><?php echo $product->sku; ?></b></div>
                                         <?php endif;?>
                                     </div>
                                 </div>
                             </td>
-							<?php if(($product_data->product_type !='variable') || ($product_data->product_type !='flexivariable') || ($product_data->product_type !='advancedvariable')):?>
-                                <td>
-                                    <?php if($product->shipping):?>
-                                        <span class="badge text-bg-<?php echo $success_class ?>"> <?php echo Text::_('JENABLED'); ?> </span>
-                                    <?php else: ?>
-                                        <span class="badge text-bg-<?php echo $danger_class ?>"> <?php echo Text::_('JDISABLED'); ?> </span>
-                                    <?php endif; ?>
-                                </td>
-							<td>
+                            <?php if(($product_data->product_type !='variable') && ($product_data->product_type !='flexivariable') && ($product_data->product_type !='advancedvariable')):?>
+                            <td>
+                                <?php if($product->shipping):?>
+                                    <span class="badge text-bg-<?php echo $success_class ?>"> <?php echo Text::_('JENABLED'); ?> </span>
+                                <?php else: ?>
+                                    <span class="badge text-bg-<?php echo $danger_class ?>"> <?php echo Text::_('JDISABLED'); ?> </span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
                                 <div class="small text-capitalize"><?php echo Text::_('J2STORE_LENGTH')?>:
                                     <?php if($product->length < 0.1):?>
                                         <span class="text-danger fw-bold"> <?php echo Text::_('J2STORE_NOT_SET'); ?> </span>

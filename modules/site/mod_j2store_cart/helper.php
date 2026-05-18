@@ -57,7 +57,14 @@ class modJ2StoreCartHelper {
 
 	public static function getOrder(){
 		if(empty( self::$_orders )){
-			self::$_orders = F0FModel::getTmpInstance('Orders', 'J2StoreModel')->initOrder()->getOrder();
+			// Use J2Store::fof()->getModel() to ensure the J2Store model include path is
+			// registered before instantiation. Without this, F0FModel::getTmpInstance()
+			// resolves component paths from the current page's 'option' parameter, which
+			// may not be 'com_j2store' on non-J2Store pages (e.g. home, articles).
+			// That causes getAnInstance() to fall back to the base F0FModel, making
+			// initOrder() / getOrder() silently return the model itself (via __call magic),
+			// so product_count is always 0 on every non-J2Store page.
+			self::$_orders = J2Store::fof()->getModel('Orders', 'J2StoreModel')->initOrder()->getOrder();
 		}
 		return self::$_orders;
 	}
@@ -70,7 +77,7 @@ class modJ2StoreCartHelper {
 			// Get params and output
 			$items = $order->getItems();
 
-			// fix the file name 
+			// fix the file name
 			foreach($items as $item) {
 				if(isset($item->orderitemattributes) && count($item->orderitemattributes)) {
 					foreach($item->orderitemattributes as &$attribute) {
@@ -78,7 +85,7 @@ class modJ2StoreCartHelper {
 							unset($table);
 							$table = F0FTable::getInstance('Upload', 'J2StoreTable')->getClone ();
 							if($table->load(array('mangled_name'=>$attribute->orderitemattribute_value))) {
-								$attribute->orderitemattribute_value = $table->original_name; 
+								$attribute->orderitemattribute_value = $table->original_name;
 							}
 						}
 					}
