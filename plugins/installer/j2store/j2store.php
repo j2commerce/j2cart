@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\CMSPlugin;
-use Joomla\Uri\Uri;
+use Joomla\CMS\Uri\Uri;
 
 class PlgInstallerJ2Store extends CMSPlugin
 {
