@@ -379,6 +379,43 @@ class Com_J2storeInstallerScript extends InstallerScript
                 $this->_log('_runPostflight() – Step 7: campaign_variant_id patch skipped (' . $e->getMessage() . ')');
             }
 
+            // ---- Step 7b: Decode double-escaped checkout layout fields ----
+            // Versions prior to 4.1.5 applied htmlspecialchars() twice when rendering the
+            // checkout layout textareas, so each save added another layer of HTML encoding.
+            // Decode each field repeatedly until the value stabilises.
+            $this->_log('_runPostflight() – Step 7b: decoding checkout layout fields');
+            $layoutKeys = ['store_billing_layout', 'store_shipping_layout', 'store_payment_layout'];
+            foreach ($layoutKeys as $key) {
+                try {
+                    $query = $db->getQuery(true)
+                        ->select($db->quoteName('config_meta_value'))
+                        ->from($db->quoteName('#__j2store_configurations'))
+                        ->where($db->quoteName('config_meta_key') . ' = ' . $db->quote($key));
+                    $db->setQuery($query);
+                    $raw = $db->loadResult();
+                    if ($raw !== null) {
+                        $decoded = $raw;
+                        // Repeatedly decode until the value no longer changes.
+                        do {
+                            $prev    = $decoded;
+                            $decoded = html_entity_decode($decoded, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        } while ($decoded !== $prev);
+                        if ($decoded !== $raw) {
+                            $updateQuery = $db->getQuery(true)
+                                ->update($db->quoteName('#__j2store_configurations'))
+                                ->set($db->quoteName('config_meta_value') . ' = ' . $db->quote($decoded))
+                                ->where($db->quoteName('config_meta_key') . ' = ' . $db->quote($key));
+                            $db->setQuery($updateQuery);
+                            $db->execute();
+                            $this->_log("_runPostflight() – Step 7b: decoded {$key}");
+                        }
+                    }
+                } catch (\Exception $e) {
+                    $this->_log("_runPostflight() – Step 7b: failed for {$key}: " . $e->getMessage(), 'WARNING');
+                }
+            }
+            $this->_log('_runPostflight() – Step 7b: done');
+
             // ---- Step 8: Render post-installation status ----
             $this->_log('_runPostflight() – Step 8: rendering status HTML');
             $this->_renderPostInstallation($status, $fofInstallationStatus, $parent);
