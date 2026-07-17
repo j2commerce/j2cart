@@ -259,18 +259,35 @@ $wa->addInlineStyle($style, [], []);
                                 var label = this.textContent;
                                 var value = this.dataset.value;
 
-                                var newRow = `
-                            <tr>
-                                <td class="addedFilter">${label}</td>
-                                <td class="text-center">
-                                    <span class="filterRemove" onclick="this.closest('tr').remove();">
-                                        <span class="icon icon-trash text-danger"></span>
-                                    </span>
-                                    <input type="hidden" value="${value}" name="<?php echo $this->form_prefix.'[productfilter_ids]' ;?>[]">
-                                </td>
-                            </tr>
-                        `;
-                                document.querySelector('.j2store_a_filter').insertAdjacentHTML('beforebegin', newRow);
+                                var tr = document.createElement('tr');
+
+                                var tdLabel = document.createElement('td');
+                                tdLabel.className = 'addedFilter';
+                                tdLabel.textContent = label;
+
+                                var tdAction = document.createElement('td');
+                                tdAction.className = 'text-center';
+
+                                var removeSpan = document.createElement('span');
+                                removeSpan.className = 'filterRemove';
+                                removeSpan.addEventListener('click', function () { this.closest('tr').remove(); });
+
+                                var icon = document.createElement('span');
+                                icon.className = 'icon icon-trash text-danger';
+                                removeSpan.appendChild(icon);
+
+                                var input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.value = value;
+                                input.name = '<?php echo $this->form_prefix.'[productfilter_ids]' ;?>[]';
+
+                                tdAction.appendChild(removeSpan);
+                                tdAction.appendChild(input);
+                                tr.appendChild(tdLabel);
+                                tr.appendChild(tdAction);
+
+                                var anchor = document.querySelector('.j2store_a_filter');
+                                anchor.parentNode.insertBefore(tr, anchor);
                                 productFilterInput.value = '';
                                 autocompleteList.innerHTML = '';
                                 updateAutocompleteListState();
