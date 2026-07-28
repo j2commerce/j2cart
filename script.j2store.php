@@ -609,12 +609,16 @@ class Com_J2storeInstallerScript extends InstallerScript
 
         if (!empty($conflicts)) {
             Factory::getApplication()->enqueueMessage(
-                'Installation blocked: the following FOF library directories were found alongside '
-                . 'the F0F library used by J2Store: <strong>' . implode(', ', $conflicts) . '</strong>. '
-                . 'Multiple FOF installations in the same Joomla instance cause class-loading conflicts. '
-                . 'Please uninstall those libraries before installing J2Commerce. <a href="index.php?option=com_installer&view=manage&filter[type]=library">Check the libraries</a>. '
-                . 'If no library is present, you may have to delete the folder(s) manually.',
-                'error'
+                'Installation postponed:'
+                . '<br>You need to perform a simple cleanup before you can resume the installation of J2Commerce.'
+                . '<br><br>The following FOF library folder(s) were found on the server: <code>/libraries/' . implode('</code>, <code>/libraries/', $conflicts) . '</code>.'
+                . '<br>Multiple FOF installations can cause conflicts and unused or unsupported code can jeopardize the site.'
+                . '<br>Please uninstall the libraries from <a href="index.php?option=com_installer&view=manage&filter[type]=library">System -&gt; Manage -&gt; Extensions -&gt; filter by the library type</a>. '
+                . '<br>Make sure you keep the FOF library packaged with J2Commerce. It has a version number similar to <code>revAC1796x</code> and is located in <code>/libraries/f0f</code>.'
+                . '<br>If some or all listed FOF libraries are missing from the Joomla console, they are still present on the server, just not visible.'
+                . '<br>In that case, you have to delete the folder(s) manually from the server.'
+                . '<br><br>Once the libraries are deleted, you can restart the installation.',
+                'warning'
             );
             return false;
         }
