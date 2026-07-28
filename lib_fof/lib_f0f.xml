@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="library" version="2.5" method="upgrade">
-    <name>F0F (NEW) DO NOT REMOVE</name>
+    <name>F0F for J2Commerce</name>
 	<libraryname>f0f</libraryname>
-	<description>Framework-on-Framework (FOF) newer version - DO NOT REMOVE - The rapid component development framework for Joomla!. This package is the newer version of FOF, not the one shipped with Joomla! as the official Joomla! RAD Layer. The Joomla! RAD Layer has ceased development in March 2014. DO NOT UNINSTALL THIS PACKAGE, IT IS *** N O T *** A DUPLICATE OF THE 'FOF' PACKAGE. REMOVING EITHER FOF PACKAGE WILL BREAK YOUR SITE.</description>
+	<description>Framework-on-Framework (FOF) version for J2Commerce - DO NOT REMOVE.</description>
 	<creationDate>APR 2026</creationDate>
 	<author>Nicholas K. Dionysopoulos / Akeeba Ltd</author>
 	<authorEmail>nicholas@akeebabackup.com</authorEmail>
@@ -10,8 +10,8 @@
 	<copyright>(C)2011-2014 Nicholas K. Dionysopoulos</copyright>
 	<license>GNU GPLv2 or later</license>
 	<version>revAC17963</version>
-	<packager>Akeeba Ltd</packager>
-	<packagerurl>https://www.AkeebaBackup.com/download.html</packagerurl>
+	<packager>J2Commerce</packager>
+	<packagerurl>https://www.j2commerce.com</packagerurl>
 
     <languages folder="_lang">
         <language tag="en-GB">en-GB/en-GB.lib_f0f.ini</language>
