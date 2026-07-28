@@ -983,7 +983,7 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
         // prepare some data
         $validate_ipn = $this->params->get('validate_ipn', 1);
         if($validate_ipn) {
-            $custom = $data['custom'];
+            $custom = isset($data['custom']) ? $data['custom'] : '';
             $custom_array = explode('|', $custom);
 
             $order_id  = $custom_array[0];

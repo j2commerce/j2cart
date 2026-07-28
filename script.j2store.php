@@ -379,6 +379,43 @@ class Com_J2storeInstallerScript extends InstallerScript
                 $this->_log('_runPostflight() – Step 7: campaign_variant_id patch skipped (' . $e->getMessage() . ')');
             }
 
+            // ---- Step 7b: Decode double-escaped checkout layout fields ----
+            // Versions prior to 4.1.5 applied htmlspecialchars() twice when rendering the
+            // checkout layout textareas, so each save added another layer of HTML encoding.
+            // Decode each field repeatedly until the value stabilises.
+            $this->_log('_runPostflight() – Step 7b: decoding checkout layout fields');
+            $layoutKeys = ['store_billing_layout', 'store_shipping_layout', 'store_payment_layout'];
+            foreach ($layoutKeys as $key) {
+                try {
+                    $query = $db->getQuery(true)
+                        ->select($db->quoteName('config_meta_value'))
+                        ->from($db->quoteName('#__j2store_configurations'))
+                        ->where($db->quoteName('config_meta_key') . ' = ' . $db->quote($key));
+                    $db->setQuery($query);
+                    $raw = $db->loadResult();
+                    if ($raw !== null) {
+                        $decoded = $raw;
+                        // Repeatedly decode until the value no longer changes.
+                        do {
+                            $prev    = $decoded;
+                            $decoded = html_entity_decode($decoded, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        } while ($decoded !== $prev);
+                        if ($decoded !== $raw) {
+                            $updateQuery = $db->getQuery(true)
+                                ->update($db->quoteName('#__j2store_configurations'))
+                                ->set($db->quoteName('config_meta_value') . ' = ' . $db->quote($decoded))
+                                ->where($db->quoteName('config_meta_key') . ' = ' . $db->quote($key));
+                            $db->setQuery($updateQuery);
+                            $db->execute();
+                            $this->_log("_runPostflight() – Step 7b: decoded {$key}");
+                        }
+                    }
+                } catch (\Exception $e) {
+                    $this->_log("_runPostflight() – Step 7b: failed for {$key}: " . $e->getMessage(), 'WARNING');
+                }
+            }
+            $this->_log('_runPostflight() – Step 7b: done');
+
             // ---- Step 8: Render post-installation status ----
             $this->_log('_runPostflight() – Step 8: rendering status HTML');
             $this->_renderPostInstallation($status, $fofInstallationStatus, $parent);
@@ -572,12 +609,16 @@ class Com_J2storeInstallerScript extends InstallerScript
 
         if (!empty($conflicts)) {
             Factory::getApplication()->enqueueMessage(
-                'Installation blocked: the following FOF library directories were found alongside '
-                . 'the F0F library used by J2Store: <strong>' . implode(', ', $conflicts) . '</strong>. '
-                . 'Multiple FOF installations in the same Joomla instance cause class-loading conflicts. '
-                . 'Please uninstall those libraries before installing J2Commerce. <a href="index.php?option=com_installer&view=manage&filter[type]=library">Check the libraries</a>. '
-                . 'If no library is present, you may have to delete the folder(s) manually.',
-                'error'
+                'Installation postponed:'
+                . '<br>You need to perform a simple cleanup before you can resume the installation of J2Commerce.'
+                . '<br><br>The following FOF library folder(s) were found on the server: <code>/libraries/' . implode('</code>, <code>/libraries/', $conflicts) . '</code>.'
+                . '<br>Multiple FOF installations can cause conflicts and unused or unsupported code can jeopardize the site.'
+                . '<br>Please uninstall the libraries from <a href="index.php?option=com_installer&view=manage&filter[type]=library">System -&gt; Manage -&gt; Extensions -&gt; filter by the library type</a>. '
+                . '<br>Make sure you keep the FOF library packaged with J2Commerce. It has a version number similar to <code>revAC1796x</code> and is located in <code>/libraries/f0f</code>.'
+                . '<br>If some or all listed FOF libraries are missing from the Joomla console, they are still present on the server, just not visible.'
+                . '<br>In that case, you have to delete the folder(s) manually from the server.'
+                . '<br><br>Once the libraries are deleted, you can restart the installation.',
+                'warning'
             );
             return false;
         }

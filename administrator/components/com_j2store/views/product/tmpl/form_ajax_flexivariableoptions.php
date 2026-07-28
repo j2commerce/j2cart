@@ -58,7 +58,7 @@ $enable_inventory = J2Store::config()->get ( 'enable_inventory', 1 );
                 <button class="accordion-button variant-button collapsed p-0 small ps-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $this->variant->j2store_variant_id;?>" aria-expanded="false" aria-controls="collapse<?php echo $this->variant->j2store_variant_id;?>">
                     <span class="variant__id fw-bold me-1 ms-4">(#<?php echo $this->variant->j2store_variant_id;?>)</span>
                     <?php echo $variantNames; ?>
-                    <?php if($this->variant->sku):?><span class="variant__sku ms-2">(<?php echo $this->variant->sku;?>)</span><?php endif;?>
+                    <?php if($this->variant->sku):?><span class="variant__sku ms-2">(<?php echo $this->escape($this->variant->sku);?>)</span><?php endif;?>
                 </button>
                 <?php if( $this->variant->isdefault_variant):?>
                     <a id="default-variant-<?php echo $this->variant->j2store_variant_id;?>" class="btn hasTooltip <?php echo $btn_class; ?> me-2" title="<?php echo Text::_('J2STORE_PRODUCT_VARIANT_UNSET_DEFAULT');?>" onclick="return listVariableItemTask(<?php echo $this->variant->j2store_variant_id;?>,'unsetDefault',<?php echo $this->variant->product_id;?>)" href="javascript:void(0);" data-original-title="<?php echo Text::_('J2STORE_PRODUCT_VARIANT_UNSET_DEFAULT');?>">

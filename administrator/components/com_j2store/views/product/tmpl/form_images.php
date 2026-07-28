@@ -145,7 +145,9 @@ $wa->addInlineStyle($style, [], []);
                             </tr>
                         <?php endif; ?>
                         <input type="hidden" id="additional_image_counter" name="additional_image_counter" value="<?php echo $image_counter; ?>"/>
-                        <tr class="tr-additional-image" id="additional-image-template" style="display: none;">
+                    </table>
+                    <template id="additional-image-template">
+                        <tr class="tr-additional-image">
                             <td></td>
                             <td colspan="1">
                                 <?php echo J2Html::media('additional_image_tmpl', '', array('id' => 'additional_image_', 'class' => 'image-input', 'image_id' => 'input-additional-image-', 'no_hide' => '')); ?>
@@ -155,7 +157,7 @@ $wa->addInlineStyle($style, [], []);
                             </td>
                             <td class="text-end"><input type="button" onclick="deleteImageRow(this)" class="btn btn-danger btn-sm" value="<?php echo Text::_('J2STORE_DELETE') ?>"/></td>
                         </tr>
-                    </table>
+                    </template>
                 </div>
             </fieldset>
         </div>
@@ -171,117 +173,58 @@ $wa->addInlineStyle($style, [], []);
 
     function deleteImageRow(element) {
         (function ($) {
-            var tbody = $(element).closest('.tr-additional-image');
-
-            if ($(".tr-additional-image").length == 2) {
-                // reset the last item
-                var image_div = jQuery("#additional-image-template");
-                addAdditionalImage(image_div, 0);
-                jQuery("#additional-image-0").addClass('hide');
+            var tr = $(element).closest('.tr-additional-image');
+            // If this is the last visible row, add an empty replacement before removing
+            if ($('.tr-additional-image').length <= 1) {
+                var newCounter = parseInt(jQuery('#additional_image_counter').val(), 10) + 1;
+                addAdditionalImage(newCounter);
+                jQuery('#additional_image_counter').val(newCounter);
             }
-            tbody.remove();
+            tr.remove();
         })(j2store.jQuery);
     }
 
     var counter = <?php echo $image_counter;?>;
 
-    jQuery("#addImagBtn").click(function () {
-        counter = jQuery("#additional_image_counter").val();
+    jQuery('#addImagBtn').click(function () {
+        counter = parseInt(jQuery('#additional_image_counter').val(), 10);
         counter++;
-        (function ($) {
-            var image_div = jQuery("#additional-image-template");
-            addAdditionalImage(image_div, counter);
-        })(j2store.jQuery);
-        jQuery("#additional_image_counter").val(counter);
-    })
+        addAdditionalImage(counter);
+        jQuery('#additional_image_counter').val(counter);
+    });
 
-    function addAdditionalImage(image_div, counter) {
-        (function ($) {
-            // Clone the entire template
-            var clone = image_div.clone();
+    /**
+     * Add a new additional-image row by cloning the inert <template> element.
+     *
+     * Using <template> (instead of a hidden <tr>) keeps the joomla-field-media
+     * web component inert until the row is actually inserted into the document.
+     * This prevents connectedCallback from firing on the template itself, which
+     * previously caused updatePreview() to remove the .button-clear child —
+     * making every subsequent clone throw "Misconfiguaration".
+     */
+    function addAdditionalImage(counter) {
+        var template = document.getElementById('additional-image-template');
+        var fragment = document.importNode(template.content, true);
+        var tr = fragment.querySelector('tr');
 
-            // Ensure it's treated as a <tr> and modify its ID
-            clone.attr('id', 'additional-image-' + counter);
-            clone.removeClass('hide');
+        tr.id = 'additional-image-' + counter;
+        tr.classList.add('tr-new-additional-image');
 
-            // Modify elements inside the clone
-            clone.find('.j2store-media-slider-image-preview').each(function () {
-                $(this).attr('src', '<?php echo Uri::root() . 'media/j2store/images/common/no_image-100x100.jpg'; ?>');
-                if (!$('#input-additional-image-' + counter).html()) {
-                    $(this).attr("id", 'input-additional-image-' + counter);
-                }
-            });
+        // Update name/id on every text input before the element enters the document
+        // (joomla-field-media's connectedCallback fires on insertion, not before)
+        fragment.querySelectorAll('input[type="text"]').forEach(function (input) {
+            var isAlt = input.classList.contains('image-alt-text');
+            var fieldName = isAlt ? 'additional_images_alt' : 'additional_images';
+            input.setAttribute('name', '<?php echo $this->form_prefix ?>[' + fieldName + '][' + counter + ']');
+            input.setAttribute('id', 'jform_image_additional_image_' + counter);
+            input.value = '';
+            input.classList.add('form-control', 'w-100');
+            input.setAttribute('image_id', 'input-additional-image-' + counter);
+        });
 
-            clone.find(':text').each(function () {
-                var is_alt_text = $(this).hasClass('image-alt-text');
-                var input_name = is_alt_text ? 'additional_images_alt' : 'additional_images';
-                $(this).attr("name", "<?php echo $this->form_prefix ?>[" + input_name + "][" + counter + "]");
-                $(this).attr("value", '');
-                $(this).attr("id", 'jform_image_additional_image_' + counter);
-                $(this).addClass('form-control w-100');
-                $(this).attr("image_id", 'input-additional-image-' + counter);
-                $(this).attr("onchange", 'previewImage(this,jform_image_additional_image_' + counter + ')');
-            });
-
-            // Ensure it's wrapped in a <tr> if needed
-            if (!clone.is('tr')) {
-                clone = $('<tr class="tr-additional-image tr-temp-image"></tr>').append(clone.contents());
-            }
-
-            clone.addClass('tr-new-additional-image');
-            // Append the <tr> directly to the <tbody>
-            $('#additionalImages').append(clone);
-
-            // Show the new row
-            clone.show();
-        })(j2store.jQuery);
+        // Append into the table's tbody (browser auto-creates tbody if absent)
+        var table = document.getElementById('additionalImages');
+        var tbody = table.querySelector('tbody') || table;
+        tbody.appendChild(fragment);
     }
-
-    /*function addAdditionalImage(image_div, counter, joomla_version) {
-        (function ($) {
-            //increment the
-            var clone = image_div.clone();
-            clone.attr('id', 'additional-image-' + counter);
-            //need to change the input name
-            clone.find('.j2store-media-slider-image-preview').each(function () {
-                $(this).attr('src', '<?php echo Uri::root() . 'media/j2store/images/common/no_image-100x100.jpg'; ?>');
-                if ($('#input-additional-image-' + counter).html() == '') {
-                    $(this).attr("id", 'input-additional-image-' + counter);
-                }
-            });
-            clone.find(':text').each(function () {
-                var is_alt_text = $(this).hasClass('image-alt-text');
-                var input_name = (is_alt_text) ? 'additional_images_alt' : 'additional_images';
-                $(this).attr("name", "<?php echo $this->form_prefix ?>[" + input_name + "][" + counter + "]");
-                $(this).attr("value", '');
-                $(this).attr("id", 'jform_image_additional_image_' + counter);
-                $(this).addClass('form-control w-100');
-                $(this).attr("image_id", 'input-additional-image-' + counter);
-                if (joomla_version == 1 || joomla_version == 4) {
-                    $(this).attr("onchange", 'previewImage(this,jform_image_additional_image_' + counter + ')');
-                }
-            });
-            clone.removeClass('hide');
-            //clone.append('<script src="<?php echo Uri::root(true) . '/media/media/js/mediafield.min.js'?>" type="text\/javascript"><\/script>');
-            //remove joomla 3.5
-            /!*if (joomla_version == 0) {
-                clone.find('.modal').each(function () {
-                    $(this).attr('href', 'index.php?option=com_media&view=images&tmpl=component&asset=1&author=673&fieldid=jform_image_additional_image_' + counter + '&folder=');
-                });
-            } else if (joomla_version == 1) {
-                //for joomla 3.5
-                clone.append('<script src="<?php echo Uri::root(true) . '/media/media/js/mediafield.min.js'?>" type="text\/javascript"><\/script>');
-            }*!/
-            //to chang label id
-            var new_html = image_div.before(clone);
-            //now it is placed just of the image div so remove the element
-            var processed_html = clone.remove();
-            //get the newly added tbody and insert after the additional-image-0
-            $(processed_html).insertAfter($('#additionalImages tr:last-child'));
-            $(processed_html).show();
-            // initialize squeeze box again for edit button to work
-            // no need in joomla 3.5
-
-        })(j2store.jQuery);
-    }*/
 </script>

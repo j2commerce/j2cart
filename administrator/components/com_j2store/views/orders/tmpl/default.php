@@ -170,14 +170,6 @@ $shouldExpand = $this->state->since || $this->state->until || $this->state->payk
                     window.location = json.success.link;
                 }
 
-                // Handle error
-                if (json.error) {
-                    const alertBox = document.querySelector('.j2store-alert-box');
-                    if (alertBox) {
-                        alertBox.style.display = 'block';
-                        alertBox.innerHTML = `<p class="alert alert-warning">' + json.error.msg + '</p>`;
-                    }
-                }
             })
             .catch(error => console.error('Error:', error));
     }
