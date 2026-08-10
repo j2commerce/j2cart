@@ -39,7 +39,20 @@ class J2StoreModelAddresses extends F0FModel {
 	
 		// first save data to the address table
 		$row = F0FTable::getInstance ( 'Address', 'J2StoreTable' );
-	
+
+		// Initialize any null fields to a safe default before binding.
+		// Databases migrated from Joomla 3 may have extra NOT NULL columns
+		// without a DEFAULT value; leaving them as null causes the INSERT to
+		// fail in MySQL strict mode.
+		$pk          = $row->getKeyName();
+		$tableFields = $row->getTableFields();
+		foreach ($tableFields as $fieldName => $fieldSpec) {
+			if ($fieldName !== $pk && $row->$fieldName === null) {
+				$fieldType      = is_object($fieldSpec) ? (string) $fieldSpec->Type : (string) $fieldSpec;
+				$row->$fieldName = preg_match('/int/i', $fieldType) ? 0 : '';
+			}
+		}
+
 		// set the id so that it updates the record rather than changing
 		if (! $row->bind ( $post )) {
 			$this->setError ( $row->getError () );
