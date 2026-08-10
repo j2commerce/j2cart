@@ -445,6 +445,17 @@ class J2StoreControllerCarts extends F0FController
 	 */
 	public function upload(){
 
+		// Require a valid CSRF token
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
+		// Require a logged-in user
+		$user = JFactory::getUser();
+		if ($user->guest) {
+			echo json_encode(array('error' => JText::_('JGLOBAL_AUTH_ACCESS_DENIED')));
+			JFactory::getApplication()->close();
+			return;
+		}
+
 		$files = $this->input->files->get('file');
 		$json = array();
 		if($files) {
