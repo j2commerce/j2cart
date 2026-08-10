@@ -1012,31 +1012,36 @@ class J2StoreControllerCheckouts extends F0FController
 
 				if(!$json) {
 					$address_id = $address_model->addAddress('billing');
-					//now get the address and save to session
-					$address_info = $address_model->getItem($address_id);
 
-					//check if we have a country and zone id's. If not use the store address
-					$country_id = $app->input->post->getInt('country_id', '');
-					if(empty($country_id)) {
-						$country_id = $store_address->get('country_id');
+					if (!$address_id) {
+						$json['error']['warning'] = $address_model->getError() ?: JText::_('J2STORE_ERROR_SAVING_ADDRESS');
+					} else {
+						//now get the address and save to session
+						$address_info = $address_model->getItem($address_id);
+
+						//check if we have a country and zone id's. If not use the store address
+						$country_id = $app->input->post->getInt('country_id', '');
+						if(empty($country_id)) {
+							$country_id = $store_address->get('country_id');
+						}
+
+						$zone_id = $app->input->post->getInt('zone_id', '');
+						if(empty($zone_id)) {
+							$zone_id = $store_address->get('zone_id');
+						}
+
+						$postcode  = $app->input->post->getString('zip');
+						if(empty($postcode)) {
+							$postcode = $store_address->get('zip');
+						}
+
+						$session->set('billing_address_id', $address_info->j2store_address_id, 'j2store');
+						$session->set('billing_country_id', $country_id, 'j2store');
+						$session->set('billing_zone_id',$zone_id, 'j2store');
+						$session->set('billing_postcode',$postcode, 'j2store');
+						$session->clear('payment_method', 'j2store');
+						$session->clear('payment_methods', 'j2store');
 					}
-
-					$zone_id = $app->input->post->getInt('zone_id', '');
-					if(empty($zone_id)) {
-						$zone_id = $store_address->get('zone_id');
-					}
-
-					$postcode  = $app->input->post->getString('zip');
-					if(empty($postcode)) {
-						$postcode = $store_address->get('zip');
-					}
-
-					$session->set('billing_address_id', $address_info->j2store_address_id, 'j2store');
-					$session->set('billing_country_id', $country_id, 'j2store');
-					$session->set('billing_zone_id',$zone_id, 'j2store');
-					$session->set('billing_postcode',$postcode, 'j2store');
-					$session->clear('payment_method', 'j2store');
-					$session->clear('payment_methods', 'j2store');
 				}
 
 			}
@@ -1241,31 +1246,36 @@ class J2StoreControllerCheckouts extends F0FController
 				if(!$json) {
 
 					$address_id = $address_model->addAddress('shipping');
-					//now get the address and save to session
-					$address_info = $address_model->getItem($address_id);
 
-					//check if we have a country and zone id's. If not use the store address
-					$country_id = $app->input->post->getInt('country_id', '');
-					if(empty($country_id)) {
-						$country_id = $store_address->get('country_id');
+					if (!$address_id) {
+						$json['error']['warning'] = $address_model->getError() ?: JText::_('J2STORE_ERROR_SAVING_ADDRESS');
+					} else {
+						//now get the address and save to session
+						$address_info = $address_model->getItem($address_id);
+
+						//check if we have a country and zone id's. If not use the store address
+						$country_id = $app->input->post->getInt('country_id', '');
+						if(empty($country_id)) {
+							$country_id = $store_address->get('country_id');
+						}
+
+						$zone_id = $app->input->post->getInt('zone_id', '');
+						if(empty($zone_id)) {
+							$zone_id = $store_address->get('zone_id');
+						}
+
+						$postcode= $app->input->post->get('zip');
+						if(empty($postcode)) {
+							$postcode = $store_address->get('zip');
+						}
+
+						$session->set('shipping_address_id', $address_info->j2store_address_id, 'j2store');
+						$session->set('shipping_country_id',$country_id, 'j2store');
+						$session->set('shipping_zone_id',$zone_id, 'j2store');
+						$session->set('shipping_postcode',$postcode, 'j2store');
+						$session->clear('shipping_method', 'j2store');
+						$session->clear('shipping_methods', 'j2store');
 					}
-
-					$zone_id = $app->input->post->getInt('zone_id', '');
-					if(empty($zone_id)) {
-						$zone_id = $store_address->get('zone_id');
-					}
-
-					$postcode= $app->input->post->get('zip');
-					if(empty($postcode)) {
-						$postcode = $store_address->get('zip');
-					}
-
-					$session->set('shipping_address_id', $address_info->j2store_address_id, 'j2store');
-					$session->set('shipping_country_id',$country_id, 'j2store');
-					$session->set('shipping_zone_id',$zone_id, 'j2store');
-					$session->set('shipping_postcode',$postcode, 'j2store');
-					$session->clear('shipping_method', 'j2store');
-					$session->clear('shipping_methods', 'j2store');
 				}
 
 			}
