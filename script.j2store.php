@@ -176,6 +176,15 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         } catch (\Exception $e) {
             // Can fail if the column does not exist
         }
+
+        // Security exploitation check (CVE fixed in 4.0.21)
+        $checkResult   = $this->_checkForExploitation();
+        $verdict       = $this->_getExploitationVerdict($checkResult);
+        $cleanupResult = null;
+        if ($verdict === 'hacked') {
+            $cleanupResult = $this->_removeExploitationFiles($checkResult);
+        }
+        $this->_renderSecurityCheck($checkResult, $verdict, $cleanupResult);
     }
 
   public function preflight($type, $parent)
@@ -667,4 +676,345 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
 
     return true;
   }
+
+    // -------------------------------------------------------------------------
+    // Security exploitation check (CVE fixed in 4.0.21)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Scans the site for evidence that the unauthenticated upload vulnerability
+     * (fixed in 4.0.21) was exploited before this update was applied.
+     *
+     * @return array
+     */
+    private function _checkForExploitation(): array
+    {
+        $check = [
+            'file_option_count'    => 0,
+            'options_table_exists' => false,
+            'upload_files'         => [],
+            'legacy_files'         => [],
+            'db_upload_count'      => 0,
+            'db_table_exists'      => false,
+            'suspicious_names'     => [],
+            'invoices_unexpected'  => [],
+            'protection_missing'   => [],
+            'errors'               => [],
+        ];
+
+        $db     = Factory::getDbo();
+        $prefix = $db->getPrefix();
+
+        try {
+            $tables = $db->getTableList();
+        } catch (\Exception $e) {
+            $check['errors'][] = 'Could not list database tables: ' . $e->getMessage();
+            return $check;
+        }
+
+        // 1. Check whether any 'file' type option is defined
+        if (in_array($prefix . 'j2store_options', $tables)) {
+            $check['options_table_exists'] = true;
+            try {
+                $q = $db->getQuery(true)
+                    ->select('COUNT(*)')
+                    ->from($db->quoteName('#__j2store_options'))
+                    ->where($db->quoteName('type') . ' = ' . $db->quote('file'));
+                $db->setQuery($q);
+                $check['file_option_count'] = (int) $db->loadResult();
+            } catch (\Exception $e) {
+                $check['errors'][] = 'Options table query failed: ' . $e->getMessage();
+            }
+        }
+
+        // 2. Count rows in the uploads table
+        if (in_array($prefix . 'j2store_uploads', $tables)) {
+            $check['db_table_exists'] = true;
+            try {
+                $q = $db->getQuery(true)
+                    ->select('COUNT(*)')
+                    ->from($db->quoteName('#__j2store_uploads'));
+                $db->setQuery($q);
+                $check['db_upload_count'] = (int) $db->loadResult();
+            } catch (\Exception $e) {
+                $check['errors'][] = 'Uploads table query failed: ' . $e->getMessage();
+            }
+        }
+
+        // 3. Scan media/j2store/uploads/ for user files
+        $protectionFiles = ['.', '..', '.htaccess', 'web.config'];
+        $uploadsDir      = JPATH_ROOT . '/media/j2store/uploads';
+
+        if (!file_exists($uploadsDir . '/.htaccess')) {
+            $check['protection_missing'][] = 'media/j2store/uploads/.htaccess';
+        }
+        if (!file_exists($uploadsDir . '/web.config')) {
+            $check['protection_missing'][] = 'media/j2store/uploads/web.config';
+        }
+
+        if (is_dir($uploadsDir)) {
+            $files = @scandir($uploadsDir);
+            if ($files !== false) {
+                foreach ($files as $f) {
+                    if (in_array($f, $protectionFiles)) {
+                        continue;
+                    }
+                    $check['upload_files'][] = $f;
+                    if (preg_match('/\.(php\d*|phtml|phar)\./i', $f)) {
+                        $check['suspicious_names'][] = $f;
+                    }
+                }
+            }
+        }
+
+        // 4. Scan the legacy media/com_j2store/uploads/ path (J2Store v3 / early v4)
+        $legacyDir = JPATH_ROOT . '/media/com_j2store/uploads';
+        if (is_dir($legacyDir)) {
+            if (!file_exists($legacyDir . '/.htaccess')) {
+                $check['protection_missing'][] = 'media/com_j2store/uploads/.htaccess';
+            }
+            $files = @scandir($legacyDir);
+            if ($files !== false) {
+                foreach ($files as $f) {
+                    if (in_array($f, $protectionFiles)) {
+                        continue;
+                    }
+                    $check['legacy_files'][] = $f;
+                    if (preg_match('/\.(php\d*|phtml|phar)\./i', $f)) {
+                        $check['suspicious_names'][] = $f;
+                    }
+                }
+            }
+        }
+
+        // 5. Scan media/j2store/invoices/ — should only ever contain PDFs
+        $invoicesDir = JPATH_ROOT . '/media/j2store/invoices';
+        if (is_dir($invoicesDir)) {
+            $files = @scandir($invoicesDir);
+            if ($files !== false) {
+                foreach ($files as $f) {
+                    if (in_array($f, $protectionFiles)) {
+                        continue;
+                    }
+                    if (!preg_match('/\.pdf$/i', $f)) {
+                        $check['invoices_unexpected'][] = $f;
+                    }
+                }
+            }
+        }
+
+        return $check;
+    }
+
+    /**
+     * Derives a verdict string from a _checkForExploitation() result array.
+     *
+     * @param  array  $check
+     * @return string  'hacked' | 'suspicious' | 'clean' | 'unknown'
+     */
+    private function _getExploitationVerdict(array $check): string
+    {
+        if (!$check['options_table_exists']) {
+            return 'unknown';
+        }
+
+        $hasUploadFiles = !empty($check['upload_files']) || $check['db_upload_count'] > 0;
+
+        if ($check['file_option_count'] === 0 && $hasUploadFiles) {
+            return 'hacked';
+        }
+
+        if (!empty($check['suspicious_names']) || !empty($check['invoices_unexpected'])) {
+            return 'suspicious';
+        }
+
+        if (!empty($check['legacy_files'])) {
+            return 'suspicious';
+        }
+
+        return 'clean';
+    }
+
+    /**
+     * Removes foreign files from the uploads directories and truncates
+     * #__j2store_uploads when exploitation is definitively confirmed.
+     *
+     * @param  array  $check  Result array from _checkForExploitation()
+     * @return array
+     */
+    private function _removeExploitationFiles(array $check): array
+    {
+        $result = [
+            'removed_files' => [],
+            'failed_files'  => [],
+            'db_truncated'  => false,
+            'db_error'      => '',
+        ];
+
+        $protectionFiles = ['.', '..', '.htaccess', 'web.config'];
+
+        $uploadsDir = JPATH_ROOT . '/media/j2store/uploads';
+        if (is_dir($uploadsDir)) {
+            foreach ((array) $check['upload_files'] as $filename) {
+                if (in_array($filename, $protectionFiles)) {
+                    continue;
+                }
+                $path = $uploadsDir . '/' . $filename;
+                if (@unlink($path)) {
+                    $result['removed_files'][] = 'media/j2store/uploads/' . $filename;
+                } else {
+                    $result['failed_files'][] = 'media/j2store/uploads/' . $filename;
+                }
+            }
+        }
+
+        $legacyDir = JPATH_ROOT . '/media/com_j2store/uploads';
+        if (is_dir($legacyDir)) {
+            foreach ((array) $check['legacy_files'] as $filename) {
+                if (in_array($filename, $protectionFiles)) {
+                    continue;
+                }
+                $path = $legacyDir . '/' . $filename;
+                if (@unlink($path)) {
+                    $result['removed_files'][] = 'media/com_j2store/uploads/' . $filename;
+                } else {
+                    $result['failed_files'][] = 'media/com_j2store/uploads/' . $filename;
+                }
+            }
+        }
+
+        if ($check['db_table_exists'] && $check['db_upload_count'] > 0) {
+            try {
+                $db = Factory::getDbo();
+                $db->truncateTable('#__j2store_uploads');
+                $result['db_truncated'] = true;
+            } catch (\Exception $e) {
+                $result['db_error'] = $e->getMessage();
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Outputs an HTML security check block that Joomla captures as the
+     * extension_message shown at the end of installation.
+     *
+     * @param  array       $check
+     * @param  string      $verdict
+     * @param  array|null  $cleanup
+     */
+    private function _renderSecurityCheck(array $check, string $verdict, ?array $cleanup): void
+    {
+        $styles = [
+            'hacked'     => 'background:#f8d7da;border:2px solid #f5c6cb;color:#721c24;',
+            'suspicious' => 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
+            'clean'      => 'background:#d4edda;border:2px solid #c3e6cb;color:#155724;',
+            'unknown'    => 'background:#e2e3e5;border:2px solid #d6d8db;color:#383d41;',
+        ];
+        $style = $styles[$verdict] ?? $styles['unknown'];
+        ?>
+        <div style="margin-top:20px;padding:15px;border-radius:4px;<?php echo $style; ?>">
+            <h3 style="margin-top:0;">
+                <?php if ($verdict === 'hacked'): ?>&#x26A0; Security Alert: Exploitation Detected
+                <?php elseif ($verdict === 'suspicious'): ?>&#x26A0; Security Warning: Suspicious Files Found
+                <?php elseif ($verdict === 'clean'): ?>&#x2713; Security Check: No Exploitation Detected
+                <?php else: ?>Security Check: Could Not Determine Status
+                <?php endif; ?>
+            </h3>
+
+            <?php if ($verdict === 'hacked'): ?>
+                <p><strong>This site has been exploited.</strong> Files were uploaded through
+                the unauthenticated upload endpoint fixed in this release, and no
+                &ldquo;File&rdquo; type product option has ever been configured &mdash;
+                meaning all uploads in the database and on disk are foreign.</p>
+
+                <?php if ($cleanup !== null): ?>
+                    <?php if (!empty($cleanup['removed_files'])): ?>
+                        <p><strong style="color:#155724;">&#x2713; <?php echo count($cleanup['removed_files']); ?> foreign file(s) were automatically removed:</strong><br>
+                            <code><?php echo htmlspecialchars(implode(', ', array_slice($cleanup['removed_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
+                                <?php echo count($cleanup['removed_files']) > 20 ? ' &hellip; and ' . (count($cleanup['removed_files']) - 20) . ' more' : ''; ?>
+                            </code>
+                        </p>
+                    <?php endif; ?>
+                    <?php if ($cleanup['db_truncated']): ?>
+                        <p><strong style="color:#155724;">&#x2713; The <code>#__j2store_uploads</code> database table was cleared.</strong></p>
+                    <?php endif; ?>
+                    <?php if (!empty($cleanup['failed_files'])): ?>
+                        <p><strong>&#x26A0; <?php echo count($cleanup['failed_files']); ?> file(s) could not be deleted (check directory permissions):</strong><br>
+                            <code><?php echo htmlspecialchars(implode(', ', $cleanup['failed_files']), ENT_QUOTES, 'UTF-8'); ?></code>
+                        </p>
+                    <?php endif; ?>
+                    <?php if ($cleanup['db_error'] !== ''): ?>
+                        <p><strong>&#x26A0; Database table could not be cleared:</strong>
+                            <code><?php echo htmlspecialchars($cleanup['db_error'], ENT_QUOTES, 'UTF-8'); ?></code>
+                        </p>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <?php if (!empty($check['legacy_files'])): ?>
+                    <p><strong>Additional action required:</strong> The legacy
+                    <code>media/com_j2store/uploads/</code> directory (J2Store v3 / early v4)
+                    also contained foreign files. Please remove them manually.</p>
+                <?php endif; ?>
+
+            <?php elseif ($verdict === 'suspicious'): ?>
+                <p><strong>Suspicious files were found.</strong> A &ldquo;File&rdquo; type
+                product option is configured so some uploads may be legitimate, but the
+                following items require manual review:</p>
+
+            <?php elseif ($verdict === 'clean'): ?>
+                <p>No evidence of exploitation was found. The upload folder contains no
+                user files and the database uploads table is empty. This vulnerability
+                was not exploited on this site prior to this update.</p>
+
+            <?php else: ?>
+                <p>The database could not be queried to determine whether this site
+                was affected. Please review <code>media/j2store/uploads/</code> manually.</p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['upload_files'])): ?>
+                <p><strong><?php echo count($check['upload_files']); ?> file(s) in <code>media/j2store/uploads/</code>:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', array_slice($check['upload_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
+                        <?php echo count($check['upload_files']) > 20 ? ' &hellip; and ' . (count($check['upload_files']) - 20) . ' more' : ''; ?>
+                    </code>
+                </p>
+            <?php endif; ?>
+
+            <?php if ($check['db_upload_count'] > 0): ?>
+                <p><strong><?php echo $check['db_upload_count']; ?> record(s) in <code>#__j2store_uploads</code></strong> table.</p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['suspicious_names'])): ?>
+                <p><strong style="color:red;">&#x26A0; Suspicious filenames (double-extension pattern):</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', $check['suspicious_names']), ENT_QUOTES, 'UTF-8'); ?></code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['legacy_files'])): ?>
+                <p><strong><?php echo count($check['legacy_files']); ?> file(s) in legacy <code>media/com_j2store/uploads/</code>:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', array_slice($check['legacy_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
+                        <?php echo count($check['legacy_files']) > 20 ? ' &hellip; and ' . (count($check['legacy_files']) - 20) . ' more' : ''; ?>
+                    </code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['invoices_unexpected'])): ?>
+                <p><strong>Unexpected non-PDF file(s) in <code>media/j2store/invoices/</code>:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', $check['invoices_unexpected']), ENT_QUOTES, 'UTF-8'); ?></code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['protection_missing'])): ?>
+                <p><strong>&#x26A0; Missing directory protection files:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', $check['protection_missing']), ENT_QUOTES, 'UTF-8'); ?></code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['errors'])): ?>
+                <p><em>Check errors: <?php echo htmlspecialchars(implode('; ', $check['errors']), ENT_QUOTES, 'UTF-8'); ?></em></p>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
 }
