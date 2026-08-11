@@ -12,7 +12,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
 
-<?php if(isset($this->order)): ?>
+<?php if(!empty($this->order) && is_object($this->order) && !empty($this->order->j2store_order_id)): ?>
 		<div class="j2storeOrderSummary">
 			<?php echo $this->loadAnyTemplate('site:com_j2store/checkout/default_cartsummary'); ?>
 		</div>
