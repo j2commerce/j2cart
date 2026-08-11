@@ -1590,6 +1590,7 @@ class J2StoreControllerCheckouts extends F0FController
 	 * arbitrary order_id and read another customer's order summary.
 	 */
 	function expressconfirm(){
+		J2Store::utilities()->nocache();
 		$app     = JFactory::getApplication();
 		$session = JFactory::getSession();
 		$user    = JFactory::getUser();
@@ -1600,7 +1601,7 @@ class J2StoreControllerCheckouts extends F0FController
 		unset($data['order_id']);
 
 		$view = $this->getThisView();
-		$order = '';
+		$order = null;
 
 		if ($model = $this->getThisModel()) {
 			$view->setModel($model, true);
@@ -1616,7 +1617,7 @@ class J2StoreControllerCheckouts extends F0FController
 			// Guest orders have user_id = 0; session possession is the implicit proof.
 			if (!$user->guest && (int) $order->user_id !== (int) $user->id) {
 				// Mismatch — do not render another user's order.
-				$order = '';
+				$order = null;
 			}
 		} else {
 			// No session order — fall back to the model's own cart-based order.
@@ -1629,7 +1630,6 @@ class J2StoreControllerCheckouts extends F0FController
 			'ExpressCheckoutConfirmPayment', array($data)
 		));
 
-		$data['order'] = $order;
 		$view->assign('order', $order);
 		$view->display();
 	}
