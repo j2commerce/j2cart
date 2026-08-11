@@ -1583,37 +1583,54 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 	/**
-	 * display expressconfirm layout
-	 *   */
+	 * Display the express checkout confirmation layout.
+	 *
+	 * SECURITY: order_id is resolved exclusively from the server-side session.
+	 * Accepting it from $_REQUEST would allow IDOR — any visitor could pass an
+	 * arbitrary order_id and read another customer's order summary.
+	 */
 	function expressconfirm(){
-		$app = JFactory::getApplication();
-		$data = $app->input->getArray($_REQUEST);
+		$app     = JFactory::getApplication();
 		$session = JFactory::getSession();
+		$user    = JFactory::getUser();
+
+		// Strip order_id from request data — it must only come from the session.
+		// Accepting it from the URL would allow IDOR (unauthenticated order disclosure).
+		$data = $app->input->getArray($_REQUEST);
+		unset($data['order_id']);
+
 		$view = $this->getThisView();
 		$order = '';
-		if ($model = $this->getThisModel())
-		{
-			// Push the model into the view (as default)
+
+		if ($model = $this->getThisModel()) {
 			$view->setModel($model, true);
 		}
-		if($session->has('order_id','j2store')){
-			$data['order_id'] = $session->get('order_id','','j2store');
-		}
-		if(isset($data['order_id']) ){
+
+		// Resolve order from session only.
+		if ($session->has('order_id', 'j2store')) {
+			$session_order_id = $session->get('order_id', '', 'j2store');
 			$order = F0FTable::getInstance('Order', 'J2StoreTable')->getClone();
-			$order->load(array('order_id'=>$data['order_id']));
+			$order->load(array('order_id' => $session_order_id));
 
-		}else{
+			// Ownership check: for logged-in users the order must belong to them.
+			// Guest orders have user_id = 0; session possession is the implicit proof.
+			if (!$user->guest && (int) $order->user_id !== (int) $user->id) {
+				// Mismatch — do not render another user's order.
+				$order = '';
+			}
+		} else {
+			// No session order — fall back to the model's own cart-based order.
 			$order_model = F0FModel::getTmpInstance('Orders', 'J2StoreModel');
-			$order = $order_model->initOrder()->getOrder();
-
+			$order       = $order_model->initOrder()->getOrder();
 		}
-		$view->setLayout('default_expressconfirm');
-		$view->assign('ec_html', J2Store::plugin()->eventWithHtml('ExpressCheckoutConfirmPayment',array($data)));
 
-		$data['order']=$order;
+		$view->setLayout('default_expressconfirm');
+		$view->assign('ec_html', J2Store::plugin()->eventWithHtml(
+			'ExpressCheckoutConfirmPayment', array($data)
+		));
+
+		$data['order'] = $order;
 		$view->assign('order', $order);
-		// Display without caching
 		$view->display();
 	}
 
