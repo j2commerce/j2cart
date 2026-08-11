@@ -1609,7 +1609,7 @@ class J2StoreControllerCheckouts extends F0FController
 
 		// Resolve order from session only.
 		if ($session->has('order_id', 'j2store')) {
-			$session_order_id = $session->get('order_id', '', 'j2store');
+			$session_order_id = $session->get('order_id', 0, 'j2store');
 			$order = F0FTable::getInstance('Order', 'J2StoreTable')->getClone();
 			$order->load(array('order_id' => $session_order_id));
 
