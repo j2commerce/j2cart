@@ -264,7 +264,7 @@ $product_id = $this->product->j2store_product_id;
 $('#product-option-<?php echo $option['productoption_id']; ?>').on('click', function() {
 	var node = this;
 	$('#form-upload').remove();
-	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /><input type="hidden" name="<?php echo JSession::getFormToken(); ?>" value="1" /></form>');
 	$('#form-upload input[name=\'file\']').trigger('click');
 	timer = setInterval(function() {
 		if ($('#form-upload input[name=\'file\']').val() != '' && $('#form-upload input[name=\'file\']').val() != undefined) {
