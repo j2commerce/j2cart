@@ -17,7 +17,8 @@ defined('_JEXEC') or die;
 		<input type="submit" value="<?php echo JText::_('J2STORE_APPLY_COUPON')?>" class="button btn btn-primary" />
 		<input type="hidden" name="option" value="com_j2store" />
          <input type="hidden" name="view" value="carts" />
-         <input type="hidden" name="task" value="applyCoupon" />	    
+         <input type="hidden" name="task" value="applyCoupon" />
+	     <?php echo JHtml::_('form.token'); ?>
 	     </form>
 	    </div> 
     <?php endif; ?>

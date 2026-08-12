@@ -44,6 +44,7 @@ $ajax_base_url = JRoute::_('index.php');
 <input type="hidden" name="shipping_name" id="shipping_name" value="<?php echo $setval ? $this->shipping_methods['0']['name'] : "";?>" />
 <input type="hidden" name="shipping_code" id="shipping_code" value="<?php echo $setval ? $this->shipping_methods['0']['code'] : "";?>" />
 <input type="hidden" name="shipping_extra" id="shipping_extra" value="<?php echo $setval ? $this->shipping_methods['0']['extra'] : "";?>" />
+<?php echo JHtml::_('form.token'); ?>
 </form>
 <script type="text/javascript">
 
