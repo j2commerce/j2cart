@@ -47,6 +47,7 @@ if($product->variant->availability || J2Store::product()->backorders_allowed($pr
 	
 		<a class="<?php echo $params->get('addtocart_button_class', 'btn btn-primary');?> j2store_add_to_cart_button"
 		href="<?php echo $action; ?>" data-quantity="1" data-product_id="<?php echo $product->j2store_product_id;?>"
+		data-<?php echo JSession::getFormToken(); ?>="1"
 		rel="nofollow">
 		<?php echo $cart_text; ?>
 		</a>
