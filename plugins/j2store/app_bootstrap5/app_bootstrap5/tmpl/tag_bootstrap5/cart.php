@@ -23,6 +23,7 @@ $action = 'index.php?option=com_j2store&view=carts&task=addItem&product_id='.$pr
 </div>
 <a class="<?php echo $params->get('addtocart_button_class', 'btn btn-primary');?> j2store_add_to_cart_button"
 href="<?php echo JRoute::_($action); ?>" data-quantity="1" data-product_id="<?php echo $product->j2store_product_id;?>"
+data-<?php echo JSession::getFormToken(); ?>="1"
 rel="nofollow">
 <?php echo $this->singleton_cartext; ?>
 </a>
