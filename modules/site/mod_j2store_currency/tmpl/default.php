@@ -72,6 +72,7 @@ color: <?php echo $link_hover_color; ?>;
     <input type="hidden" name="view" value="carts" />
     <input type="hidden" name="task" value="setcurrency" />
     <input type="hidden" name="redirect" value="<?php echo base64_encode( JUri::getInstance()->toString()); ?>" />
+    <?php echo JHtml::_('form.token'); ?>
   </div>
 </form>
 </div>
