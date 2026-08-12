@@ -42,6 +42,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	public function addItem() {
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
         $platform = J2Store::platform();
 		$app = $platform->application();
 		$model = $this->getModel('Carts', 'J2StoreModel');
@@ -94,6 +95,7 @@ class J2StoreControllerCarts extends F0FController
 	 * force shipping
 	 *   */
 	function forceshipping(){
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 		$json = array();
 		$app = JFactory::getApplication();
 		$json = J2Store::plugin()->eventWithArray('ValidateShipping');
@@ -101,6 +103,7 @@ class J2StoreControllerCarts extends F0FController
 		$app->close();
 	}
 	function update() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->clear_cache();
@@ -118,6 +121,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function clearCart(){
+		JSession::checkToken('get') or die(JText::_('JINVALID_TOKEN'));
 		J2Store::utilities()->clear_cache();
 		J2Store::utilities()->nocache();
 		$model = $this->getModel('Carts' ,'J2StoreModel');
@@ -135,6 +139,7 @@ class J2StoreControllerCarts extends F0FController
 		$this->setRedirect($url, $msg, 'notice');
 	}
 	function remove() {
+		JSession::checkToken('get') or die(JText::_('JINVALID_TOKEN'));
 		J2Store::utilities()->clear_cache();
 		J2Store::utilities()->nocache();
 
@@ -187,6 +192,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function setcurrency() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//no cache
 		J2Store::utilities()->clear_cache();
@@ -210,6 +216,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function applyCoupon() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -235,6 +242,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function removeCoupon() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -255,6 +263,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function applyVoucher() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -281,6 +290,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function removeVoucher() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -303,6 +313,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function estimate() {
+		JSession::checkToken('get') or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -371,6 +382,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function shippingUpdate() {
+		JSession::checkToken('get') or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -467,6 +479,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	public function addtowishlist() {
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		$app = JFactory::getApplication();
 		$model = $this->getModel('Carts', 'J2StoreModel');
