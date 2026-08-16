@@ -340,6 +340,57 @@ class J2Help {
      *
      * @return string
      */
+    public function dompdf_check(): string
+    {
+        try {
+            $db    = Factory::getDbo();
+            $query = $db->getQuery(true)
+                ->select($db->quoteName('manifest_cache'))
+                ->from($db->quoteName('#__extensions'))
+                ->where($db->quoteName('type')    . ' = ' . $db->quote('library'))
+                ->where($db->quoteName('element') . ' = ' . $db->quote('dompdf'));
+            $db->setQuery($query);
+            $manifestCache = $db->loadResult();
+        } catch (\Exception $e) {
+            return '';
+        }
+
+        // Library not installed — nothing to warn about.
+        if ($manifestCache === null) {
+            return '';
+        }
+
+        $manifest = json_decode($manifestCache, true);
+        $version  = $manifest['version'] ?? '';
+
+        if ($version === '' || version_compare($version, '3.1.6', '>=')) {
+            return '';
+        }
+
+        $downloadUrl = 'https://github.com/j2commerce/plg_dompdf_library/releases/download/3.1.6/lib_dompdf-v3.1.6.zip';
+
+        $html  = '<div class="user-notifications alert alert-warning" role="alert">';
+        $html .= '<h4 class="alert-heading">&#x26A0; ' . Text::_('J2STORE_ATTENTION') . '</h4>';
+        $html .= '<p><strong>The dompdf library is outdated.</strong> '
+            . 'Version <strong>' . htmlspecialchars($version, ENT_QUOTES, 'UTF-8') . '</strong> is installed; '
+            . 'version <strong>3.1.6</strong> or later is required. '
+            . 'Please update via the Joomla Extensions Update page. '
+            . 'If the update is not listed there, download it manually using the button below.</p>';
+        $html .= '<a class="btn btn-sm btn-warning" href="'
+            . htmlspecialchars($downloadUrl, ENT_QUOTES, 'UTF-8')
+            . '" target="_blank">Download dompdf 3.1.6</a>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
+    /**
+     * Checks whether any com_j2store or app_bootstrap5 template override files
+     * are present on the site but appear to be missing CSRF token protection.
+     * Returns an HTML warning when affected files are found; empty string otherwise.
+     *
+     * @return string
+     */
     public function template_override_check(): string
     {
         try {

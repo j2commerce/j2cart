@@ -79,6 +79,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                     ?>
                                 <?php endif; ?>
 
+                                <?php echo J2Store::help()->dompdf_check(); ?>
                                 <?php echo J2Store::help()->security_upload_check(); ?>
                                 <?php echo J2Store::help()->template_override_check(); ?>
 
