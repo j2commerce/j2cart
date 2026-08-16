@@ -10,6 +10,9 @@ $user = JFactory::getUser();
 if(!$user->authorise('j2store.vieworder', 'com_j2store')) {
 	return '';
 }
+if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_j2store/helpers/j2store.php')) {
+    return;
+}
 require_once( dirname(__FILE__).'/helper.php' );
 JFactory::getLanguage()->load('com_j2store', JPATH_SITE);
 $moduleclass_sfx = $params->get('moduleclass_sfx','');
