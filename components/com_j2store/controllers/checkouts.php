@@ -531,6 +531,13 @@ class J2StoreControllerCheckouts extends F0FController
 
         $redirect_url = J2Store::platform()->getCheckoutUrl();
 		$data = $app->input->getArray($_POST);
+		// Defense-in-depth: strip HTML tags from all string fields to prevent
+		// stored XSS via the cookie filter-bypass (CVE JC-01).
+		foreach ($data as $key => $value) {
+			if (is_string($value)) {
+				$data[$key] = strip_tags($value);
+			}
+		}
 		$store_address = J2Store::storeProfile();
 		//initialise guest value from session
 		$guest = $session->get('guest', array(), 'j2store');
@@ -1012,36 +1019,31 @@ class J2StoreControllerCheckouts extends F0FController
 
 				if(!$json) {
 					$address_id = $address_model->addAddress('billing');
+					//now get the address and save to session
+					$address_info = $address_model->getItem($address_id);
 
-					if (!$address_id) {
-						$json['error']['warning'] = $address_model->getError() ?: JText::_('J2STORE_ERROR_SAVING_ADDRESS');
-					} else {
-						//now get the address and save to session
-						$address_info = $address_model->getItem($address_id);
-
-						//check if we have a country and zone id's. If not use the store address
-						$country_id = $app->input->post->getInt('country_id', '');
-						if(empty($country_id)) {
-							$country_id = $store_address->get('country_id');
-						}
-
-						$zone_id = $app->input->post->getInt('zone_id', '');
-						if(empty($zone_id)) {
-							$zone_id = $store_address->get('zone_id');
-						}
-
-						$postcode  = $app->input->post->getString('zip');
-						if(empty($postcode)) {
-							$postcode = $store_address->get('zip');
-						}
-
-						$session->set('billing_address_id', $address_info->j2store_address_id, 'j2store');
-						$session->set('billing_country_id', $country_id, 'j2store');
-						$session->set('billing_zone_id',$zone_id, 'j2store');
-						$session->set('billing_postcode',$postcode, 'j2store');
-						$session->clear('payment_method', 'j2store');
-						$session->clear('payment_methods', 'j2store');
+					//check if we have a country and zone id's. If not use the store address
+					$country_id = $app->input->post->getInt('country_id', '');
+					if(empty($country_id)) {
+						$country_id = $store_address->get('country_id');
 					}
+
+					$zone_id = $app->input->post->getInt('zone_id', '');
+					if(empty($zone_id)) {
+						$zone_id = $store_address->get('zone_id');
+					}
+
+					$postcode  = $app->input->post->getString('zip');
+					if(empty($postcode)) {
+						$postcode = $store_address->get('zip');
+					}
+
+					$session->set('billing_address_id', $address_info->j2store_address_id, 'j2store');
+					$session->set('billing_country_id', $country_id, 'j2store');
+					$session->set('billing_zone_id',$zone_id, 'j2store');
+					$session->set('billing_postcode',$postcode, 'j2store');
+					$session->clear('payment_method', 'j2store');
+					$session->clear('payment_methods', 'j2store');
 				}
 
 			}
@@ -1246,36 +1248,31 @@ class J2StoreControllerCheckouts extends F0FController
 				if(!$json) {
 
 					$address_id = $address_model->addAddress('shipping');
+					//now get the address and save to session
+					$address_info = $address_model->getItem($address_id);
 
-					if (!$address_id) {
-						$json['error']['warning'] = $address_model->getError() ?: JText::_('J2STORE_ERROR_SAVING_ADDRESS');
-					} else {
-						//now get the address and save to session
-						$address_info = $address_model->getItem($address_id);
-
-						//check if we have a country and zone id's. If not use the store address
-						$country_id = $app->input->post->getInt('country_id', '');
-						if(empty($country_id)) {
-							$country_id = $store_address->get('country_id');
-						}
-
-						$zone_id = $app->input->post->getInt('zone_id', '');
-						if(empty($zone_id)) {
-							$zone_id = $store_address->get('zone_id');
-						}
-
-						$postcode= $app->input->post->get('zip');
-						if(empty($postcode)) {
-							$postcode = $store_address->get('zip');
-						}
-
-						$session->set('shipping_address_id', $address_info->j2store_address_id, 'j2store');
-						$session->set('shipping_country_id',$country_id, 'j2store');
-						$session->set('shipping_zone_id',$zone_id, 'j2store');
-						$session->set('shipping_postcode',$postcode, 'j2store');
-						$session->clear('shipping_method', 'j2store');
-						$session->clear('shipping_methods', 'j2store');
+					//check if we have a country and zone id's. If not use the store address
+					$country_id = $app->input->post->getInt('country_id', '');
+					if(empty($country_id)) {
+						$country_id = $store_address->get('country_id');
 					}
+
+					$zone_id = $app->input->post->getInt('zone_id', '');
+					if(empty($zone_id)) {
+						$zone_id = $store_address->get('zone_id');
+					}
+
+					$postcode= $app->input->post->get('zip');
+					if(empty($postcode)) {
+						$postcode = $store_address->get('zip');
+					}
+
+					$session->set('shipping_address_id', $address_info->j2store_address_id, 'j2store');
+					$session->set('shipping_country_id',$country_id, 'j2store');
+					$session->set('shipping_zone_id',$zone_id, 'j2store');
+					$session->set('shipping_postcode',$postcode, 'j2store');
+					$session->clear('shipping_method', 'j2store');
+					$session->clear('shipping_methods', 'j2store');
 				}
 
 			}
@@ -1583,54 +1580,43 @@ class J2StoreControllerCheckouts extends F0FController
 		$app->close();
 	}
 	/**
-	 * Display the express checkout confirmation layout.
-	 *
-	 * SECURITY: order_id is resolved exclusively from the server-side session.
-	 * Accepting it from $_REQUEST would allow IDOR — any visitor could pass an
-	 * arbitrary order_id and read another customer's order summary.
-	 */
+	 * display expressconfirm layout
+	 *   */
 	function expressconfirm(){
-		J2Store::utilities()->nocache();
-		$app     = JFactory::getApplication();
-		$session = JFactory::getSession();
-		$user    = JFactory::getUser();
-
-		// Strip order_id from request data — it must only come from the session.
-		// Accepting it from the URL would allow IDOR (unauthenticated order disclosure).
+		$app = JFactory::getApplication();
 		$data = $app->input->getArray($_REQUEST);
+		// Remove user-supplied order_id — resolve exclusively from session to prevent IDOR
 		unset($data['order_id']);
-
+		$session = JFactory::getSession();
 		$view = $this->getThisView();
 		$order = null;
-
-		if ($model = $this->getThisModel()) {
+		if ($model = $this->getThisModel())
+		{
+			// Push the model into the view (as default)
 			$view->setModel($model, true);
 		}
 
-		// Resolve order from session only.
-		if ($session->has('order_id', 'j2store')) {
-			$session_order_id = $session->get('order_id', 0, 'j2store');
+		$order_id = (int) $session->get('order_id', 0, 'j2store');
+		if ($order_id > 0) {
+			$data['order_id'] = $order_id;
 			$order = F0FTable::getInstance('Order', 'J2StoreTable')->getClone();
-			$order->load(array('order_id' => $session_order_id));
+			$order->load(array('order_id' => $order_id));
 
-			// Ownership check: for logged-in users the order must belong to them.
-			// Guest orders have user_id = 0; session possession is the implicit proof.
-			if (!$user->guest && (int) $order->user_id !== (int) $user->id) {
-				// Mismatch — do not render another user's order.
+			// For authenticated users, verify the loaded order belongs to them
+			$user = JFactory::getUser();
+			if (!$user->guest && isset($order->user_id) && (int)$order->user_id !== (int)$user->id) {
 				$order = null;
 			}
 		} else {
-			// No session order — fall back to the model's own cart-based order.
 			$order_model = F0FModel::getTmpInstance('Orders', 'J2StoreModel');
-			$order       = $order_model->initOrder()->getOrder();
+			$order = $order_model->initOrder()->getOrder();
 		}
 
+		J2Store::utilities()->nocache();
 		$view->setLayout('default_expressconfirm');
-		$view->assign('ec_html', J2Store::plugin()->eventWithHtml(
-			'ExpressCheckoutConfirmPayment', array($data)
-		));
-
+		$view->assign('ec_html', J2Store::plugin()->eventWithHtml('ExpressCheckoutConfirmPayment',array($data)));
 		$view->assign('order', $order);
+		// Display without caching
 		$view->display();
 	}
 
