@@ -346,7 +346,6 @@ class J2Help {
             'carts/default_coupon.php',
             'carts/default_shipping.php',
             'carts/default_voucher.php',
-            'checkout/default_expressconfirm.php',
         ];
 
         $jsFormFiles = [
@@ -356,8 +355,14 @@ class J2Help {
             'product/item_options.php',
         ];
 
-        $phpWarnings = [];
-        $jsWarnings  = [];
+        // Files needing a CSRF token added to a PHP array (not a form tag)
+        $arrayFormFiles = [
+            'carts/default_items.php',
+        ];
+
+        $phpWarnings   = [];
+        $jsWarnings    = [];
+        $arrayWarnings = [];
 
         foreach ($phpFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
@@ -370,6 +375,13 @@ class J2Help {
             $full = $comOverridePath . '/' . $file;
             if (file_exists($full) && !$hasToken($full)) {
                 $jsWarnings[] = 'templates/' . $template . '/html/com_j2store/' . $file;
+            }
+        }
+
+        foreach ($arrayFormFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasToken($full)) {
+                $arrayWarnings[] = 'templates/' . $template . '/html/com_j2store/' . $file;
             }
         }
 
@@ -405,7 +417,7 @@ class J2Help {
             }
         }
 
-        if (empty($phpWarnings) && empty($jsWarnings)) {
+        if (empty($phpWarnings) && empty($jsWarnings) && empty($arrayWarnings)) {
             return '';
         }
 
@@ -438,6 +450,19 @@ class J2Help {
             $html .= "<pre>$('body').prepend('&lt;form enctype=\"multipart/form-data\" id=\"form-upload\" ... /&gt;";
             $html .= "&lt;input type=\"hidden\" name=\"&lt;?php echo JSession::getFormToken(); ?&gt;\" value=\"1\" /&gt;";
             $html .= "&lt;/form&gt;');</pre>";
+        }
+
+        if (!empty($arrayWarnings)) {
+            $html .= '<p><strong>In the following file, add <code>JSession::getFormToken() =&gt; \'1\'</code> '
+                . 'to the cart item data array. Change:</strong></p>'
+                . '<pre>\'cartitem_id\' =&gt; $item-&gt;cartitem_id</pre>'
+                . '<p><strong>to:</strong></p>'
+                . '<pre>\'cartitem_id\' =&gt; $item-&gt;cartitem_id, JSession::getFormToken() =&gt; \'1\'</pre>'
+                . '<ul>';
+            foreach ($arrayWarnings as $f) {
+                $html .= '<li><code>' . $e($f) . '</code></li>';
+            }
+            $html .= '</ul>';
         }
 
         $html .= '<p>After updating, clear the Joomla cache.</p>';
