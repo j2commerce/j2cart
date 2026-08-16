@@ -237,7 +237,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
       //conservative method
       $xmlfile = JPATH_ADMINISTRATOR . '/components/com_j2store/manifest.xml';
       if (\JFile::exists($xmlfile)) {
-        $xml = Factory::getXML($xmlfile);
+        $xml = simplexml_load_file($xmlfile);
         $version = (string)$xml->version;
         if (version_compare($version, '3.9.99', 'lt')) {
           $parent->getParent()->abort('You cannot install J2Store Version 4 over older versions directly. A migration tool should be used first to migrate your previous store data.');
