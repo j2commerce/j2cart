@@ -1103,6 +1103,8 @@ class Com_J2storeInstallerScript extends InstallerScript
     protected function _renderPostInstallation($status, $fofInstallStatus, $parent)
     {
         $rows = 0;
+        $this->_renderSecurityCheck();
+        $this->_renderTemplateOverrideWarnings();
         ?>
         <table class="table table-striped" width="100%">
             <thead>
@@ -1168,8 +1170,6 @@ class Com_J2storeInstallerScript extends InstallerScript
             <?php endif; ?>
             </tbody>
         </table>
-        <?php $this->_renderSecurityCheck(); ?>
-        <?php $this->_renderTemplateOverrideWarnings(); ?>
         <?php
     }
 
