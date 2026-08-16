@@ -10,6 +10,9 @@ $user = JFactory::getUser();
 if(!$user->authorise('j2store.vieworder', 'com_j2store')) {
 	return '';
 }
+if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_j2store/helpers/j2store.php')) {
+    return;
+}
 
 JFactory::getLanguage()->load('com_j2store', JPATH_SITE);
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/j2store.php');
