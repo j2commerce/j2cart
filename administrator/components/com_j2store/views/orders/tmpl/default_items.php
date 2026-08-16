@@ -70,8 +70,8 @@ $wa->addInlineStyle($style, [], []);
 
                     <td class="small"><?php  echo HTMLHelper::_('date',$row->created_on, $this->params->get('date_format', Text::_('DATE_FORMAT_LC1'))); ?></td>
                     <td class="small">
-                        <span class="me-1"><?php echo $row->billing_first_name .' '.$row->billing_last_name; ?></span>
-                        <span>(<?php echo $row->user_email;?>)</span>
+                        <span class="me-1"><?php echo $this->escape($row->billing_first_name) .' '. $this->escape($row->billing_last_name); ?></span>
+                        <span>(<?php echo $this->escape($row->user_email);?>)</span>
                         <?php if($row->user_id == 0): ?>
                             <span class="fas fa-solid fa-user-slash text-warning ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo Text::_('J2STORE_GUEST')?>"></span>
                         <?php endif;?>
