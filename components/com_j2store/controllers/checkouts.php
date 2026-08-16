@@ -531,6 +531,13 @@ class J2StoreControllerCheckouts extends F0FController
 
         $redirect_url = J2Store::platform()->getCheckoutUrl();
 		$data = $app->input->getArray($_POST);
+		// Defense-in-depth: strip HTML tags from all string fields to prevent
+		// stored XSS via the cookie filter-bypass (CVE JC-01).
+		foreach ($data as $key => $value) {
+			if (is_string($value)) {
+				$data[$key] = strip_tags($value);
+			}
+		}
 		$store_address = J2Store::storeProfile();
 		//initialise guest value from session
 		$guest = $session->get('guest', array(), 'j2store');
