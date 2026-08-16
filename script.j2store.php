@@ -1673,16 +1673,18 @@ class Com_J2storeInstallerScript extends InstallerScript
             'carts/default_coupon.php',
             'carts/default_shipping.php',
             'carts/default_voucher.php',
-            'checkout/default_expressconfirm.php',
         ];
 
         $jsFormFiles = [
-            'carts/default_items.php',
-            'carts/old_default_items.php',
             'product/adminitem_configurableoptions.php',
             'product/adminitem_options.php',
             'product/item_configurableoptions.php',
             'product/item_options.php',
+        ];
+
+        /* These files pass cart item data as a PHP array and need  JSession::getFormToken() => '1'  added to that array. */
+        $arrayFormFiles = [
+            'carts/default_items.php',
         ];
 
         foreach ($phpFormFiles as $file) {
@@ -1701,6 +1703,16 @@ class Com_J2storeInstallerScript extends InstallerScript
                 $warnings[] = [
                     'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
                     'type' => 'js_form',
+                ];
+            }
+        }
+
+        foreach ($arrayFormFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasToken($full)) {
+                $warnings[] = [
+                    'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
+                    'type' => 'array_form',
                 ];
             }
         }
@@ -1747,14 +1759,17 @@ class Com_J2storeInstallerScript extends InstallerScript
             return;
         }
 
-        $phpFormFiles = [];
-        $jsFormFiles  = [];
+        $phpFormFiles   = [];
+        $jsFormFiles    = [];
+        $arrayFormFiles = [];
 
         foreach ($this->templateOverrideWarnings as $w) {
             if ($w['type'] === 'php_form') {
                 $phpFormFiles[] = $w['file'];
             } elseif ($w['type'] === 'js_form') {
                 $jsFormFiles[] = $w['file'];
+            } elseif ($w['type'] === 'array_form') {
+                $arrayFormFiles[] = $w['file'];
             }
         }
         ?>
@@ -1788,6 +1803,19 @@ class Com_J2storeInstallerScript extends InstallerScript
   + '&lt;input type="file" name="file" /&gt;'
   + '&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;'
   + '&lt;/form&gt;');</pre>
+            <?php endif; ?>
+
+            <?php if (!empty($arrayFormFiles)): ?>
+                <p><strong>In the following files, add <code>JSession::getFormToken() =&gt; '1'</code>
+                   to the cart item data array. Change:</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">'cartitem_id' =&gt; $item-&gt;cartitem_id</pre>
+                <p><strong>to:</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">'cartitem_id' =&gt; $item-&gt;cartitem_id, JSession::getFormToken() =&gt; '1'</pre>
+                <ul>
+                    <?php foreach ($arrayFormFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
             <?php endif; ?>
 
             <p>After updating the override files, clear the Joomla cache.</p>
