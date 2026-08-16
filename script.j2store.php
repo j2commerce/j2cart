@@ -479,12 +479,70 @@ class Com_J2storeInstallerScript extends InstallerScript
     public function uninstall($parent)
     {
         $this->_log('uninstall() – started');
+
+        // Safety net: disable all J2Store modules and plugins at the DB level
+        // BEFORE files are removed. This catches bundled extensions, third-party
+        // J2Store plugins, and survives any failure in _doUninstallSubextensions().
+        // Without this, remaining enabled extensions call J2Store:: after the
+        // component files are gone, causing a fatal "Class J2Store not found".
+        $this->_disableAllJ2StoreExtensions();
+
         // Uninstall bundled modules and plugins
         $status = $this->_doUninstallSubextensions($parent);
 
         // Show the post-uninstallation page
         $this->_renderPostUninstallation($status, $parent);
         $this->_log('uninstall() – completed');
+    }
+
+    /**
+     * Unpublishes all J2Store modules and disables all J2Store plugins directly
+     * in the database. Called at the very start of uninstall() so that no
+     * J2Store-dependent extension can fire after the component files are removed,
+     * regardless of whether _doUninstallSubextensions() succeeds or fails, and
+     * regardless of whether the extensions were bundled or third-party.
+     */
+    private function _disableAllJ2StoreExtensions(): void
+    {
+        try {
+            $db = Factory::getDbo();
+
+            // Unpublish all J2Store modules (admin and site)
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__modules'))
+                    ->set($db->quoteName('published') . ' = 0')
+                    ->where($db->quoteName('module') . ' LIKE ' . $db->quote('mod_j2store%'))
+            );
+            $db->execute();
+
+            // Disable all J2Store plugins:
+            // - plugins in the dedicated j2store folder (payment, shipping, app, report)
+            // - plugins in standard Joomla folders whose element contains 'j2store'
+            //   (e.g. system/j2store, content/j2store, finder/j2store, installer/j2store)
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__extensions'))
+                    ->set($db->quoteName('enabled') . ' = 0')
+                    ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
+                    ->where(
+                        '(' . $db->quoteName('folder')  . ' = '    . $db->quote('j2store') .
+                        ' OR ' . $db->quoteName('element') . ' LIKE ' . $db->quote('%j2store%') . ')'
+                    )
+            );
+            $db->execute();
+
+            // Clear the modules and plugins cache so the disabled state takes
+            // effect immediately without a manual cache flush.
+            $cache = Factory::getCache('com_modules', '');
+            $cache->clean();
+            $cache = Factory::getCache('com_plugins', '');
+            $cache->clean();
+
+        } catch (\Exception $e) {
+            // Silent fail — this is a best-effort safety net; do not interrupt
+            // the rest of the uninstall process if the DB sweep fails.
+        }
     }
 
     // -------------------------------------------------------------------------
