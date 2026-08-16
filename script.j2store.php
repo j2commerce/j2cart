@@ -185,6 +185,10 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             $cleanupResult = $this->_removeExploitationFiles($checkResult);
         }
         $this->_renderSecurityCheck($checkResult, $verdict, $cleanupResult);
+
+        // Template override CSRF check
+        $overrideWarnings = $this->_checkTemplateOverrides();
+        $this->_renderTemplateOverrideWarnings($overrideWarnings);
     }
 
   public function preflight($type, $parent)
@@ -894,6 +898,179 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         }
 
         return $result;
+    }
+
+    // -------------------------------------------------------------------------
+    // Template override CSRF check
+    // -------------------------------------------------------------------------
+
+    /**
+     * Scans the default site template (and all site templates for plugin
+     * overrides) for com_j2store template override files that appear to be
+     * missing CSRF token protection.
+     *
+     * @return array  Array of ['file' => string, 'type' => 'php_form'|'js_form']
+     */
+    private function _checkTemplateOverrides(): array
+    {
+        $warnings = [];
+
+        try {
+            $db    = Factory::getDbo();
+            $query = "SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1";
+            $db->setQuery($query);
+            $template = $db->loadResult();
+        } catch (\Exception $e) {
+            return $warnings;
+        }
+
+        if (!$template) {
+            return $warnings;
+        }
+
+        $comOverridePath = JPATH_SITE . '/templates/' . $template . '/html/com_j2store';
+
+        // Returns true when the file already contains any CSRF token call.
+        $hasToken = static function (string $path): bool {
+            $content = @file_get_contents($path);
+            if ($content === false) {
+                return true; // unreadable → skip
+            }
+            return strpos($content, 'form.token') !== false
+                || strpos($content, 'getFormToken') !== false;
+        };
+
+        /* These files contain a PHP <form> block and need <?php echo JHtml::_('form.token'); ?>  before </form>. */
+        $phpFormFiles = [
+            'carts/default.php',
+            'carts/default_calculator.php',
+            'carts/default_coupon.php',
+            'carts/default_shipping.php',
+            'carts/default_voucher.php',
+            'checkout/default_expressconfirm.php',
+        ];
+
+        /* These files build a hidden upload <form> inside a JavaScript string and need  <?php echo JSession::getFormToken(); ?>  as a hidden input. */
+        $jsFormFiles = [
+            'product/adminitem_configurableoptions.php',
+            'product/adminitem_options.php',
+            'product/item_configurableoptions.php',
+            'product/item_options.php',
+        ];
+
+        foreach ($phpFormFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasToken($full)) {
+                $warnings[] = [
+                    'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
+                    'type' => 'php_form',
+                ];
+            }
+        }
+
+        foreach ($jsFormFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasToken($full)) {
+                $warnings[] = [
+                    'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
+                    'type' => 'js_form',
+                ];
+            }
+        }
+
+        // Template overrides — search all site templates.
+        // Override path: templates/<site-template>/html/com_j2store/templates/<subtemplate>/
+        $pluginFiles = [
+            'cart.php'                        => 'php_form',
+            'default_configurableoptions.php' => 'js_form',
+            'default_options.php'             => 'js_form',
+            'view_configurableoptions.php'    => 'js_form',
+            'view_options.php'                => 'js_form',
+        ];
+
+        $pluginDirs = glob(JPATH_SITE . '/templates/*/html/com_j2store/templates', GLOB_ONLYDIR);
+        if ($pluginDirs) {
+            foreach ($pluginDirs as $pluginDir) {
+                $subtemplates = glob($pluginDir . '/*', GLOB_ONLYDIR);
+                if (!$subtemplates) {
+                    continue;
+                }
+                foreach ($subtemplates as $subtemplateDir) {
+                    foreach ($pluginFiles as $filename => $type) {
+                        $full = $subtemplateDir . '/' . $filename;
+                        if (file_exists($full) && !$hasToken($full)) {
+                            $warnings[] = [
+                                'file' => ltrim(str_replace(JPATH_SITE, '', $full), '/\\'),
+                                'type' => $type,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $warnings;
+    }
+
+    /**
+     * Outputs an HTML warning block listing template override files that are
+     * missing CSRF token protection, with instructions for each type.
+     *
+     * @param  array  $warnings  Result of _checkTemplateOverrides()
+     */
+    private function _renderTemplateOverrideWarnings(array $warnings): void
+    {
+        if (empty($warnings)) {
+            return;
+        }
+
+        $phpFormFiles = [];
+        $jsFormFiles  = [];
+
+        foreach ($warnings as $w) {
+            if ($w['type'] === 'php_form') {
+                $phpFormFiles[] = $w['file'];
+            } elseif ($w['type'] === 'js_form') {
+                $jsFormFiles[] = $w['file'];
+            }
+        }
+        ?>
+        <div style="margin-top:20px;padding:15px;border-radius:4px;background:#fff3cd;border:2px solid #ffc107;color:#856404;">
+            <h3 style="margin-top:0;">&#x26A0; Template Override CSRF Check</h3>
+            <p>The following template override files are present on this site but appear to be
+               missing CSRF (cross-site request forgery) token protection. <strong>These files must be updated manually.</strong></p>
+
+            <?php if (!empty($phpFormFiles)): ?>
+                <p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_('form.token'); ?&gt;</code>
+                   immediately before each <code>&lt;/form&gt;</code> closing tag in these files:</strong></p>
+                <ul>
+                    <?php foreach ($phpFormFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <?php if (!empty($jsFormFiles)): ?>
+                <p><strong>In the following file(s), locate the JavaScript hidden-upload form string and add
+                   a hidden input whose <code>name</code> attribute is the output of
+                   <code>&lt;?php echo JSession::getFormToken(); ?&gt;</code>:</strong></p>
+                <ul>
+                    <?php foreach ($jsFormFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
+                <p>Example of the corrected JavaScript form string:</p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$('body').prepend(
+  '&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;'
+  + '&lt;input type="file" name="file" /&gt;'
+  + '&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;'
+  + '&lt;/form&gt;');</pre>
+            <?php endif; ?>
+
+            <p>After updating the override files, clear the Joomla cache.</p>
+            <p>Find those reminders in the J2Commerce dashboard.</p>
+        </div>
+        <?php
     }
 
     /**
