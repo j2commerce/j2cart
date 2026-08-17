@@ -1567,7 +1567,7 @@ class Com_J2storeInstallerScript extends InstallerScript
 
         $style = $styles[$verdict] ?? $styles['unknown'];
         ?>
-        <div style="margin-top:20px;padding:15px;border-radius:4px;<?php echo $style; ?>">
+        <div style="padding:15px;border-radius:4px;<?php echo $style; ?>">
             <h3 style="margin-top:0;">
                 <?php if ($verdict === 'hacked'): ?>
                     &#x26A0; Security Alert: Exploitation Detected
@@ -1831,7 +1831,7 @@ class Com_J2storeInstallerScript extends InstallerScript
             }
         }
         ?>
-        <div style="margin-top:20px;padding:15px;border-radius:4px;background:#fff3cd;border:2px solid #ffc107;color:#856404;">
+        <div style="margin-top:20px;margin-bottom:20px;padding:15px;border-radius:4px;background:#fff3cd;border:2px solid #ffc107;color:#856404;">
             <h3 style="margin-top:0;">&#x26A0; Template Override CSRF Check</h3>
             <p>The following template override files are present on this site but appear to be
                missing CSRF (cross-site request forgery) token protection. <strong>These files must be updated manually.</strong></p>
