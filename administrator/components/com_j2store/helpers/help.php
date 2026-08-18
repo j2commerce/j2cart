@@ -382,13 +382,20 @@ class J2Help {
 
         $comOverridePath = JPATH_SITE . '/templates/' . $template . '/html/com_j2store';
 
-        $hasToken = static function (string $path): bool {
+        $hasFormToken = static function (string $path): bool {
             $content = @file_get_contents($path);
             if ($content === false) {
                 return true; // unreadable — skip
             }
-            return strpos($content, 'form.token') !== false
-                || strpos($content, 'getFormToken') !== false;
+            return strpos($content, 'form.token') !== false;
+        };
+
+        $hasGetFormToken = static function (string $path): bool {
+            $content = @file_get_contents($path);
+            if ($content === false) {
+                return true; // unreadable — skip
+            }
+            return strpos($content, 'getFormToken') !== false;
         };
 
         $phpFormFiles = [
@@ -408,6 +415,7 @@ class J2Help {
 
         // Files needing a CSRF token added to a PHP array (not a form tag)
         $arrayFormFiles = [
+            'carts/default.php',
             'carts/default_items.php',
         ];
 
@@ -417,21 +425,21 @@ class J2Help {
 
         foreach ($phpFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
-            if (file_exists($full) && !$hasToken($full)) {
+            if (file_exists($full) && !$hasFormToken($full)) {
                 $phpWarnings[] = 'templates/' . $template . '/html/com_j2store/' . $file;
             }
         }
 
         foreach ($jsFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
-            if (file_exists($full) && !$hasToken($full)) {
+            if (file_exists($full) && !$hasGetFormToken($full)) {
                 $jsWarnings[] = 'templates/' . $template . '/html/com_j2store/' . $file;
             }
         }
 
         foreach ($arrayFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
-            if (file_exists($full) && !$hasToken($full)) {
+            if (file_exists($full) && !$hasGetFormToken($full)) {
                 $arrayWarnings[] = 'templates/' . $template . '/html/com_j2store/' . $file;
             }
         }
@@ -454,8 +462,9 @@ class J2Help {
                 }
                 foreach ($subtemplates as $subtemplateDir) {
                     foreach ($pluginFiles as $filename => $type) {
-                        $full = $subtemplateDir . '/' . $filename;
-                        if (file_exists($full) && !$hasToken($full)) {
+                        $full    = $subtemplateDir . '/' . $filename;
+                        $checker = $type === 'php_form' ? $hasFormToken : $hasGetFormToken;
+                        if (file_exists($full) && !$checker($full)) {
                             $rel = ltrim(str_replace(JPATH_SITE, '', $full), '/\\');
                             if ($type === 'php_form') {
                                 $phpWarnings[] = $rel;
@@ -498,17 +507,18 @@ class J2Help {
             }
             $html .= '</ul>';
             $html .= '<p>Example of the corrected JavaScript form string:</p>';
-            $html .= "<pre>$('body').prepend('&lt;form enctype=\"multipart/form-data\" id=\"form-upload\" ... /&gt;";
+            $html .= "<pre style=\"white-space: pre-wrap; word-wrap: break-word;\">$('body').prepend('&lt;form enctype=\"multipart/form-data\" id=\"form-upload\" style=\"display:none;\" /&gt;";
+            $html .= "&lt;input type=\"file\" name=\"file\" /&gt;";
             $html .= "&lt;input type=\"hidden\" name=\"&lt;?php echo JSession::getFormToken(); ?&gt;\" value=\"1\" /&gt;";
             $html .= "&lt;/form&gt;');</pre>";
         }
 
         if (!empty($arrayWarnings)) {
-            $html .= '<p><strong>In the following file, add <code>JSession::getFormToken() =&gt; \'1\'</code> '
-                . 'to the cart item data array. Change:</strong></p>'
-                . '<pre>\'cartitem_id\' =&gt; $item-&gt;cartitem_id</pre>'
+            $html .= '<p><strong>In the following file(s), add <code>JSession::getFormToken() =&gt; \'1\'</code> '
+                . 'to the getCartUrl function. Change:</strong></p>'
+                . '<pre>$platform->getCartUrl(array( ...</pre>'
                 . '<p><strong>to:</strong></p>'
-                . '<pre>\'cartitem_id\' =&gt; $item-&gt;cartitem_id, JSession::getFormToken() =&gt; \'1\'</pre>'
+                . '<pre>$platform->getCartUrl(array(JSession::getFormToken() =&gt; \'1\', ...</pre>'
                 . '<ul>';
             foreach ($arrayWarnings as $f) {
                 $html .= '<li><code>' . $e($f) . '</code></li>';

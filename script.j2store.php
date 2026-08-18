@@ -987,14 +987,21 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
 
         $comOverridePath = JPATH_SITE . '/templates/' . $template . '/html/com_j2store';
 
-        // Returns true when the file already contains any CSRF token call.
-        $hasToken = static function (string $path): bool {
+        // Returns true when the file already contains the expected CSRF token call.
+        $hasFormToken = static function (string $path): bool {
             $content = @file_get_contents($path);
             if ($content === false) {
                 return true; // unreadable → skip
             }
-            return strpos($content, 'form.token') !== false
-                || strpos($content, 'getFormToken') !== false;
+            return strpos($content, 'form.token') !== false;
+        };
+
+        $hasGetFormToken = static function (string $path): bool {
+            $content = @file_get_contents($path);
+            if ($content === false) {
+                return true; // unreadable → skip
+            }
+            return strpos($content, 'getFormToken') !== false;
         };
 
         /* These files contain a PHP <form> block and need <?php echo JHtml::_('form.token'); ?>  before </form>. */
@@ -1016,12 +1023,13 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
 
         /* These files pass cart item data as a PHP array and need  JSession::getFormToken() => '1'  added to that array. */
         $arrayFormFiles = [
+            'carts/default.php',
             'carts/default_items.php',
         ];
 
         foreach ($phpFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
-            if (file_exists($full) && !$hasToken($full)) {
+            if (file_exists($full) && !$hasFormToken($full)) {
                 $warnings[] = [
                     'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
                     'type' => 'php_form',
@@ -1031,7 +1039,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
 
         foreach ($jsFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
-            if (file_exists($full) && !$hasToken($full)) {
+            if (file_exists($full) && !$hasGetFormToken($full)) {
                 $warnings[] = [
                     'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
                     'type' => 'js_form',
@@ -1041,7 +1049,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
 
         foreach ($arrayFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
-            if (file_exists($full) && !$hasToken($full)) {
+            if (file_exists($full) && !$hasGetFormToken($full)) {
                 $warnings[] = [
                     'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
                     'type' => 'array_form',
@@ -1068,8 +1076,9 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
                 }
                 foreach ($subtemplates as $subtemplateDir) {
                     foreach ($pluginFiles as $filename => $type) {
-                        $full = $subtemplateDir . '/' . $filename;
-                        if (file_exists($full) && !$hasToken($full)) {
+                        $full    = $subtemplateDir . '/' . $filename;
+                        $checker = $type === 'php_form' ? $hasFormToken : $hasGetFormToken;
+                        if (file_exists($full) && !$checker($full)) {
                             $warnings[] = [
                                 'file' => ltrim(str_replace(JPATH_SITE, '', $full), '/\\'),
                                 'type' => $type,
@@ -1134,19 +1143,15 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
                     <?php endforeach; ?>
                 </ul>
                 <p>Example of the corrected JavaScript form string:</p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$('body').prepend(
-  '&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;'
-  + '&lt;input type="file" name="file" /&gt;'
-  + '&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;'
-  + '&lt;/form&gt;');</pre>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="file" name="file" /&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;/form&gt;');</pre>
             <?php endif; ?>
 
             <?php if (!empty($arrayFormFiles)): ?>
                 <p><strong>In the following file(s), add <code>JSession::getFormToken() =&gt; '1'</code>
-                   to the cart item data array. Change:</strong></p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">'cartitem_id' =&gt; $item-&gt;cartitem_id</pre>
+                    to the getCartUrl function. Change:</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$platform->getCartUrl(array( ...</pre>
                 <p><strong>to:</strong></p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">'cartitem_id' =&gt; $item-&gt;cartitem_id, JSession::getFormToken() =&gt; '1'</pre>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$platform->getCartUrl(array(JSession::getFormToken() =&gt; \'1\', ...</pre>
                 <ul>
                     <?php foreach ($arrayFormFiles as $f): ?>
                         <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
