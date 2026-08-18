@@ -1716,13 +1716,20 @@ class Com_J2storeInstallerScript extends InstallerScript
 
         $comOverridePath = JPATH_SITE . '/templates/' . $template . '/html/com_j2store';
 
-        $hasToken = static function (string $path): bool {
+        $hasFormToken = static function (string $path): bool {
             $content = @file_get_contents($path);
             if ($content === false) {
                 return true; // unreadable → skip
             }
-            return strpos($content, 'form.token') !== false
-                || strpos($content, 'getFormToken') !== false;
+            return strpos($content, 'form.token') !== false;
+        };
+
+        $hasGetFormToken = static function (string $path): bool {
+            $content = @file_get_contents($path);
+            if ($content === false) {
+                return true; // unreadable → skip
+            }
+            return strpos($content, 'getFormToken') !== false;
         };
 
         $phpFormFiles = [
@@ -1742,12 +1749,13 @@ class Com_J2storeInstallerScript extends InstallerScript
 
         /* These files pass cart item data as a PHP array and need  JSession::getFormToken() => '1'  added to that array. */
         $arrayFormFiles = [
+            'carts/default.php',
             'carts/default_items.php',
         ];
 
         foreach ($phpFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
-            if (file_exists($full) && !$hasToken($full)) {
+            if (file_exists($full) && !$hasFormToken($full)) {
                 $warnings[] = [
                     'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
                     'type' => 'php_form',
@@ -1757,7 +1765,7 @@ class Com_J2storeInstallerScript extends InstallerScript
 
         foreach ($jsFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
-            if (file_exists($full) && !$hasToken($full)) {
+            if (file_exists($full) && !$hasGetFormToken($full)) {
                 $warnings[] = [
                     'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
                     'type' => 'js_form',
@@ -1767,7 +1775,7 @@ class Com_J2storeInstallerScript extends InstallerScript
 
         foreach ($arrayFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
-            if (file_exists($full) && !$hasToken($full)) {
+            if (file_exists($full) && !$hasGetFormToken($full)) {
                 $warnings[] = [
                     'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
                     'type' => 'array_form',
@@ -1792,8 +1800,9 @@ class Com_J2storeInstallerScript extends InstallerScript
                 }
                 foreach ($subtemplates as $subtemplateDir) {
                     foreach ($pluginFiles as $filename => $type) {
-                        $full = $subtemplateDir . '/' . $filename;
-                        if (file_exists($full) && !$hasToken($full)) {
+                        $full    = $subtemplateDir . '/' . $filename;
+                        $checker = $type === 'php_form' ? $hasFormToken : $hasGetFormToken;
+                        if (file_exists($full) && !$checker($full)) {
                             $warnings[] = [
                                 'file' => ltrim(str_replace(JPATH_SITE, '', $full), '/\\'),
                                 'type' => $type,
@@ -1837,7 +1846,7 @@ class Com_J2storeInstallerScript extends InstallerScript
                missing CSRF (cross-site request forgery) token protection. <strong>These files must be updated manually.</strong></p>
 
             <?php if (!empty($phpFormFiles)): ?>
-                <p><strong>In the following files, add <code>&lt;?php echo JHtml::_('form.token'); ?&gt;</code>
+                <p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_('form.token'); ?&gt;</code>
                    immediately before each <code>&lt;/form&gt;</code> closing tag:</strong></p>
                 <ul>
                     <?php foreach ($phpFormFiles as $f): ?>
@@ -1847,7 +1856,7 @@ class Com_J2storeInstallerScript extends InstallerScript
             <?php endif; ?>
 
             <?php if (!empty($jsFormFiles)): ?>
-                <p><strong>In the following files, locate the JavaScript hidden-upload form string and add
+                <p><strong>In the following file(s), locate the JavaScript hidden-upload form string and add
                    a hidden input whose <code>name</code> attribute is the output of
                    <code>&lt;?php echo JSession::getFormToken(); ?&gt;</code>:</strong></p>
                 <ul>
@@ -1856,19 +1865,15 @@ class Com_J2storeInstallerScript extends InstallerScript
                     <?php endforeach; ?>
                 </ul>
                 <p>Example of the corrected JavaScript form string:</p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$('body').prepend(
-  '&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;'
-  + '&lt;input type="file" name="file" /&gt;'
-  + '&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;'
-  + '&lt;/form&gt;');</pre>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="file" name="file" /&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;/form&gt;');</pre>
             <?php endif; ?>
 
             <?php if (!empty($arrayFormFiles)): ?>
-                <p><strong>In the following files, add <code>JSession::getFormToken() =&gt; '1'</code>
-                   to the cart item data array. Change:</strong></p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">'cartitem_id' =&gt; $item-&gt;cartitem_id</pre>
+                <p><strong>In the following file(s), add <code>JSession::getFormToken() =&gt; '1'</code>
+                   to the getCartUrl function. Change:</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$platform->getCartUrl(array( ...</pre>
                 <p><strong>to:</strong></p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">'cartitem_id' =&gt; $item-&gt;cartitem_id, JSession::getFormToken() =&gt; '1'</pre>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$platform->getCartUrl(array(JSession::getFormToken() =&gt; \'1\', ...</pre>
                 <ul>
                     <?php foreach ($arrayFormFiles as $f): ?>
                         <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
