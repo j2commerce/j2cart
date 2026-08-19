@@ -369,7 +369,8 @@ class J2Help {
 
         $downloadUrl = 'https://github.com/j2commerce/plg_dompdf_library/releases/download/3.1.6/lib_dompdf-v3.1.6.zip';
 
-        $html  = '<div class="user-notifications alert alert-warning" role="alert">';
+        $html  = '<div class="user-notifications alert alert-warning alert-dismissible fade show" role="alert">';
+        $html .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="' . Text::_('JCLOSE') . '"></button>';
         $html .= '<h4 class="alert-heading">&#x26A0; ' . Text::_('J2STORE_ATTENTION') . '</h4>';
         $html .= '<p><strong>The dompdf library is outdated.</strong> '
             . 'Version <strong>' . htmlspecialchars($version, ENT_QUOTES, 'UTF-8') . '</strong> is installed; '
@@ -448,6 +449,7 @@ class J2Help {
         $phpWarnings   = [];
         $jsWarnings    = [];
         $arrayWarnings = [];
+        $dataWarnings  = [];
 
         foreach ($phpFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
@@ -472,7 +474,7 @@ class J2Help {
 
         // Templates overrides across all site templates
         $pluginFiles = [
-            'cart.php'                        => 'php_form',
+            'cart.php'                        => 'data_form',
             'default_configurableoptions.php' => 'js_form',
             'default_options.php'             => 'js_form',
             'view_configurableoptions.php'    => 'js_form',
@@ -496,6 +498,8 @@ class J2Help {
                                 $phpWarnings[] = $rel;
                             } elseif ($type === 'js_form') {
                                 $jsWarnings[] = $rel;
+                            } elseif ($type === 'data_form') {
+                                $dataWarnings[] = $rel;
                             }
                         }
                     }
@@ -503,7 +507,7 @@ class J2Help {
             }
         }
 
-        if (empty($phpWarnings) && empty($jsWarnings) && empty($arrayWarnings)) {
+        if (empty($phpWarnings) && empty($jsWarnings) && empty($arrayWarnings) && empty($dataWarnings)) {
             return '';
         }
 
@@ -511,10 +515,11 @@ class J2Help {
             return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
         };
 
-        $html  = '<div class="user-notifications alert alert-warning" role="alert">';
-        $html .= '<h4 class="alert-heading">&#x26A0; Template Override CSRF Check</h4>';
-        $html .= '<p>The following template override files are missing CSRF token protection. '
-            . '<strong>Update these files manually.</strong></p>';
+        $html  = '<div class="user-notifications alert alert-warning alert-dismissible fade show" role="alert">';
+        $html .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="' . Text::_('JCLOSE') . '"></button>';
+        $html .= '<h4 class="alert-heading">&#x26A0; Template Override Token protection</h4>';
+        $html .= '<p>The following template override files appear to be missing token protection. '
+            . '<strong>Update these files manually.</strong><br>Note: You may not find a place to insert the missing code if your overrides differ significantly from the original files, and you may not need to add it at all.</p>';
 
         if (!empty($phpWarnings)) {
             $html .= '<p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_(\'form.token\'); ?&gt;</code> '
@@ -533,18 +538,15 @@ class J2Help {
             }
             $html .= '</ul>';
             $html .= '<p>Example of the corrected JavaScript form string:</p>';
-            $html .= "<pre style=\"white-space: pre-wrap; word-wrap: break-word;\">$('body').prepend('&lt;form enctype=\"multipart/form-data\" id=\"form-upload\" style=\"display:none;\" /&gt;";
-            $html .= "&lt;input type=\"file\" name=\"file\" /&gt;";
+            $html .= "<pre style=\"background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;\">$('body').prepend('&lt;form enctype=\"multipart/form-data\" id=\"form-upload\" style=\"display:none;\" /&gt;";
             $html .= "&lt;input type=\"hidden\" name=\"&lt;?php echo JSession::getFormToken(); ?&gt;\" value=\"1\" /&gt;";
+            $html .= "&lt;input type=\"file\" name=\"file\" /&gt;";
             $html .= "&lt;/form&gt;');</pre>";
         }
 
         if (!empty($arrayWarnings)) {
-            $html .= '<p><strong>In the following file(s), add <code>JSession::getFormToken() =&gt; \'1\'</code> '
-                . 'to the getCartUrl function. Change:</strong></p>'
-                . '<pre>$platform->getCartUrl(array( ...</pre>'
-                . '<p><strong>to:</strong></p>'
-                . '<pre>$platform->getCartUrl(array(JSession::getFormToken() =&gt; \'1\', ...</pre>'
+            $html .= '<p><strong>In the following file(s), add <code>JSession::getFormToken() =&gt; \'1\'</code> to the getCartUrl function.</strong></p>'
+                . '<pre style="background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$platform->getCartUrl(array(JSession::getFormToken() =&gt; \'1\', ...</pre>'
                 . '<ul>';
             foreach ($arrayWarnings as $f) {
                 $html .= '<li><code>' . $e($f) . '</code></li>';
@@ -552,7 +554,18 @@ class J2Help {
             $html .= '</ul>';
         }
 
-        $html .= '<p>After updating, clear the Joomla cache.</p>';
+        if (!empty($dataWarnings)) {
+            $html .= '<p><strong>In the following file(s), add <code>data-&lt;?php echo JSession::getFormToken(); ?&gt;=&quot;1&quot;</code> '
+                . 'as an attribute on the link with class <code>j2store_add_to_cart_button</code>:</strong></p>'
+                . '<pre style="background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">&lt;a class=&quot;... j2store_add_to_cart_button&quot; data-&lt;?php echo JSession::getFormToken(); ?&gt;=&quot;1&quot;&gt;...&lt;/a&gt;</pre>'
+                . '<ul>';
+            foreach ($dataWarnings as $f) {
+                $html .= '<li><code>' . $e($f) . '</code></li>';
+            }
+            $html .= '</ul>';
+        }
+
+        $html .= '<p>After updating, clear the Joomla cache, if enabled.</p>';
         $html .= '</div>';
 
         return $html;
