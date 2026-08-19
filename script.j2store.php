@@ -966,7 +966,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
      * overrides) for com_j2store template override files that appear to be
      * missing CSRF token protection.
      *
-     * @return array  Array of ['file' => string, 'type' => 'php_form'|'js_form']
+     * @return array  Array of ['file' => string, 'type' => 'php_form'|'js_form'|'array_form'|'data_form']
      */
     private function _checkTemplateOverrides(): array
     {
@@ -1060,7 +1060,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         // Template overrides — search all site templates.
         // Override path: templates/<site-template>/html/com_j2store/templates/<subtemplate>/
         $pluginFiles = [
-            'cart.php'                        => 'php_form',
+            'cart.php'                        => 'data_form',
             'default_configurableoptions.php' => 'js_form',
             'default_options.php'             => 'js_form',
             'view_configurableoptions.php'    => 'js_form',
@@ -1107,6 +1107,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         $phpFormFiles   = [];
         $jsFormFiles    = [];
         $arrayFormFiles = [];
+        $dataFormFiles  = [];
 
         foreach ($warnings as $w) {
             if ($w['type'] === 'php_form') {
@@ -1115,17 +1116,20 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
                 $jsFormFiles[] = $w['file'];
             } elseif ($w['type'] === 'array_form') {
                 $arrayFormFiles[] = $w['file'];
+            } elseif ($w['type'] === 'data_form') {
+                $dataFormFiles[] = $w['file'];
             }
         }
         ?>
         <div style="margin-top:20px;padding:15px;border-radius:4px;background:#fff3cd;border:2px solid #ffc107;color:#856404;">
-            <h3 style="margin-top:0;">&#x26A0; Template Override CSRF Check</h3>
-            <p>The following template override files are present on this site but appear to be
-               missing CSRF (cross-site request forgery) token protection. <strong>These files must be updated manually.</strong></p>
+            <h3 style="margin-top:0;">&#x26A0; Template Override Token protection</h3>
+            <p>The following template override files appear to be missing token protection. <strong>These files must be updated manually.</strong><br>
+                Note: You may not find a place to insert the missing code if your overrides differ significantly from the original files, and you may not need to add it at all.
+            </p>
 
             <?php if (!empty($phpFormFiles)): ?>
                 <p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_('form.token'); ?&gt;</code>
-                   immediately before each <code>&lt;/form&gt;</code> closing tag in these files:</strong></p>
+                   immediately before each <code>&lt;/form&gt;</code> closing tag:</strong></p>
                 <ul>
                     <?php foreach ($phpFormFiles as $f): ?>
                         <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
@@ -1143,15 +1147,12 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
                     <?php endforeach; ?>
                 </ul>
                 <p>Example of the corrected JavaScript form string:</p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="file" name="file" /&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;/form&gt;');</pre>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;input type="file" name="file" /&gt;&lt;/form>');</pre>
             <?php endif; ?>
 
             <?php if (!empty($arrayFormFiles)): ?>
-                <p><strong>In the following file(s), add <code>JSession::getFormToken() =&gt; '1'</code>
-                    to the getCartUrl function. Change:</strong></p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$platform->getCartUrl(array( ...</pre>
-                <p><strong>to:</strong></p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$platform->getCartUrl(array(JSession::getFormToken() =&gt; \'1\', ...</pre>
+                <p><strong>In the following file(s), add <code>JSession::getFormToken() =&gt; '1'</code> to the getCartUrl function.</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$platform->getCartUrl(array(JSession::getFormToken() =&gt; '1', ...</pre>
                 <ul>
                     <?php foreach ($arrayFormFiles as $f): ?>
                         <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
@@ -1159,7 +1160,17 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
                 </ul>
             <?php endif; ?>
 
-            <p>After updating the override files, clear the Joomla cache.</p>
+            <?php if (!empty($dataFormFiles)): ?>
+                <p><strong>In the following file(s), add <code>data-&lt;?php echo JSession::getFormToken(); ?&gt;="1"</code> as an attribute on the link with class <code>j2store_add_to_cart_button</code>:</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">&lt;a class="... j2store_add_to_cart_button" data-&lt;?php echo JSession::getFormToken(); ?&gt;="1"&gt;...&lt;/a&gt;</pre>
+                <ul>
+                    <?php foreach ($dataFormFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <p>After updating the override files, clear the Joomla cache, if enabled.</p>
             <p>Find those reminders in the J2Commerce dashboard.</p>
         </div>
         <?php
