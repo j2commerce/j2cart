@@ -166,7 +166,7 @@ class J2Help {
 
     /**
      * Checks for evidence that the unauthenticated upload vulnerability
-     * (fixed in 4.0.21) was exploited on this site.
+     * (fixed in 4.1.6) was exploited on this site.
      * Returns an HTML alert when exploitation is detected or files are suspicious;
      * returns an empty string when everything looks clean.
      *
@@ -240,6 +240,9 @@ class J2Help {
             if (!file_exists($legacyDir . '/.htaccess')) {
                 $protectionMissing[] = 'media/com_j2store/uploads/.htaccess';
             }
+            if (!file_exists($legacyDir . '/web.config')) {
+                $protectionMissing[] = 'media/com_j2store/uploads/web.config';
+            }
             foreach ((array) @scandir($legacyDir) as $f) {
                 if (in_array($f, $protectionFiles)) { continue; }
                 $legacyFiles[] = $f;
@@ -261,8 +264,11 @@ class J2Help {
 
         $hasUploadFiles = !empty($uploadFiles) || $dbUploadCount > 0;
 
+        // Previously returned 'hacked' when no file options were configured, triggering automatic
+        // removal. Disabled: some J2Store add-ons also write to the uploads folder, so automatic
+        // removal could delete legitimate files. Use 'highly_suspicious' for manual review.
         if ($fileOptionCount === 0 && $hasUploadFiles) {
-            $verdict = 'hacked';
+            $verdict = 'highly_suspicious';
         } elseif (!empty($suspiciousNames) || !empty($invoicesUnexpected) || !empty($legacyFiles)) {
             $verdict = 'suspicious';
         } else {
@@ -273,20 +279,13 @@ class J2Help {
             return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
         };
 
-        $html  = '<div class="user-notifications alert alert-' . ($verdict === 'hacked' ? 'danger' : 'warning') . '" role="alert">';
-        $html .= '<h4 class="alert-heading">&#x26A0; ';
-        $html .= $verdict === 'hacked'
-            ? 'Security Alert: Upload Exploitation Detected'
-            : 'Security Warning: Suspicious Upload Files Found';
-        $html .= '</h4>';
+        $html  = '<div class="user-notifications alert alert-warning" role="alert">';
+        $html .= '<h4 class="alert-heading">&#x26A0; Security Warning: Suspicious Upload Files Found</h4>';
 
-        if ($verdict === 'hacked') {
-            $html .= '<p><strong>This site has been exploited.</strong> Files were uploaded through '
-                . 'the unauthenticated upload endpoint fixed in J2Store 4.0.21, and no '
-                . '&ldquo;File&rdquo; type product option has ever been configured &mdash; '
-                . 'meaning all uploads on disk and in the database are foreign. '
-                . 'Please re-install J2Store 4.0.21 or later to trigger automatic cleanup, '
-                . 'or remove the files manually and truncate the <code>#__j2store_uploads</code> table.</p>';
+        if ($verdict === 'highly_suspicious') {
+            $html .= '<p><strong>We found files in your uploads folder that may have been placed there by unauthorized users through a security issue that has now been fixed.</strong><br>'
+                . 'However, some J2Store add-ons also save files to this same folder during normal use, so we cannot safely remove them automatically without risking the removal of legitimate files. '
+                . '<strong>Please review the files listed below and delete any that you do not recognize or that do not belong to your store</strong>.</p>';
         } else {
             $html .= '<p><strong>Suspicious files were found.</strong> A &ldquo;File&rdquo; type '
                 . 'product option is configured so some uploads may be legitimate, but the '
