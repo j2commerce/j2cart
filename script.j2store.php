@@ -834,6 +834,9 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             if (!file_exists($legacyDir . '/.htaccess')) {
                 $check['protection_missing'][] = 'media/com_j2store/uploads/.htaccess';
             }
+            if (!file_exists($legacyDir . '/web.config')) {
+                $check['protection_missing'][] = 'media/com_j2store/uploads/web.config';
+            }
             $files = @scandir($legacyDir);
             if ($files !== false) {
                 foreach ($files as $f) {
@@ -871,7 +874,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
      * Derives a verdict string from a _checkForExploitation() result array.
      *
      * @param  array  $check
-     * @return string  'hacked' | 'suspicious' | 'clean' | 'unknown'
+     * @return string  'suspicious' | 'clean' | 'unknown'
      */
     private function _getExploitationVerdict(array $check): string
     {
@@ -881,8 +884,11 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
 
         $hasUploadFiles = !empty($check['upload_files']) || $check['db_upload_count'] > 0;
 
+        // Previously returned 'hacked' here and triggered automatic file removal.
+        // Disabled: some J2Store add-ons also write to the uploads folder, so automatic
+        // removal could delete legitimate files. Use 'highly_suspicious' for manual review.
         if ($check['file_option_count'] === 0 && $hasUploadFiles) {
-            return 'hacked';
+            return 'highly_suspicious';
         }
 
         if (!empty($check['suspicious_names']) || !empty($check['invoices_unexpected'])) {
@@ -1187,17 +1193,18 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
     private function _renderSecurityCheck(array $check, string $verdict, ?array $cleanup): void
     {
         $styles = [
-            'hacked'     => 'background:#f8d7da;border:2px solid #f5c6cb;color:#721c24;',
-            'suspicious' => 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
-            'clean'      => 'background:#d4edda;border:2px solid #c3e6cb;color:#155724;',
-            'unknown'    => 'background:#e2e3e5;border:2px solid #d6d8db;color:#383d41;',
+            'hacked'           => 'background:#f8d7da;border:2px solid #f5c6cb;color:#721c24;',
+            'highly_suspicious'=> 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
+            'suspicious'       => 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
+            'clean'            => 'background:#d4edda;border:2px solid #c3e6cb;color:#155724;',
+            'unknown'          => 'background:#e2e3e5;border:2px solid #d6d8db;color:#383d41;',
         ];
         $style = $styles[$verdict] ?? $styles['unknown'];
         ?>
         <div style="margin-top:20px;padding:15px;border-radius:4px;<?php echo $style; ?>">
             <h3 style="margin-top:0;">
                 <?php if ($verdict === 'hacked'): ?>&#x26A0; Security Alert: Exploitation Detected
-                <?php elseif ($verdict === 'suspicious'): ?>&#x26A0; Security Warning: Suspicious Files Found
+                <?php elseif ($verdict === 'highly_suspicious' || $verdict === 'suspicious'): ?>&#x26A0; Security Warning: Suspicious Files Found
                 <?php elseif ($verdict === 'clean'): ?>&#x2713; Security Check: No Exploitation Detected
                 <?php else: ?>Security Check: Could Not Determine Status
                 <?php endif; ?>
@@ -1237,6 +1244,12 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
                     <code>media/com_j2store/uploads/</code> directory (J2Store v3 / early v4)
                     also contained foreign files. Please remove them manually.</p>
                 <?php endif; ?>
+
+            <?php elseif ($verdict === 'highly_suspicious'): ?>
+                <p><strong>We found files in your uploads folder that may have been placed there by unauthorized users through a security issue that has now been fixed</strong>.<br>
+                    However, some J2Store add-ons also save files to this same folder during normal use, so we cannot safely remove them automatically without risking
+                    the removal of legitimate files.
+                <strong>Please review the files listed below and delete any that you do not recognize or that do not belong to your store</strong>.</p>
 
             <?php elseif ($verdict === 'suspicious'): ?>
                 <p><strong>Suspicious files were found.</strong> A &ldquo;File&rdquo; type
