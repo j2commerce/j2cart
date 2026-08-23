@@ -700,6 +700,15 @@ class J2StoreModelCarts extends F0FModel {
 					$this->setError(JText::_('J2STORE_UPLOAD_ERROR_FOLDER_PERMISSION_ERROR'));
 				}
 			}
+			// Ensure protection files exist even if the folder was recreated after install.
+			$htaccess_path  = $upload_folder_path . '/.htaccess';
+			$webconfig_path = $upload_folder_path . '/web.config';
+			if (!JFile::exists($htaccess_path)) {
+				JFile::write($htaccess_path, "order deny, allow\ndeny from all\nallow from none");
+			}
+			if (!JFile::exists($webconfig_path)) {
+				JFile::write($webconfig_path, "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<configuration>\n    <system.web>\n        <authorization>\n            <deny users=\"*\"/>\n        </authorization>\n    </system.web>\n</configuration>");
+			}
 			//sanitize file name
 			$filename = basename(preg_replace('/[^a-zA-Z0-9\.\-\s+]/', '', html_entity_decode($file['name'], ENT_QUOTES, 'UTF-8')));
 

@@ -332,6 +332,11 @@ class J2StoreControllerMyProfile extends F0FController
 		$order->load(array('order_id' => $order_id));
 		$user = JFactory::getUser ();
 
+		// Verify the order belongs to the current user before touching any cart data
+		if ((int)$order->user_id !== (int)$user->id) {
+			$app->redirect($url, JText::_('J2STORE_INVALID_ORDER_PROFILE'));
+		}
+
 		if($order->load(array('order_id' => $order_id)) && $order->order_state_id == 5 ){
 			// variant check
 			// validate stock
@@ -546,21 +551,41 @@ class J2StoreControllerMyProfile extends F0FController
 	}
 	function updateHitCount(){
 		$app = JFactory::getApplication();
+		$json = array();
+
+		// Require a valid CSRF token
+		if (!JSession::checkToken('request')) {
+			$json['error'] = 1;
+			echo json_encode($json);
+			$app->close();
+			return;
+		}
+
 		$post = $app->input->getArray($_REQUEST);
-		$json = array();		
 		$order = F0FTable::getInstance('Order', 'J2StoreTable')->getClone();
-		$order->load(array('order_id'=>$post['order_id']));				
-		if(isset($post['orderdownload_id']) && isset($post['productfile_id']) && isset($post['token']) && $post['orderdownload_id'] > 0 && $post['productfile_id'] > 0 && ($order->token==$post['token'])){			
+		$order->load(array('order_id'=>$post['order_id']));
+
+		// Verify the caller owns the order via the download token
+		if(isset($post['orderdownload_id']) && isset($post['productfile_id']) && isset($post['token']) && $post['orderdownload_id'] > 0 && $post['productfile_id'] > 0 && ($order->token==$post['token'])){
 			$table = F0FTable::getAnInstance('Orderdownload', 'J2StoreTable');
 			$table->load($post['orderdownload_id']);
+
+			// Assert the download record belongs to the submitted order
+			if ((int)$table->order_id !== (int)$post['order_id']) {
+				$json['error'] = 1;
+				echo json_encode($json);
+				$app->close();
+				return;
+			}
+
 			$table->limit_count = $table->limit_count + 1;
 			$table->store();
 			$productfile = F0FTable::getAnInstance('Productfile', 'J2StoreTable');
 			$productfile->load($post['productfile_id']);
 			$productfile->download_total = $productfile->download_total +1;
-			$productfile->store();			
+			$productfile->store();
 			$json['success']=1;
-		}else{				
+		}else{
 			$json['error'] = 1;
 		}
 		echo json_encode($json);

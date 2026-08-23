@@ -42,6 +42,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	public function addItem() {
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
         $platform = J2Store::platform();
 		$app = $platform->application();
 		$model = $this->getModel('Carts', 'J2StoreModel');
@@ -75,7 +76,7 @@ class J2StoreControllerCarts extends F0FController
 		} else {
 			$return = $app->input->getBase64('return');
 			if(!is_null($return)) {
-				$return_url = base64_decode($return);
+				$return_url = $this->_getSafeReturnUrl(base64_decode($return));
 			} else {
 				$return_url = $cart_url;
 			}
@@ -94,6 +95,7 @@ class J2StoreControllerCarts extends F0FController
 	 * force shipping
 	 *   */
 	function forceshipping(){
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 		$json = array();
 		$app = JFactory::getApplication();
 		$json = J2Store::plugin()->eventWithArray('ValidateShipping');
@@ -101,6 +103,7 @@ class J2StoreControllerCarts extends F0FController
 		$app->close();
 	}
 	function update() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->clear_cache();
@@ -118,6 +121,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function clearCart(){
+		JSession::checkToken('get') or die(JText::_('JINVALID_TOKEN'));
 		J2Store::utilities()->clear_cache();
 		J2Store::utilities()->nocache();
 		$model = $this->getModel('Carts' ,'J2StoreModel');
@@ -135,6 +139,7 @@ class J2StoreControllerCarts extends F0FController
 		$this->setRedirect($url, $msg, 'notice');
 	}
 	function remove() {
+		JSession::checkToken('get') or die(JText::_('JINVALID_TOKEN'));
 		J2Store::utilities()->clear_cache();
 		J2Store::utilities()->nocache();
 
@@ -187,6 +192,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function setcurrency() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//no cache
 		J2Store::utilities()->clear_cache();
@@ -201,7 +207,7 @@ class J2StoreControllerCarts extends F0FController
 
 		//get the redirect
 		if(isset($post['redirect'])) {
-			$url = base64_decode($post['redirect']);
+			$url = $this->_getSafeReturnUrl(base64_decode($post['redirect']));
 		} else {
 			$url = 'index.php';
 		}
@@ -210,6 +216,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function applyCoupon() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -226,7 +233,7 @@ class J2StoreControllerCarts extends F0FController
 		//check if we have a redirect
 		$redirect = JFactory::getApplication()->input->getBase64('redirect', '');
 		if(!empty($redirect)) {
-			$url = JRoute::_(base64_decode($redirect));
+			$url = $this->_getSafeReturnUrl(base64_decode($redirect));
 		}else {
 			$url = $model->getCartUrl();
 		}
@@ -235,6 +242,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function removeCoupon() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -255,6 +263,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function applyVoucher() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -273,7 +282,7 @@ class J2StoreControllerCarts extends F0FController
         //check if we have a redirect
         $redirect = JFactory::getApplication()->input->getBase64('redirect', '');
         if(!empty($redirect)) {
-            $url = JRoute::_(base64_decode($redirect));
+            $url = $this->_getSafeReturnUrl(base64_decode($redirect));
         }else {
             $url = $model->getCartUrl();
         }
@@ -281,6 +290,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function removeVoucher() {
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -303,6 +313,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function estimate() {
+		JSession::checkToken('get') or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -371,6 +382,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	function shippingUpdate() {
+		JSession::checkToken('get') or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		//first clear cache
 		J2Store::utilities()->nocache();
@@ -453,6 +465,8 @@ class J2StoreControllerCarts extends F0FController
 	 *
 	 */
 	public function upload(){
+		// Require a valid CSRF token — prevents CSRF uploads from malicious third-party pages
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		$files = $this->input->files->get('file');
 		$json = array();
@@ -465,6 +479,7 @@ class J2StoreControllerCarts extends F0FController
 	}
 
 	public function addtowishlist() {
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		$app = JFactory::getApplication();
 		$model = $this->getModel('Carts', 'J2StoreModel');
@@ -473,6 +488,36 @@ class J2StoreControllerCarts extends F0FController
 		$json = J2Store::plugin()->eventWithArray('AfterAddingToWishlist', array($result));
 		echo json_encode($json);
 		$app->close();
+	}
+
+	/**
+	 * Validates a decoded redirect URL and returns it only when it points to
+	 * the current site. Rejects protocol-relative URLs (//evil.com) and any
+	 * absolute URL whose host does not match the site's base URI.
+	 *
+	 * @param  string $url  Decoded candidate URL
+	 * @return string       Safe URL (falls back to 'index.php' on rejection)
+	 */
+	private function _getSafeReturnUrl($url)
+	{
+		$url = trim((string) $url);
+
+		// Reject protocol-relative URLs – not caught by isInternal()
+		if (strpos($url, '//') === 0) {
+			return 'index.php';
+		}
+
+		// Allow relative URLs unconditionally
+		if (!preg_match('#^[a-zA-Z][a-zA-Z0-9+\-.]*://#', $url)) {
+			return $url;
+		}
+
+		// For absolute URLs, verify the host matches this site
+		if (!\Joomla\CMS\Uri\Uri::isInternal($url)) {
+			return 'index.php';
+		}
+
+		return $url;
 	}
 
 }

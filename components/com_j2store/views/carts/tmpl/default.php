@@ -41,6 +41,7 @@ $page_heading_text = $page_heading->get('page_heading','');
 						<input type="hidden" name="option" value="com_j2store" />
 						<input type="hidden" name="view" value="carts" />
 						<input type="hidden" id="j2store-cart-task" name="task" value="update" />
+						<?php echo JHtml::_('form.token'); ?>
 
 						<?php  echo $this->loadTemplate('items'); ?>
 
@@ -61,7 +62,7 @@ $page_heading_text = $page_heading->get('page_heading','');
 							<div class="buttons-right">
 								<?php if($this->params->get('show_clear_cart_button', 0)):?>
 								<span class="cart-clear-button">
-									<a class="btn btn-danger" href="<?php echo $platform->getCartUrl(array('task' => 'clearCart'));?>"><?php echo JText::_('J2STORE_EMPTY_CART')?></a>
+									<a class="btn btn-danger" href="<?php echo $platform->getCartUrl(array('task' => 'clearCart', JSession::getFormToken() => '1'));?>"><?php echo JText::_('J2STORE_EMPTY_CART')?></a>
 								</span>
 								<?php endif;?>
 							</div>

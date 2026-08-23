@@ -20,6 +20,9 @@ defined('_JEXEC') or die('Restricted access');
 if (!Factory::getApplication()->getIdentity()->authorise('core.manage', 'com_j2store')) {
     return;
 }
+if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_j2store/helpers/j2store.php')) {
+    return;
+}
 
 if (!defined('F0F_INCLUDED')) {
     include_once JPATH_LIBRARIES . '/f0f/include.php';
