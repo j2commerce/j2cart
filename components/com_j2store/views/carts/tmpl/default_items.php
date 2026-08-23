@@ -42,7 +42,7 @@ $image = J2Store::image();
 						<span class="cart-product-name">
 							<?php echo $item->orderitem_name; ?>
 							 <?php if(!$this->params->get('show_qty_field', 1)) : ?>
-							 <a class="j2store-remove remove-icon" href="<?php echo $platform->getCartUrl(array('task' => 'remove','cartitem_id' => $item->cartitem_id)); ?>">X</a>
+							 <a class="j2store-remove remove-icon" href="<?php echo $platform->getCartUrl(array('task' => 'remove', 'cartitem_id' => $item->cartitem_id, JSession::getFormToken() => '1')); ?>">X</a>
 							 <?php endif; ?>
 						</span>
 						<br>
@@ -90,7 +90,7 @@ $image = J2Store::image();
 					  <?php if($this->params->get('show_qty_field', 1)) : ?>
 						<td>
 							<?php echo J2Store::product()->displayQuantity('com_j2store.carts', $item, $this->params, array( 'class'=>'input-mini ' ) ); ?>
-							<a class="btn btn-small btn-danger btn-xs j2store-remove remove-icon" href="<?php echo $platform->getCartUrl(array('task' => 'remove','cartitem_id' => $item->cartitem_id)); ?>">
+							<a class="btn btn-small btn-danger btn-xs j2store-remove remove-icon" href="<?php echo $platform->getCartUrl(array('task' => 'remove', 'cartitem_id' => $item->cartitem_id, JSession::getFormToken() => '1')); ?>">
 							<i class="fa fa-trash-o"></i>
 							</a>
 						</td>

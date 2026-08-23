@@ -37,8 +37,8 @@ $shipping_selected_text = '';
 
 			$shipping_selected_text .= "<div class='shipping_element ".$css_id."_select_text' style='display:none;'>".JText::_ ( $select_text )."</div>"
             ?>
-            <input id="shipping_<?php echo $css_id; ?>" name="shipping_plugin" rel="<?php echo $rate['name']; ?>" type="radio" value="<?php echo $rate['element'] ?>" onClick="j2storeSetShippingRate('<?php echo $rate['name']; ?>','<?php echo $rate['price']; ?>',<?php echo $rate['tax']; ?>,<?php echo $rate['extra']; ?>, '<?php echo $rate['code']; ?>', true, '<?php echo $rate['element'];?>', '<?php echo $css_id; ?>' );" <?php echo $checked; ?> />
-            <label for="shipping_<?php echo $css_id; ?>" onClick="j2storeSetShippingRate('<?php echo $rate['name']; ?>','<?php echo $rate['price']; ?>',<?php echo $rate['tax']; ?>,<?php echo $rate['extra']; ?>, '<?php echo $rate['code']; ?>', true, '<?php echo $rate['element'];?>', '<?php echo $css_id; ?>' );"><?php echo $rate['name']; ?> ( <?php echo $this->currency->format( $rate['total']); ?> )</label><br>
+            <input id="shipping_<?php echo $css_id; ?>" name="shipping_plugin" rel="<?php echo $rate['name']; ?>" type="radio" value="<?php echo $rate['element'] ?>" onClick="j2storeSetShippingRate('<?php echo $rate['name']; ?>','<?php echo $rate['price']; ?>',<?php echo !empty($rate['tax']) ? $rate['tax'] : 0; ?>,<?php echo !empty($rate['extra']) ? $rate['extra'] : 0; ?>, '<?php echo $rate['code']; ?>', true, '<?php echo $rate['element'];?>', '<?php echo $css_id; ?>' );" <?php echo $checked; ?> />
+            <label for="shipping_<?php echo $css_id; ?>" onClick="j2storeSetShippingRate('<?php echo $rate['name']; ?>','<?php echo $rate['price']; ?>',<?php echo !empty($rate['tax']) ? $rate['tax'] : 0; ?>,<?php echo !empty($rate['extra']) ? $rate['extra'] : 0; ?>, '<?php echo $rate['code']; ?>', true, '<?php echo $rate['element'];?>', '<?php echo $css_id; ?>' );"><?php echo $rate['name']; ?> ( <?php echo $this->currency->format( $rate['total']); ?> )</label><br>
             <?php
         }
 ?>
@@ -62,7 +62,7 @@ if (!empty($this->default_rate) ) :
 <script type="text/javascript">
 (function($) {
 	$(document).ready(function(){
-		j2storeSetShippingRate('<?php echo $default_rate['name']; ?>','<?php echo $default_rate['price']; ?>',<?php echo $default_rate['tax']; ?>,<?php echo $default_rate['extra']; ?>, '<?php echo $default_rate['code']; ?>', true,'<?php echo $default_rate['element'];?>', '<?php echo $default_css_id; ?>' );
+		j2storeSetShippingRate('<?php echo $default_rate['name']; ?>','<?php echo $default_rate['price']; ?>',<?php echo !empty($default_rate['tax']) ? $default_rate['tax'] : 0; ?>,<?php echo !empty($default_rate['extra']) ? $default_rate['extra'] : 0; ?>, '<?php echo $default_rate['code']; ?>', true,'<?php echo $default_rate['element'];?>', '<?php echo $default_css_id; ?>' );
 });
 })(j2store.jQuery);
 </script>

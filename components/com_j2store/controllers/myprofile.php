@@ -333,6 +333,13 @@ class J2StoreControllerMyProfile extends F0FController
 		$user = JFactory::getUser ();
 
 		if($order->load(array('order_id' => $order_id)) && $order->order_state_id == 5 ){
+			// SECURITY: verify the order belongs to the current user.
+			// An attacker could supply any order_id via GET; the CSRF token only proves
+			// the request came from a valid session, not that the order is theirs.
+			if ((int) $order->user_id !== (int) $user->id) {
+				$app->redirect($url, JText::_('J2STORE_INVALID_ORDER_PROFILE'));
+				return;
+			}
 			// variant check
 			// validate stock
 			// option available
@@ -545,24 +552,54 @@ class J2StoreControllerMyProfile extends F0FController
 		}
 	}
 	function updateHitCount(){
+		$this->checkToken('request');
+
 		$app = JFactory::getApplication();
 		$post = $app->input->getArray($_REQUEST);
-		$json = array();		
-		$order = F0FTable::getInstance('Order', 'J2StoreTable')->getClone();
-		$order->load(array('order_id'=>$post['order_id']));				
-		if(isset($post['orderdownload_id']) && isset($post['productfile_id']) && isset($post['token']) && $post['orderdownload_id'] > 0 && $post['productfile_id'] > 0 && ($order->token==$post['token'])){			
-			$table = F0FTable::getAnInstance('Orderdownload', 'J2StoreTable');
-			$table->load($post['orderdownload_id']);
-			$table->limit_count = $table->limit_count + 1;
-			$table->store();
-			$productfile = F0FTable::getAnInstance('Productfile', 'J2StoreTable');
-			$productfile->load($post['productfile_id']);
-			$productfile->download_total = $productfile->download_total +1;
-			$productfile->store();			
-			$json['success']=1;
-		}else{				
+		$json = array();
+
+		$orderdownload_id = isset($post['orderdownload_id']) ? (int) $post['orderdownload_id'] : 0;
+		$productfile_id   = isset($post['productfile_id'])   ? (int) $post['productfile_id']   : 0;
+		$order_id         = isset($post['order_id'])         ? $app->input->getString('order_id') : '';
+
+		if ($orderdownload_id < 1 || $productfile_id < 1 || empty($order_id)) {
 			$json['error'] = 1;
+			echo json_encode($json);
+			$app->close();
+			return;
 		}
+
+		$order = F0FTable::getInstance('Order', 'J2StoreTable')->getClone();
+		$order->load(array('order_id' => $order_id));
+
+		// Verify the current user or guest owns this order
+		if (!$this->validate($order)) {
+			$json['error'] = 1;
+			echo json_encode($json);
+			$app->close();
+			return;
+		}
+
+		// Verify the orderdownload record exists and belongs to this order
+		$table = F0FTable::getAnInstance('Orderdownload', 'J2StoreTable');
+		$table->load($orderdownload_id);
+
+		if (!$table->j2store_orderdownload_id || $table->order_id !== $order_id) {
+			$json['error'] = 1;
+			echo json_encode($json);
+			$app->close();
+			return;
+		}
+
+		$table->limit_count = $table->limit_count + 1;
+		$table->store();
+
+		$productfile = F0FTable::getAnInstance('Productfile', 'J2StoreTable');
+		$productfile->load($productfile_id);
+		$productfile->download_total = $productfile->download_total + 1;
+		$productfile->store();
+
+		$json['success'] = 1;
 		echo json_encode($json);
 		$app->close();
 	}

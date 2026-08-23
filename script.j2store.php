@@ -80,6 +80,30 @@ class Com_J2storeInstallerScript extends InstallerScript
     protected $deleteFolders = [];
 
     /**
+     * Result of the security exploitation check, populated by _checkForExploitation()
+     * and consumed by _renderPostInstallation().
+     *
+     * @var array|null
+     */
+    private $securityCheckResult = null;
+
+    /**
+     * Result of the automatic cleanup performed when exploitation is confirmed,
+     * populated by _removeExploitationFiles() and consumed by _renderSecurityCheck().
+     *
+     * @var array|null
+     */
+    private $securityCleanupResult = null;
+
+    /**
+     * Template override files missing CSRF tokens, populated by _checkTemplateOverrides()
+     * and consumed by _renderTemplateOverrideWarnings().
+     *
+     * @var array|null
+     */
+    private $templateOverrideWarnings = null;
+
+    /**
      * Extra modules and plugins to install on component installation / update,
      * and to remove on component uninstallation.
      *
@@ -416,6 +440,22 @@ class Com_J2storeInstallerScript extends InstallerScript
             }
             $this->_log('_runPostflight() – Step 7b: done');
 
+            // ---- Step 7c: Security exploitation check ----
+            $this->_log('_runPostflight() – Step 7c: running exploitation check');
+            $this->securityCheckResult = $this->_checkForExploitation();
+            $verdict = $this->_getExploitationVerdict($this->securityCheckResult);
+            $this->_log('_runPostflight() – Step 7c: verdict=' . $verdict);
+            if ($verdict === 'hacked') {
+                $this->_log('_runPostflight() – Step 7c: verdict is hacked, removing exploitation files');
+                $this->securityCleanupResult = $this->_removeExploitationFiles($this->securityCheckResult);
+                $this->_log('_runPostflight() – Step 7c: cleanup done, removed=' . count($this->securityCleanupResult['removed_files']) . ' failed=' . count($this->securityCleanupResult['failed_files']));
+            }
+
+            // ---- Step 7d: Template override CSRF check ----
+            $this->_log('_runPostflight() – Step 7d: running template override check');
+            $this->templateOverrideWarnings = $this->_checkTemplateOverrides();
+            $this->_log('_runPostflight() – Step 7d: found ' . count($this->templateOverrideWarnings) . ' affected file(s)');
+
             // ---- Step 8: Render post-installation status ----
             $this->_log('_runPostflight() – Step 8: rendering status HTML');
             $this->_renderPostInstallation($status, $fofInstallationStatus, $parent);
@@ -439,12 +479,70 @@ class Com_J2storeInstallerScript extends InstallerScript
     public function uninstall($parent)
     {
         $this->_log('uninstall() – started');
+
+        // Safety net: disable all J2Store modules and plugins at the DB level
+        // BEFORE files are removed. This catches bundled extensions, third-party
+        // J2Store plugins, and survives any failure in _doUninstallSubextensions().
+        // Without this, remaining enabled extensions call J2Store:: after the
+        // component files are gone, causing a fatal "Class J2Store not found".
+        $this->_disableAllJ2StoreExtensions();
+
         // Uninstall bundled modules and plugins
         $status = $this->_doUninstallSubextensions($parent);
 
         // Show the post-uninstallation page
         $this->_renderPostUninstallation($status, $parent);
         $this->_log('uninstall() – completed');
+    }
+
+    /**
+     * Unpublishes all J2Store modules and disables all J2Store plugins directly
+     * in the database. Called at the very start of uninstall() so that no
+     * J2Store-dependent extension can fire after the component files are removed,
+     * regardless of whether _doUninstallSubextensions() succeeds or fails, and
+     * regardless of whether the extensions were bundled or third-party.
+     */
+    private function _disableAllJ2StoreExtensions(): void
+    {
+        try {
+            $db = Factory::getDbo();
+
+            // Unpublish all J2Store modules (admin and site)
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__modules'))
+                    ->set($db->quoteName('published') . ' = 0')
+                    ->where($db->quoteName('module') . ' LIKE ' . $db->quote('mod_j2store%'))
+            );
+            $db->execute();
+
+            // Disable all J2Store plugins:
+            // - plugins in the dedicated j2store folder (payment, shipping, app, report)
+            // - plugins in standard Joomla folders whose element contains 'j2store'
+            //   (e.g. system/j2store, content/j2store, finder/j2store, installer/j2store)
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__extensions'))
+                    ->set($db->quoteName('enabled') . ' = 0')
+                    ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
+                    ->where(
+                        '(' . $db->quoteName('folder')  . ' = '    . $db->quote('j2store') .
+                        ' OR ' . $db->quoteName('element') . ' LIKE ' . $db->quote('%j2store%') . ')'
+                    )
+            );
+            $db->execute();
+
+            // Clear the modules and plugins cache so the disabled state takes
+            // effect immediately without a manual cache flush.
+            $cache = Factory::getCache('com_modules', '');
+            $cache->clean();
+            $cache = Factory::getCache('com_plugins', '');
+            $cache->clean();
+
+        } catch (\Exception $e) {
+            // Silent fail — this is a best-effort safety net; do not interrupt
+            // the rest of the uninstall process if the DB sweep fails.
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -1063,6 +1161,8 @@ class Com_J2storeInstallerScript extends InstallerScript
     protected function _renderPostInstallation($status, $fofInstallStatus, $parent)
     {
         $rows = 0;
+        $this->_renderSecurityCheck();
+        $this->_renderTemplateOverrideWarnings();
         ?>
         <table class="table table-striped" width="100%">
             <thead>
@@ -1192,6 +1292,620 @@ class Com_J2storeInstallerScript extends InstallerScript
             <?php endif; ?>
             </tbody>
         </table>
+        <?php
+    }
+
+    // -------------------------------------------------------------------------
+    // Security exploitation check
+    // -------------------------------------------------------------------------
+
+    /**
+     * Scans for evidence that the unauthenticated file upload vulnerability
+     * (fixed in 4.1.6) was exploited on this site before the update was applied.
+     *
+     * Returns a structured array consumed by _renderSecurityCheck() and logged
+     * via _getExploitationVerdict().
+     *
+     * @return array
+     */
+    private function _checkForExploitation(): array
+    {
+        $check = [
+            'file_option_count'    => 0,
+            'options_table_exists' => false,
+            'upload_files'         => [],
+            'legacy_files'         => [],
+            'db_upload_count'      => 0,
+            'db_table_exists'      => false,
+            'suspicious_names'     => [],
+            'invoices_unexpected'  => [],
+            'protection_missing'   => [],
+            'errors'               => [],
+        ];
+
+        $db     = Factory::getDbo();
+        $prefix = $db->getPrefix();
+
+        try {
+            $tables = $db->getTableList();
+        } catch (\Exception $e) {
+            $check['errors'][] = 'Could not list database tables: ' . $e->getMessage();
+            return $check;
+        }
+
+        // 1. Check whether any 'file' type option is defined
+        if (in_array($prefix . 'j2store_options', $tables)) {
+            $check['options_table_exists'] = true;
+            try {
+                $q = $db->getQuery(true)
+                    ->select('COUNT(*)')
+                    ->from($db->quoteName('#__j2store_options'))
+                    ->where($db->quoteName('type') . ' = ' . $db->quote('file'));
+                $db->setQuery($q);
+                $check['file_option_count'] = (int) $db->loadResult();
+            } catch (\Exception $e) {
+                $check['errors'][] = 'Options table query failed: ' . $e->getMessage();
+            }
+        }
+
+        // 2. Count rows in the uploads table
+        if (in_array($prefix . 'j2store_uploads', $tables)) {
+            $check['db_table_exists'] = true;
+            try {
+                $q = $db->getQuery(true)
+                    ->select('COUNT(*)')
+                    ->from($db->quoteName('#__j2store_uploads'));
+                $db->setQuery($q);
+                $check['db_upload_count'] = (int) $db->loadResult();
+            } catch (\Exception $e) {
+                $check['errors'][] = 'Uploads table query failed: ' . $e->getMessage();
+            }
+        }
+
+        // 3. Scan media/j2store/uploads/ for user files
+        $protectionFiles = ['.', '..', '.htaccess', 'web.config'];
+        $uploadsDir      = JPATH_ROOT . '/media/j2store/uploads';
+
+        if (!file_exists($uploadsDir . '/.htaccess')) {
+            $check['protection_missing'][] = 'media/j2store/uploads/.htaccess';
+        }
+        if (!file_exists($uploadsDir . '/web.config')) {
+            $check['protection_missing'][] = 'media/j2store/uploads/web.config';
+        }
+
+        if (is_dir($uploadsDir)) {
+            $files = @scandir($uploadsDir);
+            if ($files !== false) {
+                foreach ($files as $f) {
+                    if (in_array($f, $protectionFiles)) {
+                        continue;
+                    }
+                    $check['upload_files'][] = $f;
+                    // Double-extension pattern used to disguise PHP as a safe type
+                    if (preg_match('/\.(php\d*|phtml|phar)\./i', $f)) {
+                        $check['suspicious_names'][] = $f;
+                    }
+                }
+            }
+        }
+
+        // 4. Scan the legacy media/com_j2store/uploads/ path (J2Store v3 / early v4)
+        $legacyDir = JPATH_ROOT . '/media/com_j2store/uploads';
+        if (is_dir($legacyDir)) {
+            if (!file_exists($legacyDir . '/.htaccess')) {
+                $check['protection_missing'][] = 'media/com_j2store/uploads/.htaccess';
+            }
+            if (!file_exists($legacyDir . '/web.config')) {
+                $check['protection_missing'][] = 'media/com_j2store/uploads/web.config';
+            }
+            $files = @scandir($legacyDir);
+            if ($files !== false) {
+                foreach ($files as $f) {
+                    if (in_array($f, $protectionFiles)) {
+                        continue;
+                    }
+                    $check['legacy_files'][] = $f;
+                    if (preg_match('/\.(php\d*|phtml|phar)\./i', $f)) {
+                        $check['suspicious_names'][] = $f;
+                    }
+                }
+            }
+        }
+
+        // 5. Scan media/j2store/invoices/ — should only ever contain PDFs
+        $invoicesDir = JPATH_ROOT . '/media/j2store/invoices';
+        if (is_dir($invoicesDir)) {
+            $files = @scandir($invoicesDir);
+            if ($files !== false) {
+                foreach ($files as $f) {
+                    if (in_array($f, $protectionFiles)) {
+                        continue;
+                    }
+                    if (!preg_match('/\.pdf$/i', $f)) {
+                        $check['invoices_unexpected'][] = $f;
+                    }
+                }
+            }
+        }
+
+        return $check;
+    }
+
+    /**
+     * Derives a verdict string from a _checkForExploitation() result array.
+     *
+     * Possible values:
+     *   'suspicious' – unexpected files found; manual review required
+     *   'clean'      – no evidence of exploitation
+     *   'unknown'    – could not query the database to determine
+     *
+     * @param  array  $check
+     * @return string
+     */
+    private function _getExploitationVerdict(array $check): string
+    {
+        if (!$check['options_table_exists']) {
+            return 'unknown';
+        }
+
+        $hasUploadFiles = !empty($check['upload_files']) || $check['db_upload_count'] > 0;
+
+        // Previously returned 'hacked' here and triggered automatic file removal.
+        // Disabled: some J2Store add-ons also write to the uploads folder, so automatic
+        // removal could delete legitimate files. Use 'highly_suspicious' for manual review.
+        if ($check['file_option_count'] === 0 && $hasUploadFiles) {
+            return 'highly_suspicious';
+        }
+
+        // Suspicious indicators even when a file option exists
+        if (!empty($check['suspicious_names']) || !empty($check['invoices_unexpected'])) {
+            return 'suspicious';
+        }
+
+        // Legacy folder has files — could be old legitimate use or old attack
+        if (!empty($check['legacy_files'])) {
+            return 'suspicious';
+        }
+
+        return 'clean';
+    }
+
+    /**
+     * Removes foreign files from the uploads directories and truncates the
+     * #__j2store_uploads table when exploitation is definitively confirmed.
+     *
+     * Only protection files (.htaccess, web.config) are preserved. All other
+     * files in media/j2store/uploads/ and (if present) the legacy
+     * media/com_j2store/uploads/ path are deleted.
+     *
+     * @param  array  $check  Result array from _checkForExploitation()
+     * @return array  {
+     *     removed_files:  string[]  — paths of successfully deleted files,
+     *     failed_files:   string[]  — paths that could not be deleted,
+     *     db_truncated:   bool      — whether #__j2store_uploads was truncated,
+     *     db_error:       string    — error message if truncation failed, '' otherwise
+     * }
+     */
+    private function _removeExploitationFiles(array $check): array
+    {
+        $result = [
+            'removed_files' => [],
+            'failed_files'  => [],
+            'db_truncated'  => false,
+            'db_error'      => '',
+        ];
+
+        $protectionFiles = ['.', '..', '.htaccess', 'web.config'];
+
+        // Delete user files from media/j2store/uploads/
+        $uploadsDir = JPATH_ROOT . '/media/j2store/uploads';
+        if (is_dir($uploadsDir)) {
+            foreach ((array) $check['upload_files'] as $filename) {
+                if (in_array($filename, $protectionFiles)) {
+                    continue;
+                }
+                $path = $uploadsDir . '/' . $filename;
+                if (@unlink($path)) {
+                    $result['removed_files'][] = 'media/j2store/uploads/' . $filename;
+                    $this->_log("_removeExploitationFiles() – deleted {$path}");
+                } else {
+                    $result['failed_files'][] = 'media/j2store/uploads/' . $filename;
+                    $this->_log("_removeExploitationFiles() – FAILED to delete {$path}", 'WARNING');
+                }
+            }
+        }
+
+        // Delete user files from the legacy media/com_j2store/uploads/ path
+        $legacyDir = JPATH_ROOT . '/media/com_j2store/uploads';
+        if (is_dir($legacyDir)) {
+            foreach ((array) $check['legacy_files'] as $filename) {
+                if (in_array($filename, $protectionFiles)) {
+                    continue;
+                }
+                $path = $legacyDir . '/' . $filename;
+                if (@unlink($path)) {
+                    $result['removed_files'][] = 'media/com_j2store/uploads/' . $filename;
+                    $this->_log("_removeExploitationFiles() – deleted {$path}");
+                } else {
+                    $result['failed_files'][] = 'media/com_j2store/uploads/' . $filename;
+                    $this->_log("_removeExploitationFiles() – FAILED to delete {$path}", 'WARNING');
+                }
+            }
+        }
+
+        // Truncate the uploads database table
+        if ($check['db_table_exists'] && $check['db_upload_count'] > 0) {
+            try {
+                $db = Factory::getDbo();
+                $db->truncateTable('#__j2store_uploads');
+                $result['db_truncated'] = true;
+                $this->_log('_removeExploitationFiles() – truncated #__j2store_uploads');
+            } catch (\Exception $e) {
+                $result['db_error'] = $e->getMessage();
+                $this->_log('_removeExploitationFiles() – failed to truncate table: ' . $e->getMessage(), 'WARNING');
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Renders the security exploitation check result as an inline HTML block
+     * appended to the post-installation status output.
+     */
+    private function _renderSecurityCheck(): void
+    {
+        if ($this->securityCheckResult === null) {
+            return;
+        }
+
+        $check   = $this->securityCheckResult;
+        $verdict = $this->_getExploitationVerdict($check);
+
+        $styles = [
+            'hacked'            => 'background:#f8d7da;border:2px solid #f5c6cb;color:#721c24;',
+            'highly_suspicious' => 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
+            'suspicious'        => 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
+            'clean'             => 'background:#d4edda;border:2px solid #c3e6cb;color:#155724;',
+            'unknown'           => 'background:#e2e3e5;border:2px solid #d6d8db;color:#383d41;',
+        ];
+
+        $style = $styles[$verdict] ?? $styles['unknown'];
+        ?>
+        <div style="padding:15px;border-radius:4px;<?php echo $style; ?>">
+            <h3 style="margin-top:0;">
+                <?php if ($verdict === 'hacked'): ?>
+                    &#x26A0; Security Alert: Exploitation Detected
+                <?php elseif ($verdict === 'highly_suspicious' || $verdict === 'suspicious'): ?>
+                    &#x26A0; Security Warning: Suspicious Files Found
+                <?php elseif ($verdict === 'clean'): ?>
+                    &#x2713; Security Check: No Exploitation Detected
+                <?php else: ?>
+                    Security Check: Could Not Determine Status
+                <?php endif; ?>
+            </h3>
+
+            <?php if ($verdict === 'hacked'): ?>
+                <p><strong>This site has been exploited.</strong> Files were uploaded through
+                the unauthenticated upload endpoint fixed in this release, and no
+                &ldquo;File&rdquo; type product option has ever been configured &mdash;
+                meaning all uploads in the database and on disk are foreign.</p>
+
+                <?php if ($this->securityCleanupResult !== null): ?>
+                    <?php $cleanup = $this->securityCleanupResult; ?>
+                    <?php if (!empty($cleanup['removed_files'])): ?>
+                        <p><strong style="color:#155724;">&#x2713; <?php echo count($cleanup['removed_files']); ?> foreign file(s) were automatically removed:</strong><br>
+                            <code><?php echo htmlspecialchars(implode(', ', array_slice($cleanup['removed_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
+                                <?php echo count($cleanup['removed_files']) > 20 ? ' &hellip; and ' . (count($cleanup['removed_files']) - 20) . ' more' : ''; ?>
+                            </code>
+                        </p>
+                    <?php endif; ?>
+                    <?php if ($cleanup['db_truncated']): ?>
+                        <p><strong style="color:#155724;">&#x2713; The <code>#__j2store_uploads</code> database table was cleared.</strong></p>
+                    <?php endif; ?>
+                    <?php if (!empty($cleanup['failed_files'])): ?>
+                        <p><strong>&#x26A0; <?php echo count($cleanup['failed_files']); ?> file(s) could not be deleted (check directory permissions):</strong><br>
+                            <code><?php echo htmlspecialchars(implode(', ', $cleanup['failed_files']), ENT_QUOTES, 'UTF-8'); ?></code>
+                        </p>
+                    <?php endif; ?>
+                    <?php if ($cleanup['db_error'] !== ''): ?>
+                        <p><strong>&#x26A0; Database table could not be cleared:</strong>
+                            <code><?php echo htmlspecialchars($cleanup['db_error'], ENT_QUOTES, 'UTF-8'); ?></code>
+                        </p>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <?php if (!empty($check['legacy_files'])): ?>
+                    <p><strong>Additional action required:</strong> The legacy
+                    <code>media/com_j2store/uploads/</code> directory (J2Store v3 / early v4)
+                    also contained foreign files. Those files are listed below &mdash;
+                    please remove them manually as this path is outside the scope of the
+                    automatic cleanup.</p>
+                <?php endif; ?>
+
+            <?php elseif ($verdict === 'highly_suspicious'): ?>
+                <p><strong>We found files in your uploads folder that may have been placed there by unauthorized users through a security issue that has now been fixed</strong>.<br>
+                    However, some J2Store add-ons also save files to this same folder during normal use, so we cannot safely remove them automatically without risking
+                    the removal of legitimate files.
+                    <strong>Please review the files listed below and delete any that you do not recognize or that do not belong to your store</strong>.</p>
+
+            <?php elseif ($verdict === 'suspicious'): ?>
+                <p><strong>Suspicious files were found.</strong> A &ldquo;File&rdquo; type
+                product option is configured so some uploads may be legitimate, but the
+                following items require manual review:</p>
+
+            <?php elseif ($verdict === 'clean'): ?>
+                <p>No evidence of exploitation was found. The upload folder contains no
+                user files and the database uploads table is empty. This vulnerability
+                was not exploited on this site prior to this update.</p>
+
+            <?php else: ?>
+                <p>The database could not be queried to determine whether this site
+                was affected. Please review <code>media/j2store/uploads/</code> manually.</p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['upload_files'])): ?>
+                <p><strong><?php echo count($check['upload_files']); ?> file(s) found in
+                    <code>media/j2store/uploads/</code>:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', array_slice($check['upload_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
+                        <?php echo count($check['upload_files']) > 20 ? ' &hellip; and ' . (count($check['upload_files']) - 20) . ' more' : ''; ?>
+                    </code>
+                </p>
+            <?php endif; ?>
+
+            <?php if ($check['db_upload_count'] > 0): ?>
+                <p><strong><?php echo $check['db_upload_count']; ?> record(s) in
+                    <code>#__j2store_uploads</code></strong> database table.</p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['suspicious_names'])): ?>
+                <p><strong style="color:red;">&#x26A0; Suspicious filenames detected
+                    (double-extension attack pattern):</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', $check['suspicious_names']), ENT_QUOTES, 'UTF-8'); ?></code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['legacy_files'])): ?>
+                <p><strong><?php echo count($check['legacy_files']); ?> file(s) found in the
+                    legacy <code>media/com_j2store/uploads/</code> path</strong> (J2Store v3 /
+                    early v4 upload directory &mdash; this path is not covered by the 4.1.6
+                    update and must be secured manually):<br>
+                    <code><?php echo htmlspecialchars(implode(', ', array_slice($check['legacy_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
+                        <?php echo count($check['legacy_files']) > 20 ? ' &hellip; and ' . (count($check['legacy_files']) - 20) . ' more' : ''; ?>
+                    </code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['invoices_unexpected'])): ?>
+                <p><strong>Unexpected non-PDF file(s) in <code>media/j2store/invoices/</code>
+                    &mdash; invoices should only contain PDFs:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', $check['invoices_unexpected']), ENT_QUOTES, 'UTF-8'); ?></code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['protection_missing'])): ?>
+                <p><strong>&#x26A0; Missing web server protection files &mdash;
+                    files in these directories may be publicly accessible:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', $check['protection_missing']), ENT_QUOTES, 'UTF-8'); ?></code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['errors'])): ?>
+                <p><em>Check errors: <?php echo htmlspecialchars(implode('; ', $check['errors']), ENT_QUOTES, 'UTF-8'); ?></em></p>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    // -------------------------------------------------------------------------
+    // Template override CSRF check
+    // -------------------------------------------------------------------------
+
+    /**
+     * Scans the default site template (and all site templates for plugin
+     * overrides) for com_j2store template override files that appear to be
+     * missing CSRF token protection.
+     *
+     * @return array  Array of ['file' => string, 'type' => 'php_form'|'js_form'|'array_form'|'data_form']
+     */
+    private function _checkTemplateOverrides(): array
+    {
+        $warnings = [];
+
+        try {
+            $db    = Factory::getDbo();
+            $query = "SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1";
+            $db->setQuery($query);
+            $template = $db->loadResult();
+        } catch (\Exception $e) {
+            return $warnings;
+        }
+
+        if (!$template) {
+            return $warnings;
+        }
+
+        $comOverridePath = JPATH_SITE . '/templates/' . $template . '/html/com_j2store';
+
+        $hasFormToken = static function (string $path): bool {
+            $content = @file_get_contents($path);
+            if ($content === false) {
+                return true; // unreadable → skip
+            }
+            return strpos($content, 'form.token') !== false;
+        };
+
+        $hasGetFormToken = static function (string $path): bool {
+            $content = @file_get_contents($path);
+            if ($content === false) {
+                return true; // unreadable → skip
+            }
+            return strpos($content, 'getFormToken') !== false;
+        };
+
+        $phpFormFiles = [
+            'carts/default.php',
+            'carts/default_calculator.php',
+            'carts/default_coupon.php',
+            'carts/default_shipping.php',
+            'carts/default_voucher.php',
+        ];
+
+        $jsFormFiles = [
+            'product/adminitem_configurableoptions.php',
+            'product/adminitem_options.php',
+            'product/item_configurableoptions.php',
+            'product/item_options.php',
+        ];
+
+        /* These files pass cart item data as a PHP array and need  JSession::getFormToken() => '1'  added to that array. */
+        $arrayFormFiles = [
+            'carts/default.php',
+            'carts/default_items.php',
+        ];
+
+        foreach ($phpFormFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasFormToken($full)) {
+                $warnings[] = [
+                    'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
+                    'type' => 'php_form',
+                ];
+            }
+        }
+
+        foreach ($jsFormFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasGetFormToken($full)) {
+                $warnings[] = [
+                    'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
+                    'type' => 'js_form',
+                ];
+            }
+        }
+
+        foreach ($arrayFormFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasGetFormToken($full)) {
+                $warnings[] = [
+                    'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
+                    'type' => 'array_form',
+                ];
+            }
+        }
+
+        $pluginFiles = [
+            'cart.php'                        => 'data_form',
+            'default_configurableoptions.php' => 'js_form',
+            'default_options.php'             => 'js_form',
+            'view_configurableoptions.php'    => 'js_form',
+            'view_options.php'                => 'js_form',
+        ];
+
+        $pluginDirs = glob(JPATH_SITE . '/templates/*/html/com_j2store/templates', GLOB_ONLYDIR);
+        if ($pluginDirs) {
+            foreach ($pluginDirs as $pluginDir) {
+                $subtemplates = glob($pluginDir . '/*', GLOB_ONLYDIR);
+                if (!$subtemplates) {
+                    continue;
+                }
+                foreach ($subtemplates as $subtemplateDir) {
+                    foreach ($pluginFiles as $filename => $type) {
+                        $full    = $subtemplateDir . '/' . $filename;
+                        $checker = $type === 'php_form' ? $hasFormToken : $hasGetFormToken;
+                        if (file_exists($full) && !$checker($full)) {
+                            $warnings[] = [
+                                'file' => ltrim(str_replace(JPATH_SITE, '', $full), '/\\'),
+                                'type' => $type,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $warnings;
+    }
+
+    /**
+     * Renders an HTML warning block for template override files missing CSRF
+     * token protection, appended after the security check block.
+     */
+    private function _renderTemplateOverrideWarnings(): void
+    {
+        if (empty($this->templateOverrideWarnings)) {
+            return;
+        }
+
+        $phpFormFiles   = [];
+        $jsFormFiles    = [];
+        $arrayFormFiles = [];
+        $dataFormFiles  = [];
+
+        foreach ($this->templateOverrideWarnings as $w) {
+            if ($w['type'] === 'php_form') {
+                $phpFormFiles[] = $w['file'];
+            } elseif ($w['type'] === 'js_form') {
+                $jsFormFiles[] = $w['file'];
+            } elseif ($w['type'] === 'array_form') {
+                $arrayFormFiles[] = $w['file'];
+            } elseif ($w['type'] === 'data_form') {
+                $dataFormFiles[] = $w['file'];
+            }
+        }
+        ?>
+        <div style="margin-top:20px;margin-bottom:20px;padding:15px;border-radius:4px;background:#fff3cd;border:2px solid #ffc107;color:#856404;">
+            <h3 style="margin-top:0;">&#x26A0; Template Override Token protection</h3>
+            <p>The following template override files appear to be missing token protection. <strong>These files must be updated manually.</strong><br>
+                Note: You may not find a place to insert the missing code if your overrides differ significantly from the original files, and you may not need to add it at all.
+            </p>
+
+            <?php if (!empty($phpFormFiles)): ?>
+                <p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_('form.token'); ?&gt;</code>
+                   immediately before each <code>&lt;/form&gt;</code> closing tag:</strong></p>
+                <ul>
+                    <?php foreach ($phpFormFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <?php if (!empty($jsFormFiles)): ?>
+                <p><strong>In the following file(s), locate the JavaScript hidden-upload form string and add
+                   a hidden input whose <code>name</code> attribute is the output of
+                   <code>&lt;?php echo JSession::getFormToken(); ?&gt;</code>:</strong></p>
+                <ul>
+                    <?php foreach ($jsFormFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
+                <p>Example of the corrected JavaScript form string:</p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;input type="file" name="file" /&gt;</form&gt;');</pre>
+            <?php endif; ?>
+
+            <?php if (!empty($arrayFormFiles)): ?>
+                <p><strong>In the following file(s), add <code>JSession::getFormToken() =&gt; '1'</code> to the getCartUrl function.</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">$platform->getCartUrl(array(JSession::getFormToken() =&gt; '1', ...</pre>
+                <ul>
+                    <?php foreach ($arrayFormFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <?php if (!empty($dataFormFiles)): ?>
+                <p><strong>In the following file(s), add <code>data-&lt;?php echo JSession::getFormToken(); ?&gt;="1"</code> as an attribute on the link with class <code>j2store_add_to_cart_button</code>:</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;">&lt;a class="... j2store_add_to_cart_button" data-&lt;?php echo JSession::getFormToken(); ?&gt;="1"&gt;...&lt;/a&gt;</pre>
+                <ul>
+                    <?php foreach ($dataFormFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <p>After updating the override files, clear the Joomla cache, if enabled.</p>
+            <p>Find those reminders in the J2Commerce dashboard.</p>
+        </div>
         <?php
     }
 
