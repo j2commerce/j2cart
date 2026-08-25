@@ -1150,9 +1150,15 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
 
             $order->add_history(JText::_('J2STORE_PAYPAL_CALLBACK_IPN_RESPONSE_RECEIVED'));
 
-            $order->transaction_details = $data ['transaction_details'];
-            $order->transaction_id = $data ['txn_id'];
-            $order->transaction_status = $data ['payment_status'];
+            // Only record PayPal's own transaction data once the callback has been
+            // confirmed as genuine. Storing it unconditionally let an unauthenticated
+            // POST to this listener write attacker-controlled text into the order,
+            // which was then rendered unescaped in the admin transaction log.
+            if (empty($ipnValidationFailed)) {
+                $order->transaction_details = $data ['transaction_details'];
+                $order->transaction_id = $data ['txn_id'];
+                $order->transaction_status = $data ['payment_status'];
+            }
 
             // check the stored amount against the payment amount
 

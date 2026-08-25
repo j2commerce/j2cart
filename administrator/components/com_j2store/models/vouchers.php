@@ -102,7 +102,12 @@ class J2StoreModelVouchers extends F0FModel {
 			}
 			$query->from('#__j2store_orderdiscounts')
 			->join('LEFT','#__j2store_orders o on #__j2store_orderdiscounts.order_id = o.order_id')
-			-> where(' o.order_state_id!=5 ')
+			// Only orders that were cancelled (6) or failed (3) release their claim on the
+			// voucher. Orders sitting in "New" (5, awaiting payment) still hold their
+			// discount, otherwise several concurrently-open unpaid orders can each pass the
+			// usage-limit check against the same voucher and collectively redeem it beyond
+			// its value.
+			-> where(' o.order_state_id NOT IN (3,6) ')
 			-> where('discount_entity_id='.$db->q($voucher_id))
 			->group('discount_entity_id');
 			$query->where('discount_type ='.$db->q('voucher'));
@@ -125,7 +130,8 @@ class J2StoreModelVouchers extends F0FModel {
             }
             $query->from('#__j2store_orderdiscounts')
                 ->join('LEFT','#__j2store_orders o on #__j2store_orderdiscounts.order_id = o.order_id')
-                -> where(' o.order_state_id!=5 ')
+                // See get_voucher_history() - only release the claim for cancelled/failed orders.
+                -> where(' o.order_state_id NOT IN (3,6) ')
                 -> where('discount_entity_id='.$db->q($voucher_id));
             if($order_id){
                 $query-> where('o.order_id !='.$db->q($order_id));
@@ -138,10 +144,11 @@ class J2StoreModelVouchers extends F0FModel {
         return $this->history[$voucher_id];
     }
 
-	public function is_valid() {
+	public function is_valid($order = null) {
 		try {
 			$this->validate_enabled();
 			$this->validate_exists();
+			$this->validate_email_binding($order);
 			$this->validate_usage_limit();
 			$this->validate_expiry_date();
 			//allow plugins to run their own course.
@@ -163,6 +170,7 @@ class J2StoreModelVouchers extends F0FModel {
         try {
             $this->validate_enabled();
             $this->validate_exists();
+            $this->validate_email_binding($order);
             $this->validate_admin_usage_limit($order);
             $this->validate_expiry_date();
             //allow plugins to run their own course.
@@ -193,6 +201,26 @@ class J2StoreModelVouchers extends F0FModel {
 	private function validate_exists() {
 		if ( ! $this->voucher) {
 			throw new Exception( JText::_('J2STORE_VOUCHER_DOES_NOT_EXIST') );
+		}
+	}
+
+	/**
+	 * Vouchers can be issued to a specific recipient email. If one is set, only an
+	 * order placed by that same email address may redeem the voucher - otherwise
+	 * anyone who learns the code (it is not a secret, e.g. shared voucher emails
+	 * often get forwarded) could redeem someone else's targeted voucher.
+	 * When the order's email isn't known yet (e.g. showing a cart preview before
+	 * checkout), the check is skipped and re-applied once the order is finalized.
+	 */
+	private function validate_email_binding($order) {
+		if (empty($this->voucher->email_to)) {
+			return;
+		}
+		if (empty($order) || empty($order->user_email)) {
+			return;
+		}
+		if (strcasecmp(trim($this->voucher->email_to), trim($order->user_email)) !== 0) {
+			throw new Exception( JText::_('J2STORE_VOUCHER_NOT_APPLICABLE') );
 		}
 	}
 
