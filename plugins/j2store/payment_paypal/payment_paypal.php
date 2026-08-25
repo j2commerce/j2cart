@@ -948,7 +948,7 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
 
         $response = curl_exec($curl);
 
@@ -959,12 +959,10 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
         $this->_log('IPN Validation REQUEST: ' . $request);
         $this->_log('IPN Validation RESPONSE: ' . $response);
 
-        if ((strcmp($response, 'VERIFIED') == 0 || strcmp($response, 'UNVERIFIED') == 0)) {
+        if (strcmp($response, 'VERIFIED') == 0) {
             return '';
-        }elseif (strcmp ($response, 'INVALID') == 0) {
-            return JText::_('J2STORE_PAYPAL_ERROR_IPN_VALIDATION');
         }
-        return '';
+        return JText::_('J2STORE_PAYPAL_ERROR_IPN_VALIDATION');
     }
 
     /**
@@ -998,7 +996,7 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
                     //ipn api validation
                     if(!$this->checkStatusOfPaypal($data)){
                         // ipn Validation failed
-                        $data['ipn_validation_results'] = $errorV;
+                        $error = $errorV;
                     }
                 }
 
@@ -1167,13 +1165,14 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
             $currency_values= $this->getCurrency($order);
             $gross = $currency->format($order->order_total, $currency_values['currency_code'], $currency_values['currency_value'], false);
 
-            $mc_gross = floatval($data['mc_gross']);
-            if ($mc_gross > 0)
-            {
+            if (!isset($data['mc_gross']) || floatval($data['mc_gross']) <= 0) {
+                $errors[] = 'Payment amount missing or invalid';
+            } else {
+                $mc_gross = floatval($data['mc_gross']);
                 // A positive value means "payment". The prices MUST match!
                 // Important: NEVER, EVER compare two floating point values for equality.
                 $isValid = ($gross - $mc_gross) < 0.05;
-                if(!$isValid) {
+                if (!$isValid) {
                     $errors[] = 'Paid amount does not match the order total';
                 }
             }
