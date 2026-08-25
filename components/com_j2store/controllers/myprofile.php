@@ -148,9 +148,11 @@ class J2StoreControllerMyProfile extends F0FController
 		$address = F0FTable::getAnInstance('Address' ,'J2StoreTable');
 		$address->load($address_id);
 		$user = JFactory::getUser ();
+		$app = JFactory::getApplication ();
 
-		if(!empty( $address->user_id ) && $user->id != $address->user_id){
-			$app = JFactory::getApplication ();
+		// Allow only when the address exists, has an owner, and that owner is the current authenticated user.
+		// Guest addresses (empty user_id) must never be exposed to logged-in users.
+		if(empty($user->id) || empty($address->j2store_address_id) || empty($address->user_id) || (int)$user->id !== (int)$address->user_id){
 			$app->redirect ('index.php?option=com_j2store&view=myprofile',JText::_('J2STORE_MYPROFILE_ADDRESS_INVALID'),'error');
 		}
 		$address_type = $this->input->getString('address_type');
