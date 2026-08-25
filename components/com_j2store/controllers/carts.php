@@ -41,6 +41,22 @@ class J2StoreControllerCarts extends F0FController
 		return parent::onBeforeBrowse();
 	}
 
+	/**
+	 * Block the inherited FOF save task on the front-end.
+	 *
+	 * FOF only enforces CSRF tokens on back-end HTML requests, so the raw
+	 * format variant (format=raw) of the inherited save task was reachable by
+	 * any anonymous visitor and could be used to insert or overwrite cart rows
+	 * with attacker-chosen user_id / session_id values.  All legitimate cart
+	 * writes go through addItem() or the other named methods below, so the
+	 * generic FOF save path is never needed on the front-end.
+	 */
+	public function save()
+	{
+		JFactory::getApplication()->setHeader('Status', '403 Forbidden', true);
+		jexit();
+	}
+
 	public function addItem() {
 		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
         $platform = J2Store::platform();
