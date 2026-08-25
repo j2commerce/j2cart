@@ -109,6 +109,30 @@ class J2StoreModelOrders extends F0FModel {
 				throw new Exception(JText::_('J2STORE_CHECKOUT_NO_SHIPPING_ADDRESS_FOUND'));
 				return false;
 			}
+
+			// If a shipping method was selected earlier in checkout but no longer
+			// matches any currently valid rate (stale selection, tampered name, or
+			// the zone/rates changed), the totals calculator silently drops the
+			// shipping charge to 0 instead of erroring. Reject the checkout instead
+			// of letting it complete with no shipping charge applied.
+			$rates = F0FModel::getTmpInstance('Shippings', 'J2StoreModel')->getShippingRates($order);
+			if (!empty($rates)) {
+				$shipping_values = $session->get('shipping_values', array(), 'j2store');
+				$selected_name = isset($shipping_values['shipping_name']) ? trim($shipping_values['shipping_name']) : '';
+				$matched = false;
+				if ($selected_name !== '') {
+					foreach ($rates as $rate) {
+						if (trim($rate['name']) === $selected_name) {
+							$matched = true;
+							break;
+						}
+					}
+				}
+				if (!$matched) {
+					throw new Exception(JText::_('J2STORE_CHECKOUT_SELECT_A_SHIPPING_METHOD'));
+					return false;
+				}
+			}
 		}else {
 			$session->clear('shipping_method', 'j2store');
 			$session->clear('shipping_values', 'j2store');

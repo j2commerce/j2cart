@@ -127,7 +127,11 @@ class J2StoreModelCoupons extends F0FModel {
 			$query = $db->getQuery ( true );
 			$query->select ( 'COUNT(*) AS total' )->from ( '#__j2store_orderdiscounts' )
                 ->join('LEFT','#__j2store_orders on #__j2store_orderdiscounts.order_id = #__j2store_orders.order_id')
-                -> where('#__j2store_orders.order_state_id!=5 ')
+                // Only orders that were cancelled (6) or failed (3) release their claim on the
+                // coupon. Orders sitting in "New" (5, awaiting payment) still hold their usage,
+                // otherwise several concurrently-open unpaid orders can each pass the usage-limit
+                // check against the same coupon and collectively redeem it beyond its limit.
+                -> where('#__j2store_orders.order_state_id NOT IN (3,6) ')
                 ->where ( '#__j2store_orderdiscounts.discount_entity_id=' . $db->q ( $coupon_id) );
 			$query->where('#__j2store_orderdiscounts.discount_type = '.$db->q('coupon'));
 			if(!empty($user_id)) {
