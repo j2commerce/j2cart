@@ -18,6 +18,14 @@ class J2StoreModelAppLocalizationdata extends F0FModel
     {
         $status = false;
 
+        // Whitelist of tables this tool is permitted to reset.
+        // Prevents arbitrary table truncation and path traversal in getInserted().
+        $allowed = array('lengths', 'weights', 'countries', 'zones', 'metrics');
+        if (!in_array($tablename, $allowed, true))
+        {
+            throw new InvalidArgumentException('Invalid table name: ' . $tablename);
+        }
+
         //Get database
         $db = JFactory::getDBO();
 
