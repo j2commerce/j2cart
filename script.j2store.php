@@ -79,6 +79,23 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
      */
     protected $originalErrorReporting;
 
+    /**
+     * The previously installed J2Store version, captured in preflight() before
+     * Joomla overwrites the #__extensions manifest_cache. Null on a fresh install.
+     *
+     * @var   string|null
+     */
+    private $_previousVersion = null;
+
+    /**
+     * The earliest version whose postflight() already performed the uploads
+     * folder security scan. Sites updating from this version (or later) do not
+     * need to be scanned again.
+     *
+     * @var   string
+     */
+    const UPLOAD_SECURITY_CHECK_INTRODUCED_IN = '4.0.21';
+
   protected $removeFilesAllVersions = array(
     'files' => array(
       // Use pathnames relative to your site's root, e.g.
@@ -178,17 +195,73 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         }
 
         // Security exploitation check (CVE fixed in 4.0.21)
-        $checkResult   = $this->_checkForExploitation();
-        $verdict       = $this->_getExploitationVerdict($checkResult);
-        $cleanupResult = null;
-        if ($verdict === 'hacked') {
-            $cleanupResult = $this->_removeExploitationFiles($checkResult);
+        if ($this->_isUploadSecurityCheckDone()) {
+            // Already scanned in a previous update on this site - no need to run again.
+        } elseif ($this->_previousVersion !== null
+            && version_compare($this->_previousVersion, self::UPLOAD_SECURITY_CHECK_INTRODUCED_IN, '>=')) {
+            // The site was already scanned by the postflight() of the previously
+            // installed version - just record that fact, don't scan again.
+            $this->_markUploadSecurityCheckDone();
+        } else {
+            $checkResult   = $this->_checkForExploitation();
+            $verdict       = $this->_getExploitationVerdict($checkResult);
+            $cleanupResult = null;
+            if ($verdict === 'hacked') {
+                $cleanupResult = $this->_removeExploitationFiles($checkResult);
+            }
+            $this->_renderSecurityCheck($checkResult, $verdict, $cleanupResult);
+            $this->_markUploadSecurityCheckDone();
         }
-        $this->_renderSecurityCheck($checkResult, $verdict, $cleanupResult);
 
         // Template override CSRF check
         $overrideWarnings = $this->_checkTemplateOverrides();
         $this->_renderTemplateOverrideWarnings($overrideWarnings);
+    }
+
+    /**
+     * Whether the uploads folder security scan has already been run and
+     * recorded for this site, via the 'security_upload_check_done' component
+     * parameter.
+     *
+     * @return  bool
+     */
+    private function _isUploadSecurityCheckDone(): bool
+    {
+        try {
+            $params = ComponentHelper::getParams('com_j2store');
+            return (bool) $params->get('security_upload_check_done', 0);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Persists the 'security_upload_check_done' flag to the com_j2store
+     * component parameters so future updates - and the admin dashboard warning
+     * in J2Help::security_upload_check() - skip the uploads folder scan.
+     *
+     * @return  void
+     */
+    private function _markUploadSecurityCheckDone(): void
+    {
+        try {
+            $component = ComponentHelper::getComponent('com_j2store');
+            $params    = $component->getParams();
+            $params->set('security_upload_check_done', 1);
+
+            $db   = Factory::getDbo();
+            $data = $params->toString();
+
+            $query = $db->getQuery(true)
+                ->update($db->quoteName('#__extensions'))
+                ->set($db->quoteName('params') . ' = ' . $db->quote($data))
+                ->where($db->quoteName('element') . ' = ' . $db->quote('com_j2store'))
+                ->where($db->quoteName('type') . ' = ' . $db->quote('component'));
+            $db->setQuery($query);
+            $db->execute();
+        } catch (\Exception $e) {
+            // Non-fatal: at worst the scan runs again on the next update.
+        }
     }
 
   public function preflight($type, $parent)
@@ -257,6 +330,10 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         $manifest = json_decode($result);
         $version = $manifest->version;
         if (!empty($version)) {
+          // remember the previously installed version so postflight() can decide
+          // whether the uploads folder security scan needs to run again
+          $this->_previousVersion = $version;
+
           // abort if the current J2Store release is older
           /*if( version_compare( $version, '3.9.99', 'lt' ) ) {
               $parent->getParent()->abort('You cannot install J2Store Version 4 over the old versions directly. A migration tool should be used first to migrate your previous store data.');
