@@ -7,6 +7,7 @@
  * @website https://www.j2commerce.com
  */
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Date\Date;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Installer\Installer;
@@ -104,6 +105,14 @@ class Com_J2storeInstallerScript extends InstallerScript
     private $templateOverrideWarnings = null;
 
     /**
+     * The previously installed J2Store version (from #__extensions.manifest_cache,
+     * captured in preflight() before Joomla overwrites it). Null on a fresh install.
+     *
+     * @var string|null
+     */
+    private $_previousVersion = null;
+
+    /**
      * Extra modules and plugins to install on component installation / update,
      * and to remove on component uninstallation.
      *
@@ -197,6 +206,10 @@ class Com_J2storeInstallerScript extends InstallerScript
         // parent::preflight() sets $this->extension via $parent->getName(), so getItemArray() is safe to use here.
         if ($type === 'update') {
             $installed = $this->getItemArray('manifest_cache', '#__extensions', 'name', $this->extension);
+
+            // remember the previously installed version so postflight() can decide
+            // whether the uploads folder security scan needs to run again
+            $this->_previousVersion = $installed['version'] ?? null;
 
             if (isset($installed['version']) && version_compare($installed['version'], '4.0.5', 'lt')) {
                 $this->_log('preflight() – blocked: installed version ' . $installed['version'] . ' is too old for direct update', 'ERROR');
@@ -441,14 +454,22 @@ class Com_J2storeInstallerScript extends InstallerScript
             $this->_log('_runPostflight() – Step 7b: done');
 
             // ---- Step 7c: Security exploitation check ----
-            $this->_log('_runPostflight() – Step 7c: running exploitation check');
-            $this->securityCheckResult = $this->_checkForExploitation();
-            $verdict = $this->_getExploitationVerdict($this->securityCheckResult);
-            $this->_log('_runPostflight() – Step 7c: verdict=' . $verdict);
-            if ($verdict === 'hacked') {
-                $this->_log('_runPostflight() – Step 7c: verdict is hacked, removing exploitation files');
-                $this->securityCleanupResult = $this->_removeExploitationFiles($this->securityCheckResult);
-                $this->_log('_runPostflight() – Step 7c: cleanup done, removed=' . count($this->securityCleanupResult['removed_files']) . ' failed=' . count($this->securityCleanupResult['failed_files']));
+            if ($this->_isUploadSecurityCheckDone()) {
+                $this->_log('_runPostflight() – Step 7c: skipped, already scanned and recorded on this site');
+            } elseif ($this->_wasAlreadyScannedByPreviousVersion($this->_previousVersion)) {
+                $this->_log('_runPostflight() – Step 7c: skipped, previous version ' . $this->_previousVersion . ' already scanned; recording flag');
+                $this->_markUploadSecurityCheckDone();
+            } else {
+                $this->_log('_runPostflight() – Step 7c: running exploitation check');
+                $this->securityCheckResult = $this->_checkForExploitation();
+                $verdict = $this->_getExploitationVerdict($this->securityCheckResult);
+                $this->_log('_runPostflight() – Step 7c: verdict=' . $verdict);
+                if ($verdict === 'hacked') {
+                    $this->_log('_runPostflight() – Step 7c: verdict is hacked, removing exploitation files');
+                    $this->securityCleanupResult = $this->_removeExploitationFiles($this->securityCheckResult);
+                    $this->_log('_runPostflight() – Step 7c: cleanup done, removed=' . count($this->securityCleanupResult['removed_files']) . ' failed=' . count($this->securityCleanupResult['failed_files']));
+                }
+                $this->_markUploadSecurityCheckDone();
             }
 
             // ---- Step 7d: Template override CSRF check ----
@@ -1298,6 +1319,78 @@ class Com_J2storeInstallerScript extends InstallerScript
     // -------------------------------------------------------------------------
     // Security exploitation check
     // -------------------------------------------------------------------------
+
+    /**
+     * Whether the uploads folder security scan has already been run and
+     * recorded for this site, via the 'security_upload_check_done' component
+     * parameter. Shared with the admin dashboard warning in
+     * J2Help::security_upload_check(), which also honours this flag.
+     *
+     * @return bool
+     */
+    private function _isUploadSecurityCheckDone(): bool
+    {
+        try {
+            $params = ComponentHelper::getParams($this->componentName);
+            return (bool) $params->get('security_upload_check_done', 0);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Whether the previously installed version's own postflight() already
+     * performed this scan, so a fresh install landing straight on a
+     * post-fix version does not need to run it again. This CVE fix (and the
+     * scan itself) shipped independently on two maintenance lines:
+     *  - the 4.0.x line, starting at 4.0.21 / 4.0.22
+     *  - the 4.1.x line, starting at 4.1.6
+     * so both thresholds must be checked rather than a single version_compare().
+     *
+     * @param  string|null $previousVersion
+     * @return bool
+     */
+    private function _wasAlreadyScannedByPreviousVersion(?string $previousVersion): bool
+    {
+        if ($previousVersion === null || $previousVersion === '') {
+            return false;
+        }
+
+        if (version_compare($previousVersion, '4.1.0', 'lt')) {
+            return version_compare($previousVersion, '4.0.21', 'ge');
+        }
+
+        return version_compare($previousVersion, '4.1.6', 'ge');
+    }
+
+    /**
+     * Persists the 'security_upload_check_done' flag to the com_j2store
+     * component parameters so future updates - and the admin dashboard warning
+     * in J2Help::security_upload_check() - skip the uploads folder scan.
+     *
+     * @return void
+     */
+    private function _markUploadSecurityCheckDone(): void
+    {
+        try {
+            $component = ComponentHelper::getComponent($this->componentName);
+            $params    = $component->getParams();
+            $params->set('security_upload_check_done', 1);
+
+            $db   = Factory::getDbo();
+            $data = $params->toString();
+
+            $query = $db->getQuery(true)
+                ->update($db->quoteName('#__extensions'))
+                ->set($db->quoteName('params') . ' = ' . $db->quote($data))
+                ->where($db->quoteName('element') . ' = ' . $db->quote($this->componentName))
+                ->where($db->quoteName('type') . ' = ' . $db->quote('component'));
+            $db->setQuery($query);
+            $db->execute();
+        } catch (\Exception $e) {
+            $this->_log('_markUploadSecurityCheckDone() – failed: ' . $e->getMessage(), 'WARNING');
+        }
+    }
 
     /**
      * Scans for evidence that the unauthenticated file upload vulnerability
