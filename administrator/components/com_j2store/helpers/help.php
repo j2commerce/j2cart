@@ -174,6 +174,14 @@ class J2Help {
      */
     public function security_upload_check(): string
     {
+        $type = 'j2store_upload_security_warning';
+
+        // The admin has already reviewed and hidden this warning.
+        $config = J2Store::config();
+        if ($config->get($type, 0)) {
+            return '';
+        }
+
         try {
             $db     = Factory::getDbo();
             $prefix = $db->getPrefix();
@@ -326,6 +334,9 @@ class J2Help {
             $html .= '<p><strong>&#x26A0; Missing directory protection files:</strong><br>'
                 . '<code>' . $e(implode(', ', $protectionMissing)) . '</code></p>';
         }
+
+        $url = Route::_('index.php?option=com_j2store&view=cpanels&task=notifications&message_type=' . $type . '&' . Session::getFormToken() . '=1');
+        $html .= '<a class="btn btn-sm btn-dark text-light text-nowrap" href="' . $url . '">' . Text::_('J2STORE_GOT_IT_AND_HIDE') . '</a>';
 
         $html .= '</div>';
 

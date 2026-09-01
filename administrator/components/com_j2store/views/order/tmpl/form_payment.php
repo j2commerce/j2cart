@@ -23,7 +23,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 		<?php if(!empty($this->item->transaction_id)): ?>
 		<tr>
 			<td><?php echo JText::_('J2STORE_ORDER_TRANSACTION_ID'); ?></td>
-			<td><?php echo $this->item->transaction_id; ?></td>
+			<td><?php echo htmlspecialchars($this->item->transaction_id, ENT_QUOTES, 'UTF-8'); ?></td>
 		</tr>
 		<?php endif; ?>
 		<tr>
@@ -71,7 +71,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                     </small>
                                 </div>
                                 <p>
-                                    <?php echo JText::_($this->item->transaction_status); ?>
+                                    <?php echo htmlspecialchars(JText::_($this->item->transaction_status), ENT_QUOTES, 'UTF-8'); ?>
                                 </p>
                             </li>
                             <li><?php echo JText::_('J2STORE_ORDER_TRANSACTION_DETAILS'); ?> <br>
@@ -80,7 +80,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
                                     </small>
                                 </div>
                                 <p>
-                                    <?php echo JText::_($this->item->transaction_details); ?>
+                                    <?php echo nl2br(htmlspecialchars($this->item->transaction_details, ENT_QUOTES, 'UTF-8')); ?>
                                 </p>
                             </li>
 
