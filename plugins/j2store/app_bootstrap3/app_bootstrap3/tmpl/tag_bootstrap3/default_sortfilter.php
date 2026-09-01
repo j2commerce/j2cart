@@ -13,7 +13,7 @@ $filter_tag = isset($this->filter_tag) ? $this->filter_tag : '';
 ?>
 <?php  $currency = $this->currency->getSymbol();?>
 <form class="form-inline" id="productFilters" name="productfilters"  action="<?php echo JRoute::_('index.php');?>" data-link="<?php echo JRoute::_($this->active_menu->link.'&Itemid='.$this->active_menu->id);?>" method="post">
-		<input type="hidden" name="filter_tag" id="sort_filter_tag"  value ="<?php echo $filter_tag;?>" />
+		<input type="hidden" name="filter_tag" id="sort_filter_tag"  value ="<?php echo htmlspecialchars($filter_tag, ENT_QUOTES, 'UTF-8');?>" />
 		<?php if($this->params->get('list_show_filter_search')):?>
 		<?php $search = htmlspecialchars($this->state->search);?>
    		<?php echo J2html::text('search',$search,array('class'=>'j2store-product-search-input'));?>

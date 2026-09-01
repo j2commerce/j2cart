@@ -36,8 +36,8 @@ class J2StoreControllerProductsBase extends F0FController
         $state['manufacturer_id'] = $app->input->getString('manufacturer_id', 0);
         $state['productid_from'] = $app->input->getString('productid_from', '');
         $state['productid_to'] = $app->input->getString('productid_to', '');
-        $state['pricefrom'] = $app->input->getString('pricefrom', '');
-        $state['priceto'] = $app->input->getString('priceto', '');
+        $state['pricefrom'] = $app->input->getFloat('pricefrom', 0.0);
+        $state['priceto'] = $app->input->getFloat('priceto', 0.0);
         $state['since'] = $app->input->getString('since', '');
         $state['until'] = $app->input->getString('until', '');
         $state['taxprofile_id'] = $app->input->getString('taxprofile_id', '');
@@ -1146,8 +1146,8 @@ class J2StoreControllerProductsBase extends F0FController
         $state['manufacturer_id'] = $app->input->getString('manufacturer_id', '');
         $state['productid_from'] = $app->input->getString('productid_from', '');
         $state['productid_to'] = $app->input->getString('productid_to', '');
-        $state['pricefrom'] = $app->input->getString('pricefrom', '');
-        $state['priceto'] = $app->input->getString('priceto', '');
+        $state['pricefrom'] = $app->input->getFloat('pricefrom', 0.0);
+        $state['priceto'] = $app->input->getFloat('priceto', 0.0);
         $state['since'] = $app->input->getString('since', '');
         $state['until'] = $app->input->getString('until', '');
         $state['taxprofile_id'] = $app->input->getString('taxprofile_id', '');

@@ -43,7 +43,7 @@ $tagid = JFactory::getApplication()->input->getInt('tagid',0);?>
 	name="productsideFilters"
 	data-link="<?php echo $this->active_menu->link.'&Itemid='.$this->active_menu->id;?>"
 	enctype="multipart/form-data">
-	<input type="hidden" name="filter_tag" id="filter_tag"  value ="<?php echo $filter_tag;?>" />
+	<input type="hidden" name="filter_tag" id="filter_tag"  value ="<?php echo htmlspecialchars($filter_tag, ENT_QUOTES, 'UTF-8');?>" />
 	<!-- Price Filters Starts Here -->
 	<?php if($this->params->get('list_show_filter_price', 0) && isset($this->filters['pricefilters']) && count($this->filters['pricefilters'])): ?>
 		<?php
