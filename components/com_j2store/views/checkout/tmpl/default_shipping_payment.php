@@ -239,3 +239,4 @@ foreach($removeFields[1] as $fieldName) {
        value="shipping_payment_method_validate" />
 <input type="hidden" name="option" value="com_j2store" />
 <input type="hidden" name="view" value="checkout" />
+<?php echo JHtml::_('form.token'); ?>

@@ -9,7 +9,7 @@
 // No direct access
 defined('_JEXEC') or die;
 ?>
-<div class="product-<?php echo $this->product->j2store_product_id; ?> <?php echo $this->product->product_type; ?>-product">
+<div class="product-<?php echo $this->product->j2store_product_id; ?> <?php echo $this->escape($this->product->product_type); ?>-product">
 	<div class="row">
 		<div class="col-sm-6">
 			<?php $images = $this->loadTemplate('images');
@@ -50,7 +50,7 @@ defined('_JEXEC') or die;
 					id="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
 					name="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
 					data-product_id="<?php echo $this->product->j2store_product_id; ?>"
-					data-product_type="<?php echo $this->product->product_type; ?>"
+					data-product_type="<?php echo $this->escape($this->product->product_type); ?>"
 					<?php if(isset($this->product->variant_json)): ?>
 						data-product_variants="<?php echo $this->escape($this->product->variant_json);?>"
 					<?php endif; ?>

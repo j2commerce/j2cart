@@ -384,6 +384,22 @@ class plgJ2StorePayment_sagepayform extends J2StorePaymentPlugin
                 //order status has already been updated. So return;
                 return JText::_($this->params->get('onafterpayment', ''));
             }
+
+            // Verify the gateway-reported amount/currency actually match this
+            // order before trusting Status at all. SagePay Form's Crypt field
+            // is AES-CBC with no message authentication code, so a tampered
+            // callback could otherwise claim any Status/Amount for a
+            // legitimate VendorTxCode. Recomputed with the same formula used
+            // to build the outbound request, so it stays correct per-currency.
+            $currency_values = $this->getCurrency($orderpayment);
+            $expected_amount = J2Store::currency()->format($orderpayment->order_total, $currency_values['currency_code'], $currency_values['currency_value'], false);
+            $amount_verified = isset($data['Amount']) && (string) $data['Amount'] === (string) $expected_amount
+                && isset($data['Currency']) && strcasecmp($data['Currency'], $currency_values['currency_code']) === 0;
+
+            if (!$amount_verified) {
+                $this->_log('Expected '.$expected_amount.' '.$currency_values['currency_code'].', gateway reported '.(isset($data['Amount']) ? $data['Amount'] : '?').' '.(isset($data['Currency']) ? $data['Currency'] : '?'), 'SagePay amount/currency verification failed');
+                $error = JText::_('J2STORE_SAGEPAYFORM_MESSAGE_INVALID_ORDERPAYMENTID');
+            } else {
             switch ($data['Status']) {
                 case 'OK':
                     $orderpayment->payment_complete();
@@ -407,6 +423,7 @@ class plgJ2StorePayment_sagepayform extends J2StorePaymentPlugin
                 case 'ABORT':
                     return JText::_($this->params->get('oncancelpayment', ''));
                     break;
+            }
             }
 
             // save the orderpayment

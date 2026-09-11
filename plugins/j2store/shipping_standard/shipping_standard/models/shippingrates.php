@@ -44,10 +44,11 @@ class J2StoreModelShippingRates extends F0FModel
        	}
     	if (strlen($filter_weight))
         {
+        	$safe_weight = (float) $filter_weight;
         	$query->where("(
-        		tbl.shipping_rate_weight_start <= '".$filter_weight."'
+        		tbl.shipping_rate_weight_start <= '".$safe_weight."'
         		AND (
-                    tbl.shipping_rate_weight_end >= '".$filter_weight."'
+                    tbl.shipping_rate_weight_end >= '".$safe_weight."'
                     OR
                     tbl.shipping_rate_weight_end = '0.000'
                     )
@@ -60,7 +61,8 @@ class J2StoreModelShippingRates extends F0FModel
 
         if (is_array($filter_geozones))
         {
-            $query->where("tbl.geozone_id IN ('" . implode("', '", $filter_geozones ) . "')" );
+            $safe_geozones = array_map('intval', $filter_geozones);
+            $query->where("tbl.geozone_id IN ('" . implode("', '", $safe_geozones ) . "')" );
         }
     }
 

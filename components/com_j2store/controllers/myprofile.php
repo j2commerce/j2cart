@@ -171,6 +171,7 @@ class J2StoreControllerMyProfile extends F0FController
 
 
 	function deleteAddress(){
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
         $platform = J2Store::platform();
         $app = $platform->application();
 		$o_id = $app->input->getInt('address_id');
@@ -208,6 +209,8 @@ class J2StoreControllerMyProfile extends F0FController
 	 * @return result
 	 */
 	function saveAddress(){
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$values = $app->input->getArray($_POST);

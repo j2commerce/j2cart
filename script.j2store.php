@@ -1842,6 +1842,25 @@ class Com_J2storeInstallerScript extends InstallerScript
             'carts/default_coupon.php',
             'carts/default_shipping.php',
             'carts/default_voucher.php',
+            'myprofile/address.php',
+        ];
+
+        /* These files render a checkout step as loose hidden option/view/task inputs (no <form> wrapper —
+           the fields are collected by JS) and need a JHtml form.token hidden input added alongside them. */
+        $hiddenTokenFiles = [
+            'checkout/default_login.php',
+            'checkout/default_register.php',
+            'checkout/default_guest.php',
+            'checkout/default_guest_shipping.php',
+            'checkout/default_billing.php',
+            'checkout/default_shipping.php',
+            'checkout/default_shipping_payment.php',
+        ];
+
+        /* The order-placement AJAX call is a hardcoded query string and needs JSession::getFormToken()
+           appended to it as a query parameter. */
+        $queryStringFiles = [
+            'checkout/default.php',
         ];
 
         $jsFormFiles = [
@@ -1863,6 +1882,26 @@ class Com_J2storeInstallerScript extends InstallerScript
                 $warnings[] = [
                     'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
                     'type' => 'php_form',
+                ];
+            }
+        }
+
+        foreach ($hiddenTokenFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasFormToken($full)) {
+                $warnings[] = [
+                    'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
+                    'type' => 'hidden_input',
+                ];
+            }
+        }
+
+        foreach ($queryStringFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasGetFormToken($full)) {
+                $warnings[] = [
+                    'file' => 'templates/' . $template . '/html/com_j2store/' . $file,
+                    'type' => 'query_string',
                 ];
             }
         }
@@ -1930,14 +1969,20 @@ class Com_J2storeInstallerScript extends InstallerScript
             return;
         }
 
-        $phpFormFiles   = [];
-        $jsFormFiles    = [];
-        $arrayFormFiles = [];
-        $dataFormFiles  = [];
+        $phpFormFiles     = [];
+        $hiddenTokenFiles = [];
+        $queryStringFiles = [];
+        $jsFormFiles      = [];
+        $arrayFormFiles   = [];
+        $dataFormFiles    = [];
 
         foreach ($this->templateOverrideWarnings as $w) {
             if ($w['type'] === 'php_form') {
                 $phpFormFiles[] = $w['file'];
+            } elseif ($w['type'] === 'hidden_input') {
+                $hiddenTokenFiles[] = $w['file'];
+            } elseif ($w['type'] === 'query_string') {
+                $queryStringFiles[] = $w['file'];
             } elseif ($w['type'] === 'js_form') {
                 $jsFormFiles[] = $w['file'];
             } elseif ($w['type'] === 'array_form') {
@@ -1974,6 +2019,26 @@ class Com_J2storeInstallerScript extends InstallerScript
                 </ul>
                 <p>Example of the corrected JavaScript form string:</p>
                 <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;input type="file" name="file" /&gt;</form&gt;');</pre>
+            <?php endif; ?>
+
+            <?php if (!empty($hiddenTokenFiles)): ?>
+                <p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_('form.token'); ?&gt;</code>
+                   alongside the existing hidden <code>option</code>/<code>view</code>/<code>task</code> inputs (these files have no <code>&lt;form&gt;</code> wrapper — the fields are collected by JS):</strong></p>
+                <ul>
+                    <?php foreach ($hiddenTokenFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <?php if (!empty($queryStringFiles)): ?>
+                <p><strong>In the following file(s), append <code>'&amp;'.JSession::getFormToken().'=1'</code> to the hardcoded order-placement AJAX query string:</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">data: 'option=com_j2store&amp;view=checkout&amp;task=confirm&amp;'.JSession::getFormToken().'=1'</pre>
+                <ul>
+                    <?php foreach ($queryStringFiles as $f): ?>
+                        <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
             <?php endif; ?>
 
             <?php if (!empty($arrayFormFiles)): ?>

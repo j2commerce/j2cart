@@ -39,7 +39,7 @@ $platform = J2Store::platform();
                     <?php if(!in_array($cross_sell_product->product_type,array('variable','flexivariable'))): ?>
                         <?php  $cross_sell_css = $cross_sell_product->params->get('product_css_class','');?>
                     <?php endif; ?>
-                    <div class="col-sm-<?php echo round((12 / $columns));?> upsell-product product-<?php echo $cross_sell_product->j2store_product_id;?> <?php echo isset($cross_sell_css) ? $cross_sell_css:''; ?>  ">
+                    <div class="col-sm-<?php echo round((12 / $columns));?> upsell-product product-<?php echo $cross_sell_product->j2store_product_id;?> <?php echo isset($cross_sell_css) ? $this->escape($cross_sell_css):''; ?>  ">
 						<span class="cross-sell-product-image">
                             <?php
                                 $thumb_image = '';

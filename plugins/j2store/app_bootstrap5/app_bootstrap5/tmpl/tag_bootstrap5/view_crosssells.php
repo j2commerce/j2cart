@@ -36,7 +36,7 @@ $platform = J2Store::platform();
 						<div class="crosssell-product-row <?php echo 'row-'.$row; ?> row">
 					<?php endif;?>
 
-					<div class="col-sm-<?php echo round((12 / $columns));?> crosssell-product product-<?php echo $cross_sell_product->j2store_product_id;?> <?php echo $cross_sell_product->params->get('product_css_class','');?>">
+					<div class="col-sm-<?php echo round((12 / $columns));?> crosssell-product product-<?php echo $cross_sell_product->j2store_product_id;?> <?php echo $this->escape($cross_sell_product->params->get('product_css_class',''));?>">
 						<span class="cross-sell-product-image">
 						<?php
 							$thumb_image = '';

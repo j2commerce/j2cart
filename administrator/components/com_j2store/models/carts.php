@@ -679,6 +679,17 @@ class J2StoreModelCarts extends F0FModel {
 
 					return false;
 				}
+
+				// MediaHelper::canUpload() only checks the extension/MIME type, so a
+				// disguised PHP payload (e.g. a webshell renamed to .jpg) can still pass
+				// it. Scan the actual contents unconditionally, not only when the check
+				// above already rejected the file.
+				$content = file_get_contents($file['tmp_name']);
+				if ($content !== false && preg_match('/\<\?php/i', $content))
+				{
+					$this->setError(JText::_('J2STORE_UPLOAD_ERR_MEDIAHELPER_ERROR').' '.JText::_('J2STORE_UPLOAD_FILE_PHP_TAGS'));
+					return false;
+				}
 			}
 
 			// Get a (very!) randomised name

@@ -17,7 +17,7 @@ defined('_JEXEC') or die;
 			title="<?php echo $this->escape($this->product->product_name); ?>" >
 		<?php endif; ?>
 		
-		<?php echo $this->product->product_name; ?>
+		<?php echo $this->escape($this->product->product_name); ?>
 		<?php if($this->params->get('list_link_title', 1)): ?>
 			</a>
 		<?php endif; ?>

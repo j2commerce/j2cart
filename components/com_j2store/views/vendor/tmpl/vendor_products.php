@@ -19,9 +19,9 @@ defined('_JEXEC') or die;
 	<tbody>
 		<?php foreach($this->item->products as $product):?>
 		<tr>
-			<td><?php echo $product->product_name;?></td>
-			<td><?php echo $product->product_type;?></td>
-			<td><?php echo $product->product_type;?></td>
+			<td><?php echo $this->escape($product->product_name);?></td>
+			<td><?php echo $this->escape($product->product_type);?></td>
+			<td><?php echo $this->escape($product->product_type);?></td>
 			<td>
 				<a class="btn btn-primary" href="<?php echo JRoute::_('index.php?option=com_content&task=article.edit&a_id='.$product->product_source_id);?>" >
 					<?php echo JText::_('J2STORE_EDIT')?>

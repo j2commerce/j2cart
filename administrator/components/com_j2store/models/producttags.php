@@ -768,7 +768,11 @@ class J2StoreModelProducttags extends F0FModel {
 			} else {
 				$product_types = $state->product_types;
 			}
-			$query->where ( '#__j2store_products.product_type IN (\'' . implode ( '\',\'', $product_types ) . '\')' );
+			$valid_product_types = F0FModel::getTmpInstance ( 'Products', 'J2StoreModel' )->getProductTypes();
+			$product_types = array_intersect ( $product_types, array_keys ( $valid_product_types ) );
+			if (count ( $product_types ) > 0) {
+				$query->where ( '#__j2store_products.product_type IN (' . implode ( ',', array_map ( array ( $db, 'q' ), $product_types ) ) . ')' );
+			}
 		}
 
 		if(!is_null ( $state->show_feature_only ) && !empty( $state->show_feature_only )){

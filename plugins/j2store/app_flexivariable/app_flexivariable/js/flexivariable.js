@@ -60,7 +60,7 @@ function doFlexiAjaxPrice(product_id, id) {
                     && typeof response.error == 'undefined' ) {
                     //SKU
                     if (response.sku) {
-                        $product.find('.sku').html(response.sku);
+                        $product.find('.sku').text(response.sku);
                     }
 
                     if(response.pricing){
@@ -121,12 +121,12 @@ function doFlexiAjaxPrice(product_id, id) {
 
                     //dimensions
                     if (response.dimensions) {
-                        $product.find('.product-dimensions').html(response.dimensions);
+                        $product.find('.product-dimensions').text(response.dimensions);
                     }
 
                     //weight
                     if (response.weight) {
-                        $product.find('.product-weight').html(response.weight);
+                        $product.find('.product-weight').text(response.weight);
                     }
 
 

@@ -156,6 +156,8 @@ class J2StoreControllerCheckouts extends F0FController
 
 	function login_validate() {
 
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$session = JFactory::getSession();
@@ -283,6 +285,8 @@ class J2StoreControllerCheckouts extends F0FController
 	}
 
 	function register_validate() {
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
         $platform = J2Store::platform();
 		$app = $platform->application();
 		$user = JFactory::getUser();
@@ -519,6 +523,8 @@ class J2StoreControllerCheckouts extends F0FController
 
 	function guest_validate() {
 
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
 		$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
@@ -740,6 +746,8 @@ class J2StoreControllerCheckouts extends F0FController
 	}
 
 	function guest_shipping_validate() {
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
 		$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
@@ -950,6 +958,8 @@ class J2StoreControllerCheckouts extends F0FController
 
 	function billing_address_validate() {
 
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
 		$user = JFactory::getUser();
@@ -1155,6 +1165,8 @@ class J2StoreControllerCheckouts extends F0FController
 	}
 
 	function shipping_address_validate() {
+
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
@@ -1406,6 +1418,8 @@ class J2StoreControllerCheckouts extends F0FController
 
 	function shipping_payment_method_validate() {
 
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
 		$user = JFactory::getUser();
@@ -1621,6 +1635,8 @@ class J2StoreControllerCheckouts extends F0FController
 	}
 
 	function confirm() {
+
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//no cache
 		J2Store::utilities()->nocache();

@@ -441,6 +441,25 @@ class J2Help {
             'carts/default_coupon.php',
             'carts/default_shipping.php',
             'carts/default_voucher.php',
+            'myprofile/address.php',
+        ];
+
+        // Checkout step files render loose hidden option/view/task inputs (no <form> wrapper —
+        // the fields are collected by JS) and need a JHtml form.token hidden input added alongside them.
+        $hiddenTokenFiles = [
+            'checkout/default_login.php',
+            'checkout/default_register.php',
+            'checkout/default_guest.php',
+            'checkout/default_guest_shipping.php',
+            'checkout/default_billing.php',
+            'checkout/default_shipping.php',
+            'checkout/default_shipping_payment.php',
+        ];
+
+        // The order-placement AJAX call is a hardcoded query string and needs
+        // JSession::getFormToken() appended to it as a query parameter.
+        $queryStringFiles = [
+            'checkout/default.php',
         ];
 
         $jsFormFiles = [
@@ -456,15 +475,31 @@ class J2Help {
             'carts/default_items.php',
         ];
 
-        $phpWarnings   = [];
-        $jsWarnings    = [];
-        $arrayWarnings = [];
-        $dataWarnings  = [];
+        $phpWarnings         = [];
+        $hiddenTokenWarnings = [];
+        $queryStringWarnings = [];
+        $jsWarnings          = [];
+        $arrayWarnings       = [];
+        $dataWarnings        = [];
 
         foreach ($phpFormFiles as $file) {
             $full = $comOverridePath . '/' . $file;
             if (file_exists($full) && !$hasFormToken($full)) {
                 $phpWarnings[] = 'templates/' . $template . '/html/com_j2store/' . $file;
+            }
+        }
+
+        foreach ($hiddenTokenFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasFormToken($full)) {
+                $hiddenTokenWarnings[] = 'templates/' . $template . '/html/com_j2store/' . $file;
+            }
+        }
+
+        foreach ($queryStringFiles as $file) {
+            $full = $comOverridePath . '/' . $file;
+            if (file_exists($full) && !$hasGetFormToken($full)) {
+                $queryStringWarnings[] = 'templates/' . $template . '/html/com_j2store/' . $file;
             }
         }
 
@@ -517,7 +552,7 @@ class J2Help {
             }
         }
 
-        if (empty($phpWarnings) && empty($jsWarnings) && empty($arrayWarnings) && empty($dataWarnings)) {
+        if (empty($phpWarnings) && empty($hiddenTokenWarnings) && empty($queryStringWarnings) && empty($jsWarnings) && empty($arrayWarnings) && empty($dataWarnings)) {
             return '';
         }
 
@@ -535,6 +570,26 @@ class J2Help {
             $html .= '<p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_(\'form.token\'); ?&gt;</code> '
                 . 'immediately before each <code>&lt;/form&gt;</code> closing tag:</strong></p><ul>';
             foreach ($phpWarnings as $f) {
+                $html .= '<li><code>' . $e($f) . '</code></li>';
+            }
+            $html .= '</ul>';
+        }
+
+        if (!empty($hiddenTokenWarnings)) {
+            $html .= '<p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_(\'form.token\'); ?&gt;</code> '
+                . 'alongside the existing hidden <code>option</code>/<code>view</code>/<code>task</code> inputs (these files have no <code>&lt;form&gt;</code> wrapper — the fields are collected by JS):</strong></p><ul>';
+            foreach ($hiddenTokenWarnings as $f) {
+                $html .= '<li><code>' . $e($f) . '</code></li>';
+            }
+            $html .= '</ul>';
+        }
+
+        if (!empty($queryStringWarnings)) {
+            $html .= '<p><strong>In the following file(s), append <code>\'&amp;\'.JSession::getFormToken().\'=1\'</code> '
+                . 'to the hardcoded order-placement AJAX query string:</strong></p>'
+                . '<pre style="background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">data: \'option=com_j2store&amp;view=checkout&amp;task=confirm&amp;\'.JSession::getFormToken().\'=1\'</pre>'
+                . '<ul>';
+            foreach ($queryStringWarnings as $f) {
                 $html .= '<li><code>' . $e($f) . '</code></li>';
             }
             $html .= '</ul>';

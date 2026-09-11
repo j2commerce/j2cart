@@ -118,11 +118,7 @@ class J2User
 		$config = JComponentHelper::getParams('com_users');
 		// Default to Registered.
 		$defaultUserGroup = $config->get('new_usertype', 2);
-		if(version_compare(JVERSION, '3.2.1', 'ge')) {
-			$md5_pass = JUserHelper::hashPassword($details['password']);
-		}else {
-			$md5_pass = md5($details['password']);
-		}
+		$md5_pass = JUserHelper::hashPassword($details['password']);
 
 		$instance->set('id'         , 0);
 		$instance->set('name'           , $details['name']);
