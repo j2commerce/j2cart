@@ -387,7 +387,7 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
         }
         $rootURL = $platform->getRootUrl();
         $vars->post_url = $this->_getPostUrl();
-        $return_url = $this->getReturnUrl();
+        $return_url = $this->getReturnUrl($order);
 
         $vars->return_url = $rootURL.$return_url;
         $vars->cancel_url = $rootURL.$platform->getCheckoutUrl(array('task' => 'confirmPayment', 'orderpayment_type' => $this->_element, 'paction' => 'cancel'));
@@ -977,6 +977,7 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
         $this->_log ( $this->_getFormattedTransactionDetails ( $data ), 'notify raw response' );
 
         $error = '';
+        $ipn_verified = true;
 
         // prepare some data
         $validate_ipn = $this->params->get('validate_ipn', 1);
@@ -995,8 +996,10 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
                 {
                     //ipn api validation
                     if(!$this->checkStatusOfPaypal($data)){
-                        // ipn Validation failed
+                        // ipn Validation failed. This request cannot be trusted to have
+                        // come from PayPal, so it must not be allowed to change order state.
                         $error = $errorV;
+                        $ipn_verified = false;
                     }
                 }
 
@@ -1012,9 +1015,13 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
         {
             $payment_error = '';
 
-            if ($data['txn_type'] == 'cart') {
+            if (!$ipn_verified) {
+                // Never mutate order state for a callback we could not confirm came from PayPal.
+                $this->_log('Rejecting unverified IPN, custom=' . @$data['custom']);
+            }
+            elseif ($data['txn_type'] == 'cart') {
                 // Payment received for multiple items; source is Express Checkout or the PayPal Shopping Cart.
-                $payment_error = $this->_processSale( $data, $error );
+                $payment_error = $this->_processSale( $data );
             }
             else {
                 // other methods not supported right now
@@ -1115,19 +1122,19 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
     /**
      * Processes the sale payment
      *
+     * Only ever invoked once _process() has confirmed the IPN is genuine
+     * (or the site owner has explicitly disabled IPN validation).
+     *
      * @param array $data IPN data
      * @return boolean Did the IPN Validate?
      * @access protected
      */
-    function _processSale($data, $ipnValidationFailed = '') {
+    function _processSale($data) {
         /*
          * validate the payment data
          */
         $errors = array ();
         $fof_helper = J2Store::fof();
-        if (! empty ( $ipnValidationFailed )) {
-            $errors [] = $ipnValidationFailed;
-        }
 
         if ($this->params->get ( 'sandbox', 0 )) {
             $merchant_email = trim ( $this->_getParam ( 'sandbox_merchant_email' ) );
@@ -1148,17 +1155,21 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
         $order = $fof_helper->loadTable('Order', 'J2StoreTable',array('order_id' => $order_id));
         if (! empty ( $order->order_id ) && ($order->order_id == $order_id)) {
 
+            // Only an order that's still awaiting a payment result may be moved by a
+            // gateway callback. This bounds what a forged or replayed callback can do
+            // (e.g. flipping an already-Confirmed/Processed/Cancelled order) even if
+            // validate_ipn has been turned off.
+            $awaiting_payment_states = array(5, 4); // New, Pending
+            if (!$order->has_status($awaiting_payment_states)) {
+                $this->_log("Ignoring PayPal callback for order {$order->order_id}: not awaiting payment (state {$order->get_status()})");
+                return '';
+            }
+
             $order->add_history(JText::_('J2STORE_PAYPAL_CALLBACK_IPN_RESPONSE_RECEIVED'));
 
-            // Only record PayPal's own transaction data once the callback has been
-            // confirmed as genuine. Storing it unconditionally let an unauthenticated
-            // POST to this listener write attacker-controlled text into the order,
-            // which was then rendered unescaped in the admin transaction log.
-            if (empty($ipnValidationFailed)) {
-                $order->transaction_details = $data ['transaction_details'];
-                $order->transaction_id = $data ['txn_id'];
-                $order->transaction_status = $data ['payment_status'];
-            }
+            $order->transaction_details = $data ['transaction_details'];
+            $order->transaction_id = $data ['txn_id'];
+            $order->transaction_status = $data ['payment_status'];
 
             // check the stored amount against the payment amount
 
@@ -1409,7 +1420,8 @@ class plgJ2StorePayment_paypal extends J2StorePaymentPlugin
             curl_setopt($ch, CURLOPT_URL, 'https://tlstest.paypal.com');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FAILONERROR, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
             //curl_setopt($ch, CURLOPT_SSLVERSION, 6); // CURL_SSLVERSION_TLSv1_2
             $result = curl_exec($ch);
             $err_no = curl_errno($ch);

@@ -171,7 +171,7 @@ class J2StoreTableProduct extends F0FTable
 		$product_filter = F0FTable::getAnInstance('ProductFilter' ,'J2StoreTable')->getClone();
 		if(!$product_filter->deleteProductFilterList($product_id)){
 			$status = false;
-		}	
+		}
 		return $status;
 	}
 
@@ -256,7 +256,7 @@ class J2StoreTableProduct extends F0FTable
         $user = JFactory::getUser();
         //access
         $access_groups = $user->getAuthorisedViewLevels();
-        
+
 		if($this->is_visible($product) && ((isset($product->source->access) && !empty($product->source->access) && in_array($product->source->access,$access_groups)) || !isset($product->source->access))){
             J2StoreStrapper::addJS();
 			J2StoreStrapper::addCSS();
@@ -276,6 +276,15 @@ class J2StoreTableProduct extends F0FTable
 			$view->assign('taxModel', $taxModel);
 			if($sublayout) {
 				$view->assign('sublayout', $sublayout);
+			}
+
+			// This product block can be rendered embedded in an article (default/tag add-to-cart
+			// placement) rather than via the native product view controller, which is the only
+			// other place that fires these content plugin events (see Products::executePlugins()).
+			// Without this, app plugins that hook onContentAfterDisplay (custom tabs, jcomments, etc.)
+			// never get a chance to inject their markup when a product is shown inside an article.
+			if(isset($product->source) && is_object($product->source) && isset($product->source->id)) {
+				$model->executePlugins($product->source, $params);
 			}
 
 			J2Store::plugin ()->event ( 'ViewItemProduct' , array(&$product,&$view) );
@@ -374,7 +383,7 @@ class J2StoreTableProduct extends F0FTable
 			ob_end_clean();
 			J2Store::plugin()->event('BeforeDisplayImages', array(&$html, $view, 'com_j2store.products.view.default'));
 			$html .= J2Store::plugin ()->eventWithHtml ( 'AfterRenderingProductImages' , array($this) );
-			
+
 		}
 		return $html;
 

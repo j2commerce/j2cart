@@ -138,6 +138,7 @@ if(empty($user->id)){
   <input type="hidden" id="address_id" name="address_id" value="<?php echo $this->address->j2store_address_id;?>" />
   <input type="hidden" id="j2store_address_id" name="j2store_address_id" value="<?php echo $this->address->j2store_address_id;?>" />
   <input type="hidden" name="user_id" value="<?php echo $this->address->user_id;?>" />
+  <?php echo JHtml::_('form.token'); ?>
 
   </form>
 

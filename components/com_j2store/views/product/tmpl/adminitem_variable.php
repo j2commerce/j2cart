@@ -25,7 +25,7 @@ $this->form_id = 'j2store-addtocart-form-'.$this->product->j2store_product_id;
 		id="<?php echo $this->form_id; ?>"
 		name="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
 		data-product_id="<?php echo $this->product->j2store_product_id; ?>"
-		data-product_type="<?php echo $this->product->product_type; ?>"
+		data-product_type="<?php echo $this->escape($this->product->product_type); ?>"
 		<?php if(isset($this->product->variant_json)): ?>
 		data-product_variants="<?php echo $this->escape($this->product->variant_json);?>"
 		<?php endif; ?>

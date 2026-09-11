@@ -37,7 +37,7 @@ $url = ltrim($baseUrl, '/');
 $siteurl = rtrim($url, '/');
 $request = '';
 foreach ($post as $key => $value) {
-	$request .= '&' . $key . '=' .$value;
+	$request .= '&' . urlencode((string) $key) . '=' . urlencode((string) $value);
 }
 
 $redirect = $siteurl.'/index.php?option=com_j2store&view=checkout&task=confirmPayment&orderpayment_type='.$plg_name.'&paction=process&tmpl=component'.$request;

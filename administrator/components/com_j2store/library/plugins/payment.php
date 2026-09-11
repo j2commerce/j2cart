@@ -389,11 +389,28 @@ class J2StorePaymentPlugin extends J2StorePluginBase
 
     /**
      * Return url for payment gateway
+     *
+     * @param object|null $order  The order this return url is being generated for. When
+     *                            given, a single-use nonce is appended so that
+     *                            confirmPayment() can identify the correct order when the
+     *                            buyer's browser is redirected back from the gateway,
+     *                            instead of trusting whatever order happens to be in the
+     *                            session at that point. The nonce is opaque and unrelated
+     *                            to the order's reusable guest-lookup token, so it's safe
+     *                            to expose in a URL (browser history, referrers, analytics,
+     *                            access logs): it's single-use and expires quickly, see
+     *                            J2Utilities::generateReturnToken().
      */
-    public function getReturnUrl()
+    public function getReturnUrl($order = null)
     {
         $platform = J2Store::platform();
         $url = $platform->getThankyouPageUrl(array('orderpayment_type' => $this->_element, 'paction' => 'display'));
+        if (!empty($order) && !empty($order->order_id)) {
+            $token = J2Store::utilities()->generateReturnToken($order);
+            if ($token !== '') {
+                $url .= '&order_token=' . $token;
+            }
+        }
         /*$menus = JMenu::getInstance('site');
         $url = 'index.php?option=com_j2store&view=checkout&task=confirmPayment&layout=postpayment&orderpayment_type='.$this->_element.'&paction=display';
         foreach ($menus->getMenu() as $menu){

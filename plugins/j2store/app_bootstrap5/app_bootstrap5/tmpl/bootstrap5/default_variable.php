@@ -44,7 +44,7 @@ echo $images;
 		id="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
 		name="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
 		data-product_id="<?php echo $this->product->j2store_product_id; ?>"
-		data-product_type="<?php echo $this->product->product_type; ?>"
+		data-product_type="<?php echo $this->escape($this->product->product_type); ?>"
 		<?php if(isset($this->product->variant_json)): ?>
 		data-product_variants="<?php echo $this->escape($this->product->variant_json);?>"
 		<?php endif; ?>
@@ -62,6 +62,9 @@ echo $images;
 <?php endif; ?>
 <input type="hidden" name="variant_id" value="<?php echo $this->product->variant->j2store_variant_id; ?>" />
 </form>
+<?php endif; ?>
+<?php if($this->params->get('item_use_tabs', 1)): ?>
+	<?php echo $this->loadTemplate('tabs'); ?>
 <?php endif; ?>
 <?php if(isset($this->product->event->afterDisplayContent)) : ?>
 	<?php echo $this->product->event->afterDisplayContent; ?>

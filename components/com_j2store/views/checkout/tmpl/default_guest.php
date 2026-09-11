@@ -130,6 +130,7 @@ $html = $html.$phtml;
 <input type="hidden" name="option" value="com_j2store" />
 <input type="hidden" name="view" value="checkout" />
 <input type="hidden" name="task" value="guest_validate" />
+<?php echo JHtml::_('form.token'); ?>
 
 <script type="text/javascript"><!--
 	(function($) {

@@ -54,6 +54,59 @@ class J2Utilities {
 			return true;
 	}
 
+	/**
+	 * Issue a single-use, short-lived token that lets confirmPayment() identify which
+	 * order an external gateway (PayPal, etc.) is redirecting the browser back for,
+	 * without exposing anything reusable (like the order's guest-lookup token) in the
+	 * URL. The token is an opaque, unguessable nonce; the order_id it maps to is kept
+	 * server-side only.
+	 *
+	 * @param object $order
+	 * @return string  the nonce, or '' on failure (caller should just omit it)
+	 */
+	public function generateReturnToken($order) {
+		if (empty($order) || empty($order->order_id)) {
+			return '';
+		}
+		try {
+			$nonce = bin2hex(random_bytes(16));
+			$cache = JFactory::getCache('com_j2store', 'output');
+			$cache->setCaching(true);
+			$cache->setLifeTime(60); // minutes
+			$cache->store((string) $order->order_id, 'j2store_return_' . $nonce);
+			return $nonce;
+		} catch (Exception $e) {
+			return '';
+		}
+	}
+
+	/**
+	 * Resolve and invalidate a token issued by generateReturnToken(). Single-use: the
+	 * mapping is removed as soon as it's read, so a token that later leaks (server
+	 * logs, analytics, browser history) is already worthless.
+	 *
+	 * @param string $nonce
+	 * @return string  the order_id it was issued for, or '' if missing/expired/already used
+	 */
+	public function consumeReturnToken($nonce) {
+		if (empty($nonce)) {
+			return '';
+		}
+		try {
+			$cache = JFactory::getCache('com_j2store', 'output');
+			$cache->setCaching(true);
+			$id = 'j2store_return_' . $nonce;
+			$order_id = $cache->get($id);
+			if ($order_id === false || $order_id === '' || $order_id === null) {
+				return '';
+			}
+			$cache->remove($id);
+			return (string) $order_id;
+		} catch (Exception $e) {
+			return '';
+		}
+	}
+
 	public function isJson($string) {
 		json_decode($string);
 		if(function_exists('json_last_error')) {
