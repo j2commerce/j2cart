@@ -397,18 +397,19 @@ class J2StoreModelOrderdownloads extends F0FModel {
 	}
 
 	/**
-	 * Rejects any product_file_save_name containing a parent-directory segment or an
-	 * absolute path. JPath::clean() (used throughout getFilePath()) only normalises
-	 * separators - it does not resolve or block ".." - so without this guard a
-	 * save_name of "../../../../etc/passwd" lets an anonymous, token-only download
-	 * request read any file readable by the webserver.
+	 * Rejects any product_file_save_name containing a parent-directory segment.
+	 * getFilePath() only ever uses this joined onto $base, so a leading slash is
+	 * harmless (it just collapses into a double separator that realpath() resolves
+	 * back inside $base) and some existing installs store names that way - but ".."
+	 * lets realpath() walk outside $base, which is what the containment check in
+	 * getFilePath() (and this guard, as a first line of defense) exist to stop.
 	 */
 	private function isSafeFileName($name) {
 		if (!is_string($name) || $name === '') {
 			return false;
 		}
 		$normalized = str_replace('\\', '/', $name);
-		if ($normalized[0] === '/' || preg_match('#(^|/)\.\.(/|$)#', $normalized)) {
+		if (preg_match('#(^|/)\.\.(/|$)#', $normalized)) {
 			return false;
 		}
 		return true;
