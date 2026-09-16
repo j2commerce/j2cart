@@ -415,6 +415,7 @@ class J2Help {
             'carts/default_coupon.php',
             'carts/default_shipping.php',
             'carts/default_voucher.php',
+            'checkout/default_confirm.php',
             'myprofile/address.php',
         ];
 
