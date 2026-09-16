@@ -67,6 +67,7 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
     <input type="hidden" name="task" value="login_validate" />
     <input type="hidden" name="option" value="com_j2store" />
     <input type="hidden" name="view" value="checkout" />
+    <?php echo JHtml::_('form.token'); ?>
     <br>
     <?php
     $forgot_pass_link = JRoute::_('index.php?option=com_users&view=reset');

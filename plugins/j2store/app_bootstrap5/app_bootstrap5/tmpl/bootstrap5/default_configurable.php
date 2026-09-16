@@ -43,7 +43,7 @@ defined('_JEXEC') or die;
 		id="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
 		name="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
 		data-product_id="<?php echo $this->product->j2store_product_id; ?>"
-		data-product_type="<?php echo $this->product->product_type; ?>"
+		data-product_type="<?php echo $this->escape($this->product->product_type); ?>"
 		enctype="multipart/form-data">
 
 <?php $cart_type = $this->params->get('list_show_cart', 1); ?>
@@ -61,6 +61,10 @@ defined('_JEXEC') or die;
 
 </form>
 
+<?php endif; ?>
+
+<?php if($this->params->get('item_use_tabs', 1)): ?>
+	<?php echo $this->loadTemplate('tabs'); ?>
 <?php endif; ?>
 
 <?php if(isset($this->product->event->afterDisplayContent)) : ?>

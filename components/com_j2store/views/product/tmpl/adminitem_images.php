@@ -102,7 +102,7 @@ $platform = j2store::platform();
 								 />
 						</li>
 							<?php elseif(!empty($image)):?>
-							<?php echo J2Store::product()->displayImage($this->product,array('type'=>'ViewAdditional','params' => $this->params,'key'=>$key,'image' => $image,'alt'=>(isset($additional_images_alt[$key]) && !empty($additional_images_alt[$key])) ? $additional_images_alt[$key] : $this->product->product_name)); ?>
+							<?php echo J2Store::product()->displayImage($this->product,array('type'=>'ViewAdditional','params' => $this->params,'key'=>$key,'image' => $image,'alt'=>(isset($additional_images_alt[$key]) && !empty($additional_images_alt[$key])) ? $this->escape($additional_images_alt[$key]) : $this->escape($this->product->product_name))); ?>
 					<?php endif;?>
 					<?php endforeach;?>
 						<?php if($main_image &&  JFile::exists(JPATH_SITE.'/'.$main_image)):?>

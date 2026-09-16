@@ -16,6 +16,28 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 	protected $cacheableTasks = array();
 	var $_catids = array();
 
+	/**
+	 * Block the F0F-inherited CRUD/state tasks on the front-end.
+	 *
+	 * This controller never overrode execute() the way carts.php/checkouts.php/
+	 * myprofile.php do, so F0FController's own add/edit/save/savenew/apply/
+	 * publish/unpublish/archive/trash/remove/copy/saveorder/orderup/orderdown
+	 * tasks were all still reachable via task=<name>. Each is only gated by
+	 * Joomla's core.edit/core.create/core.delete ACL for com_j2store (no
+	 * per-vendor ownership scoping), and F0F's CSRF check is skipped entirely
+	 * on the front-end whenever format != html, so any group ever granted
+	 * that ACL could edit/delete/create any product with a forged, tokenless
+	 * request. Only the tasks this controller actually implements for the
+	 * storefront are allowed through; everything else falls back to browse().
+	 */
+	public function execute($task) {
+		$allowed = array('browse', 'view', 'compare', 'update', 'wishlist');
+		if (!in_array($task, $allowed)) {
+			$task = 'browse';
+		}
+		return parent::execute($task);
+	}
+
 	public function browse() {
 		//first clear cache
 		$utility = J2Store::utilities();
@@ -46,7 +68,7 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 		//$model = F0FModel::getTmpInstance('Products', 'J2StoreModel');
 		$model = $this->getModel('Products');
 
-		//$model->clearState();
+		$model->clearState();
 		$view->setModel($model);
 
 
@@ -769,7 +791,13 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 		$item_id = "";
 		if(!empty($active)){
 			$back_link = isset( $_SERVER['HTTP_REFERER'] ) && $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER']: '';
-			if(empty($_SERVER['HTTP_REFERER'])){
+			// Only trust the Referer as the "back" target when it points at this site's
+			// own host. The view templates now escape back_link at output (which is what
+			// stops the XSS), but a forged Referer could otherwise still send visitors to
+			// an attacker-controlled site via the "back" link, so fall back to the active
+			// menu item's own link for anything off-site or unparsable.
+			$referer_host = $back_link !== '' ? parse_url($back_link, PHP_URL_HOST) : null;
+			if (empty($back_link) || empty($referer_host) || strcasecmp($referer_host, JUri::getInstance()->getHost()) !== 0) {
 				$back_link = $active->link;
 			}
 			$back_link_title = $active->title;

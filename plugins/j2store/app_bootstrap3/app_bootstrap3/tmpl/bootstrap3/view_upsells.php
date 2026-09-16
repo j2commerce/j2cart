@@ -38,7 +38,7 @@ $platform = J2Store::platform();
                     <?php if(!in_array($upsell_product->product_type,array('variable','flexivariable'))): ?>
                         <?php  $upsell_css = $upsell_product->params->get('product_css_class','');?>
                     <?php endif; ?>
-                    <div class="col-sm-<?php echo round((12 / $columns));?> upsell-product product-<?php echo $upsell_product->j2store_product_id;?> <?php echo isset($upsell_css) ? $upsell_css:''; ?> ">
+                    <div class="col-sm-<?php echo round((12 / $columns));?> upsell-product product-<?php echo $upsell_product->j2store_product_id;?> <?php echo isset($upsell_css) ? $this->escape($upsell_css):''; ?> ">
 							<span class="upsell-product-image">
 							<?php
                             $thumb_image = '';

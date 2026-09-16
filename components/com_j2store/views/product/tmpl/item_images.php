@@ -95,7 +95,7 @@ $platform = J2Store::platform();
                                          class="j2store-item-additionalimage-preview j2store-img-responsive"
                                          src="<?php echo $image_src; ?>"
                                          alt="<?php echo (isset($additional_images_alt[$key]) && !empty($additional_images_alt[$key])) ? $this->escape($additional_images_alt[$key]) : $this->escape($this->product->product_name); ?>"
-                                         title="<?php echo $this->product->product_name; ?>"
+                                         title="<?php echo $this->escape($this->product->product_name); ?>"
                                     />
                                 </li>
                             <?php elseif (!empty($image)): ?>

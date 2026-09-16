@@ -26,7 +26,7 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 
 					<div class="upsell-product-row <?php echo 'row-'.$row; ?> <?php echo $J2gridCol; ?>">
 					<?php endif;?>
-					<div class="<?php echo $J2gridCol.round((12 / $columns));?> upsell-product product-<?php echo $upsell_product->j2store_product_id;?> <?php echo $upsell_product->params->get('product_css_class','');?>">
+					<div class="<?php echo $J2gridCol.round((12 / $columns));?> upsell-product product-<?php echo $upsell_product->j2store_product_id;?> <?php echo $this->escape($upsell_product->params->get('product_css_class',''));?>">
 
 							<?php
 								$thumb_image = '';

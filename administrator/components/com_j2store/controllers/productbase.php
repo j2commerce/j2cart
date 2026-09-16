@@ -620,6 +620,8 @@ class J2StoreControllerProductsBase extends F0FController
 	*/
     function deleteFiles()
     {
+        JSession::checkToken( 'get' ) or die( 'Invalid Token' );
+
         $platform = J2Store::platform();
         $app = $platform->application();
         $variant_id = $app->input->getInt('variant_id');
@@ -867,6 +869,8 @@ class J2StoreControllerProductsBase extends F0FController
 	 */
     public function createproductfile()
     {
+        JSession::checkToken() or die( 'Invalid Token' );
+
         $platform = J2Store::platform();
         $fof_helper = J2Store::fof();
         $app = $platform->application();
@@ -894,6 +898,8 @@ class J2StoreControllerProductsBase extends F0FController
 	 */
     public function saveproductfiles()
     {
+        JSession::checkToken() or die( 'Invalid Token' );
+
         $platform = J2Store::platform();
         $fof_helper = J2Store::fof();
         $app = $platform->application();

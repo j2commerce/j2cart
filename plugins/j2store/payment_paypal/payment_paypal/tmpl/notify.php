@@ -27,17 +27,31 @@ jimport( 'joomla.session.session' );
 jimport( 'joomla.uri.uri' );
 
 // Instantiate the application.
-$app = JFactory::getApplication('site');
+if (class_exists('JFactory')) {
+	// Joomla 3, or Joomla 4/5 with the legacy compatibility layer active.
+	$app = JFactory::getApplication('site');
+	$rawUrl = JUri::root();
+} else {
+	// Joomla 4/5: this script bootstraps the framework directly instead of
+	// going through index.php, so the legacy J* aliases (normally registered
+	// while the full Application/plugin bootstrap runs) were never set up.
+	// Build the SiteApplication ourselves, per Joomla's own documented
+	// pattern for standalone bootstrap scripts.
+	$container = \Joomla\CMS\Factory::getContainer();
+	$container->alias(\Joomla\Session\SessionInterface::class, 'session.web.site');
+	$app = $container->get(\Joomla\CMS\Application\SiteApplication::class);
+	\Joomla\CMS\Factory::$application = $app;
+	$rawUrl = \Joomla\CMS\Uri\Uri::root();
+}
 
 $post = $app->input->getArray($_REQUEST);
-$rawUrl = JUri::root();
 //first remove references to the plugin names
 $baseUrl = str_replace("plugins".DIRECTORY_SEPARATOR."j2store".DIRECTORY_SEPARATOR.$plg_name.DIRECTORY_SEPARATOR.$plg_name.DIRECTORY_SEPARATOR."tmpl","", $rawUrl);
 $url = ltrim($baseUrl, '/');
 $siteurl = rtrim($url, '/');
 $request = '';
 foreach ($post as $key => $value) {
-	$request .= '&' . $key . '=' .$value;
+	$request .= '&' . urlencode((string) $key) . '=' . urlencode((string) $value);
 }
 
 $redirect = $siteurl.'/index.php?option=com_j2store&view=checkout&task=confirmPayment&orderpayment_type='.$plg_name.'&paction=process&tmpl=component'.$request;

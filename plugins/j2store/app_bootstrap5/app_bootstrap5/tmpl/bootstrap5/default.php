@@ -76,18 +76,23 @@ $filter_position = $this->params->get('list_filter_position', 'right');
 										<div class="j2store-products-row <?php echo 'row-'.$row; ?> row">
 								<?php endif;?>
 											<div class="col-sm-<?php echo round((12 / $col));?>">
-												<div class="j2store-single-product multiple j2store-single-product-<?php echo $product->j2store_product_id; ?> product-<?php echo $product->j2store_product_id; ?> pcolumn-<?php echo $rowcount;?>  <?php echo $product->params->get('product_css_class','');?>">
+												<div class="j2store-single-product multiple j2store-single-product-<?php echo $product->j2store_product_id; ?> product-<?php echo $product->j2store_product_id; ?> pcolumn-<?php echo $rowcount;?>  <?php echo $this->escape($product->params->get('product_css_class',''));?>">
 													<?php $this->product = $product;
                                                     $this->product_link = $this->product->product_link = $platform->getProductUrl(array('task' => 'view', 'id' => $this->product->j2store_product_id,'Itemid' => $item_id));
                                                     ?>
 													<?php
 													try {
 														$type = $product->product_type;
-														if(isset($type) && !empty($type)) {
+														// product_type has no server-side whitelist when saved, so without
+														// this check a crafted value (e.g. containing ../) could traverse
+														// out of the template directory via loadTemplate() (LFI).
+														if(isset($type) && !empty($type) && preg_match('/^[a-zA-Z0-9_]+$/', $type)) {
 															echo $this->loadTemplate(strtolower($type));
 														}
 													} catch (Exception $e) {
-														echo $e->getMessage();
+														// Don't leak internal error details (file paths, class/method
+														// names) to the public storefront; log it server-side instead.
+														JLog::add($e->getMessage(), JLog::WARNING, 'com_j2store');
 													}
 
 													?>

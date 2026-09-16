@@ -24,7 +24,8 @@ class J2StoreViewVendors extends F0FViewHtml {
 		     	            ->getList(); */
 
 		if(!isset($this->item->j2store_user_id) || $this->item->j2store_user_id != $user->id){
-				$app->redirect('index.php',JText::_('J2STORE_ACCESS_FORBIDDEN'),'warning');
+				$app->enqueueMessage(JText::_('J2STORE_ACCESS_FORBIDDEN'), 'warning');
+				$app->redirect('index.php');
 			}
 
 		return true;

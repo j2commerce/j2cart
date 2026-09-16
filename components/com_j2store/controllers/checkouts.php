@@ -156,6 +156,8 @@ class J2StoreControllerCheckouts extends F0FController
 
 	function login_validate() {
 
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$session = JFactory::getSession();
@@ -283,6 +285,8 @@ class J2StoreControllerCheckouts extends F0FController
 	}
 
 	function register_validate() {
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
         $platform = J2Store::platform();
 		$app = $platform->application();
 		$user = JFactory::getUser();
@@ -437,7 +441,8 @@ class J2StoreControllerCheckouts extends F0FController
 		//initialise order
 		$order = F0FModel::getTmpInstance('Orders', 'J2StoreModel')->initOrder()->getOrder();
 		if(count($order->getItems()) < 1) {
-			$app->redirect($link, JText::_('J2STORE_CART_NO_ITEMS'));
+			$app->enqueueMessage(JText::_('J2STORE_CART_NO_ITEMS'), 'error');
+			$app->redirect($link);
 		}
 
 		//validate stock
@@ -518,6 +523,8 @@ class J2StoreControllerCheckouts extends F0FController
 	}
 
 	function guest_validate() {
+
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
@@ -740,6 +747,8 @@ class J2StoreControllerCheckouts extends F0FController
 	}
 
 	function guest_shipping_validate() {
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
 		$address_model = F0FModel::getTmpInstance('Addresses', 'J2StoreModel');
@@ -884,7 +893,11 @@ class J2StoreControllerCheckouts extends F0FController
 
 		$order = F0FModel::getTmpInstance('Orders', 'J2StoreModel')->initOrder()->getOrder();
 		if(count($order->getItems()) < 1 ) {
-			$app->redirect($link, $order->getError());
+			$error = $order->getError();
+			if(!empty($error)) {
+				$app->enqueueMessage($error, 'error');
+			}
+			$app->redirect($link);
 		}
 
 		//validate stock
@@ -949,6 +962,8 @@ class J2StoreControllerCheckouts extends F0FController
 	//validate billing address
 
 	function billing_address_validate() {
+
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
@@ -1155,6 +1170,8 @@ class J2StoreControllerCheckouts extends F0FController
 	}
 
 	function shipping_address_validate() {
+
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
 
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
@@ -1406,6 +1423,8 @@ class J2StoreControllerCheckouts extends F0FController
 
 	function shipping_payment_method_validate() {
 
+		JSession::checkToken() or jexit(json_encode(array('error' => JText::_('JINVALID_TOKEN'))));
+
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
 		$user = JFactory::getUser();
@@ -1621,6 +1640,8 @@ class J2StoreControllerCheckouts extends F0FController
 	}
 
 	function confirm() {
+
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		//no cache
 		J2Store::utilities()->nocache();
@@ -1964,16 +1985,45 @@ class J2StoreControllerCheckouts extends F0FController
 		// check if it was a guest checkout
 		$account = $session->get ( 'account', 'register', 'j2store' );
 
-		// get the order_id from the session set by the prePayment
-		$orderpayment_id = ( int ) $app->getUserState ( 'j2store.orderpayment_id' );
-
-		$order_id = $app->getUserState ( 'j2store.order_id' );
-
-
 		$order = F0FTable::getAnInstance('Order', 'J2StoreTable')->getClone();
-		$order->load ( array (
-				'order_id' => $order_id
-		) );
+
+		// When an external gateway (e.g. PayPal) redirects the browser back here, prefer the
+		// order this single-use token was issued for over the session's "current order" state.
+		// Session state can change while the buyer is away at the gateway (another checkout
+		// started in a different tab, an abandoned-cart retry, etc.), which would otherwise show
+		// the wrong order on this confirmation page even though payment was applied correctly to
+		// the right order via the gateway's IPN/callback. The token is opaque and single-use
+		// (see J2Utilities::generateReturnToken/consumeReturnToken) - the order_id it maps to
+		// is never trusted from the client directly.
+		$return_order_token = $app->input->getString ( 'order_token', '' );
+		$return_order_id = '';
+
+		if ( $return_order_token !== '' ) {
+			$verified_order_id = J2Store::utilities ()->consumeReturnToken ( $return_order_token );
+			if ( $verified_order_id !== '' ) {
+				$order->load ( array ( 'order_id' => $verified_order_id ) );
+				if ( !empty ( $order->order_id ) ) {
+					$return_order_id = $order->order_id;
+				} else {
+					$order->reset ();
+				}
+			}
+		}
+
+		if ( $return_order_id !== '' ) {
+			$order_id = $order->order_id;
+			$orderpayment_id = ( int ) $order->j2store_order_id;
+			// keep session state in sync with the order we just verified
+			$app->setUserState ( 'j2store.order_id', $order_id );
+			$app->setUserState ( 'j2store.orderpayment_id', $orderpayment_id );
+		} else {
+			// get the order_id from the session set by the prePayment
+			$orderpayment_id = ( int ) $app->getUserState ( 'j2store.orderpayment_id' );
+			$order_id = $app->getUserState ( 'j2store.order_id' );
+			$order->load ( array (
+					'order_id' => $order_id
+			) );
+		}
 
 		$clear_cart = $params->get('clear_cart', 'order_placed');
 		if($clear_cart == 'order_placed') {
@@ -1995,6 +2045,11 @@ class J2StoreControllerCheckouts extends F0FController
 
 		// free product? set the state to confirmed and save the order.
 		if ((! empty ( $order_id )) && ( float ) $order->order_total == ( float ) '0.00' && !$showPayment) {
+			// A free order never goes through a payment gateway, so this
+			// branch is only ever reached via the same-site confirm form
+			// (default_confirm.php), which now carries a Joomla token.
+			JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+
 			$order->payment_complete();
 
 			// After confirm free product
