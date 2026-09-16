@@ -892,7 +892,7 @@ $(document).on('click', '#button-payment-method', function() {
 					url: '<?php echo $ajax_base_url; ?>',
 					type: 'post',
 					cache: false,
-					data: 'option=com_j2store&view=checkout&task=confirm',
+					data: 'option=com_j2store&view=checkout&task=confirm&<?php echo JSession::getFormToken(); ?>=1',
 					dataType: 'html',
 					success: function(html) {
 						$('#confirm .checkout-content').html(html);

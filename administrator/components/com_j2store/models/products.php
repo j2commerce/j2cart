@@ -1680,7 +1680,10 @@ class J2StoreModelProducts extends F0FModel {
             } else {
                 $product_types = $state->product_types;
             }
-            $query->where ( '#__j2store_products.product_type IN (\'' . implode ( '\',\'', $product_types ) . '\')' );
+            $product_types = array_intersect ( $product_types, array_keys ( $this->getProductTypes() ) );
+            if (count ( $product_types ) > 0) {
+                $query->where ( '#__j2store_products.product_type IN (' . implode ( ',', array_map ( array ( $db, 'q' ), $product_types ) ) . ')' );
+            }
         }
 
         if(!is_null ( $state->show_feature_only ) && !empty( $state->show_feature_only )){

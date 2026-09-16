@@ -1694,8 +1694,8 @@ class J2StoreTableOrder extends F0FTable
 					//generate invoice number
 					$this->generateInvoiceNumber ();
 
-					//generate a unique hash
-					$this->token = JApplicationHelper::getHash ( $this->order_id );
+					//token is a long-lived bearer credential for guest order/download access, so it must be unguessable even if the site secret leaks
+					$this->token = bin2hex ( random_bytes ( 32 ) );
 
 					//save again so that the unique order id is saved.
 					$this->store ();
@@ -3088,8 +3088,8 @@ class J2StoreTableOrder extends F0FTable
 				$this->order_id = time().$this->j2store_order_id;
 				//generate invoice number
 				$this->generateInvoiceNumber();
-				//generate a unique hash
-				$this->token = JApplicationHelper::getHash($this->order_id);
+				//token is a long-lived bearer credential for guest order/download access, so it must be unguessable even if the site secret leaks
+				$this->token = bin2hex(random_bytes(32));
 				//save again so that the unique order id is saved.
 				$this->store();
 			}

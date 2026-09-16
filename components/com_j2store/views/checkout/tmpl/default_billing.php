@@ -137,6 +137,7 @@ if (isset($this->addresses) && count($this->addresses) > 0) : ?>
 <input type="hidden" name="task" value="billing_address_validate" />
 <input type="hidden" name="option" value="com_j2store" />
 <input type="hidden" name="view" value="checkout" />
+<?php echo JHtml::_('form.token'); ?>
 
 <script type="text/javascript"><!--
 	(function($) {

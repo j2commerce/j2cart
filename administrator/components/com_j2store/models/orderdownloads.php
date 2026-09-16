@@ -396,60 +396,110 @@ class J2StoreModelOrderdownloads extends F0FModel {
 		return((connection_status()==0) and !connection_aborted());
 	}
 
-	private function getFilePath($productfile) {
+	/**
+	 * Rejects any product_file_save_name containing a parent-directory segment.
+	 * getFilePath() only ever uses this joined onto $base, so a leading slash is
+	 * harmless (it just collapses into a double separator that realpath() resolves
+	 * back inside $base) and some existing installs store names that way - but ".."
+	 * lets realpath() walk outside $base, which is what the containment check in
+	 * getFilePath() (and this guard, as a first line of defense) exist to stop.
+	 */
+	private function isSafeFileName($name) {
+		if (!is_string($name) || $name === '') {
+			return false;
+		}
+		$normalized = str_replace('\\', '/', $name);
+		if (preg_match('#(^|/)\.\.(/|$)#', $normalized)) {
+			return false;
+		}
+		return true;
+	}
 
+	/**
+	 * Resolves the configured attachment folder to a single canonical, existing real
+	 * path - whether it was historically stored as absolute or relative to the site
+	 * root - and refuses to treat JPATH_ROOT itself as that folder. Every candidate
+	 * file location tried by getFilePath() must live inside whatever this returns.
+	 *
+	 * @return string|false
+	 */
+	private function getAttachmentBasePath() {
 		$params = J2Store::config();
-		$path = $params->get('attachmentfolderpath');
-		//$savepath = $path.DS.'products';
-		$file = JPath::clean($path.'/'.$productfile->product_file_save_name);
+		$configuredPath = trim((string) $params->get('attachmentfolderpath'));
 
-        // For use with ARS, considering the 'releases' folder is in root
-        // Allows a mix and match of file locations between J2Store and ARS
-        if(!is_file($file)){
-            $file = JPATH_ROOT . '/' . JPath::clean('releases/' . ltrim($productfile->product_file_save_name, '/'));
-        }
-
-        if(!JFile::exists($file)) {
-            $root = JPATH_ROOT.'/';
-            $current = JPath::clean($path.'/'.$productfile->product_file_save_name);
-            $file = $root.trim($current,'/');
-        }
-
-		if(!JFile::exists($file)) {
-            $path = JPATH_ROOT.'/';
-            $file = JPath::clean($path.'/'.$productfile->product_file_save_name);
-        }
-
-		//if does not exists, check inside the web root
-		if(!JFile::exists($file)) {
-			$path = JPATH_ROOT.'/'.$path;
-			$file = JPath::clean($path.'/'.$productfile->product_file_save_name);
+		$base = realpath($configuredPath);
+		if ($base === false) {
+			$base = realpath(JPATH_ROOT.'/'.$configuredPath);
+		}
+		if ($base === false) {
+			return false;
 		}
 
-		//legacy compatibility
-		if(!JFile::exists($file)) {
-			$path = trim($params->get('attachmentfolderpath'));
-			$savepath = $path.DIRECTORY_SEPARATOR.'products';
-			$file = $savepath.DIRECTORY_SEPARATOR.$productfile->product_id.DIRECTORY_SEPARATOR.$productfile->product_file_save_name;
+		// An empty/misconfigured setting must never resolve to the webroot - that
+		// would make every file in the Joomla installation a valid download target.
+		if ($base === realpath(JPATH_ROOT)) {
+			return false;
 		}
 
-		if(!JFile::exists($file)) {
-			$path = trim($params->get('attachmentfolderpath'));
-			$savepath = $path.DIRECTORY_SEPARATOR.'products';
-			$product = F0FTable::getInstance('Product', 'J2StoreTable')->getClone();
-			if($product->load($productfile->product_id)) {
-				$product_source_id = $product->product_source_id;
+		return $base;
+	}
+
+	/**
+	 * Resolves the first existing, contained file among $relativeCandidates under $base.
+	 * Returns the resolved real path, or false if $base is invalid or none match.
+	 */
+	private function resolveContainedFile($base, array $relativeCandidates) {
+		if ($base === false) {
+			return false;
+		}
+		foreach ($relativeCandidates as $relative) {
+			$file = realpath($base.DIRECTORY_SEPARATOR.$relative);
+			if ($file === false) {
+				continue;
 			}
-
-			$file = $savepath.DIRECTORY_SEPARATOR.$product_source_id.DIRECTORY_SEPARATOR.$productfile->product_file_save_name;
-		}
-
-		$file = JPath::clean($file);
-
-		if (JFile::exists($file)) {
-			return $file;
+			// Containment check: even after realpath() resolves any symlinks, the
+			// result must still live inside $base - this is what actually stops
+			// product_file_save_name from reaching files outside the intended folder.
+			if (strpos($file, $base.DIRECTORY_SEPARATOR) !== 0) {
+				continue;
+			}
+			if (JFile::exists($file)) {
+				return $file;
+			}
 		}
 		return false;
+	}
+
+	private function getFilePath($productfile) {
+
+		if (!$this->isSafeFileName($productfile->product_file_save_name)) {
+			return false;
+		}
+
+		$save_name = $productfile->product_file_save_name;
+
+		// Legacy layouts stored files directly in the attachment folder, or in a
+		// "products/<product_id>" or "products/<product_source_id>" subfolder.
+		$relativeCandidates = array(
+			$save_name,
+			'products'.DIRECTORY_SEPARATOR.$productfile->product_id.DIRECTORY_SEPARATOR.$save_name,
+		);
+
+		$product = F0FTable::getInstance('Product', 'J2StoreTable')->getClone();
+		if ($product->load($productfile->product_id) && !empty($product->product_source_id)) {
+			$relativeCandidates[] = 'products'.DIRECTORY_SEPARATOR.$product->product_source_id.DIRECTORY_SEPARATOR.$save_name;
+		}
+
+		$file = $this->resolveContainedFile($this->getAttachmentBasePath(), $relativeCandidates);
+		if ($file !== false) {
+			return $file;
+		}
+
+		// ARS (Akeeba Release System) compatibility: some sites keep downloadable
+		// files in the site's "releases" folder instead of the J2Store attachment
+		// folder. Only the direct filename is tried here, matching the original
+		// single-candidate ARS lookup.
+		return $this->resolveContainedFile(realpath(JPATH_ROOT.'/releases'), array($save_name));
 	}
 
 	protected function hitCount($orderdownload, $productfile) {

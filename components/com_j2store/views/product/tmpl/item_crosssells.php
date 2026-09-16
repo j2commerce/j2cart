@@ -28,7 +28,7 @@ $J2gridCol = ($this->params->get('bootstrap_version', 2) == 2) ? 'span' : 'col-m
 						<div class="cross-sell-product-row <?php echo 'row-'.$row; ?> <?php echo $J2gridRow; ?>">
 					<?php endif;?>
 
-					<div class="<?php echo $J2gridCol.round((12 / $columns));?> crosssell-product product-<?php echo $cross_sell_product->j2store_product_id;?> <?php echo $cross_sell_product->params->get('product_css_class','');?>">
+					<div class="<?php echo $J2gridCol.round((12 / $columns));?> crosssell-product product-<?php echo $cross_sell_product->j2store_product_id;?> <?php echo $this->escape($cross_sell_product->params->get('product_css_class',''));?>">
 
 						<?php
 							$thumb_image = '';

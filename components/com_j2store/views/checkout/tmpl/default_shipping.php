@@ -129,6 +129,7 @@ $allFields = $this->fields;
  <input type="hidden" name="task" value="shipping_address_validate" />
   <input type="hidden" name="option" value="com_j2store" />
   <input type="hidden" name="view" value="checkout" />
+  <?php echo JHtml::_('form.token'); ?>
 <script type="text/javascript"><!--
 (function($) {
 $(document).on('change', '#shipping-address input[name=\'shipping_address\']', function() {

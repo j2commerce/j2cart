@@ -141,6 +141,7 @@ $J2gridCol = ($config->get('bootstrap_version', 2) == 2) ? 'span' : 'col-md-';
                     task: 'deleteAddress',
                     address_id: id
                 };
+                data['<?php echo JSession::getFormToken();?>'] = 1;
                 $.ajax({
                     url : '<?php echo JRoute::_('index.php');?>',
                     type: 'post',

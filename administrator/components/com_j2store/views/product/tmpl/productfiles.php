@@ -95,7 +95,7 @@ $product_type_class = 'badge bg-success';
                             <td class="text-end">
                                 <?php echo J2Html::hidden('product_files['.$counter.'][j2store_productfile_id]',$singleFile->j2store_productfile_id); ?>
                                 <?php echo J2Html::hidden('product_files['.$counter.'][product_id]',$singleFile->product_id); ?>
-                                <a class="btn btn-danger" href="index.php?option=com_j2store&view=products&task=deleteFiles&product_id=<?php echo $this->product_id;?>&productfile_id=<?php echo $singleFile->j2store_productfile_id; ?>" >
+                                <a class="btn btn-danger" href="index.php?option=com_j2store&view=products&task=deleteFiles&product_id=<?php echo $this->product_id;?>&productfile_id=<?php echo $singleFile->j2store_productfile_id; ?>&<?php echo JFactory::getSession()->getFormToken();?>=1" >
                                     <?php echo Text::_('J2STORE_REMOVE');?>
                                 </a>
                             </td>
