@@ -43,6 +43,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	<input type="hidden" name="option" value="com_j2store" />
 	<input type="hidden" name="view" value="checkout" />
 	<input type="hidden" name="task" value="confirmPayment" />
+	<?php echo JHtml::_('form.token'); ?>
 	</form>
 	<?php endif;?>
 <?php else: ?>
