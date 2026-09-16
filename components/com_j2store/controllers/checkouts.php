@@ -441,7 +441,8 @@ class J2StoreControllerCheckouts extends F0FController
 		//initialise order
 		$order = F0FModel::getTmpInstance('Orders', 'J2StoreModel')->initOrder()->getOrder();
 		if(count($order->getItems()) < 1) {
-			$app->redirect($link, JText::_('J2STORE_CART_NO_ITEMS'));
+			$app->enqueueMessage(JText::_('J2STORE_CART_NO_ITEMS'), 'error');
+			$app->redirect($link);
 		}
 
 		//validate stock
@@ -892,7 +893,11 @@ class J2StoreControllerCheckouts extends F0FController
 
 		$order = F0FModel::getTmpInstance('Orders', 'J2StoreModel')->initOrder()->getOrder();
 		if(count($order->getItems()) < 1 ) {
-			$app->redirect($link, $order->getError());
+			$error = $order->getError();
+			if(!empty($error)) {
+				$app->enqueueMessage($error, 'error');
+			}
+			$app->redirect($link);
 		}
 
 		//validate stock
@@ -2011,6 +2016,11 @@ class J2StoreControllerCheckouts extends F0FController
 
 		// free product? set the state to confirmed and save the order.
 		if ((! empty ( $order_id )) && ( float ) $order->order_total == ( float ) '0.00' && !$showPayment) {
+			// A free order never goes through a payment gateway, so this
+			// branch is only ever reached via the same-site confirm form
+			// (default_confirm.php), which now carries a Joomla token.
+			JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+
 			$order->payment_complete();
 
 			// After confirm free product
