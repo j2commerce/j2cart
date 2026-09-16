@@ -1094,6 +1094,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             'carts/default_coupon.php',
             'carts/default_shipping.php',
             'carts/default_voucher.php',
+            'checkout/default_confirm.php',
             'myprofile/address.php',
         ];
 
