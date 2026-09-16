@@ -31,7 +31,7 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 	 * storefront are allowed through; everything else falls back to browse().
 	 */
 	public function execute($task) {
-		$allowed = array('browse', 'view', 'compare', 'wishlist');
+		$allowed = array('browse', 'view', 'compare', 'update', 'wishlist');
 		if (!in_array($task, $allowed)) {
 			$task = 'browse';
 		}
