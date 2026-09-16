@@ -150,10 +150,13 @@ class J2StoreControllerMyProfile extends F0FController
 		$user = JFactory::getUser ();
 		$app = JFactory::getApplication ();
 
-		// Allow only when the address exists, has an owner, and that owner is the current authenticated user.
-		// Guest addresses (empty user_id) must never be exposed to logged-in users.
-		if(empty($user->id) || empty($address->j2store_address_id) || empty($address->user_id) || (int)$user->id !== (int)$address->user_id){
-			$app->redirect ('index.php?option=com_j2store&view=myprofile',JText::_('J2STORE_MYPROFILE_ADDRESS_INVALID'),'error');
+		// Must be logged in. When editing an existing address (address_id given), it must
+		// actually exist and belong to the current user - this also blocks guest addresses
+		// (empty user_id) from being exposed to logged-in users. address_id = 0 means the
+		// form is being opened to add a brand new address, so there is nothing to own yet.
+		if(empty($user->id) || ($address_id && (int)$user->id !== (int)$address->user_id)){
+			$app->enqueueMessage(JText::_('J2STORE_MYPROFILE_ADDRESS_INVALID'), 'error');
+			$app->redirect('index.php?option=com_j2store&view=myprofile');
 		}
 		$address_type = $this->input->getString('address_type');
 		$model = $this->getModel('Myprofile' ,'J2StoreModel');
@@ -330,7 +333,8 @@ class J2StoreControllerMyProfile extends F0FController
 		$url = 'index.php?option=com_j2store&view=myprofile';
 
 		if(!$order_id || JFactory::getUser ()->id < 1 || !JSession::checkToken('get') ){
-			$app->redirect ( $url, JText::_('J2STORE_INVALID_ORDER_PROFILE') );
+			$app->enqueueMessage(JText::_('J2STORE_INVALID_ORDER_PROFILE'), 'error');
+			$app->redirect($url);
 		}
 
 		$order = F0FTable::getInstance('Order' ,'J2StoreTable')->getClone();
@@ -342,7 +346,8 @@ class J2StoreControllerMyProfile extends F0FController
 			// An attacker could supply any order_id via GET; the CSRF token only proves
 			// the request came from a valid session, not that the order is theirs.
 			if ((int) $order->user_id !== (int) $user->id) {
-				$app->redirect($url, JText::_('J2STORE_INVALID_ORDER_PROFILE'));
+				$app->enqueueMessage(JText::_('J2STORE_INVALID_ORDER_PROFILE'), 'error');
+				$app->redirect($url);
 				return;
 			}
 			// variant check
@@ -387,6 +392,19 @@ class J2StoreControllerMyProfile extends F0FController
 					//product_option
 					foreach ($items as $key=>$item){
 						// change table to table transfer
+						// Rebuild the cart's product_options blob (base64+serialize of
+						// productattributeoption_id => productattributeoptionvalue_id) from the
+						// order item's attributes. product_options is NOT NULL in the DB, and the
+						// order item has no "orderitem_attributes" property (that was always null),
+						// so every reordered item used to fail to insert and the cart came back empty.
+						$options = array();
+						if (!empty($item->orderitemattributes) && is_array($item->orderitemattributes)) {
+							foreach ($item->orderitemattributes as $attribute) {
+								if (!empty($attribute->productattributeoption_id)) {
+									$options[$attribute->productattributeoption_id] = $attribute->productattributeoptionvalue_id;
+								}
+							}
+						}
 						$cartitem = F0FTable::getAnInstance ( 'Cartitem', 'J2StoreTable' )->getClone ();
 						$cartitem->cart_id = $cart->j2store_cart_id;
 						$cartitem->product_id = $item->product_id ;
@@ -395,7 +413,7 @@ class J2StoreControllerMyProfile extends F0FController
 						$cartitem->product_type = $item->product_type;
 						$cartitem->cartitem_params = $item->orderitem_params;
 						$cartitem->product_qty = $item->orderitem_quantity ;
-						$cartitem->product_options = $item->orderitem_attributes;
+						$cartitem->product_options = base64_encode(serialize($options));
 						$cartitem->store ();
 					}
 					$session->set('payment_method',$order->orderpayment_type, 'j2store');
@@ -443,7 +461,8 @@ class J2StoreControllerMyProfile extends F0FController
 			}
 
 		}else{
-			$app->redirect ( $url, JText::_('J2STORE_INVALID_ORDER_PROFILE') );
+			$app->enqueueMessage(JText::_('J2STORE_INVALID_ORDER_PROFILE'), 'error');
+			$app->redirect($url);
 		}
 
 	}
