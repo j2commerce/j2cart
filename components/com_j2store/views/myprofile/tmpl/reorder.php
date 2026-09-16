@@ -104,7 +104,7 @@ $ajax_base_url = JRoute::_('index.php');
 							url: '<?php echo $ajax_base_url; ?>',
 							type: 'post',
 							cache: false,
-							data: 'option=com_j2store&view=checkouts&task=confirm',
+							data: 'option=com_j2store&view=checkouts&task=confirm&<?php echo JSession::getFormToken(); ?>=1',
 							dataType: 'html',
 							success: function(html) {
 								$('#confirm .checkout-content').html(html);
