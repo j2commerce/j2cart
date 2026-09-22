@@ -1094,6 +1094,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             'carts/default_coupon.php',
             'carts/default_shipping.php',
             'carts/default_voucher.php',
+            'checkout/default_confirm.php',
             'myprofile/address.php',
         ];
 
@@ -1119,14 +1120,33 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         $jsFormFiles = [
             'product/adminitem_configurableoptions.php',
             'product/adminitem_options.php',
+            'product/adminitem_advancedvariableoptions.php',
             'product/item_configurableoptions.php',
             'product/item_options.php',
+            'product/item_advancedvariableoptions.php',
         ];
 
         /* These files pass cart item data as a PHP array and need  JSession::getFormToken() => '1'  added to that array. */
         $arrayFormFiles = [
             'carts/default.php',
             'carts/default_items.php',
+            'order/order_items.php',
+        ];
+
+        /* Module template overrides (separate override root: html/mod_j2store_cart, not html/com_j2store)
+           that build a getCartUrl() array and need the same CSRF token treatment.
+           Missing token in form for html/mod_j2store_currency */
+        $moduleOverridePaths = [
+            'cart'     => 'templates/' . $template . '/html/mod_j2store_cart',
+            'currency' => 'templates/' . $template . '/html/mod_j2store_currency',
+        ];
+        $moduleFiles = [
+            'cart' => [
+                'array_form' => 'detailcartonhover.php',
+            ],
+            'currency' => [
+                'php_form' => 'default.php',
+            ],
         ];
 
         foreach ($phpFormFiles as $file) {
@@ -1179,14 +1199,36 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             }
         }
 
+        foreach ($moduleFiles as $module => $filearray) {
+            foreach ($filearray as $type => $file) {
+                $full = JPATH_SITE . '/' . $moduleOverridePaths[$module] . '/' . $file;
+                if (file_exists($full)) {
+                    if ($type === 'array_form' && !$hasGetFormToken($full)) {
+                        $warnings[] = [
+                            'file' => $moduleOverridePaths[$module] . '/' . $file,
+                            'type' => 'array_form',
+                        ];
+                    }
+                    if ($type === 'php_form' && !$hasFormToken($full)) {
+                        $warnings[] = [
+                            'file' => $moduleOverridePaths[$module] . '/' . $file,
+                            'type' => 'php_form',
+                        ];
+                    }
+                }
+            }
+        }
+
         // Template overrides — search all site templates.
         // Override path: templates/<site-template>/html/com_j2store/templates/<subtemplate>/
         $pluginFiles = [
-            'cart.php'                        => 'data_form',
-            'default_configurableoptions.php' => 'js_form',
-            'default_options.php'             => 'js_form',
-            'view_configurableoptions.php'    => 'js_form',
-            'view_options.php'                => 'js_form',
+            'cart.php'                            => 'data_form',
+            'default_configurableoptions.php'     => 'js_form',
+            'default_options.php'                 => 'js_form',
+            'default_advancedvariableoptions.php' => 'js_form',
+            'view_configurableoptions.php'        => 'js_form',
+            'view_options.php'                    => 'js_form',
+            'view_advancedvariableoptions.php'    => 'js_form',
         ];
 
         $pluginDirs = glob(JPATH_SITE . '/templates/*/html/com_j2store/templates', GLOB_ONLYDIR);
@@ -1275,7 +1317,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
                     <?php endforeach; ?>
                 </ul>
                 <p>Example of the corrected JavaScript form string:</p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;input type="file" name="file" /&gt;&lt;/form>');</pre>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;input type="file" name="file" /&gt;&lt;/form&gt;');</pre>
             <?php endif; ?>
 
             <?php if (!empty($hiddenTokenFiles)): ?>
@@ -1289,8 +1331,8 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             <?php endif; ?>
 
             <?php if (!empty($queryStringFiles)): ?>
-                <p><strong>In the following file(s), append <code>'&amp;'.JSession::getFormToken().'=1'</code> to the hardcoded order-placement AJAX query string:</strong></p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">data: 'option=com_j2store&amp;view=checkout&amp;task=confirm&amp;'.JSession::getFormToken().'=1'</pre>
+                <p><strong>In the following file(s), append <code>'&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1'</code> to the hardcoded order-placement AJAX query string:</strong></p>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">data: 'option=com_j2store&amp;view=checkout&amp;task=confirm&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1'</pre>
                 <ul>
                     <?php foreach ($queryStringFiles as $f): ?>
                         <li><code><?php echo htmlspecialchars($f, ENT_QUOTES, 'UTF-8'); ?></code></li>
