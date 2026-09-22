@@ -80,7 +80,7 @@ if (version_compare(JVERSION, '3.99.99', 'lt')) {
 								<?php echo $item->orderitem_name; ?>
 										<?php if(!$this->params->get('show_qty_field', 1)) : ?> <a
 										class="j2store-remove remove-icon"
-										href="<?php echo J2Store::platform()->getCartUrl(array('task' => 'remove','cartitem_id' => $item->cartitem_id));//JRoute::_('index.php?option=com_j2store&view=carts&task=remove&cartitem_id='.$item->cartitem_id); ?>">X</a>
+										href="<?php echo J2Store::platform()->getCartUrl(array('task' => 'remove', 'cartitem_id' => $item->cartitem_id, JSession::getFormToken() => '1'));//JRoute::_('index.php?option=com_j2store&view=carts&task=remove&cartitem_id='.$item->cartitem_id); ?>">X</a>
 										<?php endif; ?>
 							</span>
 							<br>
