@@ -466,14 +466,33 @@ class J2Help {
         $jsFormFiles = [
             'product/adminitem_configurableoptions.php',
             'product/adminitem_options.php',
+            'product/adminitem_advancedvariableoptions.php',
             'product/item_configurableoptions.php',
             'product/item_options.php',
+            'product/item_advancedvariableoptions.php',
         ];
 
         // Files needing a CSRF token added to a PHP array (not a form tag)
         $arrayFormFiles = [
             'carts/default.php',
             'carts/default_items.php',
+            'order/order_items.php',
+        ];
+
+        // Module template overrides (separate override root: html/mod_j2store_cart, not html/com_j2store)
+        // that build a getCartUrl() array and need the same CSRF token treatment.
+        // Missing token in form for html/mod_j2store_currency
+        $moduleOverridePaths = [
+            'cart'     => 'templates/' . $template . '/html/mod_j2store_cart',
+            'currency' => 'templates/' . $template . '/html/mod_j2store_currency',
+        ];
+        $moduleFiles = [
+            'cart' => [
+                'array_form' => 'detailcartonhover.php',
+            ],
+            'currency' => [
+                'php_form' => 'default.php',
+            ],
         ];
 
         $phpWarnings         = [];
@@ -518,13 +537,29 @@ class J2Help {
             }
         }
 
+        foreach ($moduleFiles as $module => $filearray) {
+            foreach ($filearray as $type => $file) {
+                $full = JPATH_SITE . '/' . $moduleOverridePaths[$module] . '/' . $file;
+                if (file_exists($full)) {
+                    if ($type === 'array_form' && !$hasGetFormToken($full)) {
+                        $arrayWarnings[] = $moduleOverridePaths[$module] . '/' . $file;
+                    }
+                    if ($type === 'php_form' && !$hasFormToken($full)) {
+                        $phpWarnings[] = $moduleOverridePaths[$module] . '/' . $file;
+                    }
+                }
+            }
+        }
+
         // Templates overrides across all site templates
         $pluginFiles = [
-            'cart.php'                        => 'data_form',
-            'default_configurableoptions.php' => 'js_form',
-            'default_options.php'             => 'js_form',
-            'view_configurableoptions.php'    => 'js_form',
-            'view_options.php'                => 'js_form',
+            'cart.php'                            => 'data_form',
+            'default_configurableoptions.php'     => 'js_form',
+            'default_options.php'                 => 'js_form',
+            'default_advancedvariableoptions.php' => 'js_form',
+            'view_configurableoptions.php'        => 'js_form',
+            'view_options.php'                    => 'js_form',
+            'view_advancedvariableoptions.php'    => 'js_form',
         ];
 
         $pluginDirs = glob(JPATH_SITE . '/templates/*/html/com_j2store/templates', GLOB_ONLYDIR);
@@ -569,7 +604,8 @@ class J2Help {
 
         if (!empty($phpWarnings)) {
             $html .= '<p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_(\'form.token\'); ?&gt;</code> '
-                . 'immediately before each <code>&lt;/form&gt;</code> closing tag:</strong></p><ul>';
+                . 'immediately before each <code>&lt;/form&gt;</code> closing tag:</strong></p>';
+            $html .= '<ul>';
             foreach ($phpWarnings as $f) {
                 $html .= '<li><code>' . $e($f) . '</code></li>';
             }
@@ -578,7 +614,8 @@ class J2Help {
 
         if (!empty($hiddenTokenWarnings)) {
             $html .= '<p><strong>In the following file(s), add <code>&lt;?php echo JHtml::_(\'form.token\'); ?&gt;</code> '
-                . 'alongside the existing hidden <code>option</code>/<code>view</code>/<code>task</code> inputs (these files have no <code>&lt;form&gt;</code> wrapper — the fields are collected by JS):</strong></p><ul>';
+                . 'alongside the existing hidden <code>option</code>/<code>view</code>/<code>task</code> inputs (these files have no <code>&lt;form&gt;</code> wrapper — the fields are collected by JS):</strong></p>';
+            $html .= '<ul>';
             foreach ($hiddenTokenWarnings as $f) {
                 $html .= '<li><code>' . $e($f) . '</code></li>';
             }
@@ -586,10 +623,10 @@ class J2Help {
         }
 
         if (!empty($queryStringWarnings)) {
-            $html .= '<p><strong>In the following file(s), append <code>\'&amp;\'.JSession::getFormToken().\'=1\'</code> '
+            $html .= '<p><strong>In the following file(s), append <code>&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1</code> '
                 . 'to the hardcoded order-placement AJAX query string:</strong></p>'
-                . '<pre style="background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">data: \'option=com_j2store&amp;view=checkout&amp;task=confirm&amp;\'.JSession::getFormToken().\'=1\'</pre>'
-                . '<ul>';
+                . '<pre style="background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">data: \'option=com_j2store&amp;view=checkout&amp;task=confirm&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1\'</pre>';
+            $html .= '<ul>';
             foreach ($queryStringWarnings as $f) {
                 $html .= '<li><code>' . $e($f) . '</code></li>';
             }
@@ -598,7 +635,8 @@ class J2Help {
 
         if (!empty($jsWarnings)) {
             $html .= '<p><strong>In the following file(s), add <code>&lt;?php echo JSession::getFormToken(); ?&gt;</code> '
-                . 'as a hidden input name in the JavaScript upload form string:</strong></p><ul>';
+                . 'as a hidden input name in the JavaScript upload form string:</strong></p>';
+            $html .= '<ul>';
             foreach ($jsWarnings as $f) {
                 $html .= '<li><code>' . $e($f) . '</code></li>';
             }
@@ -612,8 +650,8 @@ class J2Help {
 
         if (!empty($arrayWarnings)) {
             $html .= '<p><strong>In the following file(s), add <code>JSession::getFormToken() =&gt; \'1\'</code> to the getCartUrl function.</strong></p>'
-                . '<pre style="background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$platform->getCartUrl(array(JSession::getFormToken() =&gt; \'1\', ...</pre>'
-                . '<ul>';
+                . '<pre style="background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$platform->getCartUrl(array(JSession::getFormToken() =&gt; \'1\', ...</pre>';
+            $html .= '<ul>';
             foreach ($arrayWarnings as $f) {
                 $html .= '<li><code>' . $e($f) . '</code></li>';
             }
@@ -623,8 +661,8 @@ class J2Help {
         if (!empty($dataWarnings)) {
             $html .= '<p><strong>In the following file(s), add <code>data-&lt;?php echo JSession::getFormToken(); ?&gt;=&quot;1&quot;</code> '
                 . 'as an attribute on the link with class <code>j2store_add_to_cart_button</code>:</strong></p>'
-                . '<pre style="background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">&lt;a class=&quot;... j2store_add_to_cart_button&quot; data-&lt;?php echo JSession::getFormToken(); ?&gt;=&quot;1&quot;&gt;...&lt;/a&gt;</pre>'
-                . '<ul>';
+                . '<pre style="background:#fff;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">&lt;a class=&quot;... j2store_add_to_cart_button&quot; data-&lt;?php echo JSession::getFormToken(); ?&gt;=&quot;1&quot;&gt;...&lt;/a&gt;</pre>';
+            $html .= '<ul>';
             foreach ($dataWarnings as $f) {
                 $html .= '<li><code>' . $e($f) . '</code></li>';
             }
