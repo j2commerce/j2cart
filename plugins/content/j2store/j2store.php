@@ -14,6 +14,7 @@ use Joomla\Component\Content\Site\Helper\RouteHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Log\Log;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\Router\Route;
 
@@ -74,11 +75,21 @@ class plgContentJ2Store extends CMSPlugin
                 if(!$this->checkPublishDate($article)){
                     return;
                 }
-                $this->defaultPosition($context, $article, $params, $page);
+                // Auto-placement rendering (incl. template overrides) must never be able to
+                // block shortcode processing below - they are independent features.
+                try {
+                    $this->defaultPosition($context, $article, $params, $page);
+                } catch (\Throwable $e) {
+                    Log::add('J2Store defaultPosition failed: ' . $e->getMessage(), Log::WARNING, 'j2store');
+                }
             }
         }
         if($placement == 'tag' || $placement == 'both') {
-            $this->withinArticle($context, $article, $params, $page);
+            try {
+                $this->withinArticle($context, $article, $params, $page);
+            } catch (\Throwable $e) {
+                Log::add('J2Store withinArticle failed: ' . $e->getMessage(), Log::WARNING, 'j2store');
+            }
         }
         $this->processShortCodes($context, $article, $params, $page);
     }
