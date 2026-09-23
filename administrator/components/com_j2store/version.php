@@ -13,8 +13,8 @@
 defined('_JEXEC') or die('Restricted Access');
 
 define('J2STORE_PRO', '1');
-define('J2STORE_VERSION', '4.1.9');
+define('J2STORE_VERSION', '4.1.10');
 define('J2STORE_EXTRA_VERSION', 'for Joomla 5-6');
-define('J2STORE_DATE', '2026-09-15');
+define('J2STORE_DATE', '2026-09-22');
 
 
