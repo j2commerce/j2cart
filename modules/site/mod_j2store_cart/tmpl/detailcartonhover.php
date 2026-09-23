@@ -56,7 +56,7 @@ $title = $params->get('cart_module_title', '');
 						</div>
 						<div class="pull-right">
 							<a href="<?php echo J2Store::platform()->getCartUrl();?>">
-								<?php echo JText::_('J2STORE_VIEW_CART');?>								
+								<?php echo JText::_('J2STORE_VIEW_CART');?>
 							</a>
 						</div>
 					</div>
@@ -79,7 +79,7 @@ $title = $params->get('cart_module_title', '');
 											<div class="item-product-details">
 												<?php if($params->get('show_cart_remove')):?>
 													<div class="access">
-														<a class="cart-remove text-error" href="<?php echo J2Store::platform()->getCartUrl(array('task' => 'remove','cartitem_id' => $item->cartitem_id)); ?>" > <i class="fa fa-remove"></i></a>
+														<a class="cart-remove text-error" href="<?php echo J2Store::platform()->getCartUrl(array('task' => 'remove', 'cartitem_id' => $item->cartitem_id, JSession::getFormToken() => '1')); ?>" > <i class="fa fa-remove"></i></a>
 													</div>
 												<?php endif;?>
 											</div>
@@ -87,7 +87,7 @@ $title = $params->get('cart_module_title', '');
 												<span class="cart-item-qty"> <?php echo $item->orderitem_quantity; ?> </span> x
 											<?php endif;?>
 											<?php echo $currency->format($order->get_formatted_lineitem_price($item, $params->get('checkout_price_display_options', 1))); ?>
-											<p class="j2store-product-name"> 
+											<p class="j2store-product-name">
 												<strong><?php echo $item->orderitem_name;?></strong>
 											</p>
 											<br>
@@ -105,7 +105,7 @@ $title = $params->get('cart_module_title', '');
 									</li>
 								<?php endforeach;?>
 							</ul>
-						
+
 						<?php if( $params->get('enable_checkout') ||  $params->get('enable_view_cart') ):?>
 							<div class="j2store-cart-nav">
 								<?php if($params->get('enable_checkout')):?>
