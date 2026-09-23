@@ -1643,8 +1643,12 @@ class Com_J2storeInstallerScript extends InstallerScript
     }
 
     /**
-     * Renders the security exploitation check result as an inline HTML block
-     * appended to the post-installation status output.
+     * Outputs an HTML security check block that Joomla captures as the
+     * extension_message shown at the end of installation.
+     *
+     * @param  array       $check
+     * @param  string      $verdict
+     * @param  array|null  $cleanup
      */
     private function _renderSecurityCheck(): void
     {
@@ -1665,7 +1669,7 @@ class Com_J2storeInstallerScript extends InstallerScript
 
         $style = $styles[$verdict] ?? $styles['unknown'];
         ?>
-        <div style="padding:15px;border-radius:4px;<?php echo $style; ?>">
+        <div style="margin-top:20px;padding:15px;border-radius:4px;<?php echo $style; ?>">
             <h3 style="margin-top:0;">
                 <?php if ($verdict === 'hacked'): ?>
                     &#x26A0; Security Alert: Exploitation Detected
@@ -1711,9 +1715,7 @@ class Com_J2storeInstallerScript extends InstallerScript
                 <?php if (!empty($check['legacy_files'])): ?>
                     <p><strong>Additional action required:</strong> The legacy
                     <code>media/com_j2store/uploads/</code> directory (J2Store v3 / early v4)
-                    also contained foreign files. Those files are listed below &mdash;
-                    please remove them manually as this path is outside the scope of the
-                    automatic cleanup.</p>
+                    also contained foreign files. Please remove them manually.</p>
                 <?php endif; ?>
 
             <?php elseif ($verdict === 'highly_suspicious'): ?>
@@ -1738,8 +1740,7 @@ class Com_J2storeInstallerScript extends InstallerScript
             <?php endif; ?>
 
             <?php if (!empty($check['upload_files'])): ?>
-                <p><strong><?php echo count($check['upload_files']); ?> file(s) found in
-                    <code>media/j2store/uploads/</code>:</strong><br>
+                <p><strong><?php echo count($check['upload_files']); ?> file(s) in <code>media/j2store/uploads/</code>:</strong><br>
                     <code><?php echo htmlspecialchars(implode(', ', array_slice($check['upload_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
                         <?php echo count($check['upload_files']) > 20 ? ' &hellip; and ' . (count($check['upload_files']) - 20) . ' more' : ''; ?>
                     </code>
@@ -1747,22 +1748,18 @@ class Com_J2storeInstallerScript extends InstallerScript
             <?php endif; ?>
 
             <?php if ($check['db_upload_count'] > 0): ?>
-                <p><strong><?php echo $check['db_upload_count']; ?> record(s) in
-                    <code>#__j2store_uploads</code></strong> database table.</p>
+                <p><strong><?php echo $check['db_upload_count']; ?> record(s) in <code>#__j2store_uploads</code></strong> database table.</p>
             <?php endif; ?>
 
             <?php if (!empty($check['suspicious_names'])): ?>
-                <p><strong style="color:red;">&#x26A0; Suspicious filenames detected
-                    (double-extension attack pattern):</strong><br>
+                <p><strong style="color:red;">&#x26A0; Suspicious filenames detected (double-extension attack pattern):</strong><br>
                     <code><?php echo htmlspecialchars(implode(', ', $check['suspicious_names']), ENT_QUOTES, 'UTF-8'); ?></code>
                 </p>
             <?php endif; ?>
 
             <?php if (!empty($check['legacy_files'])): ?>
-                <p><strong><?php echo count($check['legacy_files']); ?> file(s) found in the
-                    legacy <code>media/com_j2store/uploads/</code> path</strong> (J2Store v3 /
-                    early v4 upload directory &mdash; this path is not covered by the 4.1.6
-                    update and must be secured manually):<br>
+                <p><strong><?php echo count($check['legacy_files']); ?> file(s) in legacy <code>media/com_j2store/uploads/</code> path</strong> (J2Store v3 /
+                    early v4 upload directory &mdash; this path is not covered by the 4.1.6 update and must be secured manually):<br>
                     <code><?php echo htmlspecialchars(implode(', ', array_slice($check['legacy_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
                         <?php echo count($check['legacy_files']) > 20 ? ' &hellip; and ' . (count($check['legacy_files']) - 20) . ' more' : ''; ?>
                     </code>
@@ -1770,15 +1767,13 @@ class Com_J2storeInstallerScript extends InstallerScript
             <?php endif; ?>
 
             <?php if (!empty($check['invoices_unexpected'])): ?>
-                <p><strong>Unexpected non-PDF file(s) in <code>media/j2store/invoices/</code>
-                    &mdash; invoices should only contain PDFs:</strong><br>
+                <p><strong>Unexpected non-PDF file(s) in <code>media/j2store/invoices/</code>: invoices should only contain PDFs:</strong><br>
                     <code><?php echo htmlspecialchars(implode(', ', $check['invoices_unexpected']), ENT_QUOTES, 'UTF-8'); ?></code>
                 </p>
             <?php endif; ?>
 
             <?php if (!empty($check['protection_missing'])): ?>
-                <p><strong>&#x26A0; Missing web server protection files &mdash;
-                    files in these directories may be publicly accessible:</strong><br>
+                <p><strong>&#x26A0; Missing web server protection files: files in these directories may be publicly accessible:</strong><br>
                     <code><?php echo htmlspecialchars(implode(', ', $check['protection_missing']), ENT_QUOTES, 'UTF-8'); ?></code>
                 </p>
             <?php endif; ?>
@@ -1820,6 +1815,7 @@ class Com_J2storeInstallerScript extends InstallerScript
 
         $comOverridePath = JPATH_SITE . '/templates/' . $template . '/html/com_j2store';
 
+        // Returns true when the file already contains the expected CSRF token call.
         $hasFormToken = static function (string $path): bool {
             $content = @file_get_contents($path);
             if ($content === false) {
@@ -1836,6 +1832,7 @@ class Com_J2storeInstallerScript extends InstallerScript
             return strpos($content, 'getFormToken') !== false;
         };
 
+        /* These files contain a PHP <form> block and need <?php echo JHtml::_('form.token'); ?>  before </form>. */
         $phpFormFiles = [
             'carts/default.php',
             'carts/default_calculator.php',
@@ -1864,6 +1861,7 @@ class Com_J2storeInstallerScript extends InstallerScript
             'checkout/default.php',
         ];
 
+        /* These files build a hidden upload <form> inside a JavaScript string and need  <?php echo JSession::getFormToken(); ?>  as a hidden input. */
         $jsFormFiles = [
             'product/adminitem_configurableoptions.php',
             'product/adminitem_options.php',
@@ -2062,7 +2060,7 @@ class Com_J2storeInstallerScript extends InstallerScript
                     <?php endforeach; ?>
                 </ul>
                 <p>Example of the corrected JavaScript form string:</p>
-                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;input type="file" name="file" /&gt;</form&gt;');</pre>
+                <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">$('body').prepend('&lt;form enctype="multipart/form-data" id="form-upload" style="display:none;"&gt;&lt;input type="hidden" name="&lt;?php echo JSession::getFormToken(); ?&gt;" value="1" /&gt;&lt;input type="file" name="file" /&gt;&lt;/form&gt;');</pre>
             <?php endif; ?>
 
             <?php if (!empty($hiddenTokenFiles)): ?>
@@ -2076,7 +2074,7 @@ class Com_J2storeInstallerScript extends InstallerScript
             <?php endif; ?>
 
             <?php if (!empty($queryStringFiles)): ?>
-                <p><strong>In the following file(s), append <code>&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1'</code> to the hardcoded order-placement AJAX query string:</strong></p>
+                <p><strong>In the following file(s), append <code>&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1</code> to the hardcoded order-placement AJAX query string:</strong></p>
                 <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">data: 'option=com_j2store&amp;view=checkout&amp;task=confirm&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1'</pre>
                 <ul>
                     <?php foreach ($queryStringFiles as $f): ?>
