@@ -8,7 +8,7 @@
     <license>GNU General Public License v3 or later versions</license>
     <authorEmail>support@j2commerce.com</authorEmail>
     <authorUrl>https://www.j2commerce.com</authorUrl>
-	<version>4.1.0</version>
+	<version>4.1.1</version>
 	<description>Content plugin for J2Store.</description>
 
 	<files>

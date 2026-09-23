@@ -401,6 +401,14 @@ class J2StoreControllerCheckouts extends F0FController
 					$json = J2Store::plugin()->eventWithArray('CheckoutAfterRegister');
 				}
 
+				if (!$json) {
+					// Logging in above forks the session, which changes the Joomla CSRF
+					// token. The checkout page's other forms/AJAX calls still carry the
+					// pre-fork token, so force a reload (like login_validate() does) to
+					// avoid "Invalid Token" on the next step.
+					$json['redirect'] = $redirect_url;
+				}
+
 			} else {
 				$json['redirect'] = $redirect_url;
 			}

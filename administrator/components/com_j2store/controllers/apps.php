@@ -22,11 +22,24 @@ class J2StoreControllerApps extends F0FController
 		// Try lo load the report plugin controller (if any)
 		if ( $task  == "view" && $appTask != '' )
 		{
-			// Plugin controller delegation requires an authenticated administrator.
-			// FOF's per-task ACL in fof.xml does not cover delegated appTask calls,
-			// so we enforce the check here explicitly.
+			// FOF's per-task ACL in fof.xml does not cover delegated appTask calls, so we
+			// enforce authorization here explicitly:
+			//  - always require an authenticated user (blocks anonymous appTask calls)
+			//  - in the backend, additionally require core.manage on com_j2store, since
+			//    the admin-only appTasks (e.g. changeSubscriptionStatus,
+			//    updateSubscriptionOrderItem*) only guard themselves with
+			//    isClient('administrator') and have no per-record ownership check of
+			//    their own
+			// Frontend appTasks that mutate data (e.g. cancelSubscription) already
+			// enforce their own per-record ownership check, and admin-only appTasks
+			// already refuse to run outside the backend client, so no further gate is
+			// needed here for an authenticated frontend user.
 			$user = JFactory::getUser();
-			if ($user->guest || !$user->authorise('core.manage', 'com_j2store'))
+			if ($user->guest)
+			{
+				throw new RuntimeException(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+			}
+			if ($app->isClient('administrator') && !$user->authorise('core.manage', 'com_j2store'))
 			{
 				throw new RuntimeException(JText::_('JERROR_ALERTNOAUTHOR'), 403);
 			}

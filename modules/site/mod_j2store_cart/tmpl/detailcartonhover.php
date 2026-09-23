@@ -81,7 +81,7 @@ $title = $params->get('cart_module_title', '');
 											<div class="item-product-details">
 												<?php if($params->get('show_cart_remove')):?>
 													<div class="access">
-														<a class="cart-remove text-error" href="<?php echo J2Store::platform()->getCartUrl(array('task' => 'remove','cartitem_id' => $item->cartitem_id)); ?>" > <i class="fa fa-remove"></i></a>
+														<a class="cart-remove text-error" href="<?php echo J2Store::platform()->getCartUrl(array('task' => 'remove', 'cartitem_id' => $item->cartitem_id, JSession::getFormToken() => '1')); ?>" > <i class="fa fa-remove"></i></a>
 													</div>
 												<?php endif;?>
 											</div>
