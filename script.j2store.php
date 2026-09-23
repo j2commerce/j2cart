@@ -898,6 +898,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
                         continue;
                     }
                     $check['upload_files'][] = $f;
+                    // Double-extension pattern used to disguise PHP as a safe type
                     if (preg_match('/\.(php\d*|phtml|phar)\./i', $f)) {
                         $check['suspicious_names'][] = $f;
                     }
@@ -950,8 +951,13 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
     /**
      * Derives a verdict string from a _checkForExploitation() result array.
      *
+     * Possible values:
+     *   'suspicious' – unexpected files found; manual review required
+     *   'clean'      – no evidence of exploitation
+     *   'unknown'    – could not query the database to determine
+     *
      * @param  array  $check
-     * @return string  'suspicious' | 'clean' | 'unknown'
+     * @return string
      */
     private function _getExploitationVerdict(array $check): string
     {
@@ -968,10 +974,12 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             return 'highly_suspicious';
         }
 
+        // Suspicious indicators even when a file option exists
         if (!empty($check['suspicious_names']) || !empty($check['invoices_unexpected'])) {
             return 'suspicious';
         }
 
+        // Legacy folder has files — could be old legitimate use or old attack
         if (!empty($check['legacy_files'])) {
             return 'suspicious';
         }
@@ -980,11 +988,20 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
     }
 
     /**
-     * Removes foreign files from the uploads directories and truncates
-     * #__j2store_uploads when exploitation is definitively confirmed.
+     * Removes foreign files from the uploads directories and truncates the
+     * #__j2store_uploads table when exploitation is definitively confirmed.
+     *
+     * Only protection files (.htaccess, web.config) are preserved. All other
+     * files in media/j2store/uploads/ and (if present) the legacy
+     * media/com_j2store/uploads/ path are deleted.
      *
      * @param  array  $check  Result array from _checkForExploitation()
-     * @return array
+     * @return array  {
+     *     removed_files:  string[]  — paths of successfully deleted files,
+     *     failed_files:   string[]  — paths that could not be deleted,
+     *     db_truncated:   bool      — whether #__j2store_uploads was truncated,
+     *     db_error:       string    — error message if truncation failed, '' otherwise
+     * }
      */
     private function _removeExploitationFiles(array $check): array
     {
@@ -997,6 +1014,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
 
         $protectionFiles = ['.', '..', '.htaccess', 'web.config'];
 
+        // Delete user files from media/j2store/uploads/
         $uploadsDir = JPATH_ROOT . '/media/j2store/uploads';
         if (is_dir($uploadsDir)) {
             foreach ((array) $check['upload_files'] as $filename) {
@@ -1012,6 +1030,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             }
         }
 
+        // Delete user files from the legacy media/com_j2store/uploads/ path
         $legacyDir = JPATH_ROOT . '/media/com_j2store/uploads';
         if (is_dir($legacyDir)) {
             foreach ((array) $check['legacy_files'] as $filename) {
@@ -1027,6 +1046,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             }
         }
 
+        // Truncate the uploads database table
         if ($check['db_table_exists'] && $check['db_upload_count'] > 0) {
             try {
                 $db = Factory::getDbo();
@@ -1038,6 +1058,134 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
         }
 
         return $result;
+    }
+    /**
+     * Outputs an HTML security check block that Joomla captures as the
+     * extension_message shown at the end of installation.
+     *
+     * @param  array       $check
+     * @param  string      $verdict
+     * @param  array|null  $cleanup
+     */
+    private function _renderSecurityCheck(array $check, string $verdict, ?array $cleanup): void
+    {
+        $styles = [
+            'hacked'           => 'background:#f8d7da;border:2px solid #f5c6cb;color:#721c24;',
+            'highly_suspicious'=> 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
+            'suspicious'       => 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
+            'clean'            => 'background:#d4edda;border:2px solid #c3e6cb;color:#155724;',
+            'unknown'          => 'background:#e2e3e5;border:2px solid #d6d8db;color:#383d41;',
+        ];
+        $style = $styles[$verdict] ?? $styles['unknown'];
+        ?>
+        <div style="margin-top:20px;padding:15px;border-radius:4px;<?php echo $style; ?>">
+            <h3 style="margin-top:0;">
+                <?php if ($verdict === 'hacked'): ?>&#x26A0; Security Alert: Exploitation Detected
+                <?php elseif ($verdict === 'highly_suspicious' || $verdict === 'suspicious'): ?>&#x26A0; Security Warning: Suspicious Files Found
+                <?php elseif ($verdict === 'clean'): ?>&#x2713; Security Check: No Exploitation Detected
+                <?php else: ?>Security Check: Could Not Determine Status
+                <?php endif; ?>
+            </h3>
+
+            <?php if ($verdict === 'hacked'): ?>
+                <p><strong>This site has been exploited.</strong> Files were uploaded through
+                    the unauthenticated upload endpoint fixed in this release, and no
+                    &ldquo;File&rdquo; type product option has ever been configured &mdash;
+                    meaning all uploads in the database and on disk are foreign.</p>
+
+                <?php if ($cleanup !== null): ?>
+                    <?php if (!empty($cleanup['removed_files'])): ?>
+                        <p><strong style="color:#155724;">&#x2713; <?php echo count($cleanup['removed_files']); ?> foreign file(s) were automatically removed:</strong><br>
+                            <code><?php echo htmlspecialchars(implode(', ', array_slice($cleanup['removed_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
+                                <?php echo count($cleanup['removed_files']) > 20 ? ' &hellip; and ' . (count($cleanup['removed_files']) - 20) . ' more' : ''; ?>
+                            </code>
+                        </p>
+                    <?php endif; ?>
+                    <?php if ($cleanup['db_truncated']): ?>
+                        <p><strong style="color:#155724;">&#x2713; The <code>#__j2store_uploads</code> database table was cleared.</strong></p>
+                    <?php endif; ?>
+                    <?php if (!empty($cleanup['failed_files'])): ?>
+                        <p><strong>&#x26A0; <?php echo count($cleanup['failed_files']); ?> file(s) could not be deleted (check directory permissions):</strong><br>
+                            <code><?php echo htmlspecialchars(implode(', ', $cleanup['failed_files']), ENT_QUOTES, 'UTF-8'); ?></code>
+                        </p>
+                    <?php endif; ?>
+                    <?php if ($cleanup['db_error'] !== ''): ?>
+                        <p><strong>&#x26A0; Database table could not be cleared:</strong>
+                            <code><?php echo htmlspecialchars($cleanup['db_error'], ENT_QUOTES, 'UTF-8'); ?></code>
+                        </p>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <?php if (!empty($check['legacy_files'])): ?>
+                    <p><strong>Additional action required:</strong> The legacy
+                        <code>media/com_j2store/uploads/</code> directory (J2Store v3 / early v4)
+                        also contained foreign files. Please remove them manually.</p>
+                <?php endif; ?>
+
+            <?php elseif ($verdict === 'highly_suspicious'): ?>
+                <p><strong>We found files in your uploads folder that may have been placed there by unauthorized users through a security issue that has now been fixed</strong>.<br>
+                    However, some J2Store add-ons also save files to this same folder during normal use, so we cannot safely remove them automatically without risking
+                    the removal of legitimate files.
+                    <strong>Please review the files listed below and delete any that you do not recognize or that do not belong to your store</strong>.</p>
+
+            <?php elseif ($verdict === 'suspicious'): ?>
+                <p><strong>Suspicious files were found.</strong> A &ldquo;File&rdquo; type
+                    product option is configured so some uploads may be legitimate, but the
+                    following items require manual review:</p>
+
+            <?php elseif ($verdict === 'clean'): ?>
+                <p>No evidence of exploitation was found. The upload folder contains no
+                    user files and the database uploads table is empty. This vulnerability
+                    was not exploited on this site prior to this update.</p>
+
+            <?php else: ?>
+                <p>The database could not be queried to determine whether this site
+                    was affected. Please review <code>media/j2store/uploads/</code> manually.</p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['upload_files'])): ?>
+                <p><strong><?php echo count($check['upload_files']); ?> file(s) in <code>media/j2store/uploads/</code>:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', array_slice($check['upload_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
+                        <?php echo count($check['upload_files']) > 20 ? ' &hellip; and ' . (count($check['upload_files']) - 20) . ' more' : ''; ?>
+                    </code>
+                </p>
+            <?php endif; ?>
+
+            <?php if ($check['db_upload_count'] > 0): ?>
+                <p><strong><?php echo $check['db_upload_count']; ?> record(s) in <code>#__j2store_uploads</code></strong> table.</p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['suspicious_names'])): ?>
+                <p><strong style="color:red;">&#x26A0; Suspicious filenames (double-extension pattern):</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', $check['suspicious_names']), ENT_QUOTES, 'UTF-8'); ?></code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['legacy_files'])): ?>
+                <p><strong><?php echo count($check['legacy_files']); ?> file(s) in legacy <code>media/com_j2store/uploads/</code>:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', array_slice($check['legacy_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
+                        <?php echo count($check['legacy_files']) > 20 ? ' &hellip; and ' . (count($check['legacy_files']) - 20) . ' more' : ''; ?>
+                    </code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['invoices_unexpected'])): ?>
+                <p><strong>Unexpected non-PDF file(s) in <code>media/j2store/invoices/</code>:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', $check['invoices_unexpected']), ENT_QUOTES, 'UTF-8'); ?></code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['protection_missing'])): ?>
+                <p><strong>&#x26A0; Missing directory protection files:</strong><br>
+                    <code><?php echo htmlspecialchars(implode(', ', $check['protection_missing']), ENT_QUOTES, 'UTF-8'); ?></code>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!empty($check['errors'])): ?>
+                <p><em>Check errors: <?php echo htmlspecialchars(implode('; ', $check['errors']), ENT_QUOTES, 'UTF-8'); ?></em></p>
+            <?php endif; ?>
+        </div>
+        <?php
     }
 
     // -------------------------------------------------------------------------
@@ -1291,7 +1439,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             }
         }
         ?>
-        <div style="margin-top:20px;padding:15px;border-radius:4px;background:#fff3cd;border:2px solid #ffc107;color:#856404;">
+        <div style="margin-top:20px;margin-bottom:20px;padding:15px;border-radius:4px;background:#fff3cd;border:2px solid #ffc107;color:#856404;">
             <h3 style="margin-top:0;">&#x26A0; Template Override Token protection</h3>
             <p>The following template override files appear to be missing token protection. <strong>These files must be updated manually.</strong><br>
                 Note: You may not find a place to insert the missing code if your overrides differ significantly from the original files, and you may not need to add it at all.
@@ -1331,7 +1479,7 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
             <?php endif; ?>
 
             <?php if (!empty($queryStringFiles)): ?>
-                <p><strong>In the following file(s), append <code>'&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1'</code> to the hardcoded order-placement AJAX query string:</strong></p>
+                <p><strong>In the following file(s), append <code>&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1</code> to the hardcoded order-placement AJAX query string:</strong></p>
                 <pre style="background:#f8f9fa;padding:8px;border-radius:3px;font-size:12px;overflow-x:auto;white-space: pre-wrap; word-wrap: break-word;">data: 'option=com_j2store&amp;view=checkout&amp;task=confirm&amp;&lt;?php echo JSession::getFormToken(); ?&gt;=1'</pre>
                 <ul>
                     <?php foreach ($queryStringFiles as $f): ?>
@@ -1362,135 +1510,6 @@ class Com_J2storeInstallerScript extends F0FUtilsInstallscript
 
             <p>After updating the override files, clear the Joomla cache, if enabled.</p>
             <p>Find those reminders in the J2Commerce dashboard.</p>
-        </div>
-        <?php
-    }
-
-    /**
-     * Outputs an HTML security check block that Joomla captures as the
-     * extension_message shown at the end of installation.
-     *
-     * @param  array       $check
-     * @param  string      $verdict
-     * @param  array|null  $cleanup
-     */
-    private function _renderSecurityCheck(array $check, string $verdict, ?array $cleanup): void
-    {
-        $styles = [
-            'hacked'           => 'background:#f8d7da;border:2px solid #f5c6cb;color:#721c24;',
-            'highly_suspicious'=> 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
-            'suspicious'       => 'background:#fff3cd;border:2px solid #ffc107;color:#856404;',
-            'clean'            => 'background:#d4edda;border:2px solid #c3e6cb;color:#155724;',
-            'unknown'          => 'background:#e2e3e5;border:2px solid #d6d8db;color:#383d41;',
-        ];
-        $style = $styles[$verdict] ?? $styles['unknown'];
-        ?>
-        <div style="margin-top:20px;padding:15px;border-radius:4px;<?php echo $style; ?>">
-            <h3 style="margin-top:0;">
-                <?php if ($verdict === 'hacked'): ?>&#x26A0; Security Alert: Exploitation Detected
-                <?php elseif ($verdict === 'highly_suspicious' || $verdict === 'suspicious'): ?>&#x26A0; Security Warning: Suspicious Files Found
-                <?php elseif ($verdict === 'clean'): ?>&#x2713; Security Check: No Exploitation Detected
-                <?php else: ?>Security Check: Could Not Determine Status
-                <?php endif; ?>
-            </h3>
-
-            <?php if ($verdict === 'hacked'): ?>
-                <p><strong>This site has been exploited.</strong> Files were uploaded through
-                the unauthenticated upload endpoint fixed in this release, and no
-                &ldquo;File&rdquo; type product option has ever been configured &mdash;
-                meaning all uploads in the database and on disk are foreign.</p>
-
-                <?php if ($cleanup !== null): ?>
-                    <?php if (!empty($cleanup['removed_files'])): ?>
-                        <p><strong style="color:#155724;">&#x2713; <?php echo count($cleanup['removed_files']); ?> foreign file(s) were automatically removed:</strong><br>
-                            <code><?php echo htmlspecialchars(implode(', ', array_slice($cleanup['removed_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
-                                <?php echo count($cleanup['removed_files']) > 20 ? ' &hellip; and ' . (count($cleanup['removed_files']) - 20) . ' more' : ''; ?>
-                            </code>
-                        </p>
-                    <?php endif; ?>
-                    <?php if ($cleanup['db_truncated']): ?>
-                        <p><strong style="color:#155724;">&#x2713; The <code>#__j2store_uploads</code> database table was cleared.</strong></p>
-                    <?php endif; ?>
-                    <?php if (!empty($cleanup['failed_files'])): ?>
-                        <p><strong>&#x26A0; <?php echo count($cleanup['failed_files']); ?> file(s) could not be deleted (check directory permissions):</strong><br>
-                            <code><?php echo htmlspecialchars(implode(', ', $cleanup['failed_files']), ENT_QUOTES, 'UTF-8'); ?></code>
-                        </p>
-                    <?php endif; ?>
-                    <?php if ($cleanup['db_error'] !== ''): ?>
-                        <p><strong>&#x26A0; Database table could not be cleared:</strong>
-                            <code><?php echo htmlspecialchars($cleanup['db_error'], ENT_QUOTES, 'UTF-8'); ?></code>
-                        </p>
-                    <?php endif; ?>
-                <?php endif; ?>
-
-                <?php if (!empty($check['legacy_files'])): ?>
-                    <p><strong>Additional action required:</strong> The legacy
-                    <code>media/com_j2store/uploads/</code> directory (J2Store v3 / early v4)
-                    also contained foreign files. Please remove them manually.</p>
-                <?php endif; ?>
-
-            <?php elseif ($verdict === 'highly_suspicious'): ?>
-                <p><strong>We found files in your uploads folder that may have been placed there by unauthorized users through a security issue that has now been fixed</strong>.<br>
-                    However, some J2Store add-ons also save files to this same folder during normal use, so we cannot safely remove them automatically without risking
-                    the removal of legitimate files.
-                <strong>Please review the files listed below and delete any that you do not recognize or that do not belong to your store</strong>.</p>
-
-            <?php elseif ($verdict === 'suspicious'): ?>
-                <p><strong>Suspicious files were found.</strong> A &ldquo;File&rdquo; type
-                product option is configured so some uploads may be legitimate, but the
-                following items require manual review:</p>
-
-            <?php elseif ($verdict === 'clean'): ?>
-                <p>No evidence of exploitation was found. The upload folder contains no
-                user files and the database uploads table is empty. This vulnerability
-                was not exploited on this site prior to this update.</p>
-
-            <?php else: ?>
-                <p>The database could not be queried to determine whether this site
-                was affected. Please review <code>media/j2store/uploads/</code> manually.</p>
-            <?php endif; ?>
-
-            <?php if (!empty($check['upload_files'])): ?>
-                <p><strong><?php echo count($check['upload_files']); ?> file(s) in <code>media/j2store/uploads/</code>:</strong><br>
-                    <code><?php echo htmlspecialchars(implode(', ', array_slice($check['upload_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
-                        <?php echo count($check['upload_files']) > 20 ? ' &hellip; and ' . (count($check['upload_files']) - 20) . ' more' : ''; ?>
-                    </code>
-                </p>
-            <?php endif; ?>
-
-            <?php if ($check['db_upload_count'] > 0): ?>
-                <p><strong><?php echo $check['db_upload_count']; ?> record(s) in <code>#__j2store_uploads</code></strong> table.</p>
-            <?php endif; ?>
-
-            <?php if (!empty($check['suspicious_names'])): ?>
-                <p><strong style="color:red;">&#x26A0; Suspicious filenames (double-extension pattern):</strong><br>
-                    <code><?php echo htmlspecialchars(implode(', ', $check['suspicious_names']), ENT_QUOTES, 'UTF-8'); ?></code>
-                </p>
-            <?php endif; ?>
-
-            <?php if (!empty($check['legacy_files'])): ?>
-                <p><strong><?php echo count($check['legacy_files']); ?> file(s) in legacy <code>media/com_j2store/uploads/</code>:</strong><br>
-                    <code><?php echo htmlspecialchars(implode(', ', array_slice($check['legacy_files'], 0, 20)), ENT_QUOTES, 'UTF-8'); ?>
-                        <?php echo count($check['legacy_files']) > 20 ? ' &hellip; and ' . (count($check['legacy_files']) - 20) . ' more' : ''; ?>
-                    </code>
-                </p>
-            <?php endif; ?>
-
-            <?php if (!empty($check['invoices_unexpected'])): ?>
-                <p><strong>Unexpected non-PDF file(s) in <code>media/j2store/invoices/</code>:</strong><br>
-                    <code><?php echo htmlspecialchars(implode(', ', $check['invoices_unexpected']), ENT_QUOTES, 'UTF-8'); ?></code>
-                </p>
-            <?php endif; ?>
-
-            <?php if (!empty($check['protection_missing'])): ?>
-                <p><strong>&#x26A0; Missing directory protection files:</strong><br>
-                    <code><?php echo htmlspecialchars(implode(', ', $check['protection_missing']), ENT_QUOTES, 'UTF-8'); ?></code>
-                </p>
-            <?php endif; ?>
-
-            <?php if (!empty($check['errors'])): ?>
-                <p><em>Check errors: <?php echo htmlspecialchars(implode('; ', $check['errors']), ENT_QUOTES, 'UTF-8'); ?></em></p>
-            <?php endif; ?>
         </div>
         <?php
     }
