@@ -408,6 +408,18 @@ class J2StoreRouterHelper
 	}
 
     public static function getProductCategory($id,$lang='') {
+        // Cached per request: findProductMenu() calls this once per product menu item
+        // for every product link, so the same product and article were reloaded many
+        // times on pages that build a lot of product links.
+        static $cache = array();
+        $key = $id . '|' . $lang;
+        if (!array_key_exists($key, $cache)) {
+            $cache[$key] = self::loadProductCategory($id, $lang);
+        }
+        return $cache[$key];
+    }
+
+    private static function loadProductCategory($id, $lang) {
 
         //first load the product to get the id.
         $product = F0FTable::getAnInstance('Product', 'J2StoreTable')->getClone();

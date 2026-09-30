@@ -3304,7 +3304,7 @@ class F0FTable extends F0FUtilsObject implements JTableInterface
 		settype($path, 'array');
 
 		// If we have new paths to add, do so.
-		if (!empty($path) && !in_array($path, self::$_includePaths))
+		if (!empty($path))
 		{
 			// Check and add each individual new path.
 			foreach ($path as $dir)
@@ -3313,7 +3313,12 @@ class F0FTable extends F0FUtilsObject implements JTableInterface
 				$dir = trim($dir);
 
 				// Add to the front of the list so that custom paths are searched first.
-				array_unshift(self::$_includePaths, $dir);
+				// De-duplicate per directory: $path is an array here, so comparing it
+				// against the list of strings never matched and every call re-added it.
+				if (!in_array($dir, self::$_includePaths, true))
+				{
+					array_unshift(self::$_includePaths, $dir);
+				}
 			}
 		}
 

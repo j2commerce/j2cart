@@ -18,7 +18,17 @@ class J2F0F extends \stdClass {
         return self::$instance;
     }
 
+    // Include paths only need registering once per request. F0F's own de-duplication
+    // does not catch every repeat, so repeated calls kept appending copies and every
+    // later file lookup had to scan the growing list.
+    private static $tablePathsLoaded = false;
+    private static $modelPathsLoaded = false;
+
     function loadTableFilePath(){
+        if (self::$tablePathsLoaded) {
+            return;
+        }
+        self::$tablePathsLoaded = true;
         F0FTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_j2store/tables');
         $paths = array();
         J2Store::plugin()->event('CustomTablePath',array(&$paths));
@@ -28,6 +38,10 @@ class J2F0F extends \stdClass {
     }
 
     function loadModelFilePath(){
+        if (self::$modelPathsLoaded) {
+            return;
+        }
+        self::$modelPathsLoaded = true;
         F0FModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_j2store/models');
         $paths = array();
         J2Store::plugin()->event('CustomModelPath',array(&$paths));

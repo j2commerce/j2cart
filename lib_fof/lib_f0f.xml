@@ -3,13 +3,13 @@
     <name>F0F for J2Commerce</name>
 	<libraryname>f0f</libraryname>
 	<description>Framework-on-Framework (FOF) version for J2Commerce - DO NOT REMOVE.</description>
-	<creationDate>APR 2026</creationDate>
+	<creationDate>SEP 2026</creationDate>
 	<author>Nicholas K. Dionysopoulos / Akeeba Ltd</author>
 	<authorEmail>nicholas@akeebabackup.com</authorEmail>
 	<authorUrl>https://www.akeebabackup.com</authorUrl>
 	<copyright>(C)2011-2014 Nicholas K. Dionysopoulos</copyright>
 	<license>GNU GPLv2 or later</license>
-	<version>revAC17963</version>
+	<version>revAC17964</version>
 	<packager>J2Commerce</packager>
 	<packagerurl>https://www.j2commerce.com</packagerurl>
 
