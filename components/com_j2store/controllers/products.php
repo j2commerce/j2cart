@@ -29,11 +29,21 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 	 * that ACL could edit/delete/create any product with a forged, tokenless
 	 * request. Only the tasks this controller actually implements for the
 	 * storefront are allowed through; everything else falls back to browse().
+	 *
+	 * 'edit' stays reachable because the J2Store Cart tab of the front-end article
+	 * editor (plugins/content/j2store/fields/j2store.php) dispatches task=edit to
+	 * render the product form. It only renders the form, onBeforeEdit() still applies
+	 * the product view's edit ACL (fof.xml), and the write tasks remain blocked. Without it the tab
+	 * fell back to browse() and rendered the full catalogue inside the editor.
 	 */
 	public function execute($task) {
-		$allowed = array('browse', 'view', 'compare', 'update', 'wishlist');
+		$allowed = array('browse', 'view', 'compare', 'update', 'wishlist', 'edit');
 		if (!in_array($task, $allowed)) {
 			$task = 'browse';
+		}
+		// edit only ever renders the product form layout.
+		if ($task === 'edit') {
+			$this->layout = 'form';
 		}
 		return parent::execute($task);
 	}
@@ -394,7 +404,13 @@ class J2StoreControllerProducts extends J2StoreControllerProductsBase
 			$task = $this->input->getString('task');
 			if($task=='edit'){
 				$view = $this->getThisView();
-				$this->form_prefix = $this->input->getString('form_prefix');
+				// The prefix is written into field names unescaped, so accept only the
+				// characters a form control name needs and fall back to the editor's prefix.
+				$form_prefix = $this->input->getString('form_prefix', '');
+				if (!preg_match('/^[A-Za-z0-9_\[\]]+\z/', $form_prefix)) {
+					$form_prefix = 'jform[attribs][j2store]';
+				}
+				$this->form_prefix = $form_prefix;
 				// Get/Create the model
 				if ($model = $this->getThisModel())
 				{
