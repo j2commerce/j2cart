@@ -13,6 +13,7 @@ namespace J2Commerce\Plugin\Finder\J2store\Extension;
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Access\Access;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Router\SiteRouter;
@@ -326,8 +327,9 @@ final class J2store extends Adapter
         $return = null;
 
         // Set variables
+        // CLI indexing (finder:index) has no identity; fall back to guest view levels.
         $user = Factory::getApplication()->getIdentity();
-        $groups = $user->getAuthorisedViewLevels();
+        $groups = $user ? $user->getAuthorisedViewLevels() : Access::getAuthorisedViewLevels(0);
 
         $db = $this->getDatabase();
 
@@ -514,6 +516,10 @@ final class J2store extends Adapter
         $query->select('u.name AS author');
         $query->select('m.*');
         $query->select('ad.company as brand');
+
+        // The indexer pages with LIMIT/OFFSET; without a stable order MySQL may
+        // return rows in a different order per batch, skipping or repeating items.
+        $query->order($db->quoteName('a.id') . ' ASC');
 
         return $query;
     }
