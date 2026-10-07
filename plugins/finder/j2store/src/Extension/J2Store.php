@@ -11,6 +11,7 @@
 
 namespace Joomla\Plugin\Finder\J2Store\Extension;
 
+use Joomla\CMS\Access\Access;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Event\Finder as FinderEvent;
 use Joomla\Component\Content\Site\Helper\RouteHelper;
@@ -476,16 +477,18 @@ final class J2Store extends Adapter implements SubscriberInterface
         $db     = $this->getDatabase();
 
         // Set variables
+        // CLI indexing (finder:index) has no identity; fall back to guest view levels.
         $user   = $this->getApplication()->getIdentity();
-        $groups = implode(',', $user->getAuthorisedViewLevels());
+        $groups = $user ? $user->getAuthorisedViewLevels() : Access::getAuthorisedViewLevels(0);
 
         // Build a query to get the menu params.
         $query = $db->createQuery()
             ->select($db->quoteName('params'))
             ->from($db->quoteName('#__menu'))
-            ->where($db->quoteName('link') . ' = ' . $db->quote($url))
+            ->where($db->quoteName('link') . ' = :url')
             ->where($db->quoteName('published') . ' = 1')
-            ->where($db->quoteName('access') . ' IN (' . $groups . ')');
+            ->whereIn($db->quoteName('access'), $groups)
+            ->bind(':url', $url, ParameterType::STRING);
 
         // Get the menu params from the database.
         $db->setQuery($query);
@@ -732,6 +735,10 @@ final class J2Store extends Adapter implements SubscriberInterface
             'LEFT',
             '#__j2store_productimages AS img ON img.product_id = p.j2store_product_id'
         );
+
+        // The indexer pages with LIMIT/OFFSET; without a stable order MySQL may
+        // return rows in a different order per batch, skipping or repeating items.
+        $query->order($db->quoteName('a.id') . ' ASC');
 
         return $query;
     }
