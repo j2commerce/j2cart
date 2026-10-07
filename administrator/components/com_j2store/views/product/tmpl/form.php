@@ -49,7 +49,7 @@ $wa->addInlineStyle($style, [], []);
             }
             else {
                 let msg = [];
-                msg.push('');
+                msg.push(<?php echo json_encode($alert_html, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>);
                 document.getElementById('system-message-container').innerHTML = msg.join('\n');
             }
         }else{
@@ -59,7 +59,7 @@ $wa->addInlineStyle($style, [], []);
             }
             else {
                 let msg = [];
-                msg.push('');
+                msg.push(<?php echo json_encode($alert_html, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>);
                 document.getElementById('system-message-container').innerHTML = msg.join('\n');
             }
         }
