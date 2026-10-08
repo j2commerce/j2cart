@@ -22,28 +22,6 @@ class J2StoreControllerApps extends F0FController
 		// Try lo load the report plugin controller (if any)
 		if ( $task  == "view" && $appTask != '' )
 		{
-			// FOF's per-task ACL in fof.xml does not cover delegated appTask calls, so we
-			// enforce authorization here explicitly:
-			//  - always require an authenticated user (blocks anonymous appTask calls)
-			//  - in the backend, additionally require core.manage on com_j2store, since
-			//    the admin-only appTasks (e.g. changeSubscriptionStatus,
-			//    updateSubscriptionOrderItem*) only guard themselves with
-			//    isClient('administrator') and have no per-record ownership check of
-			//    their own
-			// Frontend appTasks that mutate data (e.g. cancelSubscription) already
-			// enforce their own per-record ownership check, and admin-only appTasks
-			// already refuse to run outside the backend client, so no further gate is
-			// needed here for an authenticated frontend user.
-			$user = JFactory::getUser();
-			if ($user->guest)
-			{
-				throw new RuntimeException(JText::_('JERROR_ALERTNOAUTHOR'), 403);
-			}
-			if ($app->isClient('administrator') && !$user->authorise('core.manage', 'com_j2store'))
-			{
-				throw new RuntimeException(JText::_('JERROR_ALERTNOAUTHOR'), 403);
-			}
-
 			$model = $this->getModel('Apps');
 
 			$id = $app->input->getInt('id', '0');
@@ -58,6 +36,40 @@ class J2StoreControllerApps extends F0FController
 			$row = $model->getTable();
 			$row->load( (int) $model->getId() );
 			$element = $row->element;
+
+			// FOF's per-task ACL in fof.xml does not cover delegated appTask calls, so we
+			// enforce authorization here explicitly:
+			//  - always require an authenticated user (blocks anonymous appTask calls)
+			//  - in the backend, additionally require core.manage on com_j2store, since
+			//    the admin-only appTasks (e.g. changeSubscriptionStatus,
+			//    updateSubscriptionOrderItem*) only guard themselves with
+			//    isClient('administrator') and have no per-record ownership check of
+			//    their own
+			// Frontend appTasks that mutate data (e.g. cancelSubscription) already
+			// enforce their own per-record ownership check, and admin-only appTasks
+			// already refuse to run outside the backend client, so no further gate is
+			// needed here for an authenticated frontend user.
+			// A small allow-list, keyed on plugin element AND exact appTask name, exempts
+			// read-only frontend render tasks (e.g. app_newline's product tab layouts)
+			// from the guest check so logged-out shoppers can load them; every other
+			// appTask -- on this plugin or any other -- still requires authentication.
+			$publicFrontendAppTasks = array(
+				'app_newline' => array('loadJ2StoreLayout'),
+			);
+
+			$isPublicFrontendAppTask = !$app->isClient('administrator')
+				&& isset($publicFrontendAppTasks[$element])
+				&& in_array($appTask, $publicFrontendAppTasks[$element], true);
+
+			$user = JFactory::getUser();
+			if ($user->guest && !$isPublicFrontendAppTask)
+			{
+				throw new RuntimeException(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+			}
+			if ($app->isClient('administrator') && !$user->authorise('core.manage', 'com_j2store'))
+			{
+				throw new RuntimeException(JText::_('JERROR_ALERTNOAUTHOR'), 403);
+			}
 
 			// The name of the App Controller should be the same of the $_element name,
 			// without the tool_ prefix and with the first letter Uppercase, and should
