@@ -8,6 +8,25 @@
 // No direct access
 defined('_JEXEC') or die;
 require_once (JPATH_ADMINISTRATOR.'/components/com_j2store/helpers/strapper.php');
+
+if (!class_exists('J2StoreFrontendTemplatePlatform')) {
+	/**
+	 * The item/adminitem product templates (and all their sub-templates: cart,
+	 * sku, price, stock, options, ...) only exist under the site (frontend)
+	 * component folder. F0FView::loadTemplate() picks "admin:" vs "site:" for
+	 * every single template/sub-template lookup based solely on
+	 * F0FPlatform::isBackend(), with no per-call override, so rendering this
+	 * product block from an admin request (e.g. the "add item to order"
+	 * popup) can never find any of them - see J2StoreTableProduct::get_html().
+	 * This decorator briefly makes F0F believe it's on the frontend so that
+	 * every nested loadTemplate() call during that render resolves correctly.
+	 */
+	class J2StoreFrontendTemplatePlatform extends F0FIntegrationJoomlaPlatform {
+		public function isBackend() { return false; }
+		public function isFrontend() { return true; }
+	}
+}
+
 class J2StoreTableProduct extends F0FTable
 {
 
@@ -280,7 +299,21 @@ class J2StoreTableProduct extends F0FTable
 
 			J2Store::plugin ()->event ( 'ViewItemProduct' , array(&$product,&$view) );
 			ob_start();
-			$view->display();
+			// Bypass $view->display() (and the admin edit-form onAdd()/onRead() it would
+			// trigger on this view class) and render the frontend template directly - see
+			// J2StoreFrontendTemplatePlatform above for why the platform swap is needed too:
+			// it covers the nested loadTemplate() calls this template makes internally
+			// (cart/sku/price/stock/options/...), which this explicit call alone does not.
+			$originalPlatform = F0FPlatform::getInstance();
+			F0FPlatform::forceInstance(new J2StoreFrontendTemplatePlatform());
+			try {
+				$templateResult = $view->loadAnyTemplate('site:com_j2store/product/' . $view->getLayout());
+				if (!($templateResult instanceof Exception)) {
+					echo $templateResult;
+				}
+			} finally {
+				F0FPlatform::forceInstance($originalPlatform);
+			}
 			$html .= ob_get_contents();
 			ob_end_clean();
 			$html .= J2Store::plugin ()->eventWithHtml ( 'AfterRenderingProductHtml' , array($this) );
