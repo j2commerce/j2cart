@@ -18,7 +18,7 @@ $document =JFactory::getDocument();
 
 $document->addScript(JUri::root(true).'/media/j2store/js/jquery-ui-timepicker-addon.js');
 //JHTML::_('behavior.modal');
-$add_product_link = $route."?option=com_j2store&view=products&task=displayAdminProduct&tmpl=component&user_id=".$this->order->user_id."&oid=".$this->order->j2store_order_id."&product_id=";
+$add_product_link = "index.php?option=com_j2store&view=products&task=displayAdminProduct&tmpl=component&user_id=".$this->order->user_id."&oid=".$this->order->j2store_order_id."&product_id=";
 $item_url = "index.php?option=com_j2store&view=orders&task=saveAdminOrder&layout=items&next_layout=items&oid=".$this->order->j2store_order_id;
 $row_class = 'row';
 $col_class = 'col-md-';
