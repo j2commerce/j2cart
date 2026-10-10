@@ -5,6 +5,9 @@
  * @license GNU GPL v3 or later
  */
 /** ensure this file is being included by a parent file */
+
+use Joomla\CMS\Access\Access;
+
 defined('_JEXEC') or die('Restricted access');
 
 require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php';
@@ -328,8 +331,9 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		$return = null;
 
 		// Set variables
+        // CLI indexing (finder:index) has no identity; fall back to guest view levels.
 		$user = JFactory::getUser();
-		$groups = implode(',', $user->getAuthorisedViewLevels());
+		$groups = $user ? $user->getAuthorisedViewLevels() : Access::getAuthorisedViewLevels(0);
 
 		// Build a query to get the menu params.
 		$query = $this->db->getQuery(true)
@@ -337,7 +341,7 @@ class PlgFinderJ2Store extends FinderIndexerAdapter
 		->from($this->db->quoteName('#__menu'))
 		->where($this->db->quoteName('link') . ' = ' . $this->db->quote($url))
 		->where($this->db->quoteName('published') . ' = 1')
-		->where($this->db->quoteName('access') . ' IN (' . $groups . ')');
+		->where($this->db->quoteName('access') . ' IN (' . implode(',', $groups) . ')');
 
 		// Get the menu params from the database.
 		$this->db->setQuery($query);
