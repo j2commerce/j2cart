@@ -741,7 +741,7 @@ class J2Product extends CMSObject
 				default:
 					// Quantity as Textbox
 					$text .= '<div class="product-qty">';
-					$text .= '<input type="number" name="'.$name.'" value="'. $value .'" class="'.$class.'" min="0" step="1" aria-label="' . JText::_('COM_J2STORE_QUANTITY') . '" />' ;
+					$text .= '<input type="number" name="'.$name.'" value="'. $value .'" class="'.$class.'" min="0" step="1" aria-label="' . htmlspecialchars(JText::_('J2STORE_CART_LINE_ITEM_QUANTITY'), ENT_QUOTES) . '" />' ;
 					$text .= '</div>';
 					break;
 			}
