@@ -460,32 +460,40 @@ class J2Product extends CMSObject
 		return $default;
 	}
 
-	public function validateFlexivariants($variants,$options){
-        $traits = array();
-        foreach ( $options as $option)
-        {
-
-            if ( $option['optionvalue'])
-            {
-                $attributes = array( );
-                foreach ( $option['optionvalue'] as $pkey=>$pov )
-                {
-                    $attributes[] = $pov['product_optionvalue_id'];
-                }
-                $traits[] = $attributes;
-            }
-
-        }
-
-        $csvarray = F0FModel::getTmpInstance('Products', 'J2StoreModel')->getCombinations($traits);
-
-        foreach ($variants as $variant){
-            if(!in_array($variant->variant_name,$csvarray)){
-                return false;
-            }
-        }
-        return true;
-    }
+	public function validateFlexivariants($variants, $options){
+	    $traits = array();
+	    foreach ($options as $option) {
+	        if ($option['optionvalue']) {
+	            $attributes = array();
+	            foreach ($option['optionvalue'] as $pov) {
+	                $attributes[(string) $pov['product_optionvalue_id']] = true;
+	            }
+	            $traits[] = $attributes;
+	        }
+	    }
+	
+	    $trait_count = count($traits);
+	
+	    foreach ($variants as $variant) {
+	        $variant_name = (string) $variant->variant_name;
+	        if ($trait_count === 0) {
+	            if ($variant_name !== '') {
+	                return false;
+	            }
+	            continue;
+	        }
+	        $ids = explode(',', $variant_name);
+	        if (count($ids) !== $trait_count) {
+	            return false;
+	        }
+	        foreach ($ids as $position => $id) {
+	            if (!isset($traits[$position][$id])) {
+	                return false;
+	            }
+	        }
+	    }
+	    return true;
+	}
 
 	public function validateVariants($variants, $options) {
 
